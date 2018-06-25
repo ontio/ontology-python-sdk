@@ -28,7 +28,9 @@ def calculate_hex(s):
             num.append(ord(s[i]) - ord('A') + 10)
     return num[0] << 4 | num[1]
 
+import datetime
 
 if __name__ == '__main__':
-    if type("123")==int:
-        print('good')
+    t=bytes([0])
+    t=bytes([1])
+    print(t)

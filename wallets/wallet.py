@@ -1,10 +1,11 @@
+# TODO: rewrite wallet function
 class OntWallet(object):
-    def __init__(self):
-        self.crypt_scheme=''
-        self.wallet=self.ClientImpl()
+    def __init__(self, crypt_scheme, wallet_client):
+        self.crypt_scheme = crypt_scheme
+        self.wallet = wallet_client  # ClientImpl()
 
-    class ClientImpl(object):
-        def __init__(self):
-            path='1234'
+    def set_crypt_scheme(self, crypt_scheme):
+        self.crypt_scheme = crypt_scheme
 
-
+    def get_default_account(self):
+        return self.wallet
