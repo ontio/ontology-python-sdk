@@ -1,4 +1,6 @@
 import datetime
+import json
+from utils import util
 
 
 class AccountData(object):
@@ -31,6 +33,11 @@ class WalletData(object):
         self.identities = []  # Identity list
         self.accounts = []  # AccountData list
         self.extra = ''
+
+    def load(self, wallet_path):
+        with open(wallet_path, 'r') as content_file:
+            content = content_file.read()
+        return json.loads(content)
 
 
 class ProtectedKey(object):
@@ -80,14 +87,26 @@ class UnlockAccountInfo(object):
 
 
 class ClientImpl(object):
-    def __init__(self):
-        self.path = ''
+    def __init__(self, wallet_path):
+        self.wallet_path = wallet_path
         self.account_address = {}  # map[string]*AccountData
         self.account_label = {}  # map[string]*AccountData
         self.default_account = AccountData()
         self.wallet_data = WalletData()
         self.unlock_account = {}  # map[string]*UnlockAccountInfo()
         self.lock = RWMutex()
+        self.set_value()
 
-def open():
-    pass
+    def load(self):
+        # TODO
+        self.wallet_data.load(self.wallet_path)  # how to use data
+        # for loop
+
+    def set_value(self):
+        if util.is_file_exist(self.wallet_data):
+            self.load()
+
+
+def open(wallet_path):
+    new_client_impl = ClientImpl(wallet_path)
+    return new_client_impl

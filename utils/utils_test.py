@@ -31,6 +31,7 @@ def calculate_hex(s):
 import datetime
 
 if __name__ == '__main__':
-    t=bytes([0])
-    t=bytes([1])
-    print(t)
+    path='/home/kriszhao/PycharmProjects/ontology-python-sdk/ont_sdk.py'
+    with open(path, 'r') as content_file:
+        content = content_file.read()
+    print(content)
