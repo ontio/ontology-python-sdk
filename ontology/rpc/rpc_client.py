@@ -131,18 +131,20 @@ class RpcClient(object):
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
         pass
 
-    def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
-        # todo
-        contract_address = util.get_asset_address(asset)
+    def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr: str, to_addr: str, amount):
+        contract_address = util.get_asset_address(asset)  # []bytes
         print(contract_address)
         state = {"from": from_addr, "to": to_addr, "amount": amount}
         invoke_code = self.build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
         unix_timenow = int(time())
         transction = {"gas_price": gas_price, "gas_limit": gas_limit, "tx_type": 0xd1, "Nonce": unix_timenow,
-                      "Payload": "", "Sigs": ""}
+                      "Payload": invoke_code, "Sigs": []}
         return transction
 
     def build_native_invoke_code(self, contractAddress, cversion, method, params):
+        self.build_neo_vm_param(params)
+
+    def build_neo_vm_param(self, param):
         pass
 
     def sign_to_transaction(self):

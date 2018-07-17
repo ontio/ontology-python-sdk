@@ -113,6 +113,20 @@ def bytes_reverse(data: bytearray) -> bytearray:
     return data
 
 
+def put_uint16(b: bytearray, v):
+    b[0] = v
+    b[1] = v >> 8
+    return b
+
+
+def put_uint32(b: bytearray, v):
+    b[0] = v
+    b[1] = v >> 8
+    b[2] = v >> 16
+    b[3] = v >> 24
+    return b
+
+
 def print_byte_array(byte_array):
     for i in range(len(byte_array)):
         print(byte_array[i], end=' ')
@@ -124,3 +138,13 @@ def print_byte_content(byte_array):
         print(chr(byte_array[i]), end='')
 
 
+def add_comma(l):
+    res = "["
+    for i in l:
+        if i == "[" or i == "]":
+            continue
+        elif i == " ":
+            res += ", "
+        else:
+            res += i
+    return res + ']'
