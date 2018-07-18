@@ -1,4 +1,9 @@
 from ontology.utils import util
+from functools import singledispatch
+from binascii import a2b_hex
+from ontology.vm.neo_vm.params_builder import ParamsBuilder
+from ontology.vm.neo_vm.OP_code import CHECKSIG
+from ontology.crypto.Digest import Digest
 
 ADDR_LEN = 20  # the size of address should be 20 bytes
 
@@ -36,13 +41,6 @@ auth_contract_address = address_parse_from_bytes(bytearray(
 governance_contract_address = address_parse_from_bytes(bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      0x07]))
-
-from functools import singledispatch
-from binascii import a2b_hex
-
-from Core.scripts.ParamsBuilder import ParamsBuilder
-from Core.scripts.OpCode import CHECKSIG
-from Crypto.Digest import Digest
 
 
 class Address(object):

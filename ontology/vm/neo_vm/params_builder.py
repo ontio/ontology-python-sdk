@@ -1,6 +1,6 @@
 from ontology.vm.neo_vm.OP_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
     PUSHBYTES75, APPCALL, TAILCALL, SYSCALL
-from ontology.utils import util
+from ontology.common.serialize import put_uint16, put_uint32
 
 
 class ParamsBuilder:
@@ -33,12 +33,12 @@ class ParamsBuilder:
             self.emit(PUSHDATA2)
             self.write_byte(bytearray([l]))
             b = bytearray(2)
-            b = util.put_uint16(b, l)
+            b = put_uint16(b, l)
             self.write_byte(b)
         else:
             self.emit(PUSHDATA4)
             b = bytearray(4)
-            b = util.put_uint32(b, l)
+            b = put_uint32(b, l)
             self.write_byte(b)
         self.write_byte(data)
 

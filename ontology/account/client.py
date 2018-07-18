@@ -10,14 +10,13 @@ from ontology.crypto.SignatureHandler import SignatureHandler
 from ontology.crypto.Signature import Signature
 from ontology.common.address import Address
 
-
 class Account(object):
-    def __init__(self, private_key, key_type, signature_scheme):
+    def __init__(self, private_key, key_type):
         self.__keyType = key_type
         self.__privateKey = private_key
         self.__curve_name = Curve.P256
         self.__publicKey = Signature.ec_get_pubkey_by_prikey(private_key, self.__curve_name)
-        self.__addressU160 = Address.address_from_hexstr_pubkey()
+        self.__address = Address.address_from_hexstr_pubkey(self.__publicKey)
 
     def generateSignature(self, msg, signature_scheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:
@@ -27,6 +26,12 @@ class Account(object):
         else:
             raise TypeError
         return byte_signature
+
+    def get_address(self):
+        return self.__address
+
+    def get_public_key(self):
+        return self.__publicKey
 
 
 class AccountData(object):

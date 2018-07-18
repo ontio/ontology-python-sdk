@@ -11,11 +11,32 @@ class Transaction(object):
         self.sigs = sigs  # Sig class array
         self.hash = hash  # [32]byte
 
+    def serialize_unsigned(self):
+        pass
+
+    def serialize(self):
+        pass
+
+    def hash(self):
+        pass
+
+        '''
+        if tx.hash == nil {
+                buf := bytes.Buffer{}
+                tx.SerializeUnsigned(&buf)
+        
+                temp := sha256.Sum256(buf.Bytes())
+                f := common.Uint256(sha256.Sum256(temp[:]))
+                tx.hash = &f
+            }
+            return *tx.hash
+        '''
 
 class Sig(object):
-    sig_data = []  # [][]byte
-    public_keys = []  # a list to save public keys
-    M = 0
+    def __init__(self, public_keys, M, sig_data):
+        self.public_keys = []  # a list to save public keys
+        self.M = 0
+        self.sig_data = []  # [][]byte
 
 
 def transaction_from_hex_string(raw_tx: str):

@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import utils
 from cryptography.hazmat.primitives import hashes
-
-from crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.SignatureScheme import SignatureScheme
 
 
 class SignatureHandler(object):

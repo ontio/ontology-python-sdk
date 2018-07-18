@@ -4,7 +4,9 @@ import json
 from time import time
 from ontology.utils import util
 from ontology.vm.neo_vm import build_neo_vm
-from ontology.core.transaction import Transaction
+from ontology.core.transaction import Transaction, Sig
+from ontology.account.client import Account
+from ontology.crypto.KeyType import KeyType
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -131,30 +133,55 @@ class RpcClient(object):
         return res
 
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
-        pass
+        tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address(), to_addr, amount)
+        tx=self.sign_to_transaction(tx, from_account)
 
     def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
         contract_address = util.get_asset_address(asset)  # []bytes
         state = [{"from": from_addr, "to": to_addr, "amount": amount}]
         invoke_code = build_neo_vm.build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
         unix_timenow = int(time())
-        transction = {"gas_price": gas_price, "gas_limit": gas_limit, "tx_type": 0xd1, "Nonce": unix_timenow,
-                      "Payload": invoke_code, "Sigs": []}
+        return Transaction(bytes([0]), 0xd1, unix_timenow, gas_price, gas_limit, bytearray(), invoke_code, bytearray(),
+                           [], bytearray())
 
-        return transction
+    def sign_to_transaction(self, tx, signer: Account):
+        tx.payer = signer.get_address()
+        tx_hash = tx.hash()
+        sig_data = self.sign_to_data(tx_hash, signer)
+        sig = Sig(signer.get_public_key(), 1, sig_data)
+        tx.sigs = sig
+        return tx
 
-    def sign_to_transaction(self):
+    def sign_to_data(self, data, signer):
         pass
+
+        '''
+        s, err := sig.Sign(signer.SigScheme, signer.PrivateKey, data, nil)
+        if err != nil {
+            return nil, err
+        }
+        sigData, err := sig.Serialize(s)
+        if err != nil {
+            return nil, fmt.Errorf("sig.Serialize error:%s", err)
+        }
+        return sigData, nil
+    }
+        '''
 
     def send_raw_transaction(self):
         pass
 
 
-cli = RpcClient()
-from_addr = bytearray(
-    [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191])
-to_addr = bytearray(
-    [133, 121, 185, 144, 156, 79, 58, 123, 214, 186, 172, 168, 89, 189, 199, 202, 42, 40, 22, 207])
+if __name__ == '__main__':
+    cli = RpcClient()
+    from_addr = bytearray(
+        [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191])
+    to_addr = bytearray(
+        [133, 121, 185, 144, 156, 79, 58, 123, 214, 186, 172, 168, 89, 189, 199, 202, 42, 40, 22, 207])
+    res = cli.new_transfer_transaction(0, 0, "ont", from_addr, to_addr, 0)
 
-res = cli.new_transfer_transaction(0, 0, "ont", from_addr, to_addr, 0)
-print(res)
+    private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
+    #private_key=0x15746f42ec429ce1c20647e92154599b644a00644649f03868a2a5962bd2f9de
+    #private_key=bytearray.fromhex(private_key)
+    acc = Account(private_key, KeyType.ECDSA)
+    #cli.transfer(0, 0, "ont", acc, to_addr, 1)

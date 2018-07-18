@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-
 import binascii
-
 from ecdsa import SECP256k1, SigningKey
-
-from crypto.Curve import Curve
-from crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.Curve import Curve
+from ontology.crypto.SignatureScheme import SignatureScheme
 
 
 class Signature(object):
