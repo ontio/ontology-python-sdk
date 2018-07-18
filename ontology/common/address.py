@@ -1,6 +1,4 @@
 from ontology.utils import util
-from functools import singledispatch
-from binascii import a2b_hex
 from ontology.vm.neo_vm.params_builder import ParamsBuilder
 from ontology.vm.neo_vm.OP_code import CHECKSIG
 from ontology.crypto.Digest import Digest
@@ -64,7 +62,7 @@ class Address(object):
         return addr
 
     @staticmethod
-    def address_from_hexstr_pubkey(public_key: str):
+    def address_from_hexstr_pubkey(public_key):
         return Address.address_from_bytes_pubkey((public_key))
 
     def to_base58(self):
@@ -72,3 +70,11 @@ class Address(object):
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
         return base58.b58encode(bytes(outb))
+
+
+if __name__ == '__main__':
+    addr = Address(bytearray(
+        [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191]))
+    res = addr.to_base58()
+    print(res)
+
