@@ -25,7 +25,7 @@ class Digest(object):
 
     @staticmethod
     def sha256(byte_msg, offset=0, length=0, is_hex=False):
-        if offset != 0 and length(byte_msg) > offset + length:
+        if offset != 0 and len(byte_msg) > offset + length:
             byte_msg = byte_msg[offset:offset + length]
         return Digest.__sha256(byte_msg, is_hex)
 

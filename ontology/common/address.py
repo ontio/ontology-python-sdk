@@ -1,9 +1,8 @@
 from ontology.utils import util
-from functools import singledispatch
-from binascii import a2b_hex
 from ontology.vm.neo_vm.params_builder import ParamsBuilder
 from ontology.vm.neo_vm.OP_code import CHECKSIG
 from ontology.crypto.Digest import Digest
+import base58
 
 ADDR_LEN = 20  # the size of address should be 20 bytes
 
@@ -45,7 +44,7 @@ governance_contract_address = address_parse_from_bytes(bytearray(
 
 class Address(object):
     __zero_size = 20
-    __COIN_VERSION = b'0x17'
+    __COIN_VERSION = b'\x17'
 
     def __init__(self, value):
         self.ZERO = value
@@ -63,5 +62,20 @@ class Address(object):
         return addr
 
     @staticmethod
-    def address_from_hexstr_pubkey(public_key: str):
-        return Address.address_from_bytes_pubkey(a2b_hex(public_key))
+    def address_from_hexstr_pubkey(public_key):
+        return Address.address_from_bytes_pubkey(public_key)
+
+    def to_base58(self):
+        data = bytearray()
+        data += Address.__COIN_VERSION
+        data += self.ZERO
+        check_sum = Digest.hash256(data)
+        data += check_sum[0:4]
+        return base58.b58encode(bytes(data))
+
+
+if __name__ == '__main__':
+    addr = Address(bytearray(
+        [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191]))
+    res = addr.to_base58()
+    print(res)
