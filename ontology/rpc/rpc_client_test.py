@@ -100,5 +100,6 @@ def test_new_transfer_transaction():
     print(res)
 
 
-test_new_transfer_transaction()
-
+s = "transfer"
+print(s.encode())
+util.print_byte_array(s.encode())

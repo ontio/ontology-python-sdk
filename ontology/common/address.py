@@ -36,3 +36,34 @@ auth_contract_address = address_parse_from_bytes(bytearray(
 governance_contract_address = address_parse_from_bytes(bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      0x07]))
+
+from functools import singledispatch
+from binascii import a2b_hex
+
+from Core.scripts.ParamsBuilder import ParamsBuilder
+from Core.scripts.OpCode import CHECKSIG
+from Crypto.Digest import Digest
+
+
+class Address(object):
+    __zero_size = 20
+    __COIN_VERSION = b'0x17'
+
+    def __init__(self, value):
+        self.ZERO = value
+
+    @staticmethod
+    def toScriptHash(byte_script):
+        return Digest.hash160(byte_msg=byte_script, is_hex=True)
+
+    @staticmethod
+    def address_from_bytes_pubkey(public_key: bytes):
+        builder = ParamsBuilder()
+        builder.emit_push_byte_array(bytearray(public_key))
+        builder.emit(CHECKSIG)
+        addr = Address(Address.toScriptHash(builder.get_builder()))
+        return addr
+
+    @staticmethod
+    def address_from_hexstr_pubkey(public_key: str):
+        return Address.address_from_bytes_pubkey(a2b_hex(public_key))

@@ -2,6 +2,32 @@ import datetime
 import json
 from ontology.utils import util
 
+# -*- coding: utf-8 -*-
+
+from ontology.crypto.Curve import Curve
+from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.SignatureHandler import SignatureHandler
+from ontology.crypto.Signature import Signature
+from ontology.common.address import Address
+
+
+class Account(object):
+    def __init__(self, private_key, key_type, signature_scheme):
+        self.__keyType = key_type
+        self.__privateKey = private_key
+        self.__curve_name = Curve.P256
+        self.__publicKey = Signature.ec_get_pubkey_by_prikey(private_key, self.__curve_name)
+        self.__addressU160 = Address.address_from_hexstr_pubkey()
+
+    def generateSignature(self, msg, signature_scheme):
+        if signature_scheme == SignatureScheme.SHA256withECDSA:
+            handler = SignatureHandler(self.__keyType, signature_scheme)
+            signature_value = handler.generateSignature(self.__privateKey, msg)
+            byte_signature = Signature(signature_scheme, signature_value).to_byte()
+        else:
+            raise TypeError
+        return byte_signature
+
 
 class AccountData(object):
     def __init__(self):
@@ -13,16 +39,7 @@ class AccountData(object):
         self.lock = False
 
 
-class Account(object):
-    def __init__(self):
-        self.private_key = ''
-        self.public_key = ''
-        self.address = bytearray()
-        self.sig_scheme = bytes()
 
-    # get private key and then return public key
-    def public(self):
-        pass
 
 
 class WalletData(object):

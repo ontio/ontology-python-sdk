@@ -3,6 +3,8 @@ from ontology.rpc.define import *
 import json
 from time import time
 from ontology.utils import util
+from ontology.vm.neo_vm import build_neo_vm
+from ontology.core.transaction import Transaction
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -131,24 +133,28 @@ class RpcClient(object):
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
         pass
 
-    def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr: str, to_addr: str, amount):
+    def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
         contract_address = util.get_asset_address(asset)  # []bytes
-        print(contract_address)
-        state = {"from": from_addr, "to": to_addr, "amount": amount}
-        invoke_code = self.build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
+        state = [{"from": from_addr, "to": to_addr, "amount": amount}]
+        invoke_code = build_neo_vm.build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
         unix_timenow = int(time())
         transction = {"gas_price": gas_price, "gas_limit": gas_limit, "tx_type": 0xd1, "Nonce": unix_timenow,
                       "Payload": invoke_code, "Sigs": []}
+
         return transction
-
-    def build_native_invoke_code(self, contractAddress, cversion, method, params):
-        self.build_neo_vm_param(params)
-
-    def build_neo_vm_param(self, param):
-        pass
 
     def sign_to_transaction(self):
         pass
 
     def send_raw_transaction(self):
         pass
+
+
+cli = RpcClient()
+from_addr = bytearray(
+    [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191])
+to_addr = bytearray(
+    [133, 121, 185, 144, 156, 79, 58, 123, 214, 186, 172, 168, 89, 189, 199, 202, 42, 40, 22, 207])
+
+res = cli.new_transfer_transaction(0, 0, "ont", from_addr, to_addr, 0)
+print(res)

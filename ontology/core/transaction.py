@@ -1,15 +1,15 @@
 class Transaction(object):
-    def __init__(self):
-        self.version = bytes()
-        self.tx_type = bytes()
-        self.nonce = 0
-        self.gas_price = 0
-        self.gas_limit = 0
-        self.payer = bytes()  # common.address [20]bytes
-        self.payload = ''  # todo
-        self.attributes = bytes()
-        self.sigs = []  # Sig class array
-        self.hash = bytearray()  # [32]byte
+    def __init__(self, version, tx_type, nonce, gas_price, gas_limit, payer, payload, attributes, sigs, hash):
+        self.version = version
+        self.tx_type = tx_type
+        self.nonce = nonce
+        self.gas_price = gas_price
+        self.gas_limit = gas_limit
+        self.payer = payer  # common.address [20]bytes
+        self.payload = payload
+        self.attributes = attributes
+        self.sigs = sigs  # Sig class array
+        self.hash = hash  # [32]byte
 
 
 class Sig(object):
@@ -20,4 +20,3 @@ class Sig(object):
 
 def transaction_from_hex_string(raw_tx: str):
     pass  # TODO
-

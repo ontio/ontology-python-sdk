@@ -22,16 +22,16 @@ class ParamsBuilder:
             return self.emit(int.from_bytes(PUSH1, 'little') - 1 + num)
         return self.emit(num)
 
-    def emit_push_byte_array(self, data: bytearray):
+    def emit_push_byte_array(self, data):
         l = len(data)
-        if l < int(PUSHBYTES75):
-            self.write_byte(bytearray(l))
+        if l < int.from_bytes(PUSHBYTES75, 'little'):
+            self.write_byte(bytearray([l]))
         elif l < 0x100:
             self.emit(PUSHDATA1)
-            self.write_byte(bytearray(l))
+            self.write_byte(bytearray([l]))
         elif l < 0x10000:
             self.emit(PUSHDATA2)
-            self.write_byte(bytearray(l))
+            self.write_byte(bytearray([l]))
             b = bytearray(2)
             b = util.put_uint16(b, l)
             self.write_byte(b)
@@ -47,19 +47,12 @@ class ParamsBuilder:
         self.write_byte(address)
 
     def write_byte(self, value):
-        if type(value) is bytearray:
+        if isinstance(value, bytearray) or isinstance(value, bytes):
             self.code += value
-        elif type(value) is str:
+        elif isinstance(value, str):
             self.code += value.encode()
-        elif type(value) is int:
+        elif isinstance(value, int):
             self.code += (bytes([value]))
 
     def get_builder(self):
         return self.code
-
-
-builder = ParamsBuilder()
-builder.emit(b'\x00')
-builder.emit_push_bool(True)
-builder.emit_push_integer(4)
-util.print_byte_array(builder.get_builder())

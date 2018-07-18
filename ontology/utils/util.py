@@ -148,3 +148,9 @@ def add_comma(l):
         else:
             res += i
     return res + ']'
+
+
+if __name__ == '__main__':
+    l = '[133 121 185 144 156 79 58 123 214 186 172 168 89 189 199 202 42 40 22 207]'
+    res = add_comma(l)
+    print(res)
