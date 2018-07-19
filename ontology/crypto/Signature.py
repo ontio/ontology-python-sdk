@@ -34,10 +34,6 @@ class Signature(object):
             raise TypeError
         bs = bytearray()
         bs.append(self.__scheme.value)
-        bs.append(self.__value)
+        bs += bytearray(self.__value)
         return bs
 
-
-def signature_serializae(sig_data:bytearray):
-    if sig_data == None or sig_data == "":
-        raise ValueError("fail to serializing signatures: input is null")
