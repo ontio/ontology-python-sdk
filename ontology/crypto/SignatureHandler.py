@@ -15,19 +15,19 @@ class SignatureHandler(object):
 
     def generateSignature(self, pri_key, msg):
         if self.__scheme == SignatureScheme.SHA224withECDSA:
-            private_key = ec.derive_private_key(pri_key, ec.SECP224R1(), default_backend())
+            private_key = ec.derive_private_key(int(pri_key, 16), ec.SECP224R1(), default_backend())
             signature = private_key.sign(
                 msg,
                 ec.ECDSA(hashes.SHA224())
             )
         elif self.__scheme == SignatureScheme.SHA256withECDSA:
-            private_key = ec.derive_private_key(pri_key, ec.SECP256R1(), default_backend())
+            private_key = ec.derive_private_key(int(pri_key, 16), ec.SECP256R1(), default_backend())
             signature = private_key.sign(
                 msg,
                 ec.ECDSA(hashes.SHA256())
             )
         elif self.__scheme == SignatureScheme.SHA384withECDSA:
-            private_key = ec.derive_private_key(pri_key, ec.SECP384R1(), default_backend())
+            private_key = ec.derive_private_key(int(pri_key, 16), ec.SECP384R1(), default_backend())
             signature = private_key.sign(
                 msg,
                 ec.ECDSA(hashes.SHA384())
