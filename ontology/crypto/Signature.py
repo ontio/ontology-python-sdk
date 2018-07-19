@@ -34,5 +34,6 @@ class Signature(object):
             raise TypeError
         bs = bytearray()
         bs.append(self.__scheme.value)
-        bs.append(self.__value)
+        bs += bytearray(self.__value)
         return bs
+
