@@ -8,6 +8,7 @@ from ontology.core.transaction import Transaction, Sig
 from ontology.account.client import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.Signature import signature_serializae
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -155,16 +156,9 @@ class RpcClient(object):
         return tx
 
     def sign_to_data(self, data, signer: Account):
-        signer.generateSignature(data, SignatureScheme.SHA256withECDSA)
-
-        '''
-        s, err := sig.Sign(signer.SigScheme, signer.PrivateKey, data, nil)
-        
-        sigData, err := sig.Serialize(s)
-        
-        return sigData, nil
-    }
-        '''
+        signed_data = signer.generateSignature(data, SignatureScheme.SHA256withECDSA)
+        res = signature_serializae(signed_data)
+        return res
 
     def send_raw_transaction(self):
         pass

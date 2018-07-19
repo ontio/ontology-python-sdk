@@ -40,6 +40,32 @@ class Transaction(object):
         r = Digest.hash256(r)
         return r
 
+    def serialize(self):
+
+
+        '''
+        func (tx *Transaction) Serialize(w io.Writer) error {
+
+	err := tx.SerializeUnsigned(w)
+	if err != nil {
+		return errors.NewDetailErr(err, errors.ErrNoCode, "[Serialize], Transaction txSerializeUnsigned Serialize failed.")
+	}
+
+	err = serialization.WriteVarUint(w, uint64(len(tx.Sigs)))
+	if err != nil {
+		return errors.NewDetailErr(err, errors.ErrNoCode, "[Serialize], Transaction serialize tx sigs length failed.")
+	}
+	for _, sig := range tx.Sigs {
+		err = sig.Serialize(w)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+        :return:
+        '''
+
 
 class Sig(object):
     def __init__(self, public_keys, M, sig_data):
