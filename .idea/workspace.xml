@@ -7,6 +7,9 @@
       <change beforePath="$PROJECT_DIR$/ontology/common/address.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/common/address.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/common/serialize.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/common/serialize.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/core/transaction.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/core/transaction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/io/BinaryWriter.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/io/BinaryWriter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/io/Helper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/rpc/rpc_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/rpc/rpc_client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/utils/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/utils/util.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,8 +24,8 @@
       <file leaf-file-name="transaction.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/core/transaction.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="387">
-              <caret line="34" column="16" lean-forward="true" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
+            <state relative-caret-position="343">
+              <caret line="40" column="16" selection-start-line="40" selection-start-column="16" selection-end-line="40" selection-end-column="16" />
               <folding>
                 <element signature="e#0#92#0" expanded="true" />
               </folding>
@@ -30,23 +33,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="serialize.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="serialize.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/common/serialize.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="752">
-              <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+            <state relative-caret-position="527">
+              <caret line="86" column="14" lean-forward="true" selection-start-line="86" selection-start-column="14" selection-end-line="86" selection-end-column="14" />
+              <folding>
+                <element signature="e#0#49#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="client.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ontology/account/client.py">
+      <file leaf-file-name="BinaryWriter.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ontology/io/BinaryWriter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
-              <caret line="126" lean-forward="true" selection-start-line="126" selection-end-line="126" />
-              <folding>
-                <element signature="e#0#15#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="538">
+              <caret line="63" column="38" selection-start-line="63" selection-start-column="38" selection-end-line="63" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -54,10 +57,22 @@
       <file leaf-file-name="address.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/common/address.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-155">
-              <caret line="43" lean-forward="true" selection-start-line="43" selection-end-line="43" />
+            <state relative-caret-position="-661">
+              <caret line="19" selection-start-line="19" selection-end-line="19" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="client.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ontology/account/client.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="216">
+              <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -66,8 +81,8 @@
       <file leaf-file-name="util.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/utils/util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
-              <caret line="139" column="8" selection-start-line="139" selection-start-column="8" selection-end-line="139" selection-end-column="8" />
+            <state relative-caret-position="489">
+              <caret line="142" column="14" lean-forward="true" selection-start-line="142" selection-start-column="14" selection-end-line="142" selection-end-column="14" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -75,14 +90,41 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="rpc_client.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="rpc_client.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ontology/rpc/rpc_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1193">
-              <caret line="181" lean-forward="true" selection-start-line="181" selection-end-line="181" />
+            <state relative-caret-position="376">
+              <caret line="180" column="4" selection-start-line="180" selection-start-column="4" selection-end-line="180" selection-end-column="4" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ec.py" pinned="false" current-in-tab="false">
+        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/cryptography/hazmat/primitives/asymmetric/ec.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="133">
+              <caret line="291" selection-start-line="291" selection-end-line="291" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SignatureHandler.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ontology/crypto/SignatureHandler.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="351">
+              <caret line="23" column="52" lean-forward="true" selection-start-line="23" selection-start-column="52" selection-end-line="23" selection-end-column="52" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SignatureScheme.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ontology/crypto/SignatureScheme.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="69">
+              <caret line="3" column="23" lean-forward="true" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -143,14 +185,15 @@
         <option value="$PROJECT_DIR$/ontology/crypto/SignatureHandler.py" />
         <option value="$PROJECT_DIR$/ontology/crypto/SignatureScheme.py" />
         <option value="$PROJECT_DIR$/ontology/vm/neo_vm/params_builder.py" />
-        <option value="$PROJECT_DIR$/ontology/rpc/rpc_client.py" />
         <option value="$PROJECT_DIR$/ontology/crypto/Signature.py" />
         <option value="$PROJECT_DIR$/ontology/crypto/Digest.py" />
-        <option value="$PROJECT_DIR$/ontology/account/client.py" />
+        <option value="$PROJECT_DIR$/ontology/io/BinaryWriter.py" />
+        <option value="$PROJECT_DIR$/ontology/common/serialize.py" />
         <option value="$PROJECT_DIR$/ontology/common/address.py" />
+        <option value="$PROJECT_DIR$/ontology/account/client.py" />
         <option value="$PROJECT_DIR$/ontology/utils/util.py" />
         <option value="$PROJECT_DIR$/ontology/core/transaction.py" />
-        <option value="$PROJECT_DIR$/ontology/common/serialize.py" />
+        <option value="$PROJECT_DIR$/ontology/rpc/rpc_client.py" />
       </list>
     </option>
   </component>
@@ -206,6 +249,12 @@
               <item name="ontology-python-sdk" type="b2602c69:ProjectViewProjectNode" />
               <item name="ontology-python-sdk" type="462c0819:PsiDirectoryNode" />
               <item name="ontology" type="462c0819:PsiDirectoryNode" />
+              <item name="io" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ontology-python-sdk" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ontology-python-sdk" type="462c0819:PsiDirectoryNode" />
+              <item name="ontology" type="462c0819:PsiDirectoryNode" />
               <item name="rest" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -256,25 +305,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.serialize">
-    <configuration name="address" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="ontology-python-sdk" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ontology/common" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/common/address.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
+  <component name="RunManager" selected="Python.rpc_client">
     <configuration name="client" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="ontology-python-sdk" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -329,6 +360,24 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <configuration name="transaction" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ontology-python-sdk" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ontology/core" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/core/transaction.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="util" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="ontology-python-sdk" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -348,19 +397,19 @@
       <option name="MODULE_MODE" value="false" />
     </configuration>
     <list>
-      <item itemvalue="Python.rpc_client" />
-      <item itemvalue="Python.address" />
       <item itemvalue="Python.client" />
       <item itemvalue="Python.serialize" />
       <item itemvalue="Python.util" />
+      <item itemvalue="Python.transaction" />
+      <item itemvalue="Python.rpc_client" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.serialize" />
+        <item itemvalue="Python.rpc_client" />
         <item itemvalue="Python.util" />
         <item itemvalue="Python.client" />
-        <item itemvalue="Python.address" />
-        <item itemvalue="Python.rpc_client" />
+        <item itemvalue="Python.transaction" />
+        <item itemvalue="Python.serialize" />
       </list>
     </recent_temporary>
   </component>
@@ -393,12 +442,12 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50654763" side_tool="true" weight="0.2848423" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49345237" visible="true" weight="0.2848423" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49345237" weight="0.2848423" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39979655" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39979655" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -417,21 +466,17 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="8" />
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ontology/account/client.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="9" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/python/com/github/ontio/common/define.py" />
-    <entry file="file://$PROJECT_DIR$/src/main/python/com/github/ontio/common/common.py" />
-    <entry file="file://$PROJECT_DIR$/src/main/python/com/github/ontio/common/address" />
-    <entry file="file://$PROJECT_DIR$/../zillow-house-price-prediction/model-5 NN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="12" lean-forward="true" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/python/com/github/ontio/common/address.py" />
     <entry file="file://$PROJECT_DIR$/src/main/python/com/github/ontio/utils/utils_test.py" />
     <entry file="file://$PROJECT_DIR$/src/main/python/com/github/ontio/utils/utils.py" />
     <entry file="file://$PROJECT_DIR$/utils/utils_test.py" />
@@ -546,32 +591,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/crypto/SignatureScheme.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="3" column="23" lean-forward="true" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/crypto/KeyType.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="8" column="9" lean-forward="true" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/crypto/Curve.py">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/crypto/SignatureHandler.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
-          <folding>
-            <element signature="e#49#105#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ontology/crypto/Signature.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -603,46 +624,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/rpc/rpc_client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1193">
-          <caret line="181" lean-forward="true" selection-start-line="181" selection-end-line="181" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/account/client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="126" lean-forward="true" selection-start-line="126" selection-end-line="126" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/common/address.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-155">
-          <caret line="43" lean-forward="true" selection-start-line="43" selection-end-line="43" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/utils/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="139" column="8" selection-start-line="139" selection-start-column="8" selection-end-line="139" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/crypto/Digest.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="305">
@@ -650,20 +631,118 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/io/Helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/io/MemoryStream.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/common/address.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-661">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/io/BinaryWriter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="538">
+          <caret line="63" column="38" selection-start-line="63" selection-start-column="38" selection-end-line="63" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/io/BinaryReader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="3" lean-forward="true" selection-start-column="3" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/common/serialize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="86" column="14" lean-forward="true" selection-start-line="86" selection-start-column="14" selection-end-line="86" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#49#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/core/transaction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="34" column="16" lean-forward="true" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
+        <state relative-caret-position="343">
+          <caret line="40" column="16" selection-start-line="40" selection-start-column="16" selection-end-line="40" selection-end-column="16" />
           <folding>
             <element signature="e#0#92#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/common/serialize.py">
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/KeyType.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="752">
-          <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+        <state relative-caret-position="184">
+          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/utils/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="489">
+          <caret line="142" column="14" lean-forward="true" selection-start-line="142" selection-start-column="14" selection-end-line="142" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/SignatureScheme.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="69">
+          <caret line="3" column="23" lean-forward="true" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/cryptography/hazmat/primitives/asymmetric/ec.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="291" selection-start-line="291" selection-end-line="291" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/SignatureHandler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="23" column="52" lean-forward="true" selection-start-line="23" selection-start-column="52" selection-end-line="23" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/account/client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/rpc/rpc_client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="376">
+          <caret line="180" column="4" selection-start-line="180" selection-start-column="4" selection-end-line="180" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

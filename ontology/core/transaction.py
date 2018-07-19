@@ -1,6 +1,8 @@
 from ontology.common.serialize import write_byte, write_uint32, write_uint64, write_var_uint
 from ontology.crypto.Digest import Digest
-
+from ontology.io.BinaryWriter import BinaryWriter
+from ontology.io.MemoryStream import StreamManager
+from ontology.utils.util import bytes_reader
 
 class Transaction(object):
     def __init__(self, version, tx_type, nonce, gas_price, gas_limit, payer, payload, attributes, sigs, hash):
@@ -15,21 +17,25 @@ class Transaction(object):
         self.sigs = sigs  # Sig class array
         self.hash = hash  # [32]byte
 
-    def serialize_unsigned(self) -> bytearray:
-        res = bytearray()
-        res += write_byte(self.version)
-        res += write_byte(self.tx_type)
-        res += write_uint32(self.nonce)
-        print('nonce')
-        res += write_uint64(self.gas_price)
-        res += write_uint64(self.gas_limit)
-        res += self.payer
-        res += self.payload
-        res += write_var_uint(self.attributes)
+    def serialize_unsigned(self):
+        ms = StreamManager.GetStream()
+        writer = BinaryWriter(ms)
+        writer.WriteUInt8(self.version)
+        writer.WriteUInt8(self.tx_type)
+        writer.WriteUInt32(self.nonce)
+        writer.WriteUInt64(self.gas_price)
+        writer.WriteUInt64(self.gas_limit)
+        writer.WriteBytes(bytes(self.payer))
+        writer.WriteBytes(bytes(self.payload))
+        writer.WriteVarInt(len(self.attributes))
+        ms.flush()
+        res = ms.ToArray()
+        StreamManager.ReleaseStream(ms)
         return res
 
-    def hash(self):
+    def hash256(self):
         tx_serial = self.serialize_unsigned()
+        tx_serial = bytes_reader(tx_serial)
         r = Digest.hash256(tx_serial)
         r = Digest.hash256(r)
         return r
@@ -40,3 +46,4 @@ class Sig(object):
         self.public_keys = []  # a list to save public keys
         self.M = 0
         self.sig_data = []  # [][]byte
+

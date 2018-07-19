@@ -27,7 +27,7 @@ class Account(object):
         return byte_signature
 
     def get_address(self):
-        return self.__address
+        return self.__address.to_base58()
 
     def get_public_key(self):
         return self.__publicKey
@@ -136,4 +136,4 @@ if __name__ == '__main__':
     acct0 = Account(private_key, key_type)
     print(type(acct0.get_public_key()))
     print(acct0.get_public_key().hex())
-    print(acct0.get_address().to_base58())
+    print(acct0.get_address())

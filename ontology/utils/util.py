@@ -136,5 +136,8 @@ def add_comma(l):
     return res + ']'
 
 
-if __name__ == '__main__':
-    pass
+def bytes_reader(b):
+    res = bytearray()
+    for i in range(len(b) // 2):
+        res += bytearray.fromhex(b[2 * i:2 * i + 2].decode())
+    return res

@@ -1,3 +1,6 @@
+from ontology.io.BinaryWriter import BinaryWriter
+from ontology.io.MemoryStream import StreamManager
+
 def write_byte(value):
     if isinstance(value, bytearray) or isinstance(value, bytes):
         return value
@@ -71,28 +74,23 @@ def write_var_uint(value):
 
 
 def serialize_unsigned(tx):
-    res = bytearray()
-    res += write_byte(tx.version)
-    res += write_byte(tx.tx_type)
-    res += write_uint32(tx.nonce)
-    print('nonce')
-    res += write_uint64(tx.gas_price)
-    res += write_uint64(tx.gas_limit)
-    res += tx.payer
-    res += tx.payload
-    res += write_var_uint(tx.attributes)
+    ms = StreamManager.GetStream()
+    writer = BinaryWriter(ms)
+    writer.WriteUInt8(tx.version)
+    writer.WriteUInt8(tx.tx_type)
+    writer.WriteUInt32(tx.nonce)
+    writer.WriteUInt64(tx.gas_price)
+    writer.WriteUInt64(tx.gas_limit)
+    writer.WriteBytes(tx.payer)
+    writer.WriteBytes(tx.payload)
+    writer.WriteVarInt(tx.attributes)
+    ms.flush()
+    res = ms.ToArray()
+    StreamManager.ReleaseStream(ms)
     return res
 
 
-'''
-payer = bytearray([196, 158, 110, 186, 14, 44, 238, 204, 26, 5, 15, 54, 183, 110, 158, 142, 32, 115, 243, 224])
-res = Transaction(0, 209, 1531968852, 0, 0, payer, bytearray([7]), 0, 0, 0)
-res = serialize_unsigned(res)
-print(res)
 
-b[0] is 117
-b[1] is 13
-b[2] is 80
-b[3] is 91
-'''
+
+
 

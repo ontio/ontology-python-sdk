@@ -18,8 +18,6 @@ def address_from_hex_string(s: str) -> bytearray:
     return address_parse_from_bytes(util.to_array_reverse(hx))
 
 
-def address_from_base58(encoded: str) -> bytearray:
-    pass  # TODO
 
 
 ont_contract_address = address_parse_from_bytes(bytearray(
