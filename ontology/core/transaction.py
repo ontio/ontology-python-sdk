@@ -1,3 +1,7 @@
+from ontology.common.serialize import write_byte, write_uint32, write_uint64, write_var_uint
+from ontology.crypto.Digest import Digest
+
+
 class Transaction(object):
     def __init__(self, version, tx_type, nonce, gas_price, gas_limit, payer, payload, attributes, sigs, hash):
         self.version = version
@@ -11,33 +15,28 @@ class Transaction(object):
         self.sigs = sigs  # Sig class array
         self.hash = hash  # [32]byte
 
-    def serialize_unsigned(self):
-        pass
-
-    def serialize(self):
-        pass
+    def serialize_unsigned(self) -> bytearray:
+        res = bytearray()
+        res += write_byte(self.version)
+        res += write_byte(self.tx_type)
+        res += write_uint32(self.nonce)
+        print('nonce')
+        res += write_uint64(self.gas_price)
+        res += write_uint64(self.gas_limit)
+        res += self.payer
+        res += self.payload
+        res += write_var_uint(self.attributes)
+        return res
 
     def hash(self):
-        pass
+        tx_serial = self.serialize_unsigned()
+        r = Digest.hash256(tx_serial)
+        r = Digest.hash256(r)
+        return r
 
-        '''
-        if tx.hash == nil {
-                buf := bytes.Buffer{}
-                tx.SerializeUnsigned(&buf)
-        
-                temp := sha256.Sum256(buf.Bytes())
-                f := common.Uint256(sha256.Sum256(temp[:]))
-                tx.hash = &f
-            }
-            return *tx.hash
-        '''
 
 class Sig(object):
     def __init__(self, public_keys, M, sig_data):
         self.public_keys = []  # a list to save public keys
         self.M = 0
         self.sig_data = []  # [][]byte
-
-
-def transaction_from_hex_string(raw_tx: str):
-    pass  # TODO

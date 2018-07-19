@@ -66,15 +66,7 @@ class Address(object):
         return Address.address_from_bytes_pubkey((public_key))
 
     def to_base58(self):
-        sb = bytearray() + Address.__COIN_VERSION + a2b_hex(self.ZERO)
+        sb = Address.__COIN_VERSION + bytearray.fromhex(self.ZERO)
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
         return base58.b58encode(bytes(outb))
-
-
-if __name__ == '__main__':
-    addr = Address(bytearray(
-        [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191]))
-    res = addr.to_base58()
-    print(res)
-
