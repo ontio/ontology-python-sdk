@@ -2,7 +2,6 @@ from ontology.vm.neo_vm.OP_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHD
 from ontology.io.BinaryWriter import BinaryWriter
 from ontology.io.MemoryStream import StreamManager
 from ontology.utils.util import bytes_reader
-from ontology.crypto.key import serialize_public_key
 from ontology.vm.neo_vm.params_builder import ParamsBuilder
 
 
@@ -48,7 +47,3 @@ class ProgramBuilder(object):
         res = bytes_reader(res)
         return res
 
-    @staticmethod
-    def push_pubkey(public_key):
-        buf = serialize_public_key(public_key)
-        return ProgramBuilder.push_bytes(buf)

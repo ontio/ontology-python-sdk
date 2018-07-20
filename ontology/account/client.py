@@ -24,14 +24,13 @@ class Account(object):
         return byte_signature
 
     def get_address(self):
-        return self.__address
+        return self.__address  # __address is a class not a string or bytes
+
     def get_address_base58(self):
         return self.__address.to_base58()
 
     def get_public_key(self):
         return self.__publicKey
-
-
 
 
 if __name__ == '__main__':

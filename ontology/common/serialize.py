@@ -1,6 +1,7 @@
 from ontology.io.BinaryWriter import BinaryWriter
 from ontology.io.MemoryStream import StreamManager
 
+
 def write_byte(value):
     if isinstance(value, bytearray) or isinstance(value, bytes):
         return value
@@ -88,9 +89,3 @@ def serialize_unsigned(tx):
     res = ms.ToArray()
     StreamManager.ReleaseStream(ms)
     return res
-
-
-
-
-
-

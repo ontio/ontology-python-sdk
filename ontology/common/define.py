@@ -8,12 +8,11 @@ NATIVE_APPROVE = "approve"
 NATIVE_ALLOWANCE = "allowance"
 
 # NeoVM invokes a smart contract return type
-neo_vm_return_type = bytes
+
 NEOVM_TYPE_BOOL = 1
 NEOVM_TYPE_INTEGER = 2
 NEOVM_TYPE_BYTE_ARRAY = 3
 NEOVM_TYPE_STRING = 4
-
 UINT256_SIZE = 32
 
 

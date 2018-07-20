@@ -13,6 +13,7 @@ def build_native_invoke_code(contractAddres, cversion, method, params):
     builder.emit_push_byte_array("Ontology.Native.Invoke".encode())
     return builder.get_builder()
 
+
 def build_neo_vm_param(builder, params):
     if isinstance(params, dict):
         builder.emit_push_integer(0)
@@ -36,4 +37,3 @@ def build_neo_vm_param(builder, params):
         build_neo_vm_param(builder, params[0])
         builder.emit_push_integer(len(params))
         builder.emit(PACK)
-

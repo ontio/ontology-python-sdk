@@ -1,4 +1,3 @@
-from ontology.utils import util
 from ontology.vm.neo_vm.params_builder import ParamsBuilder
 from ontology.vm.neo_vm.OP_code import CHECKSIG
 from ontology.crypto.Digest import Digest
@@ -6,38 +5,24 @@ import base58
 
 ADDR_LEN = 20  # the size of address should be 20 bytes
 
-
-def address_parse_from_bytes(addr: bytearray) -> bytearray:
-    if len(addr) != ADDR_LEN:
-        raise ValueError("[common]: address_parse_from_bytes error, len != 20")
-    return addr  # [20]byte
-
-
-def address_from_hex_string(s: str) -> bytearray:
-    hx = util.hex_to_bytes(s)
-    return address_parse_from_bytes(util.to_array_reverse(hx))
-
-
-
-
-ont_contract_address = address_parse_from_bytes(bytearray(
+ont_contract_address = bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x01]))
-ong_contract_address = address_parse_from_bytes(bytearray(
+     0x01])
+ong_contract_address = bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x02]))
-ont_id_contract_address = address_parse_from_bytes(bytearray(
+     0x02])
+ont_id_contract_address = bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x03]))
-param_contract_address = address_parse_from_bytes(bytearray(
+     0x03])
+param_contract_address = bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x04]))
-auth_contract_address = address_parse_from_bytes(bytearray(
+     0x04])
+auth_contract_address = bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x06]))
-governance_contract_address = address_parse_from_bytes(bytearray(
+     0x06])
+governance_contract_address = bytearray(
     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x07]))
+     0x07])
 
 
 class Address(object):
@@ -77,9 +62,9 @@ class Address(object):
         data = base58.b58decode(addr)
         if len(data) != 25:
             raise TypeError
-        if data[0] != int.from_bytes(Address.__COIN_VERSION,"little"):
+        if data[0] != int.from_bytes(Address.__COIN_VERSION, "little"):
             raise TypeError
         checksum = Digest.hash256(data[0:21])
-        if data[21:26] != checksum[0:4]:
+        if data[21:25] != checksum[0:4]:
             raise TypeError
         return Address(data[1:21])

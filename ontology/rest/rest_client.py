@@ -1,2 +1,0 @@
-class RestClient(object):
-    pass
