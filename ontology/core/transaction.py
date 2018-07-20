@@ -3,6 +3,8 @@ from ontology.crypto.Digest import Digest
 from ontology.io.BinaryWriter import BinaryWriter
 from ontology.io.MemoryStream import StreamManager
 from ontology.utils.util import bytes_reader
+from ontology.core.program import ProgramBuilder
+
 
 class Transaction(object):
     def __init__(self, version, tx_type, nonce, gas_price, gas_limit, payer, payload, attributes, sigs, hash):
@@ -41,35 +43,40 @@ class Transaction(object):
         return r
 
     def serialize(self):
-
-
-        '''
-        func (tx *Transaction) Serialize(w io.Writer) error {
-
-	err := tx.SerializeUnsigned(w)
-	if err != nil {
-		return errors.NewDetailErr(err, errors.ErrNoCode, "[Serialize], Transaction txSerializeUnsigned Serialize failed.")
-	}
-
-	err = serialization.WriteVarUint(w, uint64(len(tx.Sigs)))
-	if err != nil {
-		return errors.NewDetailErr(err, errors.ErrNoCode, "[Serialize], Transaction serialize tx sigs length failed.")
-	}
-	for _, sig := range tx.Sigs {
-		err = sig.Serialize(w)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-        :return:
-        '''
+        tx_serial = self.serialize_unsigned()
+        tx_serial = bytes_reader(tx_serial)
+        ms = StreamManager.GetStream()
+        writer = BinaryWriter(ms)
+        writer.WriteVarInt(len(self.sigs))
+        ms.flush()
+        temp = ms.ToArray()
+        StreamManager.ReleaseStream(ms)
+        temp = bytes_reader(temp)
+        tx_serial += temp
+        for sig in self.sigs:
+            serial_sig = sig.serialize()
+            tx_serial += serial_sig
+        return tx_serial
 
 
 class Sig(object):
     def __init__(self, public_keys, M, sig_data):
         self.public_keys = []  # a list to save public keys
         self.M = 0
-        self.sig_data = []  # [][]byte
+        self.sig_data = [[]]
 
+    def serialize(self):
+        invoke_script = ProgramBuilder.program_from_params(self.sig_data)
+        if len(self.public_keys) == 0:
+            raise ValueError("np public key in sig")
+
+        verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
+        ms = StreamManager.GetStream()
+        writer = BinaryWriter(ms)
+        writer.WriteVarBytes(invoke_script)
+        writer.WriteVarBytes(verification_script)
+        ms.flush()
+        res = ms.ToArray()
+        res = bytes_reader(res)
+        StreamManager.ReleaseStream(ms)
+        return res

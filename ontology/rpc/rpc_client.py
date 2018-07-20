@@ -8,7 +8,8 @@ from ontology.core.transaction import Transaction, Sig
 from ontology.account.client import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
-from ontology.crypto.Signature import signature_serializae
+
+# from ontology.crypto.Signature import signature_serializae
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -137,6 +138,7 @@ class RpcClient(object):
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
         tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address(), to_addr, amount)
         tx = self.sign_to_transaction(tx, from_account)
+        self.send_raw_transaction(tx)
         return tx
 
     def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
@@ -151,17 +153,21 @@ class RpcClient(object):
         tx.payer = signer.get_address()
         tx_hash = tx.hash256()
         sig_data = self.sign_to_data(tx_hash, signer)
-        sig = Sig(signer.get_public_key(), 1, sig_data)
+        sig = [Sig([signer.get_public_key()], 1, [sig_data])]
         tx.sigs = sig
         return tx
 
     def sign_to_data(self, data, signer: Account):
         signed_data = signer.generateSignature(data, SignatureScheme.SHA256withECDSA)
-        res = signature_serializae(signed_data)
-        return res
+        return signed_data
 
-    def send_raw_transaction(self):
-        pass
+    def send_raw_transaction(self, tx):
+        buf = tx.serialize()
+        tx_data = buf.hex()
+        rpc_struct = self.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_data, 1])
+        r = HttpRequest.request("post", self.addr, rpc_struct)
+        res = json.loads(r.content.decode())["result"]
+        return res
 
 
 if __name__ == '__main__':
@@ -173,3 +179,4 @@ if __name__ == '__main__':
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     acc = Account(private_key, KeyType.ECDSA)
     res = cli.transfer(0, 0, "ont", acc, to_addr, 1)
+    print(res)
