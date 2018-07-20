@@ -32,7 +32,8 @@ class SignatureHandler(object):
                 msg,
                 ec.ECDSA(hashes.SHA384())
             )
-        return signature
+        sign = SignatureHandler.dsa_der_to_plain(signature)
+        return sign
 
     @staticmethod
     def dsa_der_to_plain(signature):
