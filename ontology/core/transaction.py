@@ -27,7 +27,8 @@ class Transaction(object):
         writer.WriteUInt32(self.nonce)
         writer.WriteUInt64(self.gas_price)
         writer.WriteUInt64(self.gas_limit)
-        writer.WriteBytes(bytes(self.payer))
+        #print(type(self.payer.encode()))
+        writer.WriteBytes(bytes(self.payer.encode()))
         writer.WriteBytes(bytes(self.payload))
         writer.WriteVarInt(len(self.attributes))
         ms.flush()
@@ -43,27 +44,31 @@ class Transaction(object):
         return r
 
     def serialize(self):
-        tx_serial = self.serialize_unsigned()
-        tx_serial = bytes_reader(tx_serial)
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
+        writer.WriteBytes(self.serialize_unsigned())
         writer.WriteVarInt(len(self.sigs))
+
+        #temp = bytes_reader(temp)
+        #tx_serial += temp
+        for sig in self.sigs:
+            #print(sig.M)
+            #print(sig.public_keys)
+            #print(sig.sig_data)
+            writer.WriteBytes(sig.serialize())
+            #tx_serial += serial_sig
+
         ms.flush()
         temp = ms.ToArray()
         StreamManager.ReleaseStream(ms)
-        temp = bytes_reader(temp)
-        tx_serial += temp
-        for sig in self.sigs:
-            serial_sig = sig.serialize()
-            tx_serial += serial_sig
-        return tx_serial
+        return bytes_reader(temp)
 
 
 class Sig(object):
     def __init__(self, public_keys, M, sig_data):
-        self.public_keys = []  # a list to save public keys
-        self.M = 0
-        self.sig_data = [[]]
+        self.public_keys = public_keys  # a list to save public keys
+        self.M = M
+        self.sig_data = sig_data
 
     def serialize(self):
         invoke_script = ProgramBuilder.program_from_params(self.sig_data)

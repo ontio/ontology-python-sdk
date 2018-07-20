@@ -138,7 +138,9 @@ class RpcClient(object):
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
         tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address(), to_addr, amount)
         tx = self.sign_to_transaction(tx, from_account)
-        self.send_raw_transaction(tx)
+        #util.print_byte_array(tx.serialize())
+        print(tx.serialize().hex())
+        #self.send_raw_transaction(tx)
         return tx
 
     def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
@@ -154,6 +156,7 @@ class RpcClient(object):
         tx_hash = tx.hash256()
         sig_data = self.sign_to_data(tx_hash, signer)
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
+        #print("## %s" %sig[0].M)
         tx.sigs = sig
         return tx
 
@@ -171,12 +174,15 @@ class RpcClient(object):
 
 
 if __name__ == '__main__':
-    cli = RpcClient()
-    from_addr = bytearray(
-        [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191])
+    cli = RpcClient(0,rpc_address)
+    #from_addr = bytearray(
+    #    [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191])
     to_addr = bytearray(
         [133, 121, 185, 144, 156, 79, 58, 123, 214, 186, 172, 168, 89, 189, 199, 202, 42, 40, 22, 207])
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     acc = Account(private_key, KeyType.ECDSA)
-    res = cli.transfer(0, 0, "ont", acc, to_addr, 1)
-    print(res)
+    print(acc.get_address_base58())
+    print(acc.get_public_key().hex())
+    addr = "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs"
+    res = cli.transfer(500, 20000, "ont", acc, to_addr, 1)
+    #print(res)
