@@ -9,8 +9,6 @@ from ontology.account.client import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
-from ontology.utils.util import bytes_reader
-# from ontology.crypto.Signature import signature_serializae
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -137,7 +135,8 @@ class RpcClient(object):
         return res
 
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
-        tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address().to_array(), to_addr, amount)
+        tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address().to_array(), to_addr,
+                                           amount)
         tx = self.sign_to_transaction(tx, from_account)
         self.send_raw_transaction(tx)
         return tx
@@ -174,12 +173,11 @@ class RpcClient(object):
 
 
 if __name__ == '__main__':
-    cli = RpcClient(0,rpc_address)
+    cli = RpcClient(0, rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     acc = Account(private_key, KeyType.ECDSA)
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
     toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
     print(toAddr.to_array().hex())
-    res = cli.transfer(500, 10000, "ont", acc, toAddr.to_array(), 1)
-
+    res = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
