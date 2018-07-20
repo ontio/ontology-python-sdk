@@ -68,3 +68,8 @@ class Address(object):
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
         return base58.b58encode(bytes(outb))
+
+    def to_array(self):
+        return self.ZERO
+    def decodeBase58(self):
+        pass
