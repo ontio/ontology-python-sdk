@@ -56,7 +56,7 @@ class Address(object):
         builder = ParamsBuilder()
         builder.emit_push_byte_array(bytearray(public_key))
         builder.emit(CHECKSIG)
-        addr = Address(Address.toScriptHash(builder.get_builder()))
+        addr = Address(Address.toScriptHash(builder.code))
         return addr
 
     @staticmethod

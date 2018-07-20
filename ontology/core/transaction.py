@@ -27,10 +27,8 @@ class Transaction(object):
         writer.WriteUInt32(self.nonce)
         writer.WriteUInt64(self.gas_price)
         writer.WriteUInt64(self.gas_limit)
-        #print(type(self.payer))
         writer.WriteBytes(bytes(self.payer.encode()))
         writer.WriteBytes(bytes(self.payload))
-        #print(len(self.attributes))
         writer.WriteVarInt(len(self.attributes))
         ms.flush()
         res = ms.ToArray()
@@ -49,14 +47,8 @@ class Transaction(object):
         writer.WriteBytes(self.serialize_unsigned())
         writer.WriteVarInt(len(self.sigs))
 
-        #temp = bytes_reader(temp)
-        #tx_serial += temp
         for sig in self.sigs:
-            #print(sig.M)
-            #print(sig.public_keys)
-            #print(sig.sig_data)
             writer.WriteBytes(sig.serialize())
-            #tx_serial += serial_sig
 
         ms.flush()
         temp = ms.ToArray()

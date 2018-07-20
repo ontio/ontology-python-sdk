@@ -137,18 +137,16 @@ class RpcClient(object):
         return res
 
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
-        tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address(), to_addr, amount)
+        tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address().to_array(), to_addr, amount)
         tx = self.sign_to_transaction(tx, from_account)
-        #util.print_byte_array(tx.serialize())
-        print(bytes_reader(tx.serialize_unsigned()).hex())
-        #self.send_raw_transaction(tx)
+        self.send_raw_transaction(tx)
         return tx
 
     def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
         contract_address = util.get_asset_address(asset)  # []bytes
         state = [{"from": from_addr, "to": to_addr, "amount": amount}]
         invoke_code = build_neo_vm.build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
-        unix_timenow = 1#int(time())
+        unix_timenow = int(time())
         return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, bytearray(), invoke_code, bytearray(),
                            [], bytearray())
 
@@ -157,7 +155,6 @@ class RpcClient(object):
         tx_hash = tx.hash256()
         sig_data = self.sign_to_data(tx_hash, signer)
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
-        #print("## %s" %sig[0].M)
         tx.sigs = sig
         return tx
 
@@ -168,30 +165,21 @@ class RpcClient(object):
     def send_raw_transaction(self, tx):
         buf = tx.serialize()
         tx_data = buf.hex()
-        rpc_struct = self.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_data, 1])
+        rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
+        print(rpc_struct)
         r = HttpRequest.request("post", self.addr, rpc_struct)
+        print(r.content.decode())
         res = json.loads(r.content.decode())["result"]
         return res
 
 
 if __name__ == '__main__':
     cli = RpcClient(0,rpc_address)
-    #from_addr = bytearray(
-    #    [233, 90, 124, 86, 153, 119, 43, 68, 212, 191, 87, 222, 85, 139, 32, 23, 162, 238, 135, 191])
-    #to_addr = bytearray(
-    #    [133, 121, 185, 144, 156, 79, 58, 123, 214, 186, 172, 168, 89, 189, 199, 202, 42, 40, 22, 207])
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     acc = Account(private_key, KeyType.ECDSA)
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
     toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
     print(toAddr.to_array().hex())
-    str = "00d101000000f401000000000000204e0000000000004756c9dd829b2142883adbe1ae4f8689a1f673e97100c66b144756c9dd829b2142883adbe1ae4f8689a1f673e96a7cc814261b18069e80f351a202cd1d230641dfa450b83b6a7cc8516a7cc86c51c1087472616e736665721400000000000000000000000000000000000000010068164f6e746f6c6f67792e4e61746976652e496e766f6b650000"
-    print(str)
-    res = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
-    #print(res)
+    res = cli.transfer(500, 10000, "ont", acc, toAddr.to_array(), 1)
 
-
-
-    #00d101000000f401000000000000204e0000000000004756c9dd829b2142883adbe1ae4f8689a1f673e97100c66b144756c9dd829b2142883adbe1ae4f8689a1f673e96a7cc814261b18069e80f351a202cd1d230641dfa450b83b6a7cc8516a7cc86c51c1087472616e736665721400000000000000000000000000000000000000010068164f6e746f6c6f67792e4e61746976652e496e766f6b650000
-    #00d101000000f401000000000000204e0000000000004756c9dd829b2142883adbe1ae4f8689a1f673e900c66b6a7cc86                                                                                      a7cc8516a7cc86c51c1087472616e736665721400000000000000000000000000000000000000010068164f6e746f6c6f67792e4e61746976652e496e766f6b650000

@@ -24,6 +24,10 @@ def build_neo_vm_param(builder, params):
             builder.emit(SWAP)
             builder.emit(APPEND)
         builder.emit(FROMALTSTACK)
+    elif isinstance(params, str):
+        builder.emit_push_byte_array(util.bytes_reader(params.encode()))
+    elif isinstance(params, bytes):
+        builder.emit_push_byte_array(params)
     elif isinstance(params, bytearray):
         builder.emit_push_byte_array(params)
     elif isinstance(params, int):

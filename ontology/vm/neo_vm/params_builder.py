@@ -55,4 +55,7 @@ class ParamsBuilder:
             self.code += (bytes([value]))
 
     def get_builder(self):
-        return self.code
+        b = ParamsBuilder()
+        l = len(self.code)
+        b.emit_push_integer(l)
+        return b.code + self.code
