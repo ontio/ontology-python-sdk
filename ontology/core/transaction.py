@@ -27,9 +27,10 @@ class Transaction(object):
         writer.WriteUInt32(self.nonce)
         writer.WriteUInt64(self.gas_price)
         writer.WriteUInt64(self.gas_limit)
-        #print(type(self.payer.encode()))
+        #print(type(self.payer))
         writer.WriteBytes(bytes(self.payer.encode()))
         writer.WriteBytes(bytes(self.payload))
+        #print(len(self.attributes))
         writer.WriteVarInt(len(self.attributes))
         ms.flush()
         res = ms.ToArray()
@@ -40,7 +41,6 @@ class Transaction(object):
         tx_serial = self.serialize_unsigned()
         tx_serial = bytes_reader(tx_serial)
         r = Digest.hash256(tx_serial)
-        r = Digest.hash256(r)
         return r
 
     def serialize(self):
