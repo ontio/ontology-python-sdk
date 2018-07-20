@@ -27,7 +27,7 @@ class Account(object):
         return byte_signature
 
     def get_address(self):
-        return self.__address.to_array()
+        return self.__address
     def get_address_base58(self):
         return self.__address.to_base58()
 

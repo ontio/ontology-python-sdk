@@ -71,5 +71,15 @@ class Address(object):
 
     def to_array(self):
         return self.ZERO
-    def decodeBase58(self):
-        pass
+
+    @staticmethod
+    def decodeBase58(addr):
+        data = base58.b58decode(addr)
+        if len(data) != 25:
+            raise TypeError
+        if data[0] != int.from_bytes(Address.__COIN_VERSION,"little"):
+            raise TypeError
+        checksum = Digest.hash256(data[0:21])
+        if data[21:26] != checksum[0:4]:
+            raise TypeError
+        return Address(data[1:21])
