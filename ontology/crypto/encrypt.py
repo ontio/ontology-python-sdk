@@ -1,4 +1,7 @@
 from ontology.wallet.control import ProtectedKey
+from ontology.wallet.scrypt import ScryptParam
+from ontology.utils.util import print_byte_array
+from os import urandom
 
 
 def reencrypt_private_key(protected_key, old_pwd, new_pwd, old_param, new_param):
@@ -12,4 +15,18 @@ def decrypt_with_custom_scrypt(prot_key, pwd, param):
 
 
 def encrypt_with_custom_scrypt(private_key, addr: str, pwd: bytearray, param):
-    res = ProtectedKey()
+    prot = ProtectedKey(address=addr, enc_alg="aes-256-gcm")
+    salt = get_random_bytes(16)
+    prot.salt = salt
+    dkey = kdf()  # todo
+
+
+def get_random_bytes(length):
+    res = bytearray(urandom(length))
+    return res
+
+
+def kdf(pwd: bytearray, salt: bytearray, param: ScryptParam):
+    if param.DKLen < 32:
+        raise ValueError("The length of key is invalid")
+    # todo

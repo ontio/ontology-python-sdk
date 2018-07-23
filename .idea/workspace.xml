@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52d8dbbb-4020-46d6-9a05-68ecdbc76cb5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/wallet/account.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/account.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/wallet/control.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/control.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/wallet/identity.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/identity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/crypto/encrypt.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/crypto/encrypt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/wallet/scrypt.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/scrypt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/wallet/wallet_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/wallet_client.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,8 +26,11 @@
       <file leaf-file-name="encrypt.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ontology/crypto/encrypt.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="48" selection-start-column="48" selection-end-column="48" />
+            <state relative-caret-position="384">
+              <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+              <folding>
+                <element signature="e#0#48#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -39,8 +38,8 @@
       <file leaf-file-name="control.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/control.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="6" column="34" lean-forward="true" selection-start-line="6" selection-start-column="34" selection-end-line="6" selection-end-column="34" />
+            <state relative-caret-position="46">
+              <caret line="2" column="25" lean-forward="true" selection-start-line="1" selection-start-column="23" selection-end-line="2" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -57,8 +56,8 @@
       <file leaf-file-name="scrypt.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/scrypt.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="6" selection-start-line="6" selection-end-line="6" />
+            <state relative-caret-position="391">
+              <caret line="17" selection-start-line="17" selection-end-line="17" />
             </state>
           </provider>
         </entry>
@@ -147,10 +146,10 @@
         <option value="$PROJECT_DIR$/ontology/wallet/encrypt.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/control.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/identity.py" />
-        <option value="$PROJECT_DIR$/ontology/wallet/scrypt.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/account.py" />
-        <option value="$PROJECT_DIR$/ontology/crypto/encrypt.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/wallet_client.py" />
+        <option value="$PROJECT_DIR$/ontology/wallet/scrypt.py" />
+        <option value="$PROJECT_DIR$/ontology/crypto/encrypt.py" />
       </list>
     </option>
   </component>
@@ -283,25 +282,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.wallet_client">
-    <configuration name="KeyType" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="ontology-python-sdk" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ontology/crypto" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/crypto/KeyType.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
+  <component name="RunManager" selected="Python.encrypt">
     <configuration name="account" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="ontology-python-sdk" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -333,6 +314,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/account/client.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="encrypt" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ontology-python-sdk" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ontology/crypto" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/crypto/encrypt.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -377,17 +376,17 @@
     <list>
       <item itemvalue="Python.client" />
       <item itemvalue="Python.rpc_client" />
-      <item itemvalue="Python.KeyType" />
       <item itemvalue="Python.account" />
       <item itemvalue="Python.wallet_client" />
+      <item itemvalue="Python.encrypt" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.encrypt" />
         <item itemvalue="Python.wallet_client" />
         <item itemvalue="Python.account" />
         <item itemvalue="Python.rpc_client" />
         <item itemvalue="Python.client" />
-        <item itemvalue="Python.KeyType" />
       </list>
     </recent_temporary>
   </component>
@@ -726,20 +725,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/scrypt.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="6" column="23" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/wallet/account.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="115">
@@ -757,17 +742,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/control.py">
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/scrypt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
-          <caret line="6" column="34" lean-forward="true" selection-start-line="6" selection-start-column="34" selection-end-line="6" selection-end-column="34" />
+          <caret line="6" column="23" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/control.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="46">
+          <caret line="2" column="25" lean-forward="true" selection-start-line="1" selection-start-column="23" selection-end-line="2" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ontology/crypto/encrypt.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="48" selection-start-column="48" selection-end-column="48" />
+        <state relative-caret-position="384">
+          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+          <folding>
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
