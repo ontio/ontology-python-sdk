@@ -28,7 +28,7 @@ class WalletData(object):
     def add_account(self, acc: AccountData):
         self.accounts.append(acc)
 
-    def delete_account(self, address: str):
+    def remove_account(self, address: str):
         account, index = self.get_account_by_address(address)
         if index == -1:
             return
@@ -79,3 +79,8 @@ class WalletData(object):
 
     def add_identity(self, id: Identity):
         self.identities.append(id)
+
+    def remove_identity(self, ontid):
+        for index in range(len(self.identities)):
+            if self.identities[index].ontid == ontid:
+                del self.identities[index]
