@@ -160,14 +160,8 @@ class RpcClient(object):
 
 
 if __name__ == '__main__':
-    cli = RpcClient(0, rpc_address)
-    private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-    acc = Account(private_key, SignatureScheme.SHA256withECDSA)
-    print(acc.get_address_base58())
-    print(acc.get_public_key().hex())
-    toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
-    print(toAddr.to_array().hex())
-    res = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
-
-    res = acc.export_gcm_encrypted_private_key("123".encode(), get_random_bytes(16), 4096)
+    private_key = 'c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07'
+    scheme = SignatureScheme.SHA256withECDSA
+    acct0 = Account(private_key, scheme)
+    res = acct0.export_gcm_encrypted_private_key("123".encode(), get_random_bytes(16), 4096)
     print(res)
