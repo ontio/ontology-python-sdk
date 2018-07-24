@@ -15,7 +15,8 @@ from ontology.common.address import Address
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.aes_handler import AESHandler
 from ontology.crypto.scrypt import Scrypt
-
+from Cryptodome import Random
+import base64
 
 class Account(object):
     def __init__(self, private_key, scheme):
@@ -55,24 +56,23 @@ class Account(object):
     def get_public_key(self):
         return self.__publicKey
 
-    def export_gcm_encrypted_private_key(self, password: bytes, salt: bytes, n: int):
+    def export_gcm_encrypted_private_key(self, password: str, salt: bytes, n: int):
         r = 8
         p = 8
         dk_len = 64
         scrypt = Scrypt(n, r, p, dk_len)
-        derivedkey = scrypt.generate_kd(password, salt)
+        derivedkey = scrypt.generate_kd(password.encode(), salt)
         iv = derivedkey[0:12]
         derivedhalf2 = derivedkey[32:64]
-        scrypt = Scrypt(n, r, p, dk_len)
-        scrypt.generate_kd(password, salt)
-        mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(bytes(self.__privateKey, encoding='utf8'),
+        mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(util.hex_to_bytes(self.__privateKey),
                                                                   self.__address.to_base58(),
                                                                   derivedhalf2,
                                                                   iv)
-        encrypted_key = b2a_hex(mac_tag) + b2a_hex(cipher_text)
-        return encrypted_key
+        encrypted_key = b2a_hex(cipher_text) + b2a_hex(mac_tag)
+        encrypted_key_str = base64.b64encode(a2b_hex(encrypted_key))
+        return encrypted_key_str
 
-    def get_gcm_decoded_private_key(self, encrypted_key: bytes, password: bytes, address: bytes, salt: bytes, n: int,
+    def get_gcm_decoded_private_key(self, encrypted_key_str: str, password: str, address: str, salt: bytes, n: int,
                                     scheme: SignatureScheme):
         r = 8
         p = 8
@@ -81,19 +81,29 @@ class Account(object):
         derivedkey = scrypt.generate_kd(password, salt)
         iv = derivedkey[0:12]
         derivedhalf2 = derivedkey[32:64]
-        mac_tag = a2b_hex(encrypted_key[:32])
-        cipher_text = a2b_hex(encrypted_key[32:])
-        raw_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address, mac_tag, derivedhalf2, iv)
+        encrypted_key = base64.b64decode(encrypted_key_str).hex()
+        mac_tag = a2b_hex(encrypted_key[64:96])
+        cipher_text = a2b_hex(encrypted_key[0:64])
+        pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address, mac_tag, derivedhalf2, iv)
         acct = Account(private_key, scheme)
         if acct.get_address().to_base58() != address:
             raise RuntimeError
-        return raw_key
+        return pri_key
 
 
+# if __name__ == '__main__':
+#     private_key = '15746f42ec429ce1c20647e92154599b644a00644649f03868a2a5962bd2f9de'
+#     key_type = KeyType.ECDSA
+#     acct0 = Account(private_key, key_type)
+#     print(type(acct0.get_public_key()))
+#     print(acct0.get_public_key().hex())
+#     print(acct0.get_address())
 if __name__ == '__main__':
-    private_key = '15746f42ec429ce1c20647e92154599b644a00644649f03868a2a5962bd2f9de'
-    key_type = KeyType.ECDSA
-    acct0 = Account(private_key, key_type)
-    print(type(acct0.get_public_key()))
-    print(acct0.get_public_key().hex())
-    print(acct0.get_address())
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+    scheme = SignatureScheme.SHA256withECDSA
+    acct0 = Account(private_key, scheme)
+    salt = base64.b64decode("dtUtvYtVXALLfz6OVr6zDQ==")
+    key = acct0.export_gcm_encrypted_private_key("1", salt, 16384)
+    print(key)
+    pri = acct0.get_gcm_decoded_private_key(key,"1",acct0.get_address_base58(),salt,16384,SignatureScheme.SHA256withECDSA)
+    print(pri.hex())

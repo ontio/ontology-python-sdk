@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from Crypto import Random
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+from Cryptodome import Random
+from Cryptodome.Cipher import AES
+from Cryptodome.Util.Padding import pad, unpad
 
 
 class AESHandler(object):
