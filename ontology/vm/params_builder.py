@@ -1,4 +1,4 @@
-from ontology.vm.neo_vm.OP_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
+from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
     PUSHBYTES75, APPCALL, TAILCALL, SYSCALL
 from ontology.common.serialize import put_uint16, put_uint32
 

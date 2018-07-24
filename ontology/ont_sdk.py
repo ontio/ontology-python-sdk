@@ -1,13 +1,11 @@
 from ontology.utils import util
 from ontology.account import client
-from ontology.rpc import rpc_client
-from ontology.rest import rest_client
+from ontology.rpc import rpc
 
 
 class OntologySdk(object):
     def __init__(self):
-        self.rpc_client = rpc_client.RpcClient()
-        self.rest_client = rest_client.RestClient()
+        self.rpc_client = rpc.RpcClient()
 
     def open_or_create_wallet(self, wallet_file):
         if util.is_file_exist(wallet_file):
@@ -21,6 +19,3 @@ class OntologySdk(object):
 
     def open_wallet(self, wallet_file):
         return client.open(wallet_file)
-
-
-

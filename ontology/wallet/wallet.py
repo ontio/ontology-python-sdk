@@ -60,7 +60,7 @@ class WalletData(object):
     def to_default_security(self, passwords):
         self.reencrypt(passwords, None)
 
-    def reencrypt(self, passwords, param: ScryptParam):
+    def reencrypt(self, passwords, param):
         if len(passwords) != len(self.accounts):
             raise ValueError("no enough passwords for the accounts")
         keys = []

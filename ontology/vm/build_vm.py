@@ -1,5 +1,5 @@
-from ontology.vm.neo_vm.params_builder import ParamsBuilder
-from ontology.vm.neo_vm.OP_code import *
+from ontology.vm.params_builder import ParamsBuilder
+from ontology.vm.op_code import *
 from ontology.utils import util
 
 
@@ -34,6 +34,8 @@ def build_neo_vm_param(builder, params):
     elif isinstance(params, int):
         builder.emit_push_integer(params)
     elif isinstance(params, list):
-        build_neo_vm_param(builder, params[0])
+        for i in range(len(params)):
+            build_neo_vm_param(builder, params[i])
         builder.emit_push_integer(len(params))
         builder.emit(PACK)
+

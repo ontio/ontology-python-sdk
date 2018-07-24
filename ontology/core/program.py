@@ -1,8 +1,8 @@
-from ontology.vm.neo_vm.OP_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG
+from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG
 from ontology.io.BinaryWriter import BinaryWriter
 from ontology.io.MemoryStream import StreamManager
 from ontology.utils.util import bytes_reader
-from ontology.vm.neo_vm.params_builder import ParamsBuilder
+from ontology.vm.params_builder import ParamsBuilder
 
 
 class ProgramBuilder(object):

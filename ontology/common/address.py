@@ -1,5 +1,5 @@
-from ontology.vm.neo_vm.params_builder import ParamsBuilder
-from ontology.vm.neo_vm.OP_code import CHECKSIG
+from ontology.vm.params_builder import ParamsBuilder
+from ontology.vm.op_code import CHECKSIG
 from ontology.crypto.Digest import Digest
 import base58
 

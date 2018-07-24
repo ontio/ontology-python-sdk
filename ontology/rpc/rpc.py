@@ -1,14 +1,12 @@
 import requests
 from ontology.rpc.define import *
 import json
-from time import time
-from ontology.utils import util
-from ontology.vm.neo_vm import build_neo_vm
-from ontology.core.transaction import Transaction, Sig
+from ontology.core.transaction import Sig
 from ontology.account.client import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
+from ontology.smart_contract.native_contract.asset import new_transfer_transaction
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -135,31 +133,19 @@ class RpcClient(object):
         return res
 
     def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
-        tx = self.new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address().to_array(), to_addr,
-                                           amount)
+        tx = new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address().to_array(), to_addr,
+                                      amount)
         tx = self.sign_to_transaction(tx, from_account)
         self.send_raw_transaction(tx)
         return tx
 
-    def new_transfer_transaction(self, gas_price, gas_limit, asset, from_addr, to_addr, amount):
-        contract_address = util.get_asset_address(asset)  # []bytes
-        state = [{"from": from_addr, "to": to_addr, "amount": amount}]
-        invoke_code = build_neo_vm.build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
-        unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, bytearray(), invoke_code, bytearray(),
-                           [], bytearray())
-
     def sign_to_transaction(self, tx, signer: Account):
         tx.payer = signer.get_address().to_array()
         tx_hash = tx.hash256()
-        sig_data = self.sign_to_data(tx_hash, signer)
+        sig_data = signer.generateSignature(tx_hash, SignatureScheme.SHA256withECDSA)
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
         tx.sigs = sig
         return tx
-
-    def sign_to_data(self, data, signer: Account):
-        signed_data = signer.generateSignature(data, SignatureScheme.SHA256withECDSA)
-        return signed_data
 
     def send_raw_transaction(self, tx):
         buf = tx.serialize()
