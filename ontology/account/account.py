@@ -72,7 +72,8 @@ class Account(object):
         encrypted_key = b2a_hex(mac_tag) + b2a_hex(cipher_text)
         return encrypted_key
 
-    def get_gcm_decoded_private_key(self, encrypted_key: bytes, password: bytes, address: bytes, salt: bytes, n: int,
+    @staticmethod
+    def get_gcm_decoded_private_key(encrypted_key: bytes, password: bytes, address: bytes, salt: bytes, n: int,
                                     scheme: SignatureScheme):
         r = 8
         p = 8

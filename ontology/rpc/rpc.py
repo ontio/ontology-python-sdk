@@ -7,6 +7,7 @@ from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
 from ontology.smart_contract.native_contract.asset import new_transfer_transaction
+from ontology.crypto.encrypt import get_random_bytes
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -167,3 +168,6 @@ if __name__ == '__main__':
     toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
     print(toAddr.to_array().hex())
     res = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
+
+    res = acc.export_gcm_encrypted_private_key("123".encode(), get_random_bytes(16), 4096)
+    print(res)
