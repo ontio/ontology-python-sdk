@@ -19,7 +19,7 @@ from Cryptodome import Random
 import base64
 
 class Account(object):
-    def __init__(self, private_key, scheme):
+    def __init__(self, private_key, scheme=SignatureScheme.SHA256withECDSA):
         self.__signature_scheme = scheme
         if scheme == SignatureScheme.SHA256withECDSA:
             self.__keyType = KeyType.ECDSA
@@ -72,6 +72,7 @@ class Account(object):
         encrypted_key_str = base64.b64encode(a2b_hex(encrypted_key))
         return encrypted_key_str
 
+    @staticmethod
     def get_gcm_decoded_private_key(self, encrypted_key_str: str, password: str, address: str, salt: bytes, n: int,
                                     scheme: SignatureScheme):
         r = 8
@@ -90,6 +91,9 @@ class Account(object):
             raise RuntimeError
         return pri_key
 
+    def serialize_private_key(self):
+        return self.__privateKey
+
 
 # if __name__ == '__main__':
 #     private_key = '15746f42ec429ce1c20647e92154599b644a00644649f03868a2a5962bd2f9de'
@@ -107,3 +111,4 @@ if __name__ == '__main__':
     print(key)
     pri = acct0.get_gcm_decoded_private_key(key,"1",acct0.get_address_base58(),salt,16384,SignatureScheme.SHA256withECDSA)
     print(pri.hex())
+

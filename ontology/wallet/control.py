@@ -7,7 +7,7 @@ class ProtectedKey(object):
         self.algorithm = algorithm
         self.salt = salt
         self.hash_value = hash_value
-        self.param = param  # map[string]string
+        self.param = param
 
 class Control(object):
     def __init__(self):
