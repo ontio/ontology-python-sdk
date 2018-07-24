@@ -2,7 +2,7 @@ import requests
 from ontology.rpc.define import *
 import json
 from ontology.core.transaction import Sig
-from ontology.account.client import Account
+from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
@@ -161,7 +161,7 @@ class RpcClient(object):
 if __name__ == '__main__':
     cli = RpcClient(0, rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-    acc = Account(private_key, KeyType.ECDSA)
+    acc = Account(private_key, SignatureScheme.SHA256withECDSA)
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
     toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")

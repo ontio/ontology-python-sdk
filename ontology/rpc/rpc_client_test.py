@@ -1,5 +1,5 @@
 from ontology.utils import util
-from ontology.account import client
+from ontology.account import account
 from ontology.rpc import rpc
 from ontology.rest import rest_client
 from ontology.ont_sdk import OntologySdk

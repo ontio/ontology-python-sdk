@@ -2,19 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52d8dbbb-4020-46d6-9a05-68ecdbc76cb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/ontology/smart_contract/native_contract/asset.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ontology/smart_contract/native_contract/ontid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/account/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/account/account.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/common/address.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/common/address.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/core/program.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/core/program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/crypto/aes_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/crypto/aes_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/crypto/encrypt.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/crypto/encrypt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/crypto/scrypt.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/crypto/scrypt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/ont_sdk.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/ont_sdk.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/rpc/rpc_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/rpc/rpc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/rpc/rpc.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/rpc/rpc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/rpc/rpc_client_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/rpc/rpc_client_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/vm/neo_vm/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/vm/neo_vm/build_neo_vm.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/vm/neo_vm/op_code.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/vm/neo_vm/params_builder.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/wallet/wallet_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/wallet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/wallet/scrypt.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/wallet/wallet.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/wallet.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,8 +27,8 @@
       <file leaf-file-name="encrypt.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/crypto/encrypt.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="483">
-              <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+            <state relative-caret-position="345">
+              <caret line="15" column="8" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
               <folding>
                 <element signature="e#0#48#0" expanded="true" />
               </folding>
@@ -41,23 +39,41 @@
       <file leaf-file-name="wallet.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1095">
-              <caret line="62" column="42" lean-forward="true" selection-start-line="62" selection-start-column="42" selection-end-line="62" selection-end-column="42" />
+            <state relative-caret-position="-822">
+              <caret line="7" column="48" lean-forward="true" selection-start-line="7" selection-start-column="48" selection-end-line="7" selection-end-column="48" />
               <folding>
-                <element signature="e#0#46#0" expanded="true" />
+                <element signature="e#0#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="wallet_manager.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="wallet_manager.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
+            <state relative-caret-position="415">
+              <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="identity.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="115">
+              <caret line="5" column="19" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="control.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ontology/wallet/control.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="115">
+              <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -92,8 +108,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/wallets/wallet.py" />
-        <option value="$PROJECT_DIR$/account/client.py" />
         <option value="$PROJECT_DIR$/ont_sdk.py" />
         <option value="$PROJECT_DIR$/common/address.py" />
         <option value="$PROJECT_DIR$/src/ont_sdk.py" />
@@ -120,7 +134,6 @@
         <option value="$PROJECT_DIR$/ontology/rpc/rpc_client.py" />
         <option value="$PROJECT_DIR$/ontology/crypto/KeyType.py" />
         <option value="$PROJECT_DIR$/ontology/crypto/key.py" />
-        <option value="$PROJECT_DIR$/ontology/account/client.py" />
         <option value="$PROJECT_DIR$/ontology/common/define.py" />
         <option value="$PROJECT_DIR$/ontology/common/serialize.py" />
         <option value="$PROJECT_DIR$/ontology/crypto/Signature.py" />
@@ -129,7 +142,6 @@
         <option value="$PROJECT_DIR$/ontology/wallet/control.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/identity.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/account.py" />
-        <option value="$PROJECT_DIR$/ontology/crypto/encrypt.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/scrypt.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/wallet_client.py" />
         <option value="$PROJECT_DIR$/ontology/vm/neo_vm/build_neo_vm.py" />
@@ -137,9 +149,13 @@
         <option value="$PROJECT_DIR$/ontology/smart_contract/native_contract/ontid.py" />
         <option value="$PROJECT_DIR$/ontology/vm/params_builder.py" />
         <option value="$PROJECT_DIR$/ontology/vm/build_vm.py" />
-        <option value="$PROJECT_DIR$/ontology/common/address.py" />
         <option value="$PROJECT_DIR$/ontology/core/program.py" />
         <option value="$PROJECT_DIR$/ontology/smart_contract/native_contract/asset.py" />
+        <option value="$PROJECT_DIR$/ontology/crypto/scrypt.py" />
+        <option value="$PROJECT_DIR$/ontology/crypto/encrypt.py" />
+        <option value="$PROJECT_DIR$/ontology/account/client.py" />
+        <option value="$PROJECT_DIR$/ontology/crypto/aes_handler.py" />
+        <option value="$PROJECT_DIR$/ontology/common/address.py" />
         <option value="$PROJECT_DIR$/ontology/rpc/rpc.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/wallet.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" />
@@ -147,9 +163,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
-    <option name="x" value="842" />
-    <option name="width" value="838" />
-    <option name="height" value="1050" />
+    <option name="x" value="71" />
+    <option name="y" value="23" />
+    <option name="width" value="1280" />
+    <option name="height" value="951" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -268,25 +285,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.rpc_client">
-    <configuration name="encrypt" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="ontology-python-sdk" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ontology/crypto" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/crypto/encrypt.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
+  <component name="RunManager" selected="Python.wallet_manager">
     <configuration name="rpc_client" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="ontology-python-sdk" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -300,6 +299,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/rpc/rpc.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="scrypt (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ontology-python-sdk" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ontology/crypto" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ontology/crypto/scrypt.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -361,18 +378,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.wallet_client" />
-      <item itemvalue="Python.encrypt" />
       <item itemvalue="Python.scrypt" />
       <item itemvalue="Python.wallet_manager" />
       <item itemvalue="Python.rpc_client" />
+      <item itemvalue="Python.scrypt (1)" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.rpc_client" />
         <item itemvalue="Python.wallet_manager" />
+        <item itemvalue="Python.rpc_client" />
+        <item itemvalue="Python.scrypt (1)" />
         <item itemvalue="Python.wallet_client" />
         <item itemvalue="Python.scrypt" />
-        <item itemvalue="Python.encrypt" />
       </list>
     </recent_temporary>
   </component>
@@ -401,10 +418,10 @@
     <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13452381" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19464286" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50654763" side_tool="true" weight="0.2848423" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49345237" visible="true" weight="0.2848423" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49345237" visible="true" weight="0.2848423" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -462,12 +479,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/ontology/utils/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/common/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/account/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -526,16 +537,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/utils/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/common/serialize.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
@@ -570,20 +571,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="253">
           <caret line="11" column="20" lean-forward="true" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/crypto/KeyType.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="11" lean-forward="true" selection-start-line="3" selection-end-line="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/crypto/Digest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="598">
-          <caret line="26" column="37" selection-start-line="26" selection-start-column="37" selection-end-line="26" selection-end-column="37" />
         </state>
       </provider>
     </entry>
@@ -652,13 +639,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/account/client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/vm/neo_vm/build_neo_vm.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="26">
@@ -679,44 +659,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/scrypt.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="46">
-          <caret line="2" column="13" lean-forward="true" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="6" column="23" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/control.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/ont_sdk.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="46">
-          <caret line="2" column="28" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/account.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/vm/params_builder.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -731,13 +673,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="23">
           <caret line="1" column="33" lean-forward="true" selection-start-line="1" selection-start-column="33" selection-end-line="1" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/common/address.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="16" selection-start-column="16" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -768,43 +703,139 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/rpc/rpc.py">
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/scrypt.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3469">
-          <caret line="159" lean-forward="true" selection-start-line="159" selection-end-line="159" />
+        <state relative-caret-position="46">
+          <caret line="2" column="13" lean-forward="true" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/account.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/Digest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="598">
+          <caret line="26" column="37" selection-start-line="26" selection-start-column="37" selection-end-line="26" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/scrypt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="443">
+          <caret line="38" column="39" lean-forward="true" selection-start-line="38" selection-start-column="39" selection-end-line="38" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/ont_sdk.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="17" column="18" lean-forward="true" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/utils/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="50" column="4" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ontology/crypto/encrypt.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="483">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="345">
+          <caret line="15" column="8" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
           <folding>
             <element signature="e#0#48#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/aes_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="5" column="11" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/crypto/KeyType.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/account/account.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="20" column="39" selection-start-line="20" selection-start-column="39" selection-end-line="20" selection-end-column="39" />
+          <folding>
+            <element signature="e#48#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/common/address.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="859">
+          <caret line="36" column="30" selection-start-line="36" selection-start-column="30" selection-end-line="36" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#52#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/rpc/rpc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="160" column="26" lean-forward="true" selection-start-line="160" selection-start-column="26" selection-end-line="160" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1095">
-          <caret line="62" column="42" lean-forward="true" selection-start-line="62" selection-start-column="42" selection-end-line="62" selection-end-column="42" />
+        <state relative-caret-position="-822">
+          <caret line="7" column="48" lean-forward="true" selection-start-line="7" selection-start-column="48" selection-end-line="7" selection-end-column="48" />
           <folding>
-            <element signature="e#0#46#0" expanded="true" />
+            <element signature="e#0#41#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
+        <state relative-caret-position="415">
+          <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="5" column="19" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/control.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
         </state>
       </provider>
     </entry>

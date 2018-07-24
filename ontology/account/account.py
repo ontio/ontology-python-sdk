@@ -54,7 +54,7 @@ class Account(object):
 
     def get_public_key(self):
         return self.__publicKey
-        
+
     def export_gcm_encrypted_private_key(self, password: bytes, salt: bytes, n: int):
         r = 8
         p = 8

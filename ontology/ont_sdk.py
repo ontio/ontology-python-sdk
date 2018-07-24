@@ -1,5 +1,5 @@
 from ontology.utils import util
-from ontology.account import client
+from ontology.account import account
 from ontology.rpc import rpc
 
 
@@ -15,7 +15,7 @@ class OntologySdk(object):
     def create_wallet(self, wallet_file):
         if util.is_file_exist(wallet_file):
             raise IsADirectoryError("wallet file has already exist")
-        return client.open(wallet_file)
+        return account.open(wallet_file)
 
     def open_wallet(self, wallet_file):
-        return client.open(wallet_file)
+        return account.open(wallet_file)

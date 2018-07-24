@@ -34,7 +34,7 @@ class Address(object):
 
     @staticmethod
     def toScriptHash(byte_script):
-        return Digest.hash160(byte_msg=byte_script, is_hex=True)
+        return Digest.hash160(msg=byte_script, is_hex=True)
 
     @staticmethod
     def address_from_bytes_pubkey(public_key: bytes):

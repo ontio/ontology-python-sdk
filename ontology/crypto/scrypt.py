@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from Cryptodome.Protocol import KDF
+from Crypto.Protocol import KDF
+
 
 
 class Scrypt:

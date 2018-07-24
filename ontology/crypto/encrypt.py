@@ -1,6 +1,4 @@
 from ontology.wallet.control import ProtectedKey
-from ontology.wallet.scrypt import ScryptParam
-from ontology.utils.util import print_byte_array
 from os import urandom
 
 
@@ -15,10 +13,7 @@ def decrypt_with_custom_scrypt(prot_key, pwd, param):
 
 
 def encrypt_with_custom_scrypt(private_key, addr: str, pwd: bytearray, param):
-    prot = ProtectedKey(address=addr, enc_alg="aes-256-gcm")
-    salt = get_random_bytes(16)
-    prot.salt = salt
-
+    pass
 
 def get_random_bytes(length):
     res = bytearray(urandom(length))
