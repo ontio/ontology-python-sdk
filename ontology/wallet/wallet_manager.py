@@ -91,11 +91,6 @@ class WalletManager(object):
 
     '''
     
-        acct.address = Address.addressFromPubKey(account.serializePublicKey()).toBase58();
-        if (label == null || label.equals("")) {
-            String uuidStr = UUID.randomUUID().toString();
-            label = uuidStr.substring(0, 8);
-        }
         if (accountFlag) {
             for (Account e : walletInMem.getAccounts()) {
                 if (e.address.equals(acct.address)) {
