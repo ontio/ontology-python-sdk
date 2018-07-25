@@ -4,7 +4,7 @@ from ontology.io.BinaryWriter import BinaryWriter
 from ontology.io.MemoryStream import StreamManager
 from ontology.utils.util import bytes_reader
 from ontology.core.program import ProgramBuilder
-
+from binascii import b2a_hex, a2b_hex
 
 class Transaction(object):
     def __init__(self, version, tx_type, nonce, gas_price, gas_limit, payer, payload, attributes, sigs, hash):
@@ -37,9 +37,10 @@ class Transaction(object):
 
     def hash256(self):
         tx_serial = self.serialize_unsigned()
-        tx_serial = bytes_reader(tx_serial)
+        tx_serial = a2b_hex(tx_serial)
         r = Digest.hash256(tx_serial)
-        return r
+        #print(a2b_hex(b2a_hex(r))[::-1].hex())   [::-1]
+        return a2b_hex(b2a_hex(r))
 
     def serialize(self):
         ms = StreamManager.GetStream()
@@ -53,7 +54,7 @@ class Transaction(object):
         ms.flush()
         temp = ms.ToArray()
         StreamManager.ReleaseStream(ms)
-        return bytes_reader(temp)
+        return a2b_hex(temp)
 
 
 class Sig(object):
