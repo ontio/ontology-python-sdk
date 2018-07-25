@@ -9,4 +9,3 @@ class KeyType(Enum):
     ECDSA = b'0x12'
     SM2 = b'0x13'
     EDDSA = b'0x14'
-

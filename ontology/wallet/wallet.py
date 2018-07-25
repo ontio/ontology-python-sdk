@@ -62,3 +62,9 @@ class WalletData(object):
         for index in range(len(self.identities)):
             if self.identities[index].ontid == ontid:
                 del self.identities[index]
+
+
+
+if __name__ == '__main__':
+    w=WalletData()
+    print(w.identities)

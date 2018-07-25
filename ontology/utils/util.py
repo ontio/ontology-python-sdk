@@ -4,9 +4,11 @@ from ontology.common import address
 from ontology.common.define import *
 from os import urandom
 
+
 def get_random_bytes(length):
-    res = bytearray(urandom(length))
+    res = bytes(urandom(length))
     return res
+
 
 def hex_to_bytes(value: str) -> bytearray:
     return bytearray.fromhex(value)

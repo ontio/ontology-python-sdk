@@ -41,6 +41,8 @@ class WalletManager(object):
 
     def write_wallet(self):
         self.__wallet_in_mem.save(self.__wallet_path)
+        self.__wallet_file = self.__wallet_in_mem
+        return self.__wallet_file
 
     def reset_wallet(self):
         self.__wallet_in_mem = self.__wallet_file.clone()
@@ -90,7 +92,7 @@ class WalletManager(object):
         if self.__scheme == SignatureScheme.SHA256withECDSA:
             prot = ProtectedKey(algorithm="ECDSA", enc_alg="aes-256-gcm", hash_value="SHA256withECDSA",
                                 param={"curve": "secp256r1"})
-            acct = AccountData(protected_key=prot, sign_scheme="SHA256withECDSA")  # todo init
+            acct = AccountData(protected_key=prot, sign_scheme="SHA256withECDSA")
         else:
             raise ValueError("scheme type is error")
         # set key
@@ -100,7 +102,7 @@ class WalletManager(object):
         else:
             acct.protected_key.key = account.serialize_private_key().hex()
 
-        acct.protected_key.address = Address.address_from_bytes_pubkey(account.get_address().to_array()).to_base58()
+        acct.protected_key.address = Address.address_from_bytes_pubkey(account.get_address().to_array().encode()).to_base58()
         # set label
         if label == None or label == "":
             label = str(uuid.uuid4())[0:8]
@@ -116,7 +118,8 @@ class WalletManager(object):
             acct.protected_key.salt = salt
             self.__wallet_in_mem.accounts.append(acct)
         else:
-            for index in range(len(self.__wallet_in_mem.identities)):
+            print(type(self.__wallet_in_mem))
+            for index in range(len(self.__wallet_in_mem.identities)): # 从文件中读出来是dict，不是类了
                 if self.__wallet_in_mem.identities[index].ontid == did_ont + acct.protected_key.address:
                     raise ValueError("wallet identity exists")
 
@@ -180,7 +183,17 @@ class WalletManager(object):
 
 
 if __name__ == '__main__':
+    # test address
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+    scheme = SignatureScheme.SHA256withECDSA
+    acct = Account(private_key, scheme)
+    print(acct.get_address().to_base58())
+    # test wallet load and save
     wallet_path = '/Users/zhaoxavi/test.txt'
     w = WalletManager(wallet_path=wallet_path)
     res = w.open_wallet()
+    print(res)
+    # test create account
+    salt = get_random_bytes(16)
+    res = w.create_account("123", "567", salt, private_key, False)
     print(res)

@@ -10,3 +10,4 @@ class Curve(Enum):
     P256 = ec.SECP256R1()
     P384 = ec.SECP384R1()
     P521 = ec.SECP521R1()
+

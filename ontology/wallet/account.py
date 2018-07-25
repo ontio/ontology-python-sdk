@@ -1,8 +1,10 @@
 from ontology.wallet.control import ProtectedKey
+from ontology.crypto.SignatureScheme import SignatureScheme
 
 
 class AccountData(object):
-    def __init__(self, protected_key: ProtectedKey, label, public_key, sign_scheme, is_default, lock):
+    def __init__(self, protected_key: ProtectedKey, label="", public_key="",
+                 sign_scheme=SignatureScheme.SHA256withECDSA, is_default=False, lock=False):
         self.protected_key = protected_key
         self.label = label
         self.public_key = public_key
@@ -44,54 +46,3 @@ class AccountInfo():
         self.prikey_wif = ""
 
 
-'''
-                  
-# TODO: determine identity structure
-
-class RWMutex(object):
-    def __init__(self):
-        self.w = self.Mutex()
-        writer_sem = 0
-        reader_sem = 0
-        reader_count = 0
-        reader_wait = 0
-
-    class Mutex(object):
-        def __init__(self):
-            state = 0
-            sema = 0
-
-
-class UnlockAccountInfo(object):
-    def __init__(self):
-        self.account = Account()
-        self.unlock_time = datetime.time()
-        self.expired_at = 0
-
-
-class ClientImpl(object):
-    def __init__(self, wallet_path):
-        self.wallet_path = wallet_path
-        self.account_address = {}  # map[string]*AccountData
-        self.account_label = {}  # map[string]*AccountData
-        self.default_account = AccountData()
-        self.wallet_data = WalletData()
-        self.unlock_account = {}  # map[string]*UnlockAccountInfo()
-        self.lock = RWMutex()
-        self.set_value()
-
-    def load(self):
-        # TODO
-        self.wallet_data.load(self.wallet_path)  # how to use data
-        # for loop
-
-    def set_value(self):
-        if util.is_file_exist(self.wallet_data):
-            self.load()
-
-
-def open(wallet_path):
-    new_client_impl = ClientImpl(wallet_path)
-    return new_client_impl
-
-'''
