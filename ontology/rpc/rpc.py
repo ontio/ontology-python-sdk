@@ -9,7 +9,12 @@ from ontology.common.address import Address
 from ontology.smart_contract.native_contract.asset import new_transfer_transaction
 from ontology.crypto.encrypt import get_random_bytes
 from ontology.smart_contract.native_contract import ontid
+from ontology.io.BinaryReader import BinaryReader
+from ontology.io.MemoryStream import StreamManager
+from ontology.utils.util import *
+from ontology.crypto.Curve import Curve
 import base64
+import base58
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -185,7 +190,7 @@ if __name__ == '__main__':
     acc = Account(private_key, SignatureScheme.SHA256withECDSA)
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
-    if False :
+    if False:
         toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
         print(toAddr.to_array().hex())
         tx = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
@@ -193,11 +198,72 @@ if __name__ == '__main__':
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
     if False:
-        tx = cli.registry_ontid(acc,20000, 500)
+        tx = cli.registry_ontid(acc, 20000, 500)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
     if True:
         tx = cli.get_ddo("did:ont:"+acc.get_address_base58())
         result = cli.send_raw_transaction_preexec(tx)
-        print(result)
+        ddo = result.get("Result")
+        ms = StreamManager.GetStream(hex_to_bytes("4e010000002103036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be8890200000023131402c06c72787291a7ce27be41ce569b42abd5824d2a93158ec3c49575d1ae9e37c713046b65793106537472696e670676616c7565311456bf94c2c1b246c9efcde7ac584b9447d06d24e5"))
+        reader = BinaryReader(ms)
+        try:
+            publickey_bytes = reader.ReadVarBytes()
+        except Exception as e:
+            publickey_bytes = bytearray()
+        try:
+            attribute_bytes = reader.ReadVarBytes()
+        except Exception as e:
+            attribute_bytes = bytearray()
+        try:
+            recovery_bytes = reader.ReadVarBytes()
+        except Exception as e:
+            recovery_bytes = bytearray()
+        pubKey_list = []
+        if len(publickey_bytes) != 0:
+            ms = StreamManager.GetStream(publickey_bytes)
+            reader2 = BinaryReader(ms)
+            while True:
+                try:
+                    index = reader2.ReadInt32()
+                    addr = acc.get_address_base58()
+                    d = {}
+                    d['PubKeyId'] = "did:ont:" + addr + "#keys-" + str(index)
+                    pubkey = reader2.ReadVarBytes()
+                    if len(pubkey) == 33:
+                        d["Type"] = KeyType.ECDSA.name
+                        d["Curve"] = Curve.P256.name
+                        d["Value"] = pubkey.hex()
+                    else:
+                        print(pubkey)
+                        d["Type"] = KeyType.from_label(pubkey[0])
+                        d["Curve"] = Curve.from_label(pubkey[1])
+                        d["Value"] = pubkey.hex()
+                    pubKey_list.append(d)
+                except Exception as e:
+                    break
+        attribute_list = []
+        if len(attribute_bytes) != 0:
+            ms = StreamManager.GetStream(attribute_bytes)
+            reader2 = BinaryReader(ms)
+            while True:
+                try:
+                    d = {}
+                    key = reader2.ReadVarBytes()
+                    if key == bytes():
+                        break
+                    d["Key"] = str(key, 'utf8')
+                    d["Type"] = str(reader2.ReadVarBytes(), 'utf-8')
+                    d["Value"] = str(reader2.ReadVarBytes(), 'utf-8')
+                    attribute_list.append(d)
+                except Exception as e:
+                    break
+        d2 = {}
+        d2["Owners"] = pubKey_list
+        d2["Attributes"] = attribute_list
+        if len(recovery_bytes) != 0:
+            print(recovery_bytes)
+            d2["Recovery"] = base58.b58encode(recovery_bytes).decode("utf-8")
+        d2["OntId"] = "did:ont:" + acc.get_address_base58()
+        print(d2)

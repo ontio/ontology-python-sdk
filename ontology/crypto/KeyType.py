@@ -6,7 +6,17 @@ from enum import Enum, unique
 
 @unique
 class KeyType(Enum):
-    ECDSA = b'0x12'
-    SM2 = b'0x13'
-    EDDSA = b'0x14'
+    ECDSA = b'\x12'
+    SM2 = b'\x13'
+    EDDSA = b'\x14'
+
+    @staticmethod
+    def from_label(label: int):
+        label = bytes([label])
+        if KeyType.ECDSA.value == label:
+            return KeyType.ECDSA.name
+        elif KeyType.SM2.value == label:
+            return KeyType.SM2.name
+        elif KeyType.EDDSA.value == label:
+            return KeyType.EDDSA.name
 
