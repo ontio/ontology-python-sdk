@@ -7,9 +7,10 @@ import base64
 from ontology.crypto.scrypt import Scrypt
 from ontology.account.account import Account
 from ontology.wallet.account import AccountData
-from ontology.wallet.control import ProtectedKey
+from ontology.wallet.control import ProtectedKey, Control
 from ontology.common.address import Address
 import uuid
+from ontology.wallet.identity import Identity, did_ont, IdentityInfo
 
 
 class WalletManager(object):
@@ -41,7 +42,7 @@ class WalletManager(object):
         self.__wallet_in_mem.save(self.__wallet_path)
 
     def reset_wallet(self):
-        self.__wallet_in_mem=self.__wallet_file.clone()
+        self.__wallet_in_mem = self.__wallet_file.clone()
         return self.__wallet_in_mem
 
     def get_signature_scheme(self):
@@ -52,7 +53,7 @@ class WalletManager(object):
 
     def import_identity(self, label: str, encrypted_privkey: str, pwd, salt: bytearray, address: str):
         encrypted_privkey = base64.decodebytes(encrypted_privkey.encode())
-        private_key = Account.get_gcm_decoded_private_key(encrypted_privkey, pwd, address.encode(), salt,
+        private_key = Account.get_gcm_decoded_private_key(encrypted_privkey, pwd, address, salt,
                                                           Scrypt().get_n(),
                                                           self.__scheme)
 
@@ -61,7 +62,15 @@ class WalletManager(object):
         return  # todo getWallet().getIdentity(info.ontid);
 
     def create_identity(self, label: str, pwd, salt, private_key):
-        pass
+        acct = self.create_account(label, pwd, salt, private_key, False)
+        info = IdentityInfo()
+        info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address()).to_base58()
+        info.pubic_key = bytearray.fromhex(acct.serialize_public_key())
+        info.private_key = bytearray.fromhex(acct.serialize_private_key())
+        info.prikey_wif = acct.export_wif()
+        info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
+        info.address_u160 = acct.get_address().to_array().hex()
+        return info
 
     def create_account(self, label, pwd, salt, priv_key, account_flag: bool):
         account = Account(priv_key, self.__scheme)
@@ -79,73 +88,42 @@ class WalletManager(object):
         else:
             acct.protected_key.key = account.serialize_private_key().hex()
 
-        acct.protected_key.address=Address.address_from_bytes_pubkey(account.get_address()).to_base58()
+        acct.protected_key.address = Address.address_from_bytes_pubkey(account.get_address()).to_base58()
         # set label
-        if label==None or label=="":
-            uuidstr=str(uuid.uuid4())[0:8]
+        if label == None or label == "":
+            label = str(uuid.uuid4())[0:8]
         if account_flag:
-            pass
+            for index in range(len(self.__wallet_in_mem.accounts)):
+                if acct.protected_key.address == self.__wallet_in_mem.accounts[index]:
+                    raise ValueError("wallet account exists")
 
+            if len(self.__wallet_in_mem.accounts) == 0:
+                acct.is_default = True
+                self.__wallet_in_mem.default_account_address = acct.protected_key.address
+            acct.label = label
+            acct.protected_key.salt = salt
+            self.__wallet_in_mem.accounts.append(acct)
+        else:
+            for index in range(len(self.__wallet_in_mem.identities)):
+                if self.__wallet_in_mem.identities[index] == did_ont + acct.protected_key.address:
+                    raise ValueError("wallet identity exists")
 
+        idt = Identity()
+        idt.ontid = did_ont + acct.protected_key.address
+        idt.label = label
+        if len(self.__wallet_in_mem.identities) == 0:
+            idt.is_default = True
+            self.__wallet_in_mem.default_ontid = idt.ontid
+        prot = ProtectedKey(key=acct.protected_key.key, algorithm="ECDSA", param={"curve": "secp256r1"}, salt=salt,
+                            address=acct.protected_key.address)
+        ctl = Control(id="keys-1", protected_key=prot)  # todo public key
+        idt.controls.append(ctl)
+        self.__wallet_in_mem.identities.append(idt)
+        return account
 
-
-    '''
-    
-        if (accountFlag) {
-            for (Account e : walletInMem.getAccounts()) {
-                if (e.address.equals(acct.address)) {
-                    throw new SDKException(ErrorCode.ParamErr("wallet account exist"));
-                }
-            }
-            if (walletInMem.getAccounts().size() == 0) {
-                acct.isDefault = true;
-                walletInMem.setDefaultAccountAddress(acct.address);
-            }
-            acct.label = label;
-            acct.setSalt(salt);
-            walletInMem.getAccounts().add(acct);
-        } else {
-            for (Identity e : walletInMem.getIdentities()) {
-                if (e.ontid.equals(Common.didont + acct.address)) {
-                    throw new SDKException(ErrorCode.ParamErr("wallet Identity exist"));
-                }
-            }
-            Identity idt = new Identity();
-            idt.ontid = Common.didont + acct.address;
-            idt.label = label;
-            if (walletInMem.getIdentities().size() == 0) {
-                idt.isDefault = true;
-                walletInMem.setDefaultOntid(idt.ontid);
-            }
-            idt.controls = new ArrayList<Control>();
-            Control ctl = new Control(acct.key, "keys-1");
-            ctl.setSalt(salt);
-            ctl.setAddress(acct.address);
-            idt.controls.add(ctl);
-            walletInMem.getIdentities().add(idt);
-        }
-        return account;
-    }
-    '''
-
-
-'''
-private IdentityInfo createIdentity(String label,String password,byte[] salt, byte[] prikey) throws Exception {
-        com.github.ontio.account.Account acct = createAccount(label,password,salt, prikey, false);
-        IdentityInfo info = new IdentityInfo();
-        info.ontid = Common.didont + Address.addressFromPubKey(acct.serializePublicKey()).toBase58();
-        info.pubkey = Helper.toHexString(acct.serializePublicKey());
-        info.setPrikey(Helper.toHexString(acct.serializePrivateKey()));
-        info.setPriwif(acct.exportWif());
-        info.encryptedPrikey = acct.exportGcmEncryptedPrikey(password, salt,walletFile.getScrypt().getN());
-        info.addressU160 = acct.getAddressU160().toHexString();
-        return info;
-'''
 
 if __name__ == '__main__':
     wallet_path = '/Users/zhaoxavi/test.txt'
     w = WalletManager(wallet_path=wallet_path)
     res = w.open_wallet()
     print(res)
-
-

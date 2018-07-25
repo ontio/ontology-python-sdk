@@ -73,7 +73,7 @@ class Account(object):
         return encrypted_key_str
 
     @staticmethod
-    def get_gcm_decoded_private_key(self, encrypted_key_str: str, password: str, address: str, salt: bytes, n: int,
+    def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, address: str, salt: bytes, n: int,
                                     scheme: SignatureScheme):
         r = 8
         p = 8
@@ -94,14 +94,14 @@ class Account(object):
     def serialize_private_key(self):
         return self.__privateKey
 
+    def serialize_public_key(self):
+        return self.__publicKey
 
-# if __name__ == '__main__':
-#     private_key = '15746f42ec429ce1c20647e92154599b644a00644649f03868a2a5962bd2f9de'
-#     key_type = KeyType.ECDSA
-#     acct0 = Account(private_key, key_type)
-#     print(type(acct0.get_public_key()))
-#     print(acct0.get_public_key().hex())
-#     print(acct0.get_address())
+    def export_wif(self):
+        pass
+
+
+
 if __name__ == '__main__':
     private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     scheme = SignatureScheme.SHA256withECDSA

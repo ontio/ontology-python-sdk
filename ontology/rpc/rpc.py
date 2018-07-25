@@ -8,6 +8,7 @@ from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
 from ontology.smart_contract.native_contract.asset import new_transfer_transaction
 from ontology.crypto.encrypt import get_random_bytes
+import base64
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -160,8 +161,4 @@ class RpcClient(object):
 
 
 if __name__ == '__main__':
-    private_key = 'c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07'
-    scheme = SignatureScheme.SHA256withECDSA
-    acct0 = Account(private_key, scheme)
-    res = acct0.export_gcm_encrypted_private_key("123".encode(), get_random_bytes(16), 4096)
-    print(res)
+    pass
