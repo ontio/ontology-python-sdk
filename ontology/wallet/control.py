@@ -16,16 +16,3 @@ class Control(object):
         self.publicKey = publicKey
         self.protected_key = protected_key
 
-        '''
-        public String algorithm = "ECDSA";
-    public Map parameters = new HashMap() ;
-    public String id = "";
-    public String key = "";
-    public String salt = "";
-    public String hash = "sha256";
-    @JSONField(name = "enc-alg")
-    public String encAlg = "aes-256-gcm";
-    public String address = "";
-    
-    
-        '''
