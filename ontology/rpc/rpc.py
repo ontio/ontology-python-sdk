@@ -8,7 +8,7 @@ from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
 from ontology.smart_contract.native_contract.asset import new_transfer_transaction
 from ontology.crypto.encrypt import get_random_bytes
-from ontology.smartcontract.native import ontid
+from ontology.smart_contract.native_contract import ontid
 import base64
 
 rpc_address = "http://polaris1.ont.io:20336"
