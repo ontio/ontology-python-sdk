@@ -11,6 +11,7 @@ from ontology.wallet.control import ProtectedKey, Control
 from ontology.common.address import Address
 import uuid
 from ontology.wallet.identity import Identity, did_ont, IdentityInfo
+from ontology.utils.util import hex_to_bytes, get_random_bytes
 
 
 class WalletManager(object):
@@ -59,18 +60,29 @@ class WalletManager(object):
 
         info = self.create_identity(label, pwd, salt, private_key)
         private_key = None
-        return  # todo getWallet().getIdentity(info.ontid);
+        for index in range(len(self.__wallet_in_mem.identities)):
+            if self.__wallet_in_mem.identities[index].ontid == info.ontid:
+                return self.__wallet_in_mem.identities[index]
+        return None
 
     def create_identity(self, label: str, pwd, salt, private_key):
         acct = self.create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
         info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address()).to_base58()
-        info.pubic_key = bytearray.fromhex(acct.serialize_public_key())
-        info.private_key = bytearray.fromhex(acct.serialize_private_key())
+        info.pubic_key = acct.serialize_public_key().hex()
+        info.private_key = acct.serialize_private_key().hex()
         info.prikey_wif = acct.export_wif()
         info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
         return info
+
+    def create_identity_from_prikey(self, pwd, private_key):
+        info = self.create_identity("", pwd, hex_to_bytes(private_key))
+        private_key = None
+        for index in range(len(self.__wallet_in_mem.identities)):
+            if self.__wallet_in_mem.identities[index].ontid == info.ontid:
+                return self.__wallet_in_mem.identities[index]
+        return None
 
     def create_account(self, label, pwd, salt, priv_key, account_flag: bool):
         account = Account(priv_key, self.__scheme)
@@ -94,7 +106,7 @@ class WalletManager(object):
             label = str(uuid.uuid4())[0:8]
         if account_flag:
             for index in range(len(self.__wallet_in_mem.accounts)):
-                if acct.protected_key.address == self.__wallet_in_mem.accounts[index]:
+                if acct.protected_key.address == self.__wallet_in_mem.accounts[index].protected_key.address:
                     raise ValueError("wallet account exists")
 
             if len(self.__wallet_in_mem.accounts) == 0:
@@ -105,7 +117,7 @@ class WalletManager(object):
             self.__wallet_in_mem.accounts.append(acct)
         else:
             for index in range(len(self.__wallet_in_mem.identities)):
-                if self.__wallet_in_mem.identities[index] == did_ont + acct.protected_key.address:
+                if self.__wallet_in_mem.identities[index].ontid == did_ont + acct.protected_key.address:
                     raise ValueError("wallet identity exists")
 
         idt = Identity()
@@ -116,10 +128,29 @@ class WalletManager(object):
             self.__wallet_in_mem.default_ontid = idt.ontid
         prot = ProtectedKey(key=acct.protected_key.key, algorithm="ECDSA", param={"curve": "secp256r1"}, salt=salt,
                             address=acct.protected_key.address)
-        ctl = Control(id="keys-1", protected_key=prot)  # todo public key
+        ctl = Control(id="keys-1", protected_key=prot)
         idt.controls.append(ctl)
         self.__wallet_in_mem.identities.append(idt)
         return account
+
+    def import_account(self, label, encrypted_prikey, pwd, address, salt):
+        
+
+        """
+        public Account importAccount(String label,String encryptedPrikey, String password, String address,byte[] salt) throws Exception {
+        String prikey = com.github.ontio.account.Account.getGcmDecodedPrivateKey(encryptedPrikey, password, address,salt, walletFile.getScrypt().getN(), scheme);
+        AccountInfo info = createAccountInfo(label,password, salt,Helper.hexToBytes(prikey));
+        prikey = null;
+        password = null;
+        return getWallet().getAccount(info.addressBase58);
+    }
+        """
+
+    def create_account_from_prikey(self):
+        pass
+
+    def get_account_by_address(self):
+        pass
 
 
 if __name__ == '__main__':
