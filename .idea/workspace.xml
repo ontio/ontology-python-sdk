@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52d8dbbb-4020-46d6-9a05-68ecdbc76cb5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/ontology/utils/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/utils/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ontology/wallet/account.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/account.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -41,8 +41,8 @@
       <file leaf-file-name="account.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/account.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="5" column="42" lean-forward="true" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="42" />
+            <state relative-caret-position="357">
+              <caret line="37" column="23" lean-forward="true" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -59,8 +59,8 @@
       <file leaf-file-name="wallet_manager.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="136" column="8" lean-forward="true" selection-start-line="136" selection-start-column="8" selection-end-line="136" selection-end-column="8" />
+            <state relative-caret-position="305">
+              <caret line="152" column="8" selection-start-line="152" selection-start-column="8" selection-end-line="152" selection-end-column="8" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
               </folding>
@@ -177,12 +177,12 @@
         <option value="$PROJECT_DIR$/Cryptodome/Util/_raw_api.py" />
         <option value="$PROJECT_DIR$/../wallet/hello.py" />
         <option value="$PROJECT_DIR$/ontology/rpc/rpc_client_test.py" />
-        <option value="$PROJECT_DIR$/ontology/wallet/account.py" />
         <option value="$PROJECT_DIR$/ontology/rpc/rpc.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/control.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/identity.py" />
         <option value="$PROJECT_DIR$/ontology/account/account.py" />
         <option value="$PROJECT_DIR$/ontology/utils/util.py" />
+        <option value="$PROJECT_DIR$/ontology/wallet/account.py" />
         <option value="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" />
       </list>
     </option>
@@ -710,16 +710,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="7" column="48" selection-start-line="7" selection-start-column="48" selection-end-line="7" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/rpc/rpc.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="489">
@@ -737,20 +727,6 @@
           <folding>
             <element signature="e#48#63#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="276">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ontology/wallet/account.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="42" lean-forward="true" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="42" />
         </state>
       </provider>
     </entry>
@@ -791,10 +767,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/identity.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/account.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="37" column="23" lean-forward="true" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="7" column="48" selection-start-line="7" selection-start-column="48" selection-end-line="7" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="136" column="8" lean-forward="true" selection-start-line="136" selection-start-column="8" selection-end-line="136" selection-end-column="8" />
+        <state relative-caret-position="305">
+          <caret line="152" column="8" selection-start-line="152" selection-start-column="8" selection-end-line="152" selection-end-column="8" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
           </folding>

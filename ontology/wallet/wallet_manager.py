@@ -134,7 +134,8 @@ class WalletManager(object):
         return account
 
     def import_account(self, label, encrypted_prikey, pwd, address, salt):
-        
+        private_key = Account.get_gcm_decoded_private_key(encrypted_prikey, pwd, address, salt, Scrypt().get_n(),
+                                                          self.__scheme)
 
         """
         public Account importAccount(String label,String encryptedPrikey, String password, String address,byte[] salt) throws Exception {
@@ -145,6 +146,28 @@ class WalletManager(object):
         return getWallet().getAccount(info.addressBase58);
     }
         """
+
+    def create_account_info(self, label, pwd, salt, private_key):
+        acct = self.create_account(label, pwd, salt, private_key, True)
+
+        
+
+        '''
+        private AccountInfo createAccountInfo(String label,String password,byte[] salt, byte[] prikey) throws Exception {
+        com.github.ontio.account.Account acct = createAccount(label,password,salt, prikey, true);
+        new SecureRandom().nextBytes(prikey);
+        AccountInfo info = new AccountInfo();
+        info.addressBase58 = Address.addressFromPubKey(acct.serializePublicKey()).toBase58();
+        info.pubkey = Helper.toHexString(acct.serializePublicKey());
+        info.setPrikey(Helper.toHexString(acct.serializePrivateKey()));
+        info.setPriwif(acct.exportWif());
+        info.encryptedPrikey = acct.exportGcmEncryptedPrikey(password, salt,walletFile.getScrypt().getN());
+        info.addressU160 = acct.getAddressU160().toHexString();
+        return info;
+    }
+
+        :return:
+        '''
 
     def create_account_from_prikey(self):
         pass
