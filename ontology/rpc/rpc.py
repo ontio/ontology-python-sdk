@@ -185,7 +185,7 @@ class RpcClient(object):
         return res
 
 if __name__ == '__main__':
-    cli = RpcClient(0,rpc_address)
+    cli = RpcClient(0, rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     acc = Account(private_key, SignatureScheme.SHA256withECDSA)
     print(acc.get_address_base58())
@@ -206,7 +206,8 @@ if __name__ == '__main__':
         tx = cli.get_ddo("did:ont:"+acc.get_address_base58())
         result = cli.send_raw_transaction_preexec(tx)
         ddo = result.get("Result")
-        ms = StreamManager.GetStream(hex_to_bytes("4e010000002103036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be8890200000023131402c06c72787291a7ce27be41ce569b42abd5824d2a93158ec3c49575d1ae9e37c713046b65793106537472696e670676616c7565311456bf94c2c1b246c9efcde7ac584b9447d06d24e5"))
+        print("ddo:", ddo)
+        ms = StreamManager.GetStream(hex_to_bytes("76010000002103036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be8890200000023131402c06c72787291a7ce27be41ce569b42abd5824d2a93158ec3c49575d1ae9e37c703000000231314029682e54813cb5fc382f69803a6da84fe0a085bb888ee63d90d0e72f5e65fed0d26046b65793206537472696e670676616c756532046b65793106537472696e670676616c7565311456bf94c2c1b246c9efcde7ac584b9447d06d24e5"))
         reader = BinaryReader(ms)
         try:
             publickey_bytes = reader.ReadVarBytes()
@@ -251,7 +252,7 @@ if __name__ == '__main__':
                 try:
                     d = {}
                     key = reader2.ReadVarBytes()
-                    if key == bytes():
+                    if len(key) == 0:
                         break
                     d["Key"] = str(key, 'utf8')
                     d["Type"] = str(reader2.ReadVarBytes(), 'utf-8')
@@ -263,7 +264,8 @@ if __name__ == '__main__':
         d2["Owners"] = pubKey_list
         d2["Attributes"] = attribute_list
         if len(recovery_bytes) != 0:
-            print(recovery_bytes)
-            d2["Recovery"] = base58.b58encode(recovery_bytes).decode("utf-8")
+            addr = Address(str(recovery_bytes.hex()))
+            print(addr.to_base58())
+            d2["Recovery"] = addr.to_base58()
         d2["OntId"] = "did:ont:" + acc.get_address_base58()
         print(d2)
