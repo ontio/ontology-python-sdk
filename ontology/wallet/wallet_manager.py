@@ -184,6 +184,7 @@ class WalletManager(object):
 
 if __name__ == '__main__':
     # test address
+
     private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     scheme = SignatureScheme.SHA256withECDSA
     acct = Account(private_key, scheme)
@@ -193,7 +194,13 @@ if __name__ == '__main__':
     w = WalletManager(wallet_path=wallet_path)
     res = w.open_wallet()
     print(res)
+
+    from collections import namedtuple
+    file = open(wallet_path, 'r', encoding='utf-8')
+    content = json.load(file,object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+    print(content)
+
     # test create account
     salt = get_random_bytes(16)
-    res = w.create_account("123", "567", salt, private_key, False)
-    print(res)
+    #res = w.create_account("123", "567", salt, private_key, False)
+    #print(res)
