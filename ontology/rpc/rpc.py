@@ -8,15 +8,10 @@ from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
-from ontology.smart_contract.native_contract.asset import new_transfer_transaction
 from ontology.crypto.encrypt import get_random_bytes
-from ontology.smart_contract.native_contract.ontid import *
-from ontology.io.BinaryReader import BinaryReader
-
-from ontology.utils.util import *
-from ontology.crypto.Curve import Curve
+from ontology.smart_contract.native_contract import asset,ontid
 import base64
-import base58
+from binascii import b2a_hex, a2b_hex
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -184,35 +179,38 @@ class RpcClient(object):
         r = HttpRequest.request("post", self.addr, rpc_struct)
         print(r.content.decode())
         res = json.loads(r.content.decode())["result"]
-        return res
+        if res["State"] == 0:
+            print(res)
+            raise RuntimeError
+        return res["Result"]
 
 if __name__ == '__main__':
-    cli = RpcClient(0, rpc_address)
+    cli = RpcClient(0,rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     acc = Account(private_key, SignatureScheme.SHA256withECDSA)
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
+    if False :
+        tx = asset.new_transfer_transaction( "ont", acc.get_address().to_base58(), "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs",1, 20000, 500)
+        tx = cli.sign_to_transaction(tx, acc)
+        print(tx.hash256().hex())
+        print(tx.serialize().hex())
+        cli.send_raw_transaction(tx)
     if False:
         toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
-        print(toAddr.to_array().hex())
-        print(acc.get_address_base58())
-        print(cli.get_balance(acc.get_address_base58()))
-        print(cli.get_balance("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs"))
-        tx = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
-        print(tx.hash256().hex())
-        print(tx.serialize().hex())
-        cli.send_raw_transaction(tx)
-        time.sleep(6)
-        print(cli.get_balance(acc.get_address_base58()))
-        print(cli.get_balance("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs"))
-    if False:
-        tx = cli.registry_ontid(acc, 20000, 500)
-        print(tx.hash256().hex())
-        print(tx.serialize().hex())
-        cli.send_raw_transaction(tx)
-    if True:
-        tx = cli.get_ddo("did:ont:"+acc.get_address_base58())
+        print(toAddr.to_array())
+        tx = asset.new_get_balance_transaction("ont", "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
         result = cli.send_raw_transaction_preexec(tx)
-        ddo = result.get("Result")
-        r = parse_ddo("did:ont:"+acc.get_address_base58(), "76010000002103036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be8890200000023131402c06c72787291a7ce27be41ce569b42abd5824d2a93158ec3c49575d1ae9e37c703000000231314029682e54813cb5fc382f69803a6da84fe0a085bb888ee63d90d0e72f5e65fed0d26046b65793206537472696e670676616c756532046b65793106537472696e670676616c7565311456bf94c2c1b246c9efcde7ac584b9447d06d24e5")
-        print("r:", r)
+        print(result)
+    if True:
+        did = "did:ont:" + acc.get_address_base58()
+        tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(), 20000, 500)
+        tx = cli.sign_to_transaction(tx, acc)
+        print(tx.hash256().hex())
+        print(tx.serialize().hex())
+        cli.send_raw_transaction(tx)
+    if False:
+        did = "did:ont:"+acc.get_address_base58()
+        tx = ontid.new_get_ddo_transaction(did)
+        ddo = cli.send_raw_transaction_preexec(tx)
+        print(ontid.parse_ddo(did,ddo))
