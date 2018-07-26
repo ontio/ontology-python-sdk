@@ -11,6 +11,7 @@ class Curve(Enum):
     P384 = ec.SECP384R1()
     P521 = ec.SECP521R1()
 
+
     @staticmethod
     def from_label(label: int):
         label = bytes([label])
@@ -22,3 +23,4 @@ class Curve(Enum):
             return Curve.P384.name
         elif Curve.P521.value == label:
             return Curve.P521.name
+

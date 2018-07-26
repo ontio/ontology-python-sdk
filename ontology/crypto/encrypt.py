@@ -16,5 +16,5 @@ def encrypt_with_custom_scrypt(private_key, addr: str, pwd: bytearray, param):
     pass
 
 def get_random_bytes(length):
-    res = bytearray(urandom(length))
+    res = bytes(urandom(length))
     return res

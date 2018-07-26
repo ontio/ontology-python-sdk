@@ -6,6 +6,7 @@ from enum import Enum, unique
 
 @unique
 class KeyType(Enum):
+
     ECDSA = b'\x12'
     SM2 = b'\x13'
     EDDSA = b'\x14'
@@ -19,4 +20,6 @@ class KeyType(Enum):
             return KeyType.SM2.name
         elif KeyType.EDDSA.value == label:
             return KeyType.EDDSA.name
+
+    
 

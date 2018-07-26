@@ -6,7 +6,7 @@ import json
 import base64
 from ontology.crypto.scrypt import Scrypt
 from ontology.account.account import Account
-from ontology.wallet.account import AccountData
+from ontology.wallet.account import AccountData, AccountInfo
 from ontology.wallet.control import ProtectedKey, Control
 from ontology.common.address import Address
 import uuid
@@ -41,6 +41,8 @@ class WalletManager(object):
 
     def write_wallet(self):
         self.__wallet_in_mem.save(self.__wallet_path)
+        self.__wallet_file = self.__wallet_in_mem
+        return self.__wallet_file
 
     def reset_wallet(self):
         self.__wallet_in_mem = self.__wallet_file.clone()
@@ -68,7 +70,7 @@ class WalletManager(object):
     def create_identity(self, label: str, pwd, salt, private_key):
         acct = self.create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
-        info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address()).to_base58()
+        info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address().to_array()).to_base58()
         info.pubic_key = acct.serialize_public_key().hex()
         info.private_key = acct.serialize_private_key().hex()
         info.prikey_wif = acct.export_wif()
@@ -90,7 +92,7 @@ class WalletManager(object):
         if self.__scheme == SignatureScheme.SHA256withECDSA:
             prot = ProtectedKey(algorithm="ECDSA", enc_alg="aes-256-gcm", hash_value="SHA256withECDSA",
                                 param={"curve": "secp256r1"})
-            acct = AccountData(protected_key=prot, sign_scheme="SHA256withECDSA")  # todo init
+            acct = AccountData(protected_key=prot, sign_scheme="SHA256withECDSA")
         else:
             raise ValueError("scheme type is error")
         # set key
@@ -100,7 +102,7 @@ class WalletManager(object):
         else:
             acct.protected_key.key = account.serialize_private_key().hex()
 
-        acct.protected_key.address = Address.address_from_bytes_pubkey(account.get_address()).to_base58()
+        acct.protected_key.address = Address.address_from_bytes_pubkey(account.get_address().to_array().encode()).to_base58()
         # set label
         if label == None or label == "":
             label = str(uuid.uuid4())[0:8]
@@ -116,7 +118,8 @@ class WalletManager(object):
             acct.protected_key.salt = salt
             self.__wallet_in_mem.accounts.append(acct)
         else:
-            for index in range(len(self.__wallet_in_mem.identities)):
+            print(type(self.__wallet_in_mem))
+            for index in range(len(self.__wallet_in_mem.identities)): # 从文件中读出来是dict，不是类了
                 if self.__wallet_in_mem.identities[index].ontid == did_ont + acct.protected_key.address:
                     raise ValueError("wallet identity exists")
 
@@ -136,48 +139,68 @@ class WalletManager(object):
     def import_account(self, label, encrypted_prikey, pwd, address, salt):
         private_key = Account.get_gcm_decoded_private_key(encrypted_prikey, pwd, address, salt, Scrypt().get_n(),
                                                           self.__scheme)
-
-        """
-        public Account importAccount(String label,String encryptedPrikey, String password, String address,byte[] salt) throws Exception {
-        String prikey = com.github.ontio.account.Account.getGcmDecodedPrivateKey(encryptedPrikey, password, address,salt, walletFile.getScrypt().getN(), scheme);
-        AccountInfo info = createAccountInfo(label,password, salt,Helper.hexToBytes(prikey));
-        prikey = null;
-        password = null;
-        return getWallet().getAccount(info.addressBase58);
-    }
-        """
+        info = self.create_account_info(label, pwd, salt, hex_to_bytes(private_key))
+        private_key, pwd = None, None
+        for index in range(len(self.__wallet_in_mem.accounts)):
+            if info.address_base58 == self.__wallet_in_mem.accounts[index].protected_key.address:
+                return self.__wallet_in_mem.accounts[index]
+        return None
 
     def create_account_info(self, label, pwd, salt, private_key):
         acct = self.create_account(label, pwd, salt, private_key, True)
+        info = AccountInfo()
+        info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()
+        info.public_key = acct.serialize_public_key().hex()
+        info.private_key = acct.serialize_private_key().hex()
+        info.prikey_wif = acct.export_wif()
+        info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
+        info.address_u160 = acct.get_address().to_array().hex()
+        return info
 
-        
+    def create_account_from_prikey(self, pwd, private_key):
+        salt = get_random_bytes(16)
+        info = self.create_account_info("", pwd, salt, hex_to_bytes(private_key))
+        for index in range(len(self.__wallet_in_mem.accounts)):
+            if info.address_base58 == self.__wallet_in_mem.accounts[index].protected_key.address:
+                return self.__wallet_in_mem.accounts[index]
+        return None
 
-        '''
-        private AccountInfo createAccountInfo(String label,String password,byte[] salt, byte[] prikey) throws Exception {
-        com.github.ontio.account.Account acct = createAccount(label,password,salt, prikey, true);
-        new SecureRandom().nextBytes(prikey);
-        AccountInfo info = new AccountInfo();
-        info.addressBase58 = Address.addressFromPubKey(acct.serializePublicKey()).toBase58();
-        info.pubkey = Helper.toHexString(acct.serializePublicKey());
-        info.setPrikey(Helper.toHexString(acct.serializePrivateKey()));
-        info.setPriwif(acct.exportWif());
-        info.encryptedPrikey = acct.exportGcmEncryptedPrikey(password, salt,walletFile.getScrypt().getN());
-        info.addressU160 = acct.getAddressU160().toHexString();
-        return info;
-    }
+    def get_account_by_address(self, address: Address, pwd, salt):
+        for index in range(len(self.__wallet_in_mem.accounts)):
+            if self.__wallet_in_mem.accounts[index].protected_key.address == address.to_base58():
+                key = self.__wallet_in_mem.accounts[index].protected_key.key
+                addr = self.__wallet_in_mem.accounts[index].protected_key.address
+                private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.__scheme)
+                return Account(hex_to_bytes(private_key), self.__scheme)
 
-        :return:
-        '''
-
-    def create_account_from_prikey(self):
-        pass
-
-    def get_account_by_address(self):
-        pass
+        for index in range(len(self.__wallet_in_mem.identities)):
+            if self.__wallet_in_mem.identities[index].ontid == did_ont + address.to_base58():
+                addr = self.__wallet_in_mem.identities[index].ontid.replace(did_ont, "")
+                key = self.__wallet_in_mem.identities[index].controls[0].key
+                private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.__scheme)
+                return Account(hex_to_bytes(private_key), self.__scheme)
+        return None
 
 
 if __name__ == '__main__':
+    # test address
+
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+    scheme = SignatureScheme.SHA256withECDSA
+    acct = Account(private_key, scheme)
+    print(acct.get_address().to_base58())
+    # test wallet load and save
     wallet_path = '/Users/zhaoxavi/test.txt'
     w = WalletManager(wallet_path=wallet_path)
     res = w.open_wallet()
     print(res)
+
+    from collections import namedtuple
+    file = open(wallet_path, 'r', encoding='utf-8')
+    content = json.load(file,object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+    print(content)
+
+    # test create account
+    salt = get_random_bytes(16)
+    #res = w.create_account("123", "567", salt, private_key, False)
+    #print(res)
