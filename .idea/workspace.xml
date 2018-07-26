@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52d8dbbb-4020-46d6-9a05-68ecdbc76cb5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/ontology/wallet/wallet_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -29,8 +28,8 @@
       <file leaf-file-name="wallet_manager.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3073">
-              <caret line="184" column="19" selection-start-line="184" selection-start-column="16" selection-end-line="184" selection-end-column="19" />
+            <state relative-caret-position="175">
+              <caret line="58" column="39" selection-start-line="58" selection-start-column="39" selection-end-line="58" selection-end-column="39" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
               </folding>
@@ -791,8 +790,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ontology/wallet/wallet_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3073">
-          <caret line="184" column="19" selection-start-line="184" selection-start-column="16" selection-end-line="184" selection-end-column="19" />
+        <state relative-caret-position="175">
+          <caret line="58" column="39" selection-start-line="58" selection-start-column="39" selection-end-line="58" selection-end-column="39" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
           </folding>
