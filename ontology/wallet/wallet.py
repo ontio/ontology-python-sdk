@@ -3,6 +3,7 @@ from ontology.wallet.account import AccountData
 from ontology.wallet.identity import Identity
 import json
 from collections import namedtuple
+from ontology.wallet.control import ProtectedKey, Control
 
 
 class WalletData(object):
@@ -48,9 +49,40 @@ class WalletData(object):
                 return self.accounts[index], index
         return None, -1
 
-    def load(self, wallet_path):
+    @staticmethod
+    def load(wallet_path):
         r = json.load(open(wallet_path, "r"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-        return r
+        scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
+        identities = []
+        for index in range(len(r.identities)):
+            prot = ProtectedKey(r.identities[index].controls[0].protected_key.address,
+                                r.identities[index].controls[0].protected_key.enc_alg,
+                                r.identities[index].controls[0].protected_key.key,
+                                r.identities[index].controls[0].protected_key.algorithm,
+                                r.identities[index].controls[0].protected_key.salt,
+                                r.identities[index].controls[0].protected_key.hash_value,
+                                r.identities[index].controls[0].protected_key.param)
+            c = [Control(r.identities[index].controls[0].id, r.identities[index].controls[0].publicKey, prot)]
+            temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, c,
+                            r.identities[index].extra, r.identities[index].is_default)
+            identities.append(temp)
+        accounts = []
+        for index in range(len(r.accounts)):
+            prot = ProtectedKey(r.accounts[index].protected_key.address,
+                                r.accounts[index].protected_key.enc_alg,
+                                r.accounts[index].protected_key.key,
+                                r.accounts[index].protected_key.algorithm,
+                                r.accounts[index].protected_key.salt,
+                                r.accounts[index].protected_key.hash_value,
+                                r.accounts[index].protected_key.param)
+            temp = AccountData(prot, r.accounts[index].label, r.accounts[index].public_key,
+                               r.accounts[index].sign_scheme, r.accounts[index].is_default, r.accounts[index].lock)
+            accounts.append(temp)
+
+        res = WalletData(r.name, r.version, r.create_time, r.default_ontid, r.default_account_address, scrypt,
+                         identities, accounts, r.extra)
+
+        return res
 
     def save(self, wallet_path):
         json.dump(self, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
@@ -62,8 +94,3 @@ class WalletData(object):
         for index in range(len(self.identities)):
             if self.identities[index].ontid == ontid:
                 del self.identities[index]
-
-
-if __name__ == '__main__':
-    w = WalletData()
-    print(w.identities)
