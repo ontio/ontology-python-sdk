@@ -42,7 +42,7 @@ class Address(object):
         builder = ParamsBuilder()
         builder.emit_push_byte_array(bytearray(public_key))
         builder.emit(CHECKSIG)
-        addr = Address(Address.toScriptHash(builder.code))
+        addr = Address(Address.toScriptHash(builder.to_array()))
         return addr
 
     @staticmethod

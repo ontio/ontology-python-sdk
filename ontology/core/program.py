@@ -19,7 +19,7 @@ class ProgramBuilder(object):
         builder = ParamsBuilder()
         builder.emit_push_byte_array(public_key)
         builder.emit(CHECKSIG)
-        return builder.code
+        return builder.to_array()
 
     @staticmethod
     def push_bytes(data):

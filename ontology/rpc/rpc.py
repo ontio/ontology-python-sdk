@@ -3,19 +3,18 @@ import time
 import requests
 from ontology.rpc.define import *
 import json
-from ontology.core.transaction import Sig
+from ontology.core.sig import Sig
 from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
 from ontology.crypto.encrypt import get_random_bytes
-from ontology.smart_contract.native_contract.asset import *
-from ontology.smart_contract.native_contract.ontid import *
+from ontology.smart_contract.native_contract import asset,ontid
 import base64
 from binascii import b2a_hex, a2b_hex
 from time import *
 
-rpc_address = "http://polaris1.ont.io:20336"
+rpc_address = "http://polaris3.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
 
 
@@ -150,32 +149,7 @@ class RpcClient(object):
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def transfer(self, gas_price: int, gas_limit: int, asset: str, from_account, to_addr, amount: int):
-        tx = new_transfer_transaction(gas_price, gas_limit, asset, from_account.get_address().to_array(), to_addr,
-                                      amount)
-        tx = self.sign_to_transaction(tx, from_account)
-        self.send_raw_transaction(tx)
-        return tx
-
-    def withdraw_ong(self, gas_price: int, gas_limit: int, claimer_account, to_addr, amount: int):
-        tx = new_withdraw_ong_transaction(claimer_account.get_address().to_array(), to_addr, amount, gas_limit, gas_price)
-        tx = self.sign_to_transaction(tx, claimer_account)
-        self.send_raw_transaction(tx)
-        return tx
-
-    def registry_ontid(self, account: Account,gas_limit: int, gas_price: int):
-        did = "did:ont:"+account.get_address_base58()
-        print(did)
-        tx = new_registry_ontid_transaction( did,account.get_public_key(),gas_limit, gas_price)
-        tx = self.sign_to_transaction(tx, account)
-        return tx
-    def get_ddo(self, did: str):
-        tx = new_get_ddo_transaction(did)
-        p = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs").to_array()
-        tx.payer = str(p)
-        return tx
     def sign_to_transaction(self, tx, signer: Account):
-        tx.payer = signer.get_address().to_array()
         tx_hash = tx.hash256()
         sig_data = signer.generateSignature(tx_hash, SignatureScheme.SHA256withECDSA)
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
@@ -191,24 +165,58 @@ class RpcClient(object):
         print(r.content.decode())
         res = json.loads(r.content.decode())["result"]
         return res
-
     def send_raw_transaction_preexec(self, tx):
         buf = tx.serialize()
         tx_data = buf.hex()
-        rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
+        rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data,1])
         print(rpc_struct)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         print(r.content.decode())
+        err = json.loads(r.content.decode())["error"]
+        if err > 0:
+            raise RuntimeError
         res = json.loads(r.content.decode())["result"]
-        if len(res) == 0:
-            return ""
         if res["State"] == 0:
             print(res)
             raise RuntimeError
+        print(res)
         return res["Result"]
 
 if __name__ == '__main__':
-    rpc_address = "http://127.0.0.1:20336"
+    cli = RpcClient(0,rpc_address)
+    private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
+    acc = Account(private_key, SignatureScheme.SHA256withECDSA)
+    print(acc.get_address_base58())
+    print(acc.get_public_key().hex())
+    num = 100
+    print(num.to_bytes(4, "little"))
+    if False :
+        tx = asset.new_transfer_transaction( "ont", acc.get_address().to_base58(), "AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve",513, 20000, 500)
+        tx = cli.sign_to_transaction(tx, acc)
+        print(tx.hash256().hex())
+        print(tx.serialize().hex())
+        cli.send_raw_transaction(tx)
+    if False:
+        tx = asset.new_get_balance_transaction("ont", acc.get_address_base58())
+        result = cli.send_raw_transaction_preexec(tx)
+        balance = int.from_bytes(a2b_hex(result.encode()), byteorder='little')
+        print(balance)
+    if True:
+        did = "did:ont:" + acc.get_address_base58()
+        tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(), 20000, 500)
+        tx = cli.sign_to_transaction(tx, acc)
+        print(tx.hash256().hex())
+        print(tx.serialize().hex())
+        cli.send_raw_transaction(tx)
+    if False:
+        did = "did:ont:"+acc.get_address_base58()
+        tx = ontid.new_get_ddo_transaction(did)
+        ddo = cli.send_raw_transaction_preexec(tx)
+        print(ontid.parse_ddo(did,ddo))
+
+
+if __name__ == '__main__':
+    #rpc_address = "http://127.0.0.1:20336"
     cli = RpcClient(0, rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
@@ -216,7 +224,7 @@ if __name__ == '__main__':
     acc = Account(private_key, SignatureScheme.SHA256withECDSA)
     acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
     acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-
+    print("#################################")
     if False:
         print(acc.get_address_base58())
         print(acc2.get_address_base58())
@@ -227,30 +235,30 @@ if __name__ == '__main__':
     if False:
         print(acc.get_address_base58())
         print(acc2.get_address_base58())
-        tx = new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
+        tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
         print(cli.send_raw_transaction_preexec(tx))
         # tx2 = new_approve_transaction("ont", acc.get_address_base58(), acc2.get_address_base58(), 10, 20000, 500)
         # cli.sign_to_transaction(tx2, acc)
         # cli.send_raw_transaction(tx2)
-        tx2 = new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), 10, 20000, 500)
+        tx2 = asset.new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), 10, 20000, 500)
         cli.sign_to_transaction(tx2, acc2)
         cli.send_raw_transaction(tx2)
         sleep(6)
-        tx = new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
+        tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
         print(cli.send_raw_transaction_preexec(tx))
     if False:
-        print(unboundong(cli, acc.get_address_base58()))
+        print(asset.unboundong(cli, acc.get_address_base58()))
     if True:
-        print(unboundong(cli, acc.get_address_base58()))
+        print(asset.unboundong(cli, acc.get_address_base58()))
         print(cli.get_balance(acc.get_address_base58()))
-        tx = new_withdraw_ong_transaction(acc.get_address().to_base58(), acc.get_address().to_base58(), 200, 20000, 500)
+        tx = asset.new_withdraw_ong_transaction(acc.get_address().to_base58(), acc.get_address().to_base58(), 200, 20000, 500)
         tx = cli.sign_to_transaction(tx, acc)
         cli.send_raw_transaction(tx)
         sleep(6)
         print(cli.get_balance(acc.get_address_base58()))
-        print(unboundong(cli, acc.get_address_base58()))
+        print(asset.unboundong(cli, acc.get_address_base58()))
     if False:
-        tx = new_transfer_transaction("ont", acc.get_address().to_base58(), "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs", 1, 20000, 500)
+        tx = asset.new_transfer_transaction("ont", acc.get_address().to_base58(), "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs", 1, 20000, 500)
         tx = cli.sign_to_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
@@ -263,7 +271,7 @@ if __name__ == '__main__':
     if False:
         toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
         print(toAddr.to_array())
-        tx = new_get_balance_transaction("ont", "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
+        tx = asset.new_get_balance_transaction("ont", "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
         result = cli.send_raw_transaction_preexec(tx)
         print(result)
     if False:
@@ -277,4 +285,4 @@ if __name__ == '__main__':
         did = "did:ont:"+acc.get_address_base58()
         tx = ontid.new_get_ddo_transaction(did)
         ddo = cli.send_raw_transaction_preexec(tx)
-        print(parse_ddo(did, ddo))
+        print(asset.parse_ddo(did, ddo))

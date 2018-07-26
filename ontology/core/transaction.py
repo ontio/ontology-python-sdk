@@ -28,7 +28,7 @@ class Transaction(object):
         writer.WriteUInt64(self.gas_price)
         writer.WriteUInt64(self.gas_limit)
         writer.WriteBytes(bytes(self.payer))
-        writer.WriteBytes(bytes(self.payload))
+        writer.WriteVarBytes(bytes(self.payload))
         writer.WriteVarInt(len(self.attributes))
         ms.flush()
         res = ms.ToArray()
@@ -57,24 +57,4 @@ class Transaction(object):
         return a2b_hex(temp)
 
 
-class Sig(object):
-    def __init__(self, public_keys, M, sig_data):
-        self.public_keys = public_keys  # a list to save public keys
-        self.M = M
-        self.sig_data = sig_data
 
-    def serialize(self):
-        invoke_script = ProgramBuilder.program_from_params(self.sig_data)
-        if len(self.public_keys) == 0:
-            raise ValueError("np public key in sig")
-
-        verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
-        ms = StreamManager.GetStream()
-        writer = BinaryWriter(ms)
-        writer.WriteVarBytes(invoke_script)
-        writer.WriteVarBytes(verification_script)
-        ms.flush()
-        res = ms.ToArray()
-        res = bytes_reader(res)
-        StreamManager.ReleaseStream(ms)
-        return res
