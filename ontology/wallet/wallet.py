@@ -2,6 +2,7 @@ from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.account import AccountData
 from ontology.wallet.identity import Identity
 import json
+from collections import namedtuple
 
 
 class WalletData(object):
@@ -48,12 +49,11 @@ class WalletData(object):
         return None, -1
 
     def load(self, wallet_path):
-        with open(wallet_path, 'r') as f:
-            content = f.read()
-        return json.loads(content)
+        r = json.load(open(wallet_path, "r"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        return r
 
     def save(self, wallet_path):
-        json.dump(self, open(wallet_path, "w+"), default=lambda obj: obj.__dict__, indent=4)
+        json.dump(self, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
 
     def add_identity(self, id: Identity):
         self.identities.append(id)
@@ -64,7 +64,6 @@ class WalletData(object):
                 del self.identities[index]
 
 
-
 if __name__ == '__main__':
-    w=WalletData()
+    w = WalletData()
     print(w.identities)
