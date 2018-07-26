@@ -108,7 +108,7 @@ class WalletManager(object):
             acct.protected_key.key = account.serialize_private_key().hex()
 
         acct.protected_key.address = Address.address_from_bytes_pubkey(
-            account.get_address().to_array().encode()).to_base58()
+            account.get_address().to_array()).to_base58()
         # set label
         if label == None or label == "":
             label = str(uuid.uuid4())[0:8]
