@@ -1,3 +1,5 @@
+import time
+
 import requests
 from ontology.rpc.define import *
 import json
@@ -6,10 +8,10 @@ from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import Address
-from ontology.smart_contract.native_contract.asset import new_transfer_transaction
 from ontology.crypto.encrypt import get_random_bytes
-from ontology.smart_contract.native_contract import ontid
+from ontology.smart_contract.native_contract import asset,ontid
 import base64
+from binascii import b2a_hex, a2b_hex
 
 rpc_address = "http://polaris1.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -144,11 +146,11 @@ class RpcClient(object):
     def registry_ontid(self, account: Account,gas_limit: int, gas_price: int):
         did = "did:ont:"+account.get_address_base58()
         print(did)
-        tx = ontid.new_registry_ontid_transaction( did,account.get_public_key(),gas_limit, gas_price)
+        tx = new_registry_ontid_transaction( did,account.get_public_key(),gas_limit, gas_price)
         tx = self.sign_to_transaction(tx, account)
         return tx
     def get_ddo(self, did: str):
-        tx = ontid.new_get_ddo_transaction(did)
+        tx = new_get_ddo_transaction(did)
         p = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs").to_array()
         tx.payer = str(p)
         return tx
@@ -177,7 +179,10 @@ class RpcClient(object):
         r = HttpRequest.request("post", self.addr, rpc_struct)
         print(r.content.decode())
         res = json.loads(r.content.decode())["result"]
-        return res
+        if res["State"] == 0:
+            print(res)
+            raise RuntimeError
+        return res["Result"]
 
 if __name__ == '__main__':
     cli = RpcClient(0,rpc_address)
@@ -186,18 +191,26 @@ if __name__ == '__main__':
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
     if False :
-        toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
-        print(toAddr.to_array().hex())
-        tx = cli.transfer(500, 20000, "ont", acc, toAddr.to_array(), 1)
+        tx = asset.new_transfer_transaction( "ont", acc.get_address().to_base58(), "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs",1, 20000, 500)
+        tx = cli.sign_to_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
     if False:
-        tx = cli.registry_ontid(acc,20000, 500)
+        toAddr = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
+        print(toAddr.to_array())
+        tx = asset.new_get_balance_transaction("ont", "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
+        result = cli.send_raw_transaction_preexec(tx)
+        print(result)
+    if True:
+        did = "did:ont:" + acc.get_address_base58()
+        tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(), 20000, 500)
+        tx = cli.sign_to_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
-    if True:
-        tx = cli.get_ddo("did:ont:"+acc.get_address_base58())
-        result = cli.send_raw_transaction_preexec(tx)
-        print(result)
+    if False:
+        did = "did:ont:"+acc.get_address_base58()
+        tx = ontid.new_get_ddo_transaction(did)
+        ddo = cli.send_raw_transaction_preexec(tx)
+        print(ontid.parse_ddo(did,ddo))

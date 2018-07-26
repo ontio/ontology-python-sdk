@@ -10,10 +10,10 @@ import struct
 import binascii
 import importlib
 
-from logzero import logger
-from neocore.Fixed8 import Fixed8
-from neocore.UInt160 import UInt160
-from neocore.UInt256 import UInt256
+# from logzero import logger
+# from neocore.Fixed8 import Fixed8
+# from neocore.UInt160 import UInt160
+# from neocore.UInt256 import UInt256
 
 
 class BinaryReader(object):
@@ -58,7 +58,8 @@ class BinaryReader(object):
                 return ord(self.stream.read(1))
             return self.stream.read(1)
         except Exception as e:
-            logger.error("ord expected character but got none")
+            raise e
+            #logger.error("ord expected character but got none")
         return 0
 
     def ReadBytes(self, length):

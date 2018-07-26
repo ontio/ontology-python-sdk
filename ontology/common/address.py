@@ -2,6 +2,7 @@ from ontology.vm.params_builder import ParamsBuilder
 from ontology.vm.op_code import CHECKSIG
 from ontology.crypto.Digest import Digest
 import base58
+from binascii import b2a_hex, a2b_hex
 
 ADDR_LEN = 20  # the size of address should be 20 bytes
 
@@ -52,10 +53,10 @@ class Address(object):
         sb = Address.__COIN_VERSION + bytearray.fromhex(self.ZERO)
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
-        return base58.b58encode(bytes(outb)).decode("utf-8")
+        return base58.b58encode(bytes(outb)).decode()
 
     def to_array(self):
-        return self.ZERO
+        return a2b_hex(self.ZERO)
 
     @staticmethod
     def decodeBase58(addr):
@@ -67,4 +68,4 @@ class Address(object):
         checksum = Digest.hash256(data[0:21])
         if data[21:25] != checksum[0:4]:
             raise TypeError
-        return Address(data[1:21])
+        return Address(b2a_hex(data[1:21]))

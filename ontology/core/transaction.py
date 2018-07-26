@@ -27,7 +27,7 @@ class Transaction(object):
         writer.WriteUInt32(self.nonce)
         writer.WriteUInt64(self.gas_price)
         writer.WriteUInt64(self.gas_limit)
-        writer.WriteBytes(bytes(self.payer.encode()))
+        writer.WriteBytes(bytes(self.payer))
         writer.WriteBytes(bytes(self.payload))
         writer.WriteVarInt(len(self.attributes))
         ms.flush()
