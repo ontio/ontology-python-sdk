@@ -5,12 +5,11 @@ from ontology.core.transaction import Transaction, Sig
 from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
-from ontology.common.address import ont_id_contract_address
+from ontology.common.address import ont_id_contract_address,Address
 from ontology.io.MemoryStream import StreamManager
-from ontology.utils.util import *
 from ontology.io.BinaryReader import BinaryReader
-from ontology.common.address import Address
 from ontology.crypto.Curve import Curve
+from binascii import b2a_hex, a2b_hex
 
 def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
     contract_address = ont_id_contract_address # []bytes
@@ -25,11 +24,14 @@ def new_get_ddo_transaction(ontid:str):
     args = {"ontid": ontid.encode()}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
     unix_timenow = int(time())
-    return Transaction(0, 0xd1, unix_timenow, 0, 0, bytearray(), invoke_code, bytearray(),
+    payer = Address("0000000000000000000000000000000000000000").to_array()
+    return Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(),
                        [], bytearray())
 
+
 def parse_ddo(ontid:str, ddo:str):
-    ms = StreamManager.GetStream(hex_to_bytes(ddo))
+
+    ms = StreamManager.GetStream(a2b_hex(ddo))
     reader = BinaryReader(ms)
     try:
         publickey_bytes = reader.ReadVarBytes()
@@ -69,6 +71,7 @@ def parse_ddo(ontid:str, ddo:str):
     if len(attribute_bytes) != 0:
         ms = StreamManager.GetStream(attribute_bytes)
         reader2 = BinaryReader(ms)
+
         while True:
             try:
                 d = {}
