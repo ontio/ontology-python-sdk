@@ -6,6 +6,11 @@ from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
 from ontology.common.address import ont_id_contract_address
+from ontology.io.MemoryStream import StreamManager
+from ontology.utils.util import *
+from ontology.io.BinaryReader import BinaryReader
+from ontology.common.address import Address
+from ontology.crypto.Curve import Curve
 
 def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
     contract_address = ont_id_contract_address # []bytes
@@ -22,3 +27,66 @@ def new_get_ddo_transaction(ontid:str):
     unix_timenow = int(time())
     return Transaction(0, 0xd1, unix_timenow, 0, 0, bytearray(), invoke_code, bytearray(),
                        [], bytearray())
+
+def parse_ddo(ontid:str, ddo:str):
+    ms = StreamManager.GetStream(hex_to_bytes(ddo))
+    reader = BinaryReader(ms)
+    try:
+        publickey_bytes = reader.ReadVarBytes()
+    except Exception as e:
+        publickey_bytes = bytearray()
+    try:
+        attribute_bytes = reader.ReadVarBytes()
+    except Exception as e:
+        attribute_bytes = bytearray()
+    try:
+        recovery_bytes = reader.ReadVarBytes()
+    except Exception as e:
+        recovery_bytes = bytearray()
+    pubKey_list = []
+    if len(publickey_bytes) != 0:
+        ms = StreamManager.GetStream(publickey_bytes)
+        reader2 = BinaryReader(ms)
+        while True:
+            try:
+                index = reader2.ReadInt32()
+                d = {}
+                d['PubKeyId'] = ontid + "#keys-" + str(index)
+                pubkey = reader2.ReadVarBytes()
+                if len(pubkey) == 33:
+                    d["Type"] = KeyType.ECDSA.name
+                    d["Curve"] = Curve.P256.name
+                    d["Value"] = pubkey.hex()
+                else:
+                    print(pubkey)
+                    d["Type"] = KeyType.from_label(pubkey[0])
+                    d["Curve"] = Curve.from_label(pubkey[1])
+                    d["Value"] = pubkey.hex()
+                pubKey_list.append(d)
+            except Exception as e:
+                break
+    attribute_list = []
+    if len(attribute_bytes) != 0:
+        ms = StreamManager.GetStream(attribute_bytes)
+        reader2 = BinaryReader(ms)
+        while True:
+            try:
+                d = {}
+                key = reader2.ReadVarBytes()
+                if len(key) == 0:
+                    break
+                d["Key"] = str(key, 'utf-8')
+                d["Type"] = str(reader2.ReadVarBytes(), 'utf-8')
+                d["Value"] = str(reader2.ReadVarBytes(), 'utf-8')
+                attribute_list.append(d)
+            except Exception as e:
+                break
+    d2 = {}
+    d2["Owners"] = pubKey_list
+    d2["Attributes"] = attribute_list
+    if len(recovery_bytes) != 0:
+        addr = Address(str(recovery_bytes.hex()))
+        print(addr.to_base58())
+        d2["Recovery"] = addr.to_base58()
+    d2["OntId"] = ontid
+    return d2
