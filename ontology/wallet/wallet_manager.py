@@ -29,13 +29,41 @@ class WalletManager(object):
             self.wallet_file.save(self.wallet_path)
         # wallet file exists now
         self.wallet_file = self.load(self.wallet_path)
-        self.wallet_in_mem = self.load(self.wallet_path)
+        self.wallet_in_mem = self.wallet_file
         return self.wallet_file
 
     def load(self, wallet_path):
         r = json.load(open(wallet_path, "r"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-        res = WalletData(r.name, r.version, r.create_time, r.default_ontid, r.default_account_address, r.scrypt,
-                         r.identities, r.accounts, r.extra)
+        scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
+        identities = []
+        for index in range(len(r.identities)):
+            prot = ProtectedKey(r.identities[index].controls[0].protected_key.address,
+                                r.identities[index].controls[0].protected_key.enc_alg,
+                                r.identities[index].controls[0].protected_key.key,
+                                r.identities[index].controls[0].protected_key.algorithm,
+                                r.identities[index].controls[0].protected_key.salt,
+                                r.identities[index].controls[0].protected_key.hash_value,
+                                r.identities[index].controls[0].protected_key.param)
+            c = [Control(r.identities[index].controls[0].id, r.identities[index].controls[0].publicKey, prot)]
+            temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, c,
+                            r.identities[index].extra, r.identities[index].is_default)
+            identities.append(temp)
+        accounts = []
+        for index in range(len(r.accounts)):
+            prot = ProtectedKey(r.accounts[index].protected_key.address,
+                                r.accounts[index].protected_key.enc_alg,
+                                r.accounts[index].protected_key.key,
+                                r.accounts[index].protected_key.algorithm,
+                                r.accounts[index].protected_key.salt,
+                                r.accounts[index].protected_key.hash_value,
+                                r.accounts[index].protected_key.param)
+            temp = AccountData(prot, r.accounts[index].label, r.accounts[index].public_key,
+                               r.accounts[index].sign_scheme, r.accounts[index].is_default, r.accounts[index].lock)
+            accounts.append(temp)
+
+        res = WalletData(r.name, r.version, r.create_time, r.default_ontid, r.default_account_address, scrypt,
+                         identities, accounts, r.extra)
+
         return res
 
     def save(self, wallet_path):
@@ -102,7 +130,7 @@ class WalletManager(object):
             raise ValueError("scheme type is error")
         # set key
         if pwd != None:
-            acct.protected_key.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
+            acct.protected_key.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n()).decode()
             pwd = None
         else:
             acct.protected_key.key = account.serialize_private_key().hex()
@@ -121,11 +149,11 @@ class WalletManager(object):
                 acct.is_default = True
                 self.wallet_in_mem.default_account_address = acct.protected_key.address
             acct.label = label
-            acct.protected_key.salt = salt
+            acct.protected_key.salt = salt.hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
             print(type(self.wallet_in_mem))
-            for index in range(len(self.wallet_in_mem.identities)):  # 从文件中读出来是dict，不是类了
+            for index in range(len(self.wallet_in_mem.identities)):
                 if self.wallet_in_mem.identities[index].ontid == did_ont + acct.protected_key.address:
                     raise ValueError("wallet identity exists")
 
@@ -135,7 +163,8 @@ class WalletManager(object):
         if len(self.wallet_in_mem.identities) == 0:
             idt.is_default = True
             self.wallet_in_mem.default_ontid = idt.ontid
-        prot = ProtectedKey(key=acct.protected_key.key, algorithm="ECDSA", param={"curve": "secp256r1"}, salt=salt,
+        prot = ProtectedKey(key=acct.protected_key.key, algorithm="ECDSA", param={"curve": "secp256r1"},
+                            salt=salt.hex(),
                             address=acct.protected_key.address)
         ctl = Control(id="keys-1", protected_key=prot)
         idt.controls.append(ctl)
@@ -189,17 +218,13 @@ class WalletManager(object):
 
 
 if __name__ == '__main__':
-    # test address
-
-    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
-    scheme = SignatureScheme.SHA256withECDSA
-    acct = Account(private_key, scheme)
-    print(acct.get_address().to_base58())
     # test wallet load and save
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     wallet_path = '/Users/zhaoxavi/test.txt'
     w = WalletManager(wallet_path=wallet_path)
     w.open_wallet()
-
+    print(w.wallet_in_mem)
     salt = get_random_bytes(16)
-    w.create_account("123", "567", salt, private_key, True)
-    print(w.wallet_in_mem.identities[0].controls[0].protected_key.__dict__)
+    #w.create_account("123", "567", salt, private_key, True)
+    print(type(w.wallet_in_mem.accounts[0].protected_key.param))
+    w.save(wallet_path)

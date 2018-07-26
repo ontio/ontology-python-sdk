@@ -2,13 +2,13 @@ did_ont = "did:ont:"
 
 
 class Identity(object):
-    def __init__(self):
-        self.ontid = ""
-        self.label = ""
-        self.lock = False
-        self.controls = []  # a list of Control()
-        self.extra = ""
-        self.is_default = False
+    def __init__(self, ontid="", label="", lock=False, controls=[], extra="", is_default=False):
+        self.ontid = ontid
+        self.label = label
+        self.lock = lock
+        self.controls = controls  # a list of Control()
+        self.extra = extra
+        self.is_default = is_default
 
 
 class IdentityInfo(object):

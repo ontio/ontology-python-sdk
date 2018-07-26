@@ -1,5 +1,5 @@
 class ProtectedKey(object):
-    def __init__(self, address='', enc_alg="aes-256-gcm", key=bytearray(), algorithm='', salt=bytearray(), hash_value="sha256",
+    def __init__(self, address='', enc_alg="aes-256-gcm", key="", algorithm='', salt="", hash_value="sha256",
                  param={}):
         self.address = address
         self.enc_alg = enc_alg
