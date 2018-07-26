@@ -4,7 +4,6 @@ from ontology.crypto.SignatureScheme import SignatureScheme
 from datetime import datetime
 import json
 import base64
-from collections import namedtuple
 from ontology.crypto.scrypt import Scrypt
 from ontology.account.account import Account
 from ontology.wallet.account import AccountData, AccountInfo
@@ -75,14 +74,15 @@ class WalletManager(object):
         info = IdentityInfo()
         info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address().to_array()).to_base58()
         info.pubic_key = acct.serialize_public_key().hex()
-        info.private_key = acct.serialize_private_key().hex()
+        info.private_key = acct.serialize_private_key()
         info.prikey_wif = acct.export_wif()
         info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
         return info
 
     def create_identity_from_prikey(self, pwd, private_key):
-        info = self.create_identity("", pwd, hex_to_bytes(private_key))
+        salt = get_random_bytes(16)
+        info = self.create_identity("", pwd, salt, private_key)
         private_key = None
         for index in range(len(self.wallet_in_mem.identities)):
             if self.wallet_in_mem.identities[index].ontid == info.ontid:
@@ -122,7 +122,6 @@ class WalletManager(object):
             acct.protected_key.salt = salt.hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
-            print(type(self.wallet_in_mem))
             for index in range(len(self.wallet_in_mem.identities)):
                 if self.wallet_in_mem.identities[index].ontid == did_ont + acct.protected_key.address:
                     raise ValueError("wallet identity exists")
@@ -156,7 +155,7 @@ class WalletManager(object):
         info = AccountInfo()
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()
         info.public_key = acct.serialize_public_key().hex()
-        info.private_key = acct.serialize_private_key().hex()
+        info.private_key = acct.serialize_private_key()
         info.prikey_wif = acct.export_wif()
         info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
@@ -164,7 +163,7 @@ class WalletManager(object):
 
     def create_account_from_prikey(self, pwd, private_key):
         salt = get_random_bytes(16)
-        info = self.create_account_info("", pwd, salt, hex_to_bytes(private_key))
+        info = self.create_account_info("", pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
             if info.address_base58 == self.wallet_in_mem.accounts[index].protected_key.address:
                 return self.wallet_in_mem.accounts[index]
@@ -189,12 +188,12 @@ class WalletManager(object):
 
 if __name__ == '__main__':
     # test wallet load and save
-    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1b'
     wallet_path = '/Users/zhaoxavi/test.txt'
     w = WalletManager(wallet_path=wallet_path)
     w.open_wallet()
-    print(w.wallet_in_mem)
     salt = get_random_bytes(16)
-    # w.create_account("123", "567", salt, private_key, True)
-    print(type(w.wallet_in_mem.accounts[0].protected_key.param))
+    w.create_account_from_prikey("123", private_key)
     w.save(wallet_path)
+    # w.create_account("123", "567", salt, private_key, True)
+    # print((w.wallet_in_mem.accounts[0].protected_key.__dict__))
