@@ -82,6 +82,13 @@ class WalletData(object):
 
     def save(self, wallet_path):
         json.dump(self, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
+        f = open(wallet_path, 'r+')
+        s = f.read()
+        while "enc_alg" in s:
+            s = s.replace("enc_alg", "enc-alg")
+        f.seek(0)
+        f.write(s)
+        f.close()
 
     def add_identity(self, id: Identity):
         self.identities.append(id)
