@@ -25,7 +25,7 @@ class ParamsBuilder:
             return self.emit_push_byte_array(num.to_bytes(2, "little"))
         else:
             return self.emit_push_byte_array(num.to_bytes(4, "little"))
-        return self.emit(num)
+
 
     def emit_push_byte_array(self, data):
         l = len(data)

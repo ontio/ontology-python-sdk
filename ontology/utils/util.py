@@ -119,29 +119,6 @@ def bytes_reverse(data: bytearray) -> bytearray:
     return data
 
 
-def print_byte_array(byte_array):
-    for i in range(len(byte_array)):
-        print(byte_array[i], end=' ')
-    print()
-
-
-def print_byte_content(byte_array):
-    for i in range(len(byte_array)):
-        print(chr(byte_array[i]), end='')
-
-
-def add_comma(l):
-    res = "["
-    for i in l:
-        if i == "[" or i == "]":
-            continue
-        elif i == " ":
-            res += ", "
-        else:
-            res += i
-    return res + ']'
-
-
 def bytes_reader(b):
     res = bytearray()
     for i in range(len(b) // 2):

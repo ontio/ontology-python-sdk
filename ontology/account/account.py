@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import datetime
-import json
-
 from binascii import b2a_hex, a2b_hex
-
 from ontology.utils import util
 from ontology.crypto.Curve import Curve
 from ontology.crypto.SignatureScheme import SignatureScheme
@@ -15,7 +11,8 @@ from ontology.common.address import Address
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.aes_handler import AESHandler
 from ontology.crypto.scrypt import Scrypt
-from Cryptodome import Random
+from ontology.crypto.Digest import Digest
+import base58
 import base64
 
 
@@ -93,13 +90,18 @@ class Account(object):
         return pri_key
 
     def serialize_private_key(self):
-        return self.__privateKey
+        return a2b_hex(self.__privateKey)
 
     def serialize_public_key(self):
         return self.__publicKey
 
     def export_wif(self):
-        pass
+        data = b'\x80'
+        data = data + self.serialize_private_key()
+        data += b'\01'
+        checksum = Digest.hash256(data[0:34])
+        data += checksum[0:4]
+        return base58.b58encode(data)
 
 
 if __name__ == '__main__':
@@ -107,8 +109,10 @@ if __name__ == '__main__':
     scheme = SignatureScheme.SHA256withECDSA
     acct0 = Account(private_key, scheme)
     salt = base64.b64decode("dtUtvYtVXALLfz6OVr6zDQ==")
+    print(base64.b64encode(salt))
     key = acct0.export_gcm_encrypted_private_key("1", salt, 16384)
     print(key)
-    pri = acct0.get_gcm_decoded_private_key(key, "1", acct0.get_address_base58(), salt, 16384,
+    priv = acct0.get_gcm_decoded_private_key(key, "1", acct0.get_address_base58(), salt, 16384,
                                             SignatureScheme.SHA256withECDSA)
-    print(pri.hex())
+    print(priv.hex())
+    print(acct0.serialize_private_key())
