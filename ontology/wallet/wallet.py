@@ -68,8 +68,8 @@ class WalletData(object):
         accounts = []
 
         for index in range(len(r.accounts)):
-            temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].public_key,
-                               sign_scheme=r.accounts[index].sign_scheme, is_default=r.accounts[index].isDefault,
+            temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
+                               sign_scheme=r.accounts[index].signatureScheme, is_default=r.accounts[index].isDefault,
                                lock=r.accounts[index].lock, address=r.accounts[index].address,
                                algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
                                key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
@@ -80,7 +80,6 @@ class WalletData(object):
                          identities, accounts)
         return res
 
-    @staticmethod
     def save(self, wallet_path):
         json.dump(self, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
 

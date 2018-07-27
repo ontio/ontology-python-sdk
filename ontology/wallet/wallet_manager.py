@@ -117,8 +117,8 @@ class WalletManager(object):
                     raise ValueError("wallet account exists")
 
             if len(self.wallet_in_mem.accounts) == 0:
-                acct.is_default = True
-                self.wallet_in_mem.default_account_address = acct.address
+                acct.isDefault = True
+                self.wallet_in_mem.defaultAccountAddress = acct.address
             acct.label = label
             acct.salt = base64.b64encode(salt).decode()
             self.wallet_in_mem.accounts.append(acct)
@@ -130,8 +130,8 @@ class WalletManager(object):
             idt.ontid = did_ont + acct.address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
-                idt.is_default = True
-                self.wallet_in_mem.default_ontid = idt.ontid
+                idt.isDefault = True
+                self.wallet_in_mem.defaultOntid = idt.ontid
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt).decode(), address=acct.address)
             idt.controls.append(ctl)
             self.wallet_in_mem.identities.append(idt)
@@ -166,7 +166,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, address: Address, pwd, salt):
+    def get_account(self, address: str, pwd, salt):
         for index in range(len(self.wallet_in_mem.accounts)):
             if self.wallet_in_mem.accounts[index].address == address:
                 key = self.wallet_in_mem.accounts[index].key
@@ -185,7 +185,7 @@ class WalletManager(object):
 
 if __name__ == '__main__':
     # test wallet load and save
-    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1a'
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     private_key = a2b_hex(private_key.encode())
     scheme = SignatureScheme.SHA256withECDSA
     acct0 = Account(private_key, scheme)
@@ -194,8 +194,8 @@ if __name__ == '__main__':
     w = WalletManager()
     w.open_wallet(wallet_path)
     salt = get_random_bytes(16)
-    #w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
-    w.create_account_from_prikey("123", private_key)
-    # w.create_account("123", "567", salt, private_key, True)
+    # w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
+    #w.create_account_from_prikey("123", private_key)
+    w.create_account("123", "567", salt, private_key, True)
     print(w.wallet_in_mem.accounts[0].__dict__)
     w.save(wallet_path)
