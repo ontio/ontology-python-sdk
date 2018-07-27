@@ -30,7 +30,7 @@ class Address(object):
     __zero_size = 20
     __COIN_VERSION = b'\x17'
 
-    def __init__(self, value):
+    def __init__(self, value:bytes):
         self.ZERO = value
 
     def get_address(self):
@@ -38,7 +38,7 @@ class Address(object):
 
     @staticmethod
     def toScriptHash(byte_script):
-        return Digest.hash160(msg=byte_script, is_hex=True)
+        return a2b_hex(Digest.hash160(msg=byte_script, is_hex=True))
 
     @staticmethod
     def address_from_bytes_pubkey(public_key: bytes):
@@ -53,13 +53,13 @@ class Address(object):
         return Address.address_from_bytes_pubkey((public_key))
 
     def to_base58(self):
-        sb = Address.__COIN_VERSION + bytearray.fromhex(self.ZERO)
+        sb = Address.__COIN_VERSION + self.ZERO
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
         return base58.b58encode(bytes(outb)).decode()
 
     def to_array(self):
-        return a2b_hex(self.ZERO)
+        return (self.ZERO)
 
     @staticmethod
     def decodeBase58(addr):
@@ -71,4 +71,4 @@ class Address(object):
         checksum = Digest.hash256(data[0:21])
         if data[21:25] != checksum[0:4]:
             raise TypeError
-        return Address(b2a_hex(data[1:21]))
+        return Address(data[1:21])

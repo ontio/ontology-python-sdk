@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import datetime
+import json
+
 from binascii import b2a_hex, a2b_hex
+
 from ontology.utils import util
 from ontology.crypto.Curve import Curve
 from ontology.crypto.SignatureScheme import SignatureScheme
@@ -12,12 +16,12 @@ from ontology.crypto.KeyType import KeyType
 from ontology.crypto.aes_handler import AESHandler
 from ontology.crypto.scrypt import Scrypt
 from ontology.crypto.Digest import Digest
-import base58
+from Cryptodome import Random
 import base64
-
+import base58
 
 class Account(object):
-    def __init__(self, private_key, scheme=SignatureScheme.SHA256withECDSA):
+    def __init__(self, private_key:bytes, scheme=SignatureScheme.SHA256withECDSA):
         self.__signature_scheme = scheme
         if scheme == SignatureScheme.SHA256withECDSA:
             self.__keyType = KeyType.ECDSA
@@ -39,7 +43,7 @@ class Account(object):
     def generateSignature(self, msg, signature_scheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:
             handler = SignatureHandler(self.__keyType, signature_scheme)
-            signature_value = handler.generateSignature(self.__privateKey, msg)
+            signature_value = handler.generateSignature(b2a_hex(self.__privateKey), msg)
             byte_signature = Signature(signature_scheme, signature_value).to_byte()
         else:
             raise TypeError
@@ -62,7 +66,7 @@ class Account(object):
         derivedkey = scrypt.generate_kd(password.encode(), salt)
         iv = derivedkey[0:12]
         derivedhalf2 = derivedkey[32:64]
-        mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(util.hex_to_bytes(self.__privateKey),
+        mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__privateKey,
                                                                   self.__address.to_base58().encode(),
                                                                   derivedhalf2,
                                                                   iv)
@@ -84,13 +88,13 @@ class Account(object):
         mac_tag = a2b_hex(encrypted_key[64:96])
         cipher_text = a2b_hex(encrypted_key[0:64])
         pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address.encode(), mac_tag, derivedhalf2, iv)
-        acct = Account(b2a_hex(pri_key), scheme)
+        acct = Account(pri_key, scheme)
         if acct.get_address().to_base58() != address:
             raise RuntimeError
         return pri_key
 
     def serialize_private_key(self):
-        return a2b_hex(self.__privateKey)
+        return self.__privateKey
 
     def serialize_public_key(self):
         return self.__publicKey
@@ -103,18 +107,23 @@ class Account(object):
         data += checksum[0:4]
         return base58.b58encode(data)
 
-
 if __name__ == '__main__':
     prikey = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     scheme = SignatureScheme.SHA256withECDSA
-    acct0 = Account(prikey, scheme)
-    print(acct0.__dict__)
-    salt = base64.b64decode("dtUtvYtVXALLfz6OVr6zDQ==")
-    print(base64.b64encode(salt))
-    key = acct0.export_gcm_encrypted_private_key("1", salt, 16384)
-    print(key)
-    print(acct0.get_address_base58())
-    priv = acct0.get_gcm_decoded_private_key(key, "1", acct0.get_address_base58(), salt, 16384,
-                                            SignatureScheme.SHA256withECDSA)
-    print(priv.hex())
-    print(acct0.serialize_private_key())
+
+    print(len(a2b_hex(private_key.encode())),a2b_hex(private_key.encode()))
+    acct0 = Account(a2b_hex(private_key.encode()), scheme)
+    print(acct0.export_wif())
+    # print(len(acct0.serialize_public_key()),acct0.serialize_public_key())
+    # print(len(acct0.serialize_private_key()),acct0.serialize_private_key())
+    a = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
+    print(a.to_base58())
+
+
+    # salt = base64.b64decode("dtUtvYtVXALLfz6OVr6zDQ==")
+    # key = acct0.export_gcm_encrypted_private_key("1", salt, 16384)
+    # print(key)
+    # pri = acct0.get_gcm_decoded_private_key(key, "1", acct0.get_address_base58(), salt, 16384,
+    #                                         SignatureScheme.SHA256withECDSA)
+    # print(pri.hex())
+
