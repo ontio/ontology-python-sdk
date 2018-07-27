@@ -12,9 +12,9 @@ class Signature(object):
         self.__value = signature_value
 
     @staticmethod
-    def ec_get_pubkey_by_prikey(privateKey, curveName):
+    def ec_get_pubkey_by_prikey(privateKey:bytes, curveName):
         if curveName == Curve.P256:
-            private_key = SigningKey.from_string(string=binascii.a2b_hex(privateKey), curve=NIST256p)
+            private_key = SigningKey.from_string(string=(privateKey), curve=NIST256p)
             # public_key = private_key.get_verifying_key().to_string()
             verifying_key = private_key.get_verifying_key()
             order = verifying_key.pubkey.order

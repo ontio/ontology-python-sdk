@@ -96,9 +96,9 @@ class RpcClient(object):
     def get_allowance(self, addr):
         contract_address = get_asset_address("ont")
         print(contract_address)
-        print(Address(str(contract_address.hex())).to_base58())
+        print(Address((contract_address)).to_base58())
         print(addr)
-        rpc_struct = self.set_json_rpc_version(RPC_GET_ALLOWANCE, ["ong", Address(str(contract_address.hex())).to_base58(), addr])
+        rpc_struct = self.set_json_rpc_version(RPC_GET_ALLOWANCE, ["ong", Address((contract_address)).to_base58(), addr])
         print(rpc_struct)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())["result"]
@@ -185,7 +185,7 @@ class RpcClient(object):
 if __name__ == '__main__':
     cli = RpcClient(0,rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-    acc = Account(private_key, SignatureScheme.SHA256withECDSA)
+    acc = Account(a2b_hex(private_key.encode()), SignatureScheme.SHA256withECDSA)
     print(acc.get_address_base58())
     print(acc.get_public_key().hex())
     num = 100
@@ -221,9 +221,9 @@ if __name__ == '__main__':
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
     private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
     private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
-    acc = Account(private_key, SignatureScheme.SHA256withECDSA)
-    acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-    acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
+    acc = Account(a2b_hex(private_key.encode()), SignatureScheme.SHA256withECDSA)
+    acc2 = Account(a2b_hex(private_key2.encode()), SignatureScheme.SHA256withECDSA)
+    acc3 = Account(a2b_hex(private_key3.encode()), SignatureScheme.SHA256withECDSA)
     print("#################################")
     if False:
         print(acc.get_address_base58())

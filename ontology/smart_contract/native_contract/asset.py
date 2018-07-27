@@ -67,7 +67,6 @@ def new_get_decimals_transaction(asset: str):
 def new_withdraw_ong_transaction(claimer_addr :str, recv_addr :str, amount :int, gas_limit :int, gas_price :int):
     ont_contract_address = get_asset_address("ont")
     ong_contract_address = get_asset_address("ong")
-    print(amount)
     args = {"sender": Address.decodeBase58(claimer_addr).to_array(), "from": Address(str(ont_contract_address.hex())).to_array(), "to": Address.decodeBase58(recv_addr).to_array(),
              "value": amount}
     invoke_code = build_native_invoke_code(ong_contract_address, bytes([0]), "transferFrom", args)
