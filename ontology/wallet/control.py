@@ -1,5 +1,5 @@
 class Control(object):
-    def __init__(self, id="", address='', enc_alg="aes-256-gcm", key="", algorithm='', salt="",
+    def __init__(self, id="", address='', enc_alg="aes-256-gcm", key="", algorithm='ECDSA', salt="",
                  param={"curve": "P-256"}, hash_value="sha256", public_key=""):
         self.address = address
         self.algorithm = algorithm

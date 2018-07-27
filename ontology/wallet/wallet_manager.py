@@ -69,7 +69,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.identities[index]
         return None
 
-    def create_identity(self, label: str, pwd, salt, private_key):
+    def create_identity(self, label: str, pwd:str, salt, private_key):
         acct = self.create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
         info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address().to_array()).to_base58()
@@ -80,18 +80,18 @@ class WalletManager(object):
         info.address_u160 = acct.get_address().to_array().hex()
         return info
 
-    def create_identity_from_prikey(self, pwd, private_key):
+    def create_identity_from_prikey(self,label:str, pwd:str, private_key):
         salt = get_random_bytes(16)
-        info = self.create_identity("", pwd, salt, private_key)
+        info = self.create_identity(label, pwd, salt, private_key)
         private_key = None
         for index in range(len(self.wallet_in_mem.identities)):
             if self.wallet_in_mem.identities[index].ontid == info.ontid:
                 return self.wallet_in_mem.identities[index]
         return None
 
-    def create_random_account(self, label, pwd, salt, account_flag: bool):
+    def create_random_account(self, label, pwd, salt):
         priv_key = get_random_bytes(32)
-        self.create_account(label, pwd, salt, priv_key, account_flag)
+        self.create_account(label, pwd, salt, priv_key, True)
 
     def create_account(self, label, pwd, salt, priv_key, account_flag: bool):
         account = Account(priv_key, self.scheme)
@@ -121,6 +121,7 @@ class WalletManager(object):
                 self.wallet_in_mem.defaultAccountAddress = acct.address
             acct.label = label
             acct.salt = base64.b64encode(salt).decode()
+            acct.publicKey = account.serialize_public_key().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
             for index in range(len(self.wallet_in_mem.identities)):
@@ -132,7 +133,7 @@ class WalletManager(object):
             if len(self.wallet_in_mem.identities) == 0:
                 idt.isDefault = True
                 self.wallet_in_mem.defaultOntid = idt.ontid
-            ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt).decode(), address=acct.address)
+            ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt).decode(), address=acct.address,public_key=account.serialize_public_key().hex())
             idt.controls.append(ctl)
             self.wallet_in_mem.identities.append(idt)
         return account
@@ -190,12 +191,13 @@ if __name__ == '__main__':
     scheme = SignatureScheme.SHA256withECDSA
     acct0 = Account(private_key, scheme)
     encrypted_key = 'T3uep1USsEqiJbP4O+CKsl2AWfpGjvuVSKxpoKeGdEUa0nfLHHjIq3G4xOz7a4PC'
-    wallet_path = '/Users/zhaoxavi/test.txt'
+    wallet_path = 'test.json'
     w = WalletManager()
     w.open_wallet(wallet_path)
     salt = get_random_bytes(16)
     # w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
     #w.create_account_from_prikey("123", private_key)
-    w.create_account("123", "567", salt, private_key, True)
+    w.create_random_account("label123", "567",  private_key)
+    w.create_identity_from_prikey("label123", "567",private_key)
     print(w.wallet_in_mem.accounts[0].__dict__)
     w.save(wallet_path)
