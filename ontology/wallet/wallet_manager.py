@@ -86,6 +86,10 @@ class WalletManager(object):
                 return self.wallet_in_mem.identities[index]
         return None
 
+    def create_random_account(self, label, pwd, salt, account_flag: bool):
+        priv_key = get_random_bytes(32)
+        self.create_account(label, pwd, salt, priv_key, account_flag)
+
     def create_account(self, label, pwd, salt, priv_key, account_flag: bool):
         account = Account(priv_key, self.scheme)
         # initialization
@@ -194,10 +198,8 @@ if __name__ == '__main__':
     w = WalletManager()
     w.open_wallet(wallet_path)
     salt = get_random_bytes(16)
-    #w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
+    w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
     # w.create_account_from_prikey("123", private_key)
     # w.create_account("123", "567", salt, private_key, True)
-    a=Address.decodeBase58("ASBNLVgyuB7hG2Qt6YcmVLuizNUmkZtyRH").to_base58()
-    print(a.__dict__)
-    #w.save(wallet_path)
+    # w.save(wallet_path)
     # print((w.wallet_in_mem.accounts[0].protected_key.__dict__))
