@@ -1,7 +1,8 @@
 from time import time
 from ontology.utils import util
 from ontology.vm import build_vm
-from ontology.core.transaction import Transaction, Sig
+from ontology.core.sig import Sig
+from ontology.core.transaction import Transaction
 from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
@@ -12,15 +13,16 @@ from ontology.crypto.Curve import Curve
 from binascii import b2a_hex, a2b_hex
 
 def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
-    contract_address = ont_id_contract_address # []bytes
+    contract_address = ont_id_contract_address
     args = {"ontid": ontid.encode(), "pubkey": pubkey}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
     unix_timenow = int(time())
-    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, bytearray(), invoke_code, bytearray(),
+    payer = Address.decodeBase58(ontid.replace("did:ont:","")).to_array()
+    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit,payer, invoke_code, bytearray(),
                        [], bytearray())
 
 def new_get_ddo_transaction(ontid:str):
-    contract_address = ont_id_contract_address # []bytes
+    contract_address = ont_id_contract_address
     args = {"ontid": ontid.encode()}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
     unix_timenow = int(time())
@@ -36,7 +38,7 @@ def parse_ddo(ontid:str, ddo:str):
     try:
         publickey_bytes = reader.ReadVarBytes()
     except Exception as e:
-        publickey_bytes = bytearray()
+        raise e
     try:
         attribute_bytes = reader.ReadVarBytes()
     except Exception as e:

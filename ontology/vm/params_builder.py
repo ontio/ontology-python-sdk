@@ -1,11 +1,12 @@
 from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
     PUSHBYTES75, APPCALL, TAILCALL, SYSCALL
 from ontology.common.serialize import put_uint16, put_uint32
-
+from ontology.io.MemoryStream import MemoryStream
+from binascii import b2a_hex, a2b_hex
 
 class ParamsBuilder:
     def __init__(self):
-        self.code = bytearray()
+        self.ms = MemoryStream()
 
     def emit(self, op):
         self.write_byte(op)
@@ -20,6 +21,10 @@ class ParamsBuilder:
             return self.emit(PUSH0)
         elif num > 0 and num < 16:
             return self.emit(int.from_bytes(PUSH1, 'little') - 1 + num)
+        elif num < 0x10000:
+            return self.emit_push_byte_array(num.to_bytes(2, "little"))
+        else:
+            return self.emit_push_byte_array(num.to_bytes(4, "little"))
         return self.emit(num)
 
     def emit_push_byte_array(self, data):
@@ -31,15 +36,10 @@ class ParamsBuilder:
             self.write_byte(bytearray([l]))
         elif l < 0x10000:
             self.emit(PUSHDATA2)
-            self.write_byte(bytearray([l]))
-            b = bytearray(2)
-            b = put_uint16(b, l)
-            self.write_byte(b)
+            self.write_byte(len(data).to_bytes(2, "little"))
         else:
             self.emit(PUSHDATA4)
-            b = bytearray(4)
-            b = put_uint32(b, l)
-            self.write_byte(b)
+            self.write_byte(len(data).to_bytes(4, "little"))
         self.write_byte(data)
 
     def emit_push_call(self, address):
@@ -48,14 +48,13 @@ class ParamsBuilder:
 
     def write_byte(self, value):
         if isinstance(value, bytearray) or isinstance(value, bytes):
-            self.code += value
+            self.ms.write(value)
         elif isinstance(value, str):
-            self.code += value.encode()
+            self.ms.write(value.encode())
         elif isinstance(value, int):
-            self.code += (bytes([value]))
+           self.ms.write(bytes([value]))
+        else:
+            raise TypeError
 
-    def get_builder(self):
-        b = ParamsBuilder()
-        l = len(self.code)
-        b.emit_push_integer(l)
-        return b.code + self.code
+    def to_array(self):
+        return a2b_hex(self.ms.ToArray())
