@@ -4,6 +4,7 @@ import requests
 from ontology.rpc.define import *
 import json
 from ontology.core.sig import Sig
+from ontology.core.transaction import Transaction
 from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
@@ -149,14 +150,14 @@ class RpcClient(object):
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def sign_to_transaction(self, tx, signer: Account):
+    def sign_transaction(self, tx:Transaction, signer: Account):
         tx_hash = tx.hash256()
         sig_data = signer.generateSignature(tx_hash, SignatureScheme.SHA256withECDSA)
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
         tx.sigs = sig
         return tx
 
-    def send_raw_transaction(self, tx):
+    def send_raw_transaction(self, tx:Transaction):
         buf = tx.serialize()
         tx_data = buf.hex()
         rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
@@ -165,7 +166,7 @@ class RpcClient(object):
         print(r.content.decode())
         res = json.loads(r.content.decode())["result"]
         return res
-    def send_raw_transaction_preexec(self, tx):
+    def send_raw_transaction_preexec(self, tx:Transaction):
         buf = tx.serialize()
         tx_data = buf.hex()
         rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data,1])
@@ -192,19 +193,19 @@ if __name__ == '__main__':
     print(num.to_bytes(4, "little"))
     if False :
         tx = asset.new_transfer_transaction( "ont", acc.get_address().to_base58(), "AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve",513, 20000, 500)
-        tx = cli.sign_to_transaction(tx, acc)
+        tx = cli.sign_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
-    if False:
+    if True:
         tx = asset.new_get_balance_transaction("ont", acc.get_address_base58())
         result = cli.send_raw_transaction_preexec(tx)
         balance = int.from_bytes(a2b_hex(result.encode()), byteorder='little')
         print(balance)
-    if True:
+    if False:
         did = "did:ont:" + acc.get_address_base58()
         tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(), 20000, 500)
-        tx = cli.sign_to_transaction(tx, acc)
+        tx = cli.sign_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
@@ -215,7 +216,7 @@ if __name__ == '__main__':
         print(ontid.parse_ddo(did,ddo))
 
 
-if __name__ == '__main__':
+if __name__ == '__main2__':
     #rpc_address = "http://127.0.0.1:20336"
     cli = RpcClient(0, rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
@@ -241,7 +242,7 @@ if __name__ == '__main__':
         # cli.sign_to_transaction(tx2, acc)
         # cli.send_raw_transaction(tx2)
         tx2 = asset.new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), 10, 20000, 500)
-        cli.sign_to_transaction(tx2, acc2)
+        cli.sign_transaction(tx2, acc2)
         cli.send_raw_transaction(tx2)
         sleep(6)
         tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
@@ -252,14 +253,14 @@ if __name__ == '__main__':
         print(asset.unboundong(cli, acc.get_address_base58()))
         print(cli.get_balance(acc.get_address_base58()))
         tx = asset.new_withdraw_ong_transaction(acc.get_address().to_base58(), acc.get_address().to_base58(), 200, 20000, 500)
-        tx = cli.sign_to_transaction(tx, acc)
+        tx = cli.sign_transaction(tx, acc)
         cli.send_raw_transaction(tx)
         sleep(6)
         print(cli.get_balance(acc.get_address_base58()))
         print(asset.unboundong(cli, acc.get_address_base58()))
     if False:
         tx = asset.new_transfer_transaction("ont", acc.get_address().to_base58(), "AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs", 1, 20000, 500)
-        tx = cli.sign_to_transaction(tx, acc)
+        tx = cli.sign_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         print(cli.get_balance(acc.get_address_base58()))
@@ -277,7 +278,7 @@ if __name__ == '__main__':
     if False:
         did = "did:ont:" + acc.get_address_base58()
         tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(), 20000, 500)
-        tx = cli.sign_to_transaction(tx, acc)
+        tx = cli.sign_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)

@@ -12,7 +12,7 @@ class Sig(object):
         self.M = M
         self.sig_data = sig_data
 
-    def serialize(self):
+    def serialize(self)->bytes:
         invoke_script = ProgramBuilder.program_from_params(self.sig_data)
         if len(self.public_keys) == 0:
             raise ValueError("np public key in sig")

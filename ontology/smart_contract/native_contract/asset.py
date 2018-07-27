@@ -1,4 +1,4 @@
-from ontology.utils.util import get_asset_address
+
 from ontology.vm.build_vm import build_native_invoke_code,build_neo_vm_param
 from time import time
 from ontology.core.transaction import Transaction
@@ -7,7 +7,17 @@ from binascii import b2a_hex, a2b_hex
 from ontology.common.address import Address
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.vm.op_code import *
-from ontology.utils import util
+from ontology.common.define import *
+
+
+def get_asset_address(asset: str) -> bytearray:
+    if asset.upper() == 'ONT':
+        contract_address = ONT_CONTRACT_ADDRESS
+    elif asset.upper() == 'ONG':
+        contract_address = ONG_CONTRACT_ADDRESS
+    else:
+        raise ValueError("asset is not equal to ONT or ONG")
+    return contract_address  # [20]byte
 
 
 def new_transfer_transaction( asset:str, from_addr :str, to_addr :str, amount :int, gas_limit:int,gas_price:int):

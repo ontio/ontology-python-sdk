@@ -19,7 +19,7 @@ class Transaction(object):
         self.sigs = sigs  # Sig class array
         self.hash = hash  # [32]byte
 
-    def serialize_unsigned(self):
+    def serialize_unsigned(self)->bytes:
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.WriteUInt8(self.version)
@@ -35,14 +35,14 @@ class Transaction(object):
         StreamManager.ReleaseStream(ms)
         return res
 
-    def hash256(self):
+    def hash256(self)->bytes:
         tx_serial = self.serialize_unsigned()
         tx_serial = a2b_hex(tx_serial)
         r = Digest.hash256(tx_serial)
         #print(a2b_hex(b2a_hex(r))[::-1].hex())   [::-1]
         return a2b_hex(b2a_hex(r))
 
-    def serialize(self):
+    def serialize(self)->bytes:
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.WriteBytes(self.serialize_unsigned())

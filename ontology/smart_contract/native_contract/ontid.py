@@ -6,14 +6,15 @@ from ontology.core.transaction import Transaction
 from ontology.account.account import Account
 from ontology.crypto.KeyType import KeyType
 from ontology.crypto.SignatureScheme import SignatureScheme
-from ontology.common.address import ont_id_contract_address,Address
+from ontology.common.address import Address
+from ontology.common.define import *
 from ontology.io.MemoryStream import StreamManager
 from ontology.io.BinaryReader import BinaryReader
 from ontology.crypto.Curve import Curve
 from binascii import b2a_hex, a2b_hex
 
 def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
-    contract_address = ont_id_contract_address
+    contract_address = ONTID_CONTRACT_ADDRESS
     args = {"ontid": ontid.encode(), "pubkey": pubkey}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
     unix_timenow = int(time())
@@ -22,11 +23,11 @@ def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
                        [], bytearray())
 
 def new_get_ddo_transaction(ontid:str):
-    contract_address = ont_id_contract_address
+    contract_address = ONTID_CONTRACT_ADDRESS
     args = {"ontid": ontid.encode()}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
     unix_timenow = int(time())
-    payer = Address("0000000000000000000000000000000000000000").to_array()
+    payer = Address(a2b_hex("0000000000000000000000000000000000000000".encode())).to_array()
     return Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(),
                        [], bytearray())
 
