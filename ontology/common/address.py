@@ -33,6 +33,9 @@ class Address(object):
     def __init__(self, value):
         self.ZERO = value
 
+    def get_address(self):
+        return self.ZERO
+
     @staticmethod
     def toScriptHash(byte_script):
         return Digest.hash160(msg=byte_script, is_hex=True)

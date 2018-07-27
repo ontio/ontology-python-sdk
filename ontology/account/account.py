@@ -84,7 +84,7 @@ class Account(object):
         mac_tag = a2b_hex(encrypted_key[64:96])
         cipher_text = a2b_hex(encrypted_key[0:64])
         pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address.encode(), mac_tag, derivedhalf2, iv)
-        acct = Account(private_key, scheme)
+        acct = Account(b2a_hex(pri_key), scheme)
         if acct.get_address().to_base58() != address:
             raise RuntimeError
         return pri_key
@@ -105,13 +105,15 @@ class Account(object):
 
 
 if __name__ == '__main__':
-    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+    prikey = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     scheme = SignatureScheme.SHA256withECDSA
-    acct0 = Account(private_key, scheme)
+    acct0 = Account(prikey, scheme)
+    print(acct0.__dict__)
     salt = base64.b64decode("dtUtvYtVXALLfz6OVr6zDQ==")
     print(base64.b64encode(salt))
     key = acct0.export_gcm_encrypted_private_key("1", salt, 16384)
     print(key)
+    print(acct0.get_address_base58())
     priv = acct0.get_gcm_decoded_private_key(key, "1", acct0.get_address_base58(), salt, 16384,
                                             SignatureScheme.SHA256withECDSA)
     print(priv.hex())
