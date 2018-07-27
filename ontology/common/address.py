@@ -39,7 +39,7 @@ class Address(object):
         return base58.b58encode(bytes(outb)).decode()
 
     def to_array(self):
-        return (self.ZERO)
+        return self.ZERO
 
     @staticmethod
     def decodeBase58(addr):

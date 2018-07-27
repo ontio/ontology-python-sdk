@@ -11,9 +11,9 @@ class WalletData(object):
                  scrypt=Scrypt(), identities=[], accounts=[]):
         self.name = name
         self.version = version
-        self.create_time = create_time
-        self.default_ontid = default_ontid
-        self.default_account_address = default_account_address
+        self.createTime = create_time
+        self.defaultOntid = default_ontid
+        self.defaultAccountAddress = default_account_address
         self.scrypt = scrypt  # Scrypt class
         self.identities = identities  # a list of Identity class
         self.accounts = accounts  # a list of AccountData class
@@ -56,30 +56,31 @@ class WalletData(object):
         for index in range(len(r.identities)):
             control = [Control(id=r.identities[index].controls[0].id,
                                algorithm=r.identities[index].controls[0].algorithm,
-                               param=r.identities[index].controls[0].param,
+                               param=r.identities[index].controls[0].parameters,
                                key=r.identities[index].controls[0].key,
                                address=r.identities[index].controls[0].address,
                                salt=r.identities[index].controls[0].salt,
                                enc_alg=r.identities[index].controls[0].enc_alg,
-                               hash_value=r.identities[index].controls[0].hash_value,
-                               public_key=r.identities[index].controls[0].public_key)]
+                               hash_value=r.identities[index].controls[0].hash,
+                               public_key=r.identities[index].controls[0].publicKey)]
             temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, control)
             identities.append(temp)
         accounts = []
 
         for index in range(len(r.accounts)):
             temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].public_key,
-                               sign_scheme=r.accounts[index].sign_scheme, is_default=r.accounts[index].is_default,
+                               sign_scheme=r.accounts[index].sign_scheme, is_default=r.accounts[index].isDefault,
                                lock=r.accounts[index].lock, address=r.accounts[index].address,
-                               algorithm=r.accounts[index].algorithm, param=r.accounts[index].param,
+                               algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
                                key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
-                               salt=r.accounts[index].salt, hash_value=r.accounts[index].hash_value)
+                               salt=r.accounts[index].salt, hash_value=r.accounts[index].hash)
             accounts.append(temp)
 
-        res = WalletData(r.name, r.version, r.create_time, r.default_ontid, r.default_account_address, scrypt,
+        res = WalletData(r.name, r.version, r.createTime, r.defaultOntid, r.defaultAccountAddress, scrypt,
                          identities, accounts)
         return res
 
+    @staticmethod
     def save(self, wallet_path):
         json.dump(self, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
 

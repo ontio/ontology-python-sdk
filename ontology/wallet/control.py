@@ -4,9 +4,9 @@ class Control(object):
         self.address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
-        self.hash_value = hash_value
+        self.hash = hash_value
         self.id = id
         self.key = key
-        self.param = param
+        self.parameters = param
         self.salt = salt
-        self.public_key = public_key
+        self.publicKey = public_key
