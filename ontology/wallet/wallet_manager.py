@@ -6,11 +6,14 @@ import json
 import base64
 from ontology.crypto.scrypt import Scrypt
 from ontology.account.account import Account
-from ontology.wallet.account import AccountData, AccountInfo
-from ontology.wallet.control import ProtectedKey, Control
+from ontology.wallet.account import AccountData
+from ontology.wallet.account_info import AccountInfo
+from ontology.wallet.control import Control
 from ontology.common.address import Address
 import uuid
-from ontology.wallet.identity import Identity, did_ont, IdentityInfo
+from binascii import a2b_hex
+from ontology.wallet.identity import Identity, did_ont
+from ontology.wallet.identity_info import IdentityInfo
 from ontology.utils.util import hex_to_bytes, get_random_bytes
 
 
@@ -94,52 +97,44 @@ class WalletManager(object):
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
-            prot = ProtectedKey(algorithm="ECDSA", enc_alg="aes-256-gcm", hash_value="SHA256withECDSA",
-                                param={"curve": "secp256r1"})
-            acct = AccountData(protected_key=prot, sign_scheme="SHA256withECDSA")
+            acct = AccountData()
         else:
             raise ValueError("scheme type is error")
         # set key
         if pwd != None:
-            acct.protected_key.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n()).decode()
-            print(acct.protected_key.key)
+            acct.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n()).decode()
             pwd = None
         else:
-            acct.protected_key.key = account.serialize_private_key().hex()
+            acct.key = account.serialize_private_key().hex()
 
-        acct.protected_key.address = Address.address_from_bytes_pubkey(
-            account.get_address().to_array()).to_base58()
+        acct.address = Address.address_from_bytes_pubkey(account.get_address().to_array()).to_base58()
         # set label
         if label == None or label == "":
             label = str(uuid.uuid4())[0:8]
         if account_flag:
             for index in range(len(self.wallet_in_mem.accounts)):
-                if acct.protected_key.address == self.wallet_in_mem.accounts[index].protected_key.address:
+                if acct.address == self.wallet_in_mem.accounts[index].address:
                     raise ValueError("wallet account exists")
 
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.is_default = True
-                self.wallet_in_mem.default_account_address = acct.protected_key.address
+                self.wallet_in_mem.default_account_address = acct.address
             acct.label = label
-            acct.protected_key.salt = base64.b64encode(salt).decode()
+            acct.salt = base64.b64encode(salt).decode()
             self.wallet_in_mem.accounts.append(acct)
         else:
             for index in range(len(self.wallet_in_mem.identities)):
-                if self.wallet_in_mem.identities[index].ontid == did_ont + acct.protected_key.address:
+                if self.wallet_in_mem.identities[index].ontid == did_ont + acct.address:
                     raise ValueError("wallet identity exists")
-
-        idt = Identity()
-        idt.ontid = did_ont + acct.protected_key.address
-        idt.label = label
-        if len(self.wallet_in_mem.identities) == 0:
-            idt.is_default = True
-            self.wallet_in_mem.default_ontid = idt.ontid
-        prot = ProtectedKey(key=acct.protected_key.key, algorithm="ECDSA", param={"curve": "secp256r1"},
-                            salt=base64.b64encode(salt).decode(),
-                            address=acct.protected_key.address)
-        ctl = Control(id="keys-1", protected_key=prot)
-        idt.controls.append(ctl)
-        self.wallet_in_mem.identities.append(idt)
+            idt = Identity()
+            idt.ontid = did_ont + acct.address
+            idt.label = label
+            if len(self.wallet_in_mem.identities) == 0:
+                idt.is_default = True
+                self.wallet_in_mem.default_ontid = idt.ontid
+            ctl = Control(id="keys-1", key=acct.key,salt=base64.b64encode(salt).decode(),address=acct.address)
+            idt.controls.append(ctl)
+            self.wallet_in_mem.identities.append(idt)
         return account
 
     def import_account(self, label, encrypted_prikey, pwd, base58_addr: str, salt):
@@ -148,7 +143,7 @@ class WalletManager(object):
         info = self.create_account_info(label, pwd, salt, hex_to_bytes(private_key))
         private_key, pwd = None, None
         for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].protected_key.address:
+            if info.address_base58 == self.wallet_in_mem.accounts[index].address:
                 return self.wallet_in_mem.accounts[index]
         return None
 
@@ -167,20 +162,20 @@ class WalletManager(object):
         salt = get_random_bytes(16)
         info = self.create_account_info("", pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].protected_key.address:
+            if info.address_base58 == self.wallet_in_mem.accounts[index].address:
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account_by_address(self, address: Address, pwd, salt):
+    def get_account(self, address: Address, pwd, salt):
         for index in range(len(self.wallet_in_mem.accounts)):
-            if self.wallet_in_mem.accounts[index].protected_key.address == address.to_base58():
-                key = self.wallet_in_mem.accounts[index].protected_key.key
-                addr = self.wallet_in_mem.accounts[index].protected_key.address
+            if self.wallet_in_mem.accounts[index].address == address:
+                key = self.wallet_in_mem.accounts[index].key
+                addr = self.wallet_in_mem.accounts[index].address
                 private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
                 return Account(hex_to_bytes(private_key), self.scheme)
 
         for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ontid == did_ont + address.to_base58():
+            if self.wallet_in_mem.identities[index].ontid == did_ont + address:
                 addr = self.wallet_in_mem.identities[index].ontid.replace(did_ont, "")
                 key = self.wallet_in_mem.identities[index].controls[0].key
                 private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
@@ -190,7 +185,8 @@ class WalletManager(object):
 
 if __name__ == '__main__':
     # test wallet load and save
-    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1b'
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1e'
+    private_key=a2b_hex(private_key.encode())
     scheme = SignatureScheme.SHA256withECDSA
     acct0 = Account(private_key, scheme)
     encrypted_key = 'T3uep1USsEqiJbP4O+CKsl2AWfpGjvuVSKxpoKeGdEUa0nfLHHjIq3G4xOz7a4PC'
@@ -198,8 +194,9 @@ if __name__ == '__main__':
     w = WalletManager()
     w.open_wallet(wallet_path)
     salt = get_random_bytes(16)
-    w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
-    # w.create_account_from_prikey("123", private_key)
-    # w.create_account("123", "567", salt, private_key, True)
-    # w.save(wallet_path)
-    # print((w.wallet_in_mem.accounts[0].protected_key.__dict__))
+    #w.import_account("123", encrypted_key, '234', acct0.get_address_base58(), salt)
+    #w.create_account_from_prikey("123", private_key)
+    w.create_account("123", "567", salt, private_key, True)
+    print(w.wallet_in_mem.accounts[0].__dict__)
+    w.save(wallet_path)
+

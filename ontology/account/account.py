@@ -5,7 +5,6 @@ import datetime
 import json
 
 from binascii import b2a_hex, a2b_hex
-
 from ontology.utils import util
 from ontology.crypto.Curve import Curve
 from ontology.crypto.SignatureScheme import SignatureScheme
@@ -16,7 +15,6 @@ from ontology.crypto.KeyType import KeyType
 from ontology.crypto.aes_handler import AESHandler
 from ontology.crypto.scrypt import Scrypt
 from ontology.crypto.Digest import Digest
-from Cryptodome import Random
 import base64
 import base58
 
@@ -110,14 +108,9 @@ class Account(object):
 if __name__ == '__main__':
     prikey = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     scheme = SignatureScheme.SHA256withECDSA
-
-    print(len(a2b_hex(private_key.encode())),a2b_hex(private_key.encode()))
-    acct0 = Account(a2b_hex(private_key.encode()), scheme)
-    print(acct0.export_wif())
+    acct0 = Account(a2b_hex(prikey.encode()), scheme)
     # print(len(acct0.serialize_public_key()),acct0.serialize_public_key())
     # print(len(acct0.serialize_private_key()),acct0.serialize_private_key())
-    a = Address.decodeBase58("AKFMnJT1u5pyPhzGRuauD1KkyUvqjQsmGs")
-    print(a.to_base58())
 
 
     # salt = base64.b64decode("dtUtvYtVXALLfz6OVr6zDQ==")

@@ -1,48 +1,45 @@
-from ontology.wallet.control import ProtectedKey
 from ontology.crypto.SignatureScheme import SignatureScheme
 
 
 class AccountData(object):
-    def __init__(self, protected_key: ProtectedKey, label="", public_key="",
-                 sign_scheme=SignatureScheme.SHA256withECDSA, is_default=False, lock=False):
-        self.protected_key = protected_key
+    def __init__(self, address='', enc_alg="aes-256-gcm", key="", algorithm="ECDSA", salt="", param={"curve": "P-256"},
+                 label="", public_key="", sign_scheme="SHA256withECDSA", is_default=True, lock=False,
+                 hash_value="sha256"):
+        self.address = address
+        self.algorithm = algorithm
+        self.enc_alg = enc_alg
+        self.hash_value = hash_value
+        self.is_default = is_default
+        self.key = key
         self.label = label
+        self.lock = lock
+        self.param = param
+        self.salt = salt
         self.public_key = public_key
         self.sign_scheme = sign_scheme
-        self.is_default = is_default
-        self.lock = lock
-
-    def set_key_pair(self, key_info: ProtectedKey):
-        self.protected_key.address = key_info.address
-        self.protected_key.enc_alg = key_info.enc_alg
-        self.protected_key.key = key_info.key
-        self.protected_key.algorithm = key_info.algorithm
-        self.protected_key.salt = key_info.salt
-        self.protected_key.hash_value = key_info.hash_value
-        self.protected_key.param = key_info.hash_value
-
-    def get_key_pair(self):
-        new_ProtectedKey = ProtectedKey()
-        new_ProtectedKey.address = self.protected_key.address
-        new_ProtectedKey.enc_alg = self.protected_key.enc_alg
-        new_ProtectedKey.key = self.protected_key.key
-        new_ProtectedKey.algorithm = self.protected_key.algorithm
-        new_ProtectedKey.salt = self.protected_key.salt
-        new_ProtectedKey.hash_value = self.protected_key.hash_value
-        new_ProtectedKey.param = self.protected_key.param
-        return new_ProtectedKey
 
     def set_label(self, label: str):
         self.label = label
 
+    def set_address(self, address):
+        self.address = address
 
-class AccountInfo():
-    def __init__(self):
-        self.address_base58 = ""
-        self.public_key = ""
-        self.encrypted_prikey = ""
-        self.address_u160 = ""
-        self.private_key = ""
-        self.prikey_wif = ""
+    def set_public_key(self, public_key):
+        self.public_key = public_key
+
+    def set_key(self, key):
+        self.key = key
+
+    def get_label(self):
+        return self.label
+
+    def get_address(self):
+        return self.address
+
+    def get_public_key(self):
+        return self.public_key
+
+    def get_key(self):
+        return self.key
 
 

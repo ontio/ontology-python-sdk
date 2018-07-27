@@ -3,12 +3,12 @@ from ontology.wallet.account import AccountData
 from ontology.wallet.identity import Identity
 import json
 from collections import namedtuple
-from ontology.wallet.control import ProtectedKey, Control
+from ontology.wallet.control import Control
 
 
 class WalletData(object):
     def __init__(self, name="MyWallet", version="1.1", create_time="", default_ontid="", default_account_address="",
-                 scrypt=Scrypt(), identities=[], accounts=[], extra=""):
+                 scrypt=Scrypt(), identities=[], accounts=[]):
         self.name = name
         self.version = version
         self.create_time = create_time
@@ -17,7 +17,6 @@ class WalletData(object):
         self.scrypt = scrypt  # Scrypt class
         self.identities = identities  # a list of Identity class
         self.accounts = accounts  # a list of AccountData class
-        self.extra = extra
 
     def clone(self):
         wallet = WalletData()
@@ -26,7 +25,6 @@ class WalletData(object):
         wallet.scrypt = self.scrypt
         wallet.accounts = self.accounts
         wallet.identities = self.identities
-        wallet.extra = self.extra
         return wallet
 
     def add_account(self, acc: AccountData):
@@ -54,34 +52,32 @@ class WalletData(object):
         r = json.load(open(wallet_path, "r"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
         identities = []
+
         for index in range(len(r.identities)):
-            prot = ProtectedKey(r.identities[index].controls[0].protected_key.address,
-                                r.identities[index].controls[0].protected_key.enc_alg,
-                                r.identities[index].controls[0].protected_key.key,
-                                r.identities[index].controls[0].protected_key.algorithm,
-                                r.identities[index].controls[0].protected_key.salt,
-                                r.identities[index].controls[0].protected_key.hash_value,
-                                r.identities[index].controls[0].protected_key.param)
-            c = [Control(r.identities[index].controls[0].id, r.identities[index].controls[0].publicKey, prot)]
-            temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, c,
-                            r.identities[index].extra, r.identities[index].is_default)
+            control = [Control(id=r.identities[index].controls[0].id,
+                               algorithm=r.identities[index].controls[0].algorithm,
+                               param=r.identities[index].controls[0].param,
+                               key=r.identities[index].controls[0].key,
+                               address=r.identities[index].controls[0].address,
+                               salt=r.identities[index].controls[0].salt,
+                               enc_alg=r.identities[index].controls[0].enc_alg,
+                               hash_value=r.identities[index].controls[0].hash_value,
+                               public_key=r.identities[index].controls[0].public_key)]
+            temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, control)
             identities.append(temp)
         accounts = []
+
         for index in range(len(r.accounts)):
-            prot = ProtectedKey(r.accounts[index].protected_key.address,
-                                r.accounts[index].protected_key.enc_alg,
-                                r.accounts[index].protected_key.key,
-                                r.accounts[index].protected_key.algorithm,
-                                r.accounts[index].protected_key.salt,
-                                r.accounts[index].protected_key.hash_value,
-                                r.accounts[index].protected_key.param)
-            temp = AccountData(prot, r.accounts[index].label, r.accounts[index].public_key,
-                               r.accounts[index].sign_scheme, r.accounts[index].is_default, r.accounts[index].lock)
+            temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].public_key,
+                               sign_scheme=r.accounts[index].sign_scheme, is_default=r.accounts[index].is_default,
+                               lock=r.accounts[index].lock, address=r.accounts[index].address,
+                               algorithm=r.accounts[index].algorithm, param=r.accounts[index].param,
+                               key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
+                               salt=r.accounts[index].salt, hash_value=r.accounts[index].hash_value)
             accounts.append(temp)
 
         res = WalletData(r.name, r.version, r.create_time, r.default_ontid, r.default_account_address, scrypt,
-                         identities, accounts, r.extra)
-
+                         identities, accounts)
         return res
 
     def save(self, wallet_path):
