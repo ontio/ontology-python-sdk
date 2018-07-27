@@ -44,15 +44,6 @@ def get_contract_address(contract_code: str) -> bytearray:
     return address_from_vm_code(code)  # [20]byte
 
 
-def get_asset_address(asset: str) -> bytearray:
-    if asset.upper() == 'ONT':
-        contract_address = address.ont_contract_address
-    elif asset.upper() == 'ONG':
-        contract_address = address.ong_contract_address
-    else:
-        raise ValueError("asset is not equal to ONT or ONG")
-    return contract_address  # [20]byte
-
 
 def is_file_exist(file_path: str) -> bool:
     return os.path.isfile(file_path)

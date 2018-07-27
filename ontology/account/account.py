@@ -38,7 +38,7 @@ class Account(object):
         self.__publicKey = Signature.ec_get_pubkey_by_prikey(private_key, self.__curve_name)
         self.__address = Address.address_from_hexstr_pubkey(self.__publicKey)
 
-    def generateSignature(self, msg, signature_scheme):
+    def generateSignature(self, msg:bytes, signature_scheme:SignatureScheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:
             handler = SignatureHandler(self.__keyType, signature_scheme)
             signature_value = handler.generateSignature(b2a_hex(self.__privateKey), msg)
@@ -106,7 +106,7 @@ class Account(object):
         return base58.b58encode(data)
 
 if __name__ == '__main__':
-    prikey = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+    private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
     scheme = SignatureScheme.SHA256withECDSA
     acct0 = Account(a2b_hex(prikey.encode()), scheme)
     # print(len(acct0.serialize_public_key()),acct0.serialize_public_key())
