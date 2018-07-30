@@ -10,7 +10,7 @@ class Address(object):
     __zero_size = 20
     __COIN_VERSION = b'\x17'
 
-    def __init__(self, value:bytes):
+    def __init__(self, value: bytes):
         self.ZERO = value
 
     def get_address(self):

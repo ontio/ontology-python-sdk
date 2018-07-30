@@ -13,7 +13,8 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.crypto.curve import Curve
 from binascii import b2a_hex, a2b_hex
 
-def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
+
+def new_registry_ontid_transaction(ontid: str,pubkey: str,gas_limit: int,gas_price: int):
     contract_address = ONTID_CONTRACT_ADDRESS
     args = {"ontid": ontid.encode(), "pubkey": pubkey}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
@@ -22,7 +23,8 @@ def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):
     return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit,payer, invoke_code, bytearray(),
                        [], bytearray())
 
-def new_get_ddo_transaction(ontid:str):
+
+def new_get_ddo_transaction(ontid: str):
     contract_address = ONTID_CONTRACT_ADDRESS
     args = {"ontid": ontid.encode()}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
@@ -32,7 +34,7 @@ def new_get_ddo_transaction(ontid:str):
                        [], bytearray())
 
 
-def parse_ddo(ontid:str, ddo:str):
+def parse_ddo(ontid: str, ddo: str):
 
     ms = StreamManager.GetStream(a2b_hex(ddo))
     reader = BinaryReader(ms)
@@ -91,7 +93,7 @@ def parse_ddo(ontid:str, ddo:str):
     d2["Owners"] = pubKey_list
     d2["Attributes"] = attribute_list
     if len(recovery_bytes) != 0:
-        addr = Address(str(recovery_bytes.hex()))
+        addr = Address(recovery_bytes)
         print(addr.to_base58())
         d2["Recovery"] = addr.to_base58()
     d2["OntId"] = ontid

@@ -6,12 +6,9 @@ import json
 from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
 from ontology.account.account import Account
-from ontology.crypto.key_type import KeyType
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.common.address import Address
-from ontology.crypto.encrypt import get_random_bytes
 from ontology.smart_contract.native_contract import asset,ontid
-import base64
 from binascii import b2a_hex, a2b_hex
 from time import *
 
@@ -183,6 +180,7 @@ class RpcClient(object):
         print(res)
         return res["Result"]
 
+
 if __name__ == '__main__':
     cli = RpcClient(0,rpc_address)
     private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
@@ -197,7 +195,7 @@ if __name__ == '__main__':
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
-    if True:
+    if False:
         tx = asset.new_get_balance_transaction("ont", acc.get_address_base58())
         result = cli.send_raw_transaction_preexec(tx)
         balance = int.from_bytes(a2b_hex(result.encode()), byteorder='little')
@@ -209,11 +207,11 @@ if __name__ == '__main__':
         print(tx.hash256().hex())
         print(tx.serialize().hex())
         cli.send_raw_transaction(tx)
-    if False:
+    if True:
         did = "did:ont:"+acc.get_address_base58()
         tx = ontid.new_get_ddo_transaction(did)
         ddo = cli.send_raw_transaction_preexec(tx)
-        print(ontid.parse_ddo(did,ddo))
+        print(ontid.parse_ddo(did, ddo))
 
 
 if __name__ == '__main2__':

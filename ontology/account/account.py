@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import datetime
-import json
-
 from binascii import b2a_hex, a2b_hex
-from ontology.utils import util
 from ontology.crypto.curve import Curve
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler
@@ -17,6 +13,7 @@ from ontology.crypto.scrypt import Scrypt
 from ontology.crypto.digest import Digest
 import base64
 import base58
+
 
 class Account(object):
     def __init__(self, private_key:bytes, scheme=SignatureScheme.SHA256withECDSA):
