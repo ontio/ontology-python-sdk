@@ -190,7 +190,7 @@ class WalletManager(object):
     def import_account(self, label, encrypted_prikey, pwd, base58_addr: str, salt):
         private_key = Account.get_gcm_decoded_private_key(encrypted_prikey, pwd, base58_addr, salt, Scrypt().get_n(),
                                                           self.scheme)
-        info = self.create_account_info(label, pwd, salt, hex_to_bytes(private_key))
+        info = self.create_account_info(label, pwd, salt, private_key)
         private_key, pwd = None, None
         for index in range(len(self.wallet_in_mem.accounts)):
             if info.address_base58 == self.wallet_in_mem.accounts[index].address:
