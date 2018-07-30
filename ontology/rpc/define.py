@@ -1,3 +1,5 @@
+from ontology.common.define import ONT_CONTRACT_ADDRESS,ONG_CONTRACT_ADDRESS
+
 RPC_GET_VERSION = "getversion"
 RPC_GET_TRANSACTION = "getrawtransaction"
 RPC_SEND_TRANSACTION = "sendrawtransaction"
@@ -71,9 +73,9 @@ def get_contract_address(contract_code: str) -> bytearray:
 
 def get_asset_address(asset: str) -> bytearray:
     if asset.upper() == 'ONT':
-        contract_address = address.ont_contract_address
+        contract_address = ONT_CONTRACT_ADDRESS
     elif asset.upper() == 'ONG':
-        contract_address = address.ong_contract_address
+        contract_address = ONG_CONTRACT_ADDRESS
     else:
         raise ValueError("asset is not equal to ONT or ONG")
     return contract_address  # [20]byte
