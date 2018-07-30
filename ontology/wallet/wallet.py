@@ -1,9 +1,7 @@
 from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.account import AccountData
 from ontology.wallet.identity import Identity
-import json
-from collections import namedtuple
-from ontology.wallet.control import Control
+
 
 
 class WalletData(object):
@@ -46,49 +44,6 @@ class WalletData(object):
             if self.accounts[index].keypair.address == address:
                 return self.accounts[index], index
         return None, -1
-
-    @staticmethod
-    def load(wallet_path):
-        r = json.load(open(wallet_path, "r"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-        scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
-        identities = []
-
-        for index in range(len(r.identities)):
-            control = [Control(id=r.identities[index].controls[0].id,
-                               algorithm=r.identities[index].controls[0].algorithm,
-                               param=r.identities[index].controls[0].parameters,
-                               key=r.identities[index].controls[0].key,
-                               address=r.identities[index].controls[0].address,
-                               salt=r.identities[index].controls[0].salt,
-                               enc_alg=r.identities[index].controls[0].enc_alg,
-                               hash_value=r.identities[index].controls[0].hash,
-                               public_key=r.identities[index].controls[0].publicKey)]
-            temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, control)
-            identities.append(temp)
-        accounts = []
-
-        for index in range(len(r.accounts)):
-            temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
-                               sign_scheme=r.accounts[index].signatureScheme, is_default=r.accounts[index].isDefault,
-                               lock=r.accounts[index].lock, address=r.accounts[index].address,
-                               algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
-                               key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
-                               salt=r.accounts[index].salt, hash_value=r.accounts[index].hash)
-            accounts.append(temp)
-
-        res = WalletData(r.name, r.version, r.createTime, r.defaultOntid, r.defaultAccountAddress, scrypt,
-                         identities, accounts)
-        return res
-
-    def save(self, wallet_path):
-        json.dump(self, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
-        f = open(wallet_path, 'r+')
-        s = f.read()
-        while "enc_alg" in s:
-            s = s.replace("enc_alg", "enc-alg")
-        f.seek(0)
-        f.write(s)
-        f.close()
 
     def add_identity(self, id: Identity):
         self.identities.append(id)

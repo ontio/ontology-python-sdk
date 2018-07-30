@@ -15,6 +15,7 @@ from binascii import a2b_hex
 from ontology.wallet.identity import Identity, did_ont
 from ontology.wallet.identity_info import IdentityInfo
 from ontology.utils.util import hex_to_bytes, get_random_bytes
+from collections import namedtuple
 
 
 class WalletManager(object):
@@ -22,36 +23,70 @@ class WalletManager(object):
         self.scheme = scheme
         self.wallet_file = WalletData()
         self.wallet_in_mem = WalletData()
+        self.wallet_path = ""
 
     def open_wallet(self, wallet_path):
+        self.wallet_path = wallet_path
         if is_file_exist(wallet_path) is False:
             # create a new wallet file
-            self.wallet_file.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-            self.wallet_file.save(wallet_path)
+            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+            self.save()
         # wallet file exists now
-        self.wallet_file = self.load(wallet_path)
+        self.wallet_file = self.load()
         self.wallet_in_mem = self.wallet_file
         return self.wallet_file
 
-    def load(self, wallet_path):
-        res = WalletData.load(wallet_path)
+    def load(self):
+        f = open(self.wallet_path, "r")
+        r = json.load(f, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        f.close()
+        scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
+        identities = []
+
+        for index in range(len(r.identities)):
+            control = [Control(id=r.identities[index].controls[0].id,
+                               algorithm=r.identities[index].controls[0].algorithm,
+                               param=r.identities[index].controls[0].parameters,
+                               key=r.identities[index].controls[0].key,
+                               address=r.identities[index].controls[0].address,
+                               salt=r.identities[index].controls[0].salt,
+                               enc_alg=r.identities[index].controls[0].enc_alg,
+                               hash_value=r.identities[index].controls[0].hash,
+                               public_key=r.identities[index].controls[0].publicKey)]
+            temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, control)
+            identities.append(temp)
+        accounts = []
+
+        for index in range(len(r.accounts)):
+            temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
+                               sign_scheme=r.accounts[index].signatureScheme, is_default=r.accounts[index].isDefault,
+                               lock=r.accounts[index].lock, address=r.accounts[index].address,
+                               algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
+                               key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
+                               salt=r.accounts[index].salt, hash_value=r.accounts[index].hash)
+            accounts.append(temp)
+
+        res = WalletData(r.name, r.version, r.createTime, r.defaultOntid, r.defaultAccountAddress, scrypt,
+                         identities, accounts)
         return res
 
-    def save(self, wallet_path):
-        json.dump(self.wallet_in_mem, open(wallet_path, "w"), default=lambda obj: obj.__dict__, indent=4)
-        f = open(wallet_path, 'r+')
-        s = f.read()
-        while "enc_alg" in s:
-            s = s.replace("enc_alg", "enc-alg")
-        f.seek(0)
-        f.write(s)
+    def save(self):
+        f = open(self.wallet_path, "w")
+        json.dump(self.wallet_in_mem, f, default=lambda obj: obj.__dict__, indent=4)
         f.close()
+        # f = open(wallet_path, 'r+')
+        # s = f.read()
+        # while "enc_alg" in s:
+        #     s = s.replace("enc_alg", "enc-alg")
+        # f.seek(0)
+        # f.write(s)
+        # f.close()
 
     def get_wallet(self):
         return self.wallet_in_mem
 
-    def write_wallet(self, wallet_path):
-        self.wallet_in_mem.save(wallet_path)
+    def write_wallet(self):
+        self.save()
         self.wallet_file = self.wallet_in_mem
         return self.wallet_file
 
