@@ -24,6 +24,22 @@ def new_registry_ontid_transaction(ontid: str,pubkey: str,gas_limit: int,gas_pri
                        [], bytearray())
 
 
+def new_add_attribute_transaction(ontid: str, pubkey: str,attris: list,payer: str, gas_limit: int,gas_price: int):
+    contract_address = ONTID_CONTRACT_ADDRESS
+    args = {"ontid": ontid.encode(),"length": len(attris)}
+    for i in range(len(attris)):
+        args["key"+str(i)] = bytes(attris[i]["key"].encode())
+        args["type" + str(i)] = bytes(attris[i]["type"].encode())
+        args["value" + str(i)] = bytes(attris[i]["value"].encode())
+    args["pubkey"] = pubkey
+    invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addAttributes", args)
+    print("invoke_code", invoke_code.hex())
+    unix_timenow = int(time())
+    payer = Address.decodeBase58(ontid.replace("did:ont:", "")).to_array()
+    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, payer, invoke_code, bytearray(),
+                       [], bytearray())
+
+
 def new_get_ddo_transaction(ontid: str):
     contract_address = ONTID_CONTRACT_ADDRESS
     args = {"ontid": ontid.encode()}

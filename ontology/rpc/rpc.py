@@ -212,6 +212,17 @@ if __name__ == '__main__':
         tx = ontid.new_get_ddo_transaction(did)
         ddo = cli.send_raw_transaction_preexec(tx)
         print(ontid.parse_ddo(did, ddo))
+    if False:
+        did = "did:ont:" + acc.get_address_base58()
+        attris = []
+        attri = {}
+        attri["key"] = "key1"
+        attri["type"] = "string"
+        attri["value"] = "value100"
+        attris.append(attri)
+        tx = ontid.new_add_attribute_transaction(did, acc.get_public_key(),attris,acc.get_address_base58(), 20000, 500)
+        tx = cli.sign_transaction(tx, acc)
+        cli.send_raw_transaction(tx)
 
 
 if __name__ == '__main2__':
