@@ -1,4 +1,3 @@
-import base64
 from unittest import TestCase
 
 from ontology.account.account import Account
@@ -27,5 +26,7 @@ class TestAccount(TestCase):
         print(account.serialize_private_key().hex())
         print(account.serialize_public_key().hex())
         print(account.export_wif())
+        print(account.get_address().to_base58())
+        print(account.get_address_base58())
 
 
