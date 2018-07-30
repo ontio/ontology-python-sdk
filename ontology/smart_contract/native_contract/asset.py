@@ -30,7 +30,7 @@ def new_transfer_transaction( asset:str, from_addr :str, to_addr :str, amount :i
                        [], bytearray())
 
 
-def new_get_balance_transaction(asset, addr:str):
+def new_get_balance_transaction(asset: str, addr:str):
     contract_address = get_asset_address(asset)
     invoke_code = build_native_invoke_code(contract_address, bytes([0]), "balanceOf", Address.decodeBase58(addr).to_array())
     unix_timenow = int(time())
@@ -39,7 +39,7 @@ def new_get_balance_transaction(asset, addr:str):
                        [], bytearray())
 
 
-def new_get_allowance_transaction(asset, from_addr:str, to_addr:str):
+def new_get_allowance_transaction(asset: str, from_addr:str, to_addr:str):
     contract_address = get_asset_address(asset)
     args = {"from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(to_addr).to_array()}
     invoke_code = build_native_invoke_code(contract_address, bytes([0]), "allowance", args)
@@ -88,7 +88,7 @@ def new_withdraw_ong_transaction(claimer_addr :str, recv_addr :str, amount :int,
                        [], bytearray())
 
 
-def new_approve_transaction(asset, send_addr:str, recv_addr:str, amount:int, gas_limit:int, gas_price:int):
+def new_approve_transaction(asset: str, send_addr:str, recv_addr:str, amount:int, gas_limit:int, gas_price:int):
     contract_address = get_asset_address(asset)  # []bytes
     args = {"from": Address.decodeBase58(send_addr).to_array(), "to": Address.decodeBase58(recv_addr).to_array(), "amount": amount}
     invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
@@ -98,7 +98,7 @@ def new_approve_transaction(asset, send_addr:str, recv_addr:str, amount:int, gas
                        [], bytearray())
 
 
-def new_transferfrom_transaction(asset, send_addr:str, from_addr:str, recv_addr:str, amount:int, gas_limit:int, gas_price:int):
+def new_transferfrom_transaction(asset: str, send_addr:str, from_addr:str, recv_addr:str, amount:int, gas_limit:int, gas_price:int):
     contract_address = get_asset_address(asset)  # []bytes
     args = {"sender": Address.decodeBase58(send_addr).to_array(), "from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(recv_addr).to_array(),
                                                                                                                    "amount": amount}
