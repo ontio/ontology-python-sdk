@@ -6,15 +6,15 @@ import json
 
 from binascii import b2a_hex, a2b_hex
 from ontology.utils import util
-from ontology.crypto.Curve import Curve
-from ontology.crypto.SignatureScheme import SignatureScheme
-from ontology.crypto.SignatureHandler import SignatureHandler
-from ontology.crypto.Signature import Signature
+from ontology.crypto.curve import Curve
+from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.crypto.signature_handler import SignatureHandler
+from ontology.crypto.signature import Signature
 from ontology.common.address import Address
-from ontology.crypto.KeyType import KeyType
+from ontology.crypto.key_type import KeyType
 from ontology.crypto.aes_handler import AESHandler
 from ontology.crypto.scrypt import Scrypt
-from ontology.crypto.Digest import Digest
+from ontology.crypto.digest import Digest
 import base64
 import base58
 

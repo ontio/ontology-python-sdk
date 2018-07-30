@@ -1,6 +1,6 @@
 from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG
-from ontology.io.BinaryWriter import BinaryWriter
-from ontology.io.MemoryStream import StreamManager
+from ontology.io.binary_writer import BinaryWriter
+from ontology.io.memory_stream import StreamManager
 from ontology.utils.util import bytes_reader
 from ontology.vm.params_builder import ParamsBuilder
 

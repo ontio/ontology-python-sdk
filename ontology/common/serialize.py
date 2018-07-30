@@ -1,5 +1,5 @@
-from ontology.io.BinaryWriter import BinaryWriter
-from ontology.io.MemoryStream import StreamManager
+from ontology.io.binary_writer import BinaryWriter
+from ontology.io.memory_stream import StreamManager
 
 
 def write_byte(value):

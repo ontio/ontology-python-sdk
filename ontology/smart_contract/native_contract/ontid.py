@@ -4,13 +4,13 @@ from ontology.vm import build_vm
 from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
 from ontology.account.account import Account
-from ontology.crypto.KeyType import KeyType
-from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.key_type import KeyType
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.common.address import Address
 from ontology.common.define import *
-from ontology.io.MemoryStream import StreamManager
-from ontology.io.BinaryReader import BinaryReader
-from ontology.crypto.Curve import Curve
+from ontology.io.memory_stream import StreamManager
+from ontology.io.binary_reader import BinaryReader
+from ontology.crypto.curve import Curve
 from binascii import b2a_hex, a2b_hex
 
 def new_registry_ontid_transaction(ontid,pubkey,gas_limit,gas_price):

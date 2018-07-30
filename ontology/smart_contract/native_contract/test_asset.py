@@ -5,7 +5,7 @@ from binascii import a2b_hex
 from unittest import TestCase
 
 from ontology.account.account import Account
-from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.rpc.rpc import RpcClient
 from ontology.smart_contract.native_contract import asset
 import time

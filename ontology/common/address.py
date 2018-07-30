@@ -1,6 +1,6 @@
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.vm.op_code import CHECKSIG
-from ontology.crypto.Digest import Digest
+from ontology.crypto.digest import Digest
 import base58
 from binascii import b2a_hex, a2b_hex
 

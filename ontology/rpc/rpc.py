@@ -6,8 +6,8 @@ import json
 from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
 from ontology.account.account import Account
-from ontology.crypto.KeyType import KeyType
-from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.key_type import KeyType
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.common.address import Address
 from ontology.crypto.encrypt import get_random_bytes
 from ontology.smart_contract.native_contract import asset,ontid

@@ -1,6 +1,6 @@
 from ontology.wallet.wallet import WalletData
 from ontology.utils.util import is_file_exist
-from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.signature_scheme import SignatureScheme
 from datetime import datetime
 import json
 import base64

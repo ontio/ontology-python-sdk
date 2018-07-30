@@ -1,7 +1,7 @@
 from ontology.common.serialize import write_byte, write_uint32, write_uint64, write_var_uint
-from ontology.crypto.Digest import Digest
-from ontology.io.BinaryWriter import BinaryWriter
-from ontology.io.MemoryStream import StreamManager
+from ontology.crypto.digest import Digest
+from ontology.io.binary_writer import BinaryWriter
+from ontology.io.memory_stream import StreamManager
 from ontology.utils.util import bytes_reader
 from ontology.core.program import ProgramBuilder
 from binascii import b2a_hex, a2b_hex

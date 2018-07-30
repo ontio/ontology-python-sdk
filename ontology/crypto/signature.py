@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import binascii
 from ecdsa import SECP256k1, ecdsa, util, NIST256p, SigningKey
-from ontology.crypto.Curve import Curve
-from ontology.crypto.SignatureScheme import SignatureScheme
+from ontology.crypto.curve import Curve
+from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class Signature(object):

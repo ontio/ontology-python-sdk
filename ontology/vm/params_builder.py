@@ -1,7 +1,7 @@
 from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
     PUSHBYTES75, APPCALL, TAILCALL, SYSCALL
 from ontology.common.serialize import put_uint16, put_uint32
-from ontology.io.MemoryStream import MemoryStream
+from ontology.io.memory_stream import MemoryStream
 from binascii import b2a_hex, a2b_hex
 
 class ParamsBuilder:
