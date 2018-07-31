@@ -90,7 +90,7 @@ class TestRpcClient(TestCase):
         acct2 = Account(private_key2)
         tx = asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
                                             acct2.get_address().to_base58(), 2, 20000, 500)
-        tx = sdk.rpc_client.sign_transaction(tx, acct)
+        tx = sdk.sign_transaction(tx, acct)
         res = sdk.rpc_client.send_raw_transaction(tx)
         print(res)
 
@@ -101,6 +101,6 @@ class TestRpcClient(TestCase):
         acct2 = Account(private_key2)
         tx = asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
                                             acct2.get_address().to_base58(), 2, 20000, 500)
-        tx = sdk.rpc_client.sign_transaction(tx, acct)
+        tx = sdk.sign_transaction(tx, acct)
         res = sdk.rpc_client.send_raw_transaction_preexec(tx)
         print(res)

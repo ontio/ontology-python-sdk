@@ -8,7 +8,6 @@ from ontology.io.memory_stream import StreamManager
 from ontology.io.binary_reader import BinaryReader
 from ontology.crypto.curve import Curve
 from binascii import b2a_hex, a2b_hex
-from ontology.utils import util
 
 
 def new_registry_ontid_transaction(ontid: str,pubkey: str,gas_limit: int,gas_price: int):
