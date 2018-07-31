@@ -38,5 +38,3 @@ class AccountData(object):
 
     def get_key(self):
         return self.key
-
-

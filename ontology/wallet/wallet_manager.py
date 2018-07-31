@@ -14,7 +14,7 @@ import uuid
 from binascii import a2b_hex
 from ontology.wallet.identity import Identity, did_ont
 from ontology.wallet.identity_info import IdentityInfo
-from ontology.utils.util import hex_to_bytes, get_random_bytes
+from ontology.utils.util import get_random_bytes
 from collections import namedtuple
 
 
@@ -29,7 +29,7 @@ class WalletManager(object):
         self.wallet_path = wallet_path
         if is_file_exist(wallet_path) is False:
             # create a new wallet file
-            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+            self.wallet_in_mem.createTime = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
             self.save()
         # wallet file exists now
         self.wallet_file = self.load()
@@ -41,8 +41,8 @@ class WalletManager(object):
         r = json.load(f, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         f.close()
         scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
-        identities = []
 
+        identities = []
         for index in range(len(r.identities)):
             control = [Control(id=r.identities[index].controls[0].id,
                                algorithm=r.identities[index].controls[0].algorithm,
@@ -55,8 +55,8 @@ class WalletManager(object):
                                public_key=r.identities[index].controls[0].publicKey)]
             temp = Identity(r.identities[index].ontid, r.identities[index].label, r.identities[index].lock, control)
             identities.append(temp)
-        accounts = []
 
+        accounts = []
         for index in range(len(r.accounts)):
             temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
                                sign_scheme=r.accounts[index].signatureScheme, is_default=r.accounts[index].isDefault,

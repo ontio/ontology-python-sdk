@@ -3,7 +3,6 @@ from ontology.wallet.account import AccountData
 from ontology.wallet.identity import Identity
 
 
-
 class WalletData(object):
     def __init__(self, name="MyWallet", version="1.1", create_time="", default_ontid="", default_account_address="",
                  scrypt=Scrypt(), identities=[], accounts=[]):
@@ -20,6 +19,9 @@ class WalletData(object):
         wallet = WalletData()
         wallet.name = self.name
         wallet.version = self.version
+        wallet.createTime = self.createTime
+        wallet.defaultOntid = self.defaultOntid
+        wallet.defaultAccountAddress = self.defaultAccountAddress
         wallet.scrypt = self.scrypt
         wallet.accounts = self.accounts
         wallet.identities = self.identities
@@ -41,7 +43,7 @@ class WalletData(object):
 
     def get_account_by_address(self, address: str):
         for index in range(len(self.accounts)):
-            if self.accounts[index].keypair.address == address:
+            if self.accounts[index].address == address:
                 return self.accounts[index], index
         return None, -1
 
@@ -52,3 +54,4 @@ class WalletData(object):
         for index in range(len(self.identities)):
             if self.identities[index].ontid == ontid:
                 del self.identities[index]
+                break

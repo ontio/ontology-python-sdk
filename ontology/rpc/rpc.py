@@ -101,7 +101,7 @@ class RpcClient(object):
         s = json.loads(r.content.decode())["result"]
         s = bytearray.fromhex(s)
         res = (s[0]) | (s[1]) << 8 | (s[2]) << 16 | (s[3]) << 24 | (s[4]) << 32 | (s[5]) << 40 | (s[6]) << 48 | (
-        s[7]) << 56
+            s[7]) << 56
         return res
 
     def get_smart_contract_event_by_txhash(self, tx_hash):
@@ -139,7 +139,6 @@ class RpcClient(object):
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())["result"]
         return res
-
 
     def send_raw_transaction(self, tx: Transaction):
         buf = tx.serialize()
