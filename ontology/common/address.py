@@ -2,9 +2,10 @@ from ontology.vm.params_builder import ParamsBuilder
 from ontology.vm.op_code import CHECKSIG
 from ontology.crypto.digest import Digest
 import base58
-from binascii import b2a_hex, a2b_hex
+from binascii import a2b_hex
 
 ADDR_LEN = 20  # the size of address should be 20 bytes
+
 
 class Address(object):
     __zero_size = 20

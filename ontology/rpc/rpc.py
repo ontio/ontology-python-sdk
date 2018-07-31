@@ -6,6 +6,7 @@ from ontology.core.transaction import Transaction
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.common.address import Address
+from ontology.utils.util import get_asset_address
 
 rpc_address = "http://polaris3.ont.io:20336"
 rest_address = "http://polaris1.ont.io:20334"
@@ -99,7 +100,8 @@ class RpcClient(object):
         r = HttpRequest.request("post", self.addr, rpc_struct)
         s = json.loads(r.content.decode())["result"]
         s = bytearray.fromhex(s)
-        res = (s[0]) | (s[1]) << 8 | (s[2]) << 16 | (s[3]) << 24 | (s[4]) << 32 | (s[5]) << 40 | (s[6]) << 48 | (s[7]) << 56
+        res = (s[0]) | (s[1]) << 8 | (s[2]) << 16 | (s[3]) << 24 | (s[4]) << 32 | (s[5]) << 40 | (s[6]) << 48 | (
+        s[7]) << 56
         return res
 
     def get_smart_contract_event_by_txhash(self, tx_hash):
@@ -140,7 +142,7 @@ class RpcClient(object):
 
     def sign_transaction(self, tx: Transaction, signer: Account):
         tx_hash = tx.hash256()
-        sig_data = signer.generateSignature(tx_hash, SignatureScheme.SHA256withECDSA)
+        sig_data = signer.generate_signature(tx_hash, SignatureScheme.SHA256withECDSA)
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
         tx.sigs = sig
         return tx
@@ -150,7 +152,6 @@ class RpcClient(object):
         tx_data = buf.hex()
         rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        print(r.content.decode())
         res = json.loads(r.content.decode())["result"]
         return res
 
@@ -160,14 +161,9 @@ class RpcClient(object):
         rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())
-        print(res)
         err = res["error"]
         if err > 0:
             raise RuntimeError
         if res["result"]["State"] == 0:
             raise RuntimeError
         return res["result"]["Result"]
-
-
-if __name__ == '__main__':
-    pass

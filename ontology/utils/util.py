@@ -1,8 +1,17 @@
 import hashlib
 import os.path
-from ontology.common import address
 from ontology.common.define import *
 from os import urandom
+
+
+def get_asset_address(asset: str) -> bytearray:
+    if asset.upper() == 'ONT':
+        contract_address = ONT_CONTRACT_ADDRESS
+    elif asset.upper() == 'ONG':
+        contract_address = ONG_CONTRACT_ADDRESS
+    else:
+        raise ValueError("asset is not equal to ONT or ONG")
+    return contract_address  # [20]byte
 
 
 def get_random_bytes(length):
@@ -42,7 +51,6 @@ def address_from_vm_code(code: bytearray) -> bytearray:
 def get_contract_address(contract_code: str) -> bytearray:
     code = bytearray.fromhex(contract_code)
     return address_from_vm_code(code)  # [20]byte
-
 
 
 def is_file_exist(file_path: str) -> bool:
