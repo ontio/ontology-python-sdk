@@ -39,5 +39,9 @@ class SignatureHandler(object):
     def dsa_der_to_plain(signature):
         r, s = utils.decode_dss_signature(signature)
         r = hex(r)[2:]
+        if len(r) < 64:
+            r = "".join(['0' for i in range(64-len(r))]) + r
         s = hex(s)[2:]
+        if len(s) < 64:
+            s = "".join(['0' for i in range(64-len(s))]) + s
         return r + s
