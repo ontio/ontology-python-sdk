@@ -4,7 +4,7 @@ import base64
 from ontology.utils.util import get_random_bytes
 from ontology.account.account import Account
 from binascii import a2b_hex
-
+from ontology.utils import util
 
 class TestWalletManager(TestCase):
     def test_open_wallet(self):
