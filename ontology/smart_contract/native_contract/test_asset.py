@@ -42,7 +42,7 @@ class TestAsset(TestCase):
 
     def test_new_transfer_transaction(self):
         tx = asset.new_transfer_transaction("ont", acc.get_address().to_base58(), acc2.get_address_base58(),
-                                            1, 20000, 500)
+                                            1, acc.get_address().to_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())
@@ -56,8 +56,8 @@ class TestAsset(TestCase):
         aa = asset.unboundong(sdk.rpc_client,acc.get_address_base58())
         if aa != "0":
             bb = int(aa)
-            tx = asset.new_withdraw_ong_transaction(acc.get_address_base58(),acc.get_address_base58(),bb,20000,500)
-            sdk.rpc_client.sign_transaction(tx,acc)
+            tx = asset.new_withdraw_ong_transaction(acc.get_address_base58(),acc.get_address_base58(),bb,acc.get_address_base58(),20000,500)
+            sdk.sign_transaction(tx,acc)
             sdk.rpc_client.send_raw_transaction(tx)
             time.sleep(6)
             aa2 = asset.unboundong(sdk.rpc_client,acc.get_address_base58())
@@ -81,8 +81,8 @@ class TestAsset(TestCase):
         tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
         allowance = sdk.rpc_client.send_raw_transaction_preexec(tx)
         amount = 10
-        tx2 = asset.new_approve_transaction("ont", acc.get_address_base58(), acc2.get_address_base58(), amount, 20000, 500)
-        sdk.rpc_client.sign_to_transaction(tx2, acc)
+        tx2 = asset.new_approve_transaction("ont", acc.get_address_base58(), acc2.get_address_base58(), amount,acc.get_address_base58(), 20000, 500)
+        sdk.sign_transaction(tx2, acc)
         sdk.rpc_client.send_raw_transaction(tx2)
         time.sleep(6)
         tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
@@ -90,7 +90,7 @@ class TestAsset(TestCase):
         if allowance == "":
             allowance = "0"
         assert int(allowance2,16) - int(allowance,16) == amount
-        tx2 = asset.new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), amount, 20000, 500)
+        tx2 = asset.new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), amount, acc2.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx2, acc2)
         sdk.rpc_client.send_raw_transaction(tx2)
         time.sleep(6)

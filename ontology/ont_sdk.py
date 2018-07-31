@@ -39,7 +39,7 @@ class OntologySdk(object):
     def create_wallet(self, wallet_file):
         if util.is_file_exist(wallet_file):
             raise IsADirectoryError("wallet file has already exist")
-        return WalletManager().open_wallet(wallet_file)
+        return self.wallet_manager.open_wallet(wallet_file)
 
     def open_wallet(self, wallet_file):
-        return WalletManager().open_wallet(wallet_file)
+        return self.wallet_manager.open_wallet(wallet_file)
