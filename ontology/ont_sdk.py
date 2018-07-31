@@ -3,13 +3,13 @@ from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
 from ontology.utils import util
 from ontology.wallet.wallet_manager import WalletManager
-from ontology.rpc import rpc
+from ontology.rpc.rpc import RpcClient
 from ontology.common import define as Common
 
 
 class OntologySdk(object):
     def __init__(self):
-        self.rpc_client = rpc.RpcClient()
+        self.rpc_client = RpcClient()
         self.wallet_manager = WalletManager()
 
     def sign_transaction(self, tx: Transaction, signer: Account):
@@ -29,7 +29,6 @@ class OntologySdk(object):
         sig = Sig([signer.serialize_public_key()], 1, [sig_data])
         tx.sigs.append(sig)
         return tx
-
 
     def open_or_create_wallet(self, wallet_file):
         if util.is_file_exist(wallet_file):
