@@ -20,13 +20,12 @@ def get_asset_address(asset: str) -> bytearray:
     return contract_address  # [20]byte
 
 
-def new_transfer_transaction( asset:str, from_addr :str, to_addr :str, amount :int, gas_limit:int,gas_price:int):
+def new_transfer_transaction( asset:str, from_addr :str, to_addr :str, amount :int, payer: str, gas_limit:int,gas_price:int):
     contract_address = get_asset_address(asset)  # []bytes
     state = [{"from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(to_addr).to_array(), "amount": amount}]
     invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
     unix_timenow = int(time())
-    payer = Address.decodeBase58(from_addr).to_array()
-    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, payer, invoke_code, bytearray(),
+    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
                        [], bytearray())
 
 

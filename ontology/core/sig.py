@@ -13,7 +13,7 @@ class Sig(object):
     def serialize(self) -> bytes:
         invoke_script = ProgramBuilder.program_from_params(self.sig_data)
         if len(self.public_keys) == 0:
-            raise ValueError("np public key in sig")
+            raise ValueError("no public key in sig")
 
         verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
         ms = StreamManager.GetStream()

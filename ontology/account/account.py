@@ -50,6 +50,9 @@ class Account(object):
     def get_public_key(self):
         return self.__publicKey
 
+    def get_signature_scheme(self):
+        return self.__signature_scheme
+
     def export_gcm_encrypted_private_key(self, password: str, salt: bytes, n: int):
         r = 8
         p = 8

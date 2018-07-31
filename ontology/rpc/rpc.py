@@ -140,12 +140,6 @@ class RpcClient(object):
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def sign_transaction(self, tx: Transaction, signer: Account):
-        tx_hash = tx.hash256()
-        sig_data = signer.generate_signature(tx_hash, SignatureScheme.SHA256withECDSA)
-        sig = [Sig([signer.get_public_key()], 1, [sig_data])]
-        tx.sigs = sig
-        return tx
 
     def send_raw_transaction(self, tx: Transaction):
         buf = tx.serialize()
