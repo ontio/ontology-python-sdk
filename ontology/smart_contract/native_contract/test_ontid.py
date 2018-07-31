@@ -22,7 +22,7 @@ did = "did:ont:" + acc.get_address_base58()
 class test_ontid(TestCase):
 
     def test_new_registry_ontid_transaction(self):
-        tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(), 20000, 500)
+        tx = ontid.new_registry_ontid_transaction(did, acc.get_public_key(),acc.get_address_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acc)
         print(tx.hash256().hex())
         print(tx.serialize().hex())

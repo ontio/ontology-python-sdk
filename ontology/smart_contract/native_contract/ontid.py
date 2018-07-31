@@ -10,13 +10,12 @@ from ontology.crypto.curve import Curve
 from binascii import b2a_hex, a2b_hex
 
 
-def new_registry_ontid_transaction(ontid: str,pubkey: str,gas_limit: int,gas_price: int):
+def new_registry_ontid_transaction(ontid: str,pubkey: str, payer: str, gas_limit: int,gas_price: int):
     contract_address = ONTID_CONTRACT_ADDRESS
     args = {"ontid": ontid.encode(), "pubkey": pubkey}
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
     unix_timenow = int(time())
-    payer = Address.decodeBase58(ontid.replace("did:ont:","")).to_array()
-    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, payer, invoke_code, bytearray(),
+    return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
                        [], bytearray())
 
 
@@ -29,7 +28,6 @@ def new_add_attribute_transaction(ontid: str, pubkey: str, attris: list, payer: 
         args["value" + str(i)] = bytes(attris[i]["value"].encode())
     args["pubkey"] = pubkey
     invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addAttributes", args)
-    print("invoke_code", invoke_code.hex())
     unix_timenow = int(time())
     return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
                        [], bytearray())
