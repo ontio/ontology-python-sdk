@@ -18,23 +18,21 @@ class TestWalletManager(TestCase):
         salt = get_random_bytes(16)
         privete_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(a2b_hex(privete_key.encode()))
-        enpri = acct.export_gcm_encrypted_private_key("1",salt,16384)
+        enpri = acct.export_gcm_encrypted_private_key("1", salt, 16384)
         wm.import_identity("label2", enpri, "1", salt, acct.get_address_base58())
 
-    def test_create_random_identity(self):
-        self.fail()
-
-    def test_create_identity(self):
-        self.fail()
-
     def test_create_identity_from_prikey(self):
-        self.fail()
+        wm = WalletManager()
+        wm.open_wallet("./test6.json")
+        wm.create_identity_from_prikey("ide", "1", util.hex_to_bytes(
+            "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"))
 
     def test_create_random_account(self):
-        self.fail()
-
-    def test_create_account(self):
-        self.fail()
+        wm = WalletManager()
+        wm.open_wallet("./test.json")
+        acc = wm.create_random_account("mywallet", "1")
+        wm.save()
+        print(acc)
 
     def test_import_account(self):
         wm = WalletManager()
@@ -43,11 +41,10 @@ class TestWalletManager(TestCase):
                           "AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve", base64.b64decode("pwLIUKAf2bAbTseH/WYrfQ=="))
         wm.save()
 
-    def test_create_account_info(self):
-        self.fail()
-
     def test_create_account_from_prikey(self):
-        self.fail()
-
-    def test_get_account(self):
-        self.fail()
+        wm = WalletManager()
+        wm.open_wallet("/Users/zhaoxavi/test.txt")
+        account = wm.create_account_from_prikey("myaccount", "1", util.hex_to_bytes(
+            "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"))
+        wm.save()
+        print(account)
