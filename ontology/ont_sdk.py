@@ -1,6 +1,7 @@
 from ontology.account.account import Account
 from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
+from ontology.smart_contract.native_vm import NativeVm
 from ontology.utils import util
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.rpc.rpc import RpcClient
@@ -11,6 +12,7 @@ class OntologySdk(object):
     def __init__(self):
         self.rpc_client = RpcClient()
         self.wallet_manager = WalletManager()
+        self.native_vm = NativeVm()
 
     def sign_transaction(self, tx: Transaction, signer: Account):
         tx_hash = tx.hash256()

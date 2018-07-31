@@ -22,7 +22,7 @@ did = "did:ont:" + acc2.get_address_base58()
 class test_ontid(TestCase):
 
     def test_new_registry_ontid_transaction(self):
-        tx = ontid.new_registry_ontid_transaction(did, acc2.get_public_key(),acc.get_address_base58(), 20000, 500)
+        tx = sdk.native_vm.ontid.new_registry_ontid_transaction(did, acc2.get_public_key(),acc.get_address_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acc2)
         tx = sdk.add_sign_transaction(tx,acc)
         print(tx.hash256().hex())
@@ -30,10 +30,10 @@ class test_ontid(TestCase):
         sdk.rpc_client.send_raw_transaction(tx)
 
     def test_new_get_ddo_transaction(self):
-        tx = ontid.new_get_ddo_transaction(did)
+        tx = sdk.native_vm.ontid.new_get_ddo_transaction(did)
         ddo = sdk.rpc_client.send_raw_transaction_preexec(tx)
         print(ddo)
-        print(ontid.parse_ddo(did, ddo))
+        print(sdk.native_vm.ontid.parse_ddo(did, ddo))
 
     def test_new_add_attribute_transaction(self):
         attris = []
@@ -42,34 +42,34 @@ class test_ontid(TestCase):
         attri["type"] = "string"
         attri["value"] = "value100"
         attris.append(attri)
-        tx = ontid.new_add_attribute_transaction(did, acc2.get_public_key(), attris, acc.get_address_base58(), 20000,
+        tx = sdk.native_vm.ontid.new_add_attribute_transaction(did, acc2.get_public_key(), attris, acc.get_address_base58(), 20000,
                                                  500)
         tx = sdk.sign_transaction(tx, acc2)
         tx = sdk.add_sign_transaction(tx, acc)
         sdk.rpc_client.send_raw_transaction(tx)
 
     def test_new_remove_attribute_transaction(self):
-        tx = ontid.new_remove_attribute_transaction(did, acc2.get_public_key(), "key1", acc.get_address_base58(), 20000, 500)
+        tx = sdk.native_vm.ontid.new_remove_attribute_transaction(did, acc2.get_public_key(), "key1", acc.get_address_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acc2)
         tx = sdk.add_sign_transaction(tx, acc)
         sdk.rpc_client.send_raw_transaction(tx)
 
     def test_new_add_pubkey_transaction(self):
-        tx = ontid.new_add_pubkey_transaction(did, acc2.get_public_key(), acc.get_public_key(), acc.get_address_base58(), 20000,
+        tx = sdk.native_vm.ontid.new_add_pubkey_transaction(did, acc2.get_public_key(), acc.get_public_key(), acc.get_address_base58(), 20000,
                                                     500)
         tx = sdk.sign_transaction(tx, acc2)
         tx = sdk.add_sign_transaction(tx, acc)
         sdk.rpc_client.send_raw_transaction(tx)
 
     def test_new_remove_pubkey_transaction(self):
-        tx = ontid.new_remove_pubkey_transaction(did, acc2.get_public_key(), acc.get_public_key(), acc.get_address_base58(), 20000,
+        tx = sdk.native_vm.ontid.new_remove_pubkey_transaction(did, acc2.get_public_key(), acc.get_public_key(), acc.get_address_base58(), 20000,
                                                     500)
         tx = sdk.sign_transaction(tx, acc2)
         tx = sdk.add_sign_transaction(tx, acc)
         sdk.rpc_client.send_raw_transaction(tx)
 
     def test_new_add_recovery_transaction(self):
-        tx = ontid.new_add_rcovery_transaction(did, acc2.get_public_key(), acc.get_address_base58(), acc.get_address_base58(), 20000,
+        tx = sdk.native_vm.ontid.new_add_rcovery_transaction(did, acc2.get_public_key(), acc.get_address_base58(), acc.get_address_base58(), 20000,
                                                     500)
         tx = sdk.sign_transaction(tx, acc2)
         tx = sdk.add_sign_transaction(tx, acc)

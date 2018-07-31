@@ -29,8 +29,7 @@ class TestAsset(TestCase):
         b2 = sdk.rpc_client.get_balance(acc2.get_address_base58())
         print("acc:", b)
         print("acc2:", b2)
-        tx = asset.new_transfer_transaction("ont", acc.get_address().to_base58(), acc2.get_address_base58(),
-                                            1, acc2.get_address_base58(), 20000, 500)
+        tx = sdk.native_vm.asset.new_transfer_transaction("ont", acc.get_address().to_base58(), acc2.get_address_base58(), 1, acc2.get_address_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acc)
         tx = sdk.add_sign_transaction(tx, acc2)
         sdk.rpc_client.send_raw_transaction(tx)
@@ -41,7 +40,7 @@ class TestAsset(TestCase):
         print("acc2:", b2)
 
     def test_new_transfer_transaction(self):
-        tx = asset.new_transfer_transaction("ont", acc.get_address().to_base58(), acc2.get_address_base58(),
+        tx = sdk.native_vm.asset.new_transfer_transaction("ont", acc.get_address().to_base58(), acc2.get_address_base58(),
                                             1, acc.get_address().to_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acc)
         print(tx.hash256().hex())
@@ -53,48 +52,48 @@ class TestAsset(TestCase):
         bs = sdk.rpc_client.get_balance(acc.get_address_base58())
         b2s = sdk.rpc_client.get_balance(acc2.get_address_base58())
         assert int(b["ont"])-int(bs["ont"]) == int(b2s["ont"])-int(b2["ont"])
-        aa = asset.unboundong(sdk.rpc_client,acc.get_address_base58())
+        aa = sdk.native_vm.asset.unboundong(sdk.rpc_client,acc.get_address_base58())
         if aa != "0":
             bb = int(aa)
-            tx = asset.new_withdraw_ong_transaction(acc.get_address_base58(),acc.get_address_base58(),bb,acc.get_address_base58(),20000,500)
+            tx = sdk.native_vm.asset.new_withdraw_ong_transaction(acc.get_address_base58(),acc.get_address_base58(),bb,acc.get_address_base58(),20000,500)
             sdk.sign_transaction(tx,acc)
             sdk.rpc_client.send_raw_transaction(tx)
             time.sleep(6)
-            aa2 = asset.unboundong(sdk.rpc_client,acc.get_address_base58())
+            aa2 = sdk.native_vm.asset.unboundong(sdk.rpc_client,acc.get_address_base58())
             assert aa2 == "0"
 
     def test_new_get_balance_transaction(self):
-        tx = asset.new_get_balance_transaction("ont", acc.get_address_base58())
+        tx = sdk.native_vm.asset.new_get_balance_transaction("ont", acc.get_address_base58())
         result = sdk.rpc_client.send_raw_transaction_preexec(tx)
         assert int(result) >= 0
-        tx = asset.new_get_name_transaction("ont")
+        tx = sdk.native_vm.asset.new_get_name_transaction("ont")
         result = sdk.rpc_client.send_raw_transaction_preexec(tx)
         assert result != ""
-        tx = asset.new_get_symbol_transaction("ont")
+        tx = sdk.native_vm.asset.new_get_symbol_transaction("ont")
         result = sdk.rpc_client.send_raw_transaction_preexec(tx)
         assert result != ""
-        tx = asset.new_get_decimals_transaction("ont")
+        tx = sdk.native_vm.asset.new_get_decimals_transaction("ont")
         result = sdk.rpc_client.send_raw_transaction_preexec(tx)
         assert int(result) >= 0
 
     def test_new_approve_transaction(self):
-        tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
+        tx = sdk.native_vm.asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
         allowance = sdk.rpc_client.send_raw_transaction_preexec(tx)
         amount = 10
-        tx2 = asset.new_approve_transaction("ont", acc.get_address_base58(), acc2.get_address_base58(), amount,acc.get_address_base58(), 20000, 500)
+        tx2 = sdk.native_vm.asset.new_approve_transaction("ont", acc.get_address_base58(), acc2.get_address_base58(), amount,acc.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx2, acc)
         sdk.rpc_client.send_raw_transaction(tx2)
         time.sleep(6)
-        tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
+        tx = sdk.native_vm.asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
         allowance2 = sdk.rpc_client.send_raw_transaction_preexec(tx)
         if allowance == "":
             allowance = "0"
-        assert int(allowance2,16) - int(allowance,16) == amount
-        tx2 = asset.new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), amount, acc2.get_address_base58(), 20000, 500)
+        assert int(allowance2, 16) - int(allowance, 16) == amount
+        tx2 = sdk.native_vm.asset.new_transferfrom_transaction("ont", acc2.get_address_base58(), acc.get_address_base58(), acc2.get_address_base58(), amount, acc2.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx2, acc2)
         sdk.rpc_client.send_raw_transaction(tx2)
         time.sleep(6)
-        tx = asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
+        tx = sdk.native_vm.asset.new_get_allowance_transaction("ont", acc.get_address_base58(), acc2.get_address_base58())
         allowance3 = sdk.rpc_client.send_raw_transaction_preexec(tx)
         if allowance3 == "":
             allowance3 = "0"
