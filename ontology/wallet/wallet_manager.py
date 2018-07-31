@@ -101,7 +101,6 @@ class WalletManager(object):
         self.scheme = scheme
 
     def import_identity(self, label: str, encrypted_privkey: str, pwd: str, salt: bytes, address: str):
-        encrypted_privkey = base64.decodebytes(encrypted_privkey.encode())
         private_key = Account.get_gcm_decoded_private_key(encrypted_privkey, pwd, address, salt,
                                                           Scrypt().get_n(), self.scheme)
         info = self.create_identity(label, pwd, salt, private_key)
