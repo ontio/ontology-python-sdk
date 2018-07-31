@@ -1,10 +1,8 @@
-from ontology.common.serialize import write_byte, write_uint32, write_uint64, write_var_uint
 from ontology.crypto.digest import Digest
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
-from ontology.utils.util import bytes_reader
-from ontology.core.program import ProgramBuilder
 from binascii import b2a_hex, a2b_hex
+
 
 class Transaction(object):
     def __init__(self, version, tx_type, nonce, gas_price, gas_limit, payer, payload, attributes, sigs, hash):
@@ -13,13 +11,13 @@ class Transaction(object):
         self.nonce = nonce
         self.gas_price = gas_price
         self.gas_limit = gas_limit
-        self.payer = payer  # common.address [20]bytes
+        self.payer = payer  # 20 bytes
         self.payload = payload
         self.attributes = attributes
         self.sigs = sigs  # Sig class array
-        self.hash = hash  # [32]byte
+        self.hash = hash  # 32 bytes
 
-    def serialize_unsigned(self)->bytes:
+    def serialize_unsigned(self) -> bytes:
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.WriteUInt8(self.version)
@@ -35,14 +33,13 @@ class Transaction(object):
         StreamManager.ReleaseStream(ms)
         return res
 
-    def hash256(self)->bytes:
+    def hash256(self) -> bytes:
         tx_serial = self.serialize_unsigned()
         tx_serial = a2b_hex(tx_serial)
         r = Digest.hash256(tx_serial)
-        #print(a2b_hex(b2a_hex(r))[::-1].hex())   [::-1]
         return a2b_hex(b2a_hex(r))
 
-    def serialize(self)->bytes:
+    def serialize(self) -> bytes:
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.WriteBytes(self.serialize_unsigned())
@@ -55,6 +52,3 @@ class Transaction(object):
         temp = ms.ToArray()
         StreamManager.ReleaseStream(ms)
         return a2b_hex(temp)
-
-
-

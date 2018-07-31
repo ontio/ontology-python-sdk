@@ -1,10 +1,8 @@
-from ontology.common.serialize import write_byte, write_uint32, write_uint64, write_var_uint
-from ontology.crypto.digest import Digest
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
 from ontology.utils.util import bytes_reader
 from ontology.core.program import ProgramBuilder
-from binascii import b2a_hex, a2b_hex
+
 
 class Sig(object):
     def __init__(self, public_keys, M, sig_data):
@@ -12,7 +10,7 @@ class Sig(object):
         self.M = M
         self.sig_data = sig_data
 
-    def serialize(self)->bytes:
+    def serialize(self) -> bytes:
         invoke_script = ProgramBuilder.program_from_params(self.sig_data)
         if len(self.public_keys) == 0:
             raise ValueError("np public key in sig")

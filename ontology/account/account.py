@@ -30,7 +30,7 @@ class Account(object):
         self.__privateKey = private_key  # 32 bytes
         self.__curve_name = Curve.P256
         self.__publicKey = Signature.ec_get_pubkey_by_prikey(private_key, self.__curve_name)  # 33 bytes
-        self.__address = Address.address_from_hexstr_pubkey(self.__publicKey)  # address is a class type
+        self.__address = Address.address_from_bytes_pubkey(self.__publicKey)  # address is a class type
 
     def generate_signature(self, msg: bytes, signature_scheme: SignatureScheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:

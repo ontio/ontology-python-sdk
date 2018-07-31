@@ -1,8 +1,8 @@
 from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
-    PUSHBYTES75, APPCALL, TAILCALL, SYSCALL
-from ontology.common.serialize import put_uint16, put_uint32
+    PUSHBYTES75, APPCALL
 from ontology.io.memory_stream import MemoryStream
-from binascii import b2a_hex, a2b_hex
+from binascii import a2b_hex
+
 
 class ParamsBuilder:
     def __init__(self):
@@ -25,7 +25,6 @@ class ParamsBuilder:
             return self.emit_push_byte_array(num.to_bytes(2, "little"))
         else:
             return self.emit_push_byte_array(num.to_bytes(4, "little"))
-
 
     def emit_push_byte_array(self, data):
         l = len(data)
@@ -52,7 +51,7 @@ class ParamsBuilder:
         elif isinstance(value, str):
             self.ms.write(value.encode())
         elif isinstance(value, int):
-           self.ms.write(bytes([value]))
+            self.ms.write(bytes([value]))
         else:
             raise TypeError
 

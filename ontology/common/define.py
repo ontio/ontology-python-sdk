@@ -1,4 +1,4 @@
-from binascii import b2a_hex, a2b_hex
+from binascii import a2b_hex
 
 VERSION_TRANSACTION = bytes([0])
 VERSION_CONTRACT_ONT = bytes([0])
@@ -23,41 +23,3 @@ ONTID_CONTRACT_ADDRESS = a2b_hex(("0000000000000000000000000000000000000003").en
 PARAM_CONTRACT_ADDRESS = a2b_hex(("0000000000000000000000000000000000000004").encode())
 AUTH_CONTRACT_ADDRESS = a2b_hex(("0000000000000000000000000000000000000006").encode())
 GOVERNANCE_CONTRACT_ADDRESS = a2b_hex(("0000000000000000000000000000000000000007").encode())
-
-
-# Balance object for account
-class Balance(object):
-    def __init__(self, ont=0, ong=0):
-        self.ont = ont
-        self.ong = ong
-
-
-# Response object for balance request
-class BalanceRsp(object):
-    def __init__(self, ont="", ong=""):
-        self.ont = ont
-        self.ong = ong
-
-
-# SmartContactEvent object for event of transaction
-class SmartContactEvent(object):
-    def __init__(self, tx_hash="", state=bytearray(), gas_consumed=0):
-        self.tx_hash = tx_hash
-        self.state = state
-        self.gas_consumed = gas_consumed
-
-    class NotifyEventInfo(object):
-        contract_address = ""
-        states = ""
-
-
-# MerkleProof return structure
-class MerkleProof(object):
-    def __init__(self, merkle_proof_type='', transactions_root="", block_height=0, cur_block_root="",
-                 cur_block_height=0, target_hashes=[]):
-        self.merkle_proof_type = merkle_proof_type
-        self.transactions_root = transactions_root
-        self.block_height = block_height
-        self.cur_block_root = cur_block_root
-        self.cur_block_height = cur_block_height
-        self.target_hashes = target_hashes  # string array

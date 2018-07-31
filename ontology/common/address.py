@@ -4,21 +4,16 @@ from ontology.crypto.digest import Digest
 import base58
 from binascii import a2b_hex
 
-ADDR_LEN = 20  # the size of address should be 20 bytes
-
 
 class Address(object):
     __zero_size = 20
     __COIN_VERSION = b'\x17'
 
     def __init__(self, value: bytes):
-        self.ZERO = value
-
-    def get_address(self):
-        return self.ZERO
+        self.ZERO = value  # 20 bytes
 
     @staticmethod
-    def toScriptHash(byte_script):
+    def to_script_hash(byte_script):
         return a2b_hex(Digest.hash160(msg=byte_script, is_hex=True))
 
     @staticmethod
@@ -26,12 +21,8 @@ class Address(object):
         builder = ParamsBuilder()
         builder.emit_push_byte_array(bytearray(public_key))
         builder.emit(CHECKSIG)
-        addr = Address(Address.toScriptHash(builder.to_array()))
+        addr = Address(Address.to_script_hash(builder.to_array()))
         return addr
-
-    @staticmethod
-    def address_from_hexstr_pubkey(public_key):
-        return Address.address_from_bytes_pubkey((public_key))
 
     def to_base58(self):
         sb = Address.__COIN_VERSION + self.ZERO
