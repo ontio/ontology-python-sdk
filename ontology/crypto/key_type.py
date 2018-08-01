@@ -11,6 +11,12 @@ class KeyType(Enum):
     SM2 = b'\x13'
     EDDSA = b'\x14'
 
+    def __init__(self, b: int):
+        self.label = b
+
+    def get_label(self):
+        return self.label
+
     @staticmethod
     def from_label(label: int):
         label = bytes([label])
@@ -21,5 +27,12 @@ class KeyType(Enum):
         elif KeyType.EDDSA.value == label:
             return KeyType.EDDSA.name
 
-    
+    @staticmethod
+    def from_pubkey(pubkey: []):
+        if len(pubkey) == 33:
+            return KeyType.ECDSA
+        else:
+            return KeyType.from_label(pubkey[0])
+
+
 

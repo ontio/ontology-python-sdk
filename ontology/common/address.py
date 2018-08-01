@@ -1,3 +1,4 @@
+from ontology.core.program import ProgramBuilder
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.vm.op_code import CHECKSIG
 from ontology.crypto.digest import Digest
@@ -23,6 +24,10 @@ class Address(object):
         builder.emit(CHECKSIG)
         addr = Address(Address.to_script_hash(builder.to_array()))
         return addr
+
+    @staticmethod
+    def address_from_multi_pubKeys(m: int, pubkeys: []):
+        return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pubkeys)))
 
     def to_base58(self):
         sb = Address.__COIN_VERSION + self.ZERO
