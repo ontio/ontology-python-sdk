@@ -1,38 +1,13 @@
 <h1 align="center">Python SDK For Ontology  </h1>
-<h4 align="center">Version 0.6.0 </h4>
+<h4 align="center">Version 0.1.0 </h4>
 
-## Overview
+## Introduction
 
-This is a comprehensive python library for the Ontology blockchain. Currently, it supports local wallet management, digital identity management, digital asset management,  deployment and invoke for Smart Contract , and communication with Ontology Blockchain. The future will also support more rich functions and applications .
-
-## Getting started
-
-* 进入 [中文版](https://ontio.github.io/documentation/ontology_python_sdk_zh.html) .
-* Enter [English Version](https://ontio.github.io/documentation/ontology_python_sdk_en.html) .
-
-## Installation Environment 
-
-Please configure JDK 8 and above.
-
-> **Note:** As the length of key used in SDK is greater than 128, due to the restriction of python security policy files, it is necessary to download local_policy.jar and US_export_policy.jar from the official website , to replace the two jar of ${python_home}/jre/lib/security in JRE directory.
-
-Download URL：
-
->http://www.oracle.com/technetwork/python/pythonse/downloads/jce8-download-2133166.html
+This is a comprehensive python library for the Ontology blockchain. Currently, it supports local wallet management, digital identity management, digital asset management,  deployment and invoke for Smart Contract , and RPC communication with Ontology Blockchain. The future will also support more rich functions and applications .
 
 
-## Build
 
-```
-mvn clean install
-```
-
-## Preparations
-
-* Make sure Ontology Blockchain has deployed well,  RPC port has been opened, and SDK will connect the RPC server to initialize.
-
-
-# Contributing
+## Contributing
 
 Can I contribute patches to Ontology project?
 
@@ -68,7 +43,6 @@ looks like this:
   Reported-by: whoever-reported-it
   Signed-off-by: Your Name <youremail@yourhost.com>
 
-## Community
 
 ## Site
 
