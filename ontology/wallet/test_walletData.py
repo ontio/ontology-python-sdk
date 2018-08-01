@@ -5,6 +5,11 @@ from ontology.wallet.identity import Identity
 
 
 class TestWalletData(TestCase):
+
+    def test_field(self):
+        data = AccountData()
+        print(data.algorithm)
+
     def test_clone(self):
         w = WalletData(default_ontid='hahaha')
         clone = w.clone()

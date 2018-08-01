@@ -15,7 +15,10 @@ class Sig(object):
         if len(self.public_keys) == 0:
             raise ValueError("no public key in sig")
 
-        verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
+        if len(self.public_keys) == 1:
+            verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
+        else:
+            verification_script = ProgramBuilder.program_from_multi_pubkey(self.M, self.public_keys)
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.WriteVarBytes(invoke_script)
