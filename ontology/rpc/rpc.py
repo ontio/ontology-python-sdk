@@ -123,12 +123,6 @@ class RpcClient(object):
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def get_generate_block_time(self):
-        rpc_struct = self.set_json_rpc_version(RPC_GET_GENERATE_BLOCK_TIME)
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
-        return res
-
     def get_merkle_proof(self, tx_hash):
         rpc_struct = self.set_json_rpc_version(RPC_GET_MERKLE_PROOF, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
