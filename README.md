@@ -34,10 +34,9 @@ Ontology Python SDK function consists of four parts, RPC interface, wallet, asse
  |   11 | get_smart_contract_event_by_block (block_height)               |  
  |   12 | get_raw_transaction (transaction_hash)         |  
  |   13 | get_smart_contract (contract_address)     | 
- |   14 | get_generate_block_time ()          |  
- |   15 | get_merkle_proof (transaction_hash)   |  
- |   16 | send_raw_transaction (transaction)    |  
- |  17 | send_raw_transaction_preexec (transaction)  | 
+ |   14 | get_merkle_proof (transaction_hash)   |  
+ |   15 | send_raw_transaction (transaction)    |  
+ |  16 | send_raw_transaction_preexec (transaction)  | 
 
 
 ## Wallet function list
