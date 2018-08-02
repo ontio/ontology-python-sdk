@@ -6,7 +6,6 @@ from ontology.ont_sdk import OntologySdk
 from ontology.rpc.rpc import RpcClient
 from binascii import a2b_hex
 
-from ontology.smart_contract.native_contract import ontid
 
 rpc_address = "http://polaris3.ont.io:20336"
 # rpc_address = "http://127.0.0.1:20336"

@@ -7,7 +7,7 @@ from ontology.smart_contract.native_contract.asset import Asset
 import time
 
 rpc_address = "http://polaris3.ont.io:20336"
-sdk = OntologySdk()
+sdk = OntologySdk.get_instance()
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
 private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
 private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
@@ -22,7 +22,7 @@ class TestAsset(TestCase):
         b2 = sdk.rpc.get_balance(acc2.get_address_base58())
         print("acc:", b)
         print("acc2:", b2)
-        tx = sdk.native_vm.asset.new_transfer_transaction("ont", acc.get_address().to_base58(),
+        tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address().to_base58(),
                                                           acc2.get_address_base58(), 1, acc2.get_address_base58(),
                                                           20000, 500)
         tx = sdk.sign_transaction(tx, acc)
@@ -89,7 +89,7 @@ class TestAsset(TestCase):
         if allowance == "":
             allowance = "0"
         assert int(allowance2, 16) - int(allowance, 16) == amount
-        tx2 = sdk.native_vm.asset.new_transferfrom_transaction("ont", acc2.get_address_base58(),
+        tx2 = sdk.native_vm().asset().new_transferfrom_transaction("ont", acc2.get_address_base58(),
                                                                acc.get_address_base58(), acc2.get_address_base58(),
                                                                amount, acc2.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx2, acc2)
