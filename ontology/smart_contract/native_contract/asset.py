@@ -120,7 +120,7 @@ class Asset(object):
         tx = self.__sdk.sign_transaction(tx, sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
-        flag = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        flag = self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256().hex() if flag else None
 
     def new_transfer_from(self, asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int,
