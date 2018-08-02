@@ -17,8 +17,8 @@ class OntologySdk(object):
 
     def __init__(self):
         self.rpc = RpcClient()
-        self._wallet_manager = WalletManager()
-        self._native_vm = None
+        self.wallet_manager = WalletManager()
+        self.__native_vm = None
         self.defaultSignScheme = SignatureScheme.SHA256withECDSA
 
     @staticmethod
@@ -30,19 +30,19 @@ class OntologySdk(object):
         return OntologySdk.__instance
 
     def native_vm(self):
-        if self._native_vm is None:
-            self._native_vm = NativeVm(OntologySdk.get_instance())
-        return self._native_vm
+        if self.__native_vm is None:
+            self.__native_vm = NativeVm(OntologySdk.get_instance())
+        return self.__native_vm
 
     def get_wallet_manager(self):
-        if self._wallet_manager is None:
-            self._wallet_manager = WalletManager()
-        return self._wallet_manager
+        if self.wallet_manager is None:
+            self.wallet_manager = WalletManager()
+        return self.wallet_manager
 
     def get_rpc(self):
-        if self._rpc is None:
-            self._rpc = RpcClient()
-        return self._rpc
+        if self.rpc is None:
+            self.rpc = RpcClient()
+        return self.rpc
 
     def set_signaturescheme(self, scheme: SignatureScheme):
         self.defaultSignScheme = scheme
@@ -89,4 +89,4 @@ class OntologySdk(object):
         return tx
 
     def open_wallet(self, wallet_file):
-        return self._wallet_manager.open_wallet(wallet_file)
+        return self.wallet_manager.open_wallet(wallet_file)

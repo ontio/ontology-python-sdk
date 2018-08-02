@@ -5,10 +5,10 @@ from ontology.smart_contract.native_contract.ontid import OntId
 
 class NativeVm(object):
     def __init__(self, sdk):
-        self._sdk = sdk
+        self.__sdk = sdk
 
     def asset(self):
-        return Asset(self._sdk)
+        return Asset(self.__sdk)
 
     def ontid(self):
-        return OntId(self._sdk)
+        return OntId(self.__sdk)
