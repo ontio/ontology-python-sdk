@@ -16,9 +16,9 @@ class OntologySdk(object):
     _instance_lock = threading.Lock()
 
     def __init__(self):
-        self._rpc = None
+        self.rpc = RpcClient()
         self._wallet_manager = WalletManager()
-        self._native_vm = None
+        self._native_vm = NativeVm(OntologySdk.get_instance())
         self.defaultSignScheme = SignatureScheme.SHA256WITHECDSA
 
     @staticmethod
@@ -28,26 +28,6 @@ class OntologySdk(object):
                 if not hasattr(OntologySdk, "_instance"):
                     OntologySdk._instance = OntologySdk()
         return OntologySdk._instance
-
-    def native_vm(self):
-        if self._native_vm is None:
-            self._native_vm = NativeVm(OntologySdk.get_instance())
-        else:
-            return self._native_vm
-
-    def get_wallet_manager(self):
-        if self._wallet_manager is None:
-            self._wallet_manager = WalletManager()
-        return self._wallet_manager
-
-    def get_rpc(self):
-        if self._rpc is None:
-            self._rpc = RpcClient()
-        return self._rpc
-
-    def set_signaturescheme(self, scheme: SignatureScheme):
-        self.defaultSignScheme = scheme
-        self._wallet_manager.set_signature_scheme(scheme)
 
     def sign_transaction(self, tx: Transaction, signer: Account):
         tx_hash = tx.hash256()
@@ -88,16 +68,6 @@ class OntologySdk(object):
         sig = Sig(pubkeys, m, [sig_data])
         tx.sigs.append(sig)
         return tx
-
-    def open_or_create_wallet(self, wallet_file):
-        if util.is_file_exist(wallet_file):
-            return self.open_wallet(wallet_file)
-        return self.create_wallet(wallet_file)
-
-    def create_wallet(self, wallet_file):
-        if util.is_file_exist(wallet_file):
-            raise IsADirectoryError("wallet file has already exist")
-        return self.wallet_manager.open_wallet(wallet_file)
 
     def open_wallet(self, wallet_file):
         return self.wallet_manager.open_wallet(wallet_file)

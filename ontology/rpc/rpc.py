@@ -1,15 +1,10 @@
 import requests
 from ontology.rpc.define import *
 import json
-from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
-from ontology.account.account import Account
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.common.address import Address
+from ontology.rpc.define import rpc_address
 from ontology.utils.util import get_asset_address
-
-rpc_address = "http://polaris3.ont.io:20336"
-rest_address = "http://polaris1.ont.io:20334"
 
 
 class HttpRequest(object):
@@ -31,7 +26,7 @@ class HttpRequest(object):
 
 
 class RpcClient(object):
-    def __init__(self, qid=0, addr=""):
+    def __init__(self, qid=0, addr=rpc_address):
         self.qid = qid
         self.addr = addr
 
