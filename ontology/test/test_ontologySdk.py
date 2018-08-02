@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from binascii import a2b_hex
 from unittest import TestCase
 
@@ -25,16 +28,11 @@ class TestOntologySdk(TestCase):
         a = sdk.open_wallet("./wallet/test.json")
         print(a)
 
-    def test_open_or_create_wallet(self):
-        a = sdk.open_or_create_wallet("./test.json")
-        print(a)
-
     def test_bb(self):
         print(sdk.rpc.get_balance(acc.get_address_base58()))
         print(sdk.rpc.get_balance(multi_addr.to_base58()))
 
     def test_add_multi_sign_transaction(self):
-
         print(multi_addr.to_base58())
         # tx = sdk.native_vm.asset.new_transfer_transaction("ong",acc.get_address_base58() ,multi_addr.to_base58(), 100000000,
         #                                                   acc.get_address_base58(), 20000, 500)
@@ -54,8 +52,3 @@ class TestOntologySdk(TestCase):
         print(a[0].hex())
         print(a[1].hex())
         print(a[2].hex())
-
-
-
-
-

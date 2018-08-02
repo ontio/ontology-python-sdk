@@ -89,4 +89,4 @@ class OntologySdk(object):
         return tx
 
     def open_wallet(self, wallet_file):
-        return self.wallet_manager.open_wallet(wallet_file)
+        return self._wallet_manager.open_wallet(wallet_file)
