@@ -143,9 +143,10 @@ class RpcClient(object):
         rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())
+        print(res)
         err = res["error"]
         if err > 0:
-            raise RuntimeError
+            raise RuntimeError("error > 0")
         if res["result"]["State"] == 0:
-            raise RuntimeError
+            raise RuntimeError("State = 0")
         return res["result"]["Result"]

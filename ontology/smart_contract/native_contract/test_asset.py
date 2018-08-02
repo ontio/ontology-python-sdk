@@ -5,6 +5,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
 from ontology.smart_contract.native_contract.asset import Asset
 import time
+from ontology.utils.util import get_random_bytes
 
 rpc_address = "http://polaris3.ont.io:20336"
 sdk = OntologySdk.get_instance()
@@ -23,8 +24,8 @@ class TestAsset(TestCase):
         print("acc:", b)
         print("acc2:", b2)
         tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address().to_base58(),
-                                                          acc2.get_address_base58(), 1, acc2.get_address_base58(),
-                                                          20000, 500)
+                                                              acc2.get_address_base58(), 1, acc2.get_address_base58(),
+                                                              20000, 500)
         tx = sdk.sign_transaction(tx, acc)
         tx = sdk.add_sign_transaction(tx, acc2)
         sdk.rpc.send_raw_transaction(tx)
@@ -90,8 +91,8 @@ class TestAsset(TestCase):
             allowance = "0"
         assert int(allowance2, 16) - int(allowance, 16) == amount
         tx2 = sdk.native_vm().asset().new_transferfrom_transaction("ont", acc2.get_address_base58(),
-                                                               acc.get_address_base58(), acc2.get_address_base58(),
-                                                               amount, acc2.get_address_base58(), 20000, 500)
+                                                                   acc.get_address_base58(), acc2.get_address_base58(),
+                                                                   amount, acc2.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx2, acc2)
         sdk.rpc.send_raw_transaction(tx2)
         time.sleep(6)
@@ -130,4 +131,9 @@ class TestAsset(TestCase):
     def test_send_withdraw_ong_transaction(self):
         a = Asset(sdk)
         res = a.send_withdraw_ong_transaction(acc, acc2.get_address_base58(), 1, acc3, 20000, 500)
+        print(res)
+
+    def test_send_approve2(self):
+        a = Asset(sdk)
+        res = a.send_approve("ont", acc, acc2.get_address_base58(), 1, acc3, 20000, 500)
         print(res)
