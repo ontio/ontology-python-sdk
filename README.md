@@ -9,6 +9,8 @@
   - [Digit identity](#digit-identity)
 - [Asset function list](#asset-function-list)
   - [Native digit asset](#native-digit-asset)
+- [Identity function list](#identity-function-list)
+  - [ONT ID](#ont-id)
 
 
 ## Introduction
@@ -81,7 +83,27 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
  |   6 | query_decimals(self, asset: str)                                                                   |  
  |   7 | send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int) |                                                              
  |   8 | send_approve(self, asset: str, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int) |                                                                       
- |   9 | send_transfer_from(self, asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int,payer: str, gas_limit: int, gas_price: int)|                                                                 
+ |   9 | send_transfer_from(self, asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int,payer: str, gas_limit: int, gas_price: int)|         
+ 
+## Identity function list 
+
+### ONT ID
+
+ |     | Main   Function |          
+ |:-----|:--------|:-----------------------|
+ |   1 | new_registry_ontid_transaction(self, ontid: str, pubkey: str, payer: str, gas_limit: int, gas_price: int)      |
+|    2 | new_add_attribute_transaction(self, ontid: str, pubkey: str, attris: list, payer: str, gas_limit: int, gas_price: int)  |  
+|    3 | new_remove_attribute_transaction(self, ontid: str, pubkey: bytearray, path: str, payer: str, gas_limit: int,
+                                         gas_price: int)                                |  
+ |   4 | new_add_pubkey_transaction(self, ontid: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,
+                                   gas_limit: int, gas_price: int)      |  
+ |   5 | new_remove_pubkey_transaction(self, ontid: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str,
+                                      gas_limit: int, gas_price: int)                       |  
+ |   6 | new_add_recovery_transaction(self, ontid: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,
+                                    gas_price: int)    | 
+ |   7 | new_get_ddo_transaction(self, ontid: str)                                                                                                       |  
+ |   8 | parse_ddo(self, ontid: str, ddo: str)                 | 
+                                                                                                   
 
 
 ## Contribution
