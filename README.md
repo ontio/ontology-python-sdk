@@ -83,7 +83,7 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
  |   6 | query_decimals(self, asset: str)                                                                   |  
  |   7 | send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int) |                                                              
  |   8 | send_approve(self, asset: str, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int) |                                                                       
- |   9 | send_transfer_from(self, asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int,payer: str, gas_limit: int, gas_price: int)|         
+ |   9 | send_transfer_from(self, asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,payer: Account, gas_limit: int, gas_price: int)|         
  
 ## Identity function list 
 
