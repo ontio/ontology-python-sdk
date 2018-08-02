@@ -9,10 +9,7 @@
   - [Digit identity](#digit-identity)
 - [Asset function list](#asset-function-list)
   - [Native digit asset](#native-digit-asset)
-- [Identity function list](#identity-function-list)
-  - [ONT ID](#ont-id)
-- [Smart Contract](#smart-contract)
-  - [Native smart contract invocation](#native-smart-contract-invocation)
+
 
 ## Introduction
 Ontology Python SDK function consists of four parts, RPC interface, wallet, asset, and identity. For RPC interface, it is responsible to interact with the Ontology blockchain, including querying and sending transactions. For wallet, it manages wallet file and store the encrypted private key of the asset account and identity. The function of asset can transfer ONT/ONG, check account balance, withdraw ONT/ONG and so on. The function of identity can send request to register ONT ID and get DDO object. In addition to these four parts, SDK also support constructing, deploying, and invoking a smart contract. 
