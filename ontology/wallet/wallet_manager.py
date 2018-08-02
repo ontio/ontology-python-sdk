@@ -132,12 +132,12 @@ class WalletManager(object):
         private_key = None
         return identity
 
-    def create_random_account(self, label: str, pwd: str):
+    def create_account(self, label: str, pwd: str):
         priv_key = get_random_bytes(32)
         salt = get_random_bytes(16)
-        self.create_account(label, pwd, salt, priv_key, True)
+        return self.__create_account(label, pwd, salt, priv_key, True)
 
-    def create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool):
+    def __create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool):
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
@@ -194,12 +194,10 @@ class WalletManager(object):
         return None
 
     def create_account_info(self, label: str, pwd: str, salt: bytes, private_key: bytes):
-        acct = self.create_account(label, pwd, salt, private_key, True)
+        acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()
         info.public_key = acct.serialize_public_key().hex()
-        info.private_key = acct.serialize_private_key().hex()
-        info.prikey_wif = acct.export_wif()
         info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
         return info
