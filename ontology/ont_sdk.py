@@ -1,6 +1,9 @@
+import threading
+
 from ontology.account.account import Account
 from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_vm import NativeVm
 from ontology.utils import util
 from ontology.wallet.wallet_manager import WalletManager
@@ -10,10 +13,41 @@ from ontology.core.program import ProgramBuilder
 
 
 class OntologySdk(object):
+    _instance_lock = threading.Lock()
+
     def __init__(self):
-        self.rpc_client = RpcClient()
-        self.wallet_manager = WalletManager()
-        self.native_vm = NativeVm()
+        self._rpc = None
+        self._wallet_manager = WalletManager()
+        self._native_vm = None
+        self.defaultSignScheme = SignatureScheme.SHA256WITHECDSA
+
+    @staticmethod
+    def get_instance():
+        if not hasattr(OntologySdk, "_instance"):
+            with OntologySdk._instance_lock:
+                if not hasattr(OntologySdk, "_instance"):
+                    OntologySdk._instance = OntologySdk()
+        return OntologySdk._instance
+
+    def native_vm(self):
+        if self._native_vm is None:
+            self._native_vm = NativeVm(OntologySdk.get_instance())
+        else:
+            return self._native_vm
+
+    def get_wallet_manager(self):
+        if self._wallet_manager is None:
+            self._wallet_manager = WalletManager()
+        return self._wallet_manager
+
+    def get_rpc(self):
+        if self._rpc is None:
+            self._rpc = RpcClient()
+        return self._rpc
+
+    def set_signaturescheme(self, scheme: SignatureScheme):
+        self.defaultSignScheme = scheme
+        self._wallet_manager.set_signature_scheme(scheme)
 
     def sign_transaction(self, tx: Transaction, signer: Account):
         tx_hash = tx.hash256()
