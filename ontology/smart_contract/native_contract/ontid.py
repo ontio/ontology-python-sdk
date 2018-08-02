@@ -11,6 +11,8 @@ from binascii import b2a_hex, a2b_hex
 
 
 class OntId(object):
+    def __init__(self, sdk):
+        self.__sdk = sdk
 
     def new_registry_ontid_transaction(self, ontid: str,pubkey: str, payer: str, gas_limit: int,gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
