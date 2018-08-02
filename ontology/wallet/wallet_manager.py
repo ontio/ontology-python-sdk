@@ -103,7 +103,7 @@ class WalletManager(object):
     def import_identity(self, label: str, encrypted_privkey: str, pwd: str, salt: bytes, address: str):
         private_key = Account.get_gcm_decoded_private_key(encrypted_privkey, pwd, address, salt,
                                                           Scrypt().get_n(), self.scheme)
-        info = self.create_identity(label, pwd, salt, private_key)
+        info = self.__create_identity(label, pwd, salt, private_key)
         private_key = None
         for index in range(len(self.wallet_in_mem.identities)):
             if self.wallet_in_mem.identities[index].ontid == info.ontid:
@@ -116,7 +116,7 @@ class WalletManager(object):
         return self.__create_identity(label, pwd, salt, priv_key)
 
     def __create_identity(self, label: str, pwd: str, salt: bytes, private_key: bytes):
-        acct = self.create_account(label, pwd, salt, private_key, False)
+        acct = self.__create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
         info.ontid = did_ont + acct.get_address_base58()
         info.pubic_key = acct.serialize_public_key().hex()
@@ -132,10 +132,11 @@ class WalletManager(object):
         private_key = None
         return identity
 
-    def create_account(self, label: str, pwd: str):
+    def create_account(self, label: str, pwd: str)->AccountData:
         priv_key = get_random_bytes(32)
         salt = get_random_bytes(16)
-        return self.__create_account(label, pwd, salt, priv_key, True)
+        account = self.__create_account(label, pwd, salt, priv_key, True)
+        return self.wallet_file.get_account_by_address(account.get_address_base58())
 
     def __create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool):
         account = Account(priv_key, self.scheme)
