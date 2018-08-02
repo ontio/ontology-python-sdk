@@ -11,7 +11,7 @@ from ontology.core.program import ProgramBuilder
 
 class OntologySdk(object):
     def __init__(self):
-        self.rpc_client = RpcClient()
+        self.rpc = RpcClient()
         self.wallet_manager = WalletManager()
         self.native_vm = NativeVm()
 

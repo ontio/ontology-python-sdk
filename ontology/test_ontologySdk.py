@@ -9,7 +9,7 @@ from ontology.ont_sdk import OntologySdk
 
 sdk = OntologySdk()
 rpc_address = "http://polaris3.ont.io:20336"
-sdk.rpc_client.set_address(rpc_address)
+sdk.rpc.set_address(rpc_address)
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
 private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
 private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
@@ -30,8 +30,8 @@ class TestOntologySdk(TestCase):
         print(a)
 
     def test_bb(self):
-        print(sdk.rpc_client.get_balance(acc.get_address_base58()))
-        print(sdk.rpc_client.get_balance(multi_addr.to_base58()))
+        print(sdk.rpc.get_balance(acc.get_address_base58()))
+        print(sdk.rpc.get_balance(multi_addr.to_base58()))
 
     def test_add_multi_sign_transaction(self):
 
@@ -45,7 +45,7 @@ class TestOntologySdk(TestCase):
         sdk.sign_transaction(tx, acc)
         sdk.add_multi_sign_transaction(tx, 2, pubkeys, acc)
         sdk.add_multi_sign_transaction(tx, 2, pubkeys, acc2)
-        sdk.rpc_client.send_raw_transaction(tx)
+        sdk.rpc.send_raw_transaction(tx)
 
     def test_aa(self):
         pubkeys = [acc.get_public_key(), acc2.get_public_key(), acc3.get_public_key()]
