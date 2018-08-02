@@ -48,6 +48,9 @@ class WalletData(object):
         return None, -1
 
     def add_identity(self, id: Identity):
+        for identity in self.identities:
+            if identity.ontid == id.ontid:
+                raise Exception("")
         self.identities.append(id)
 
     def remove_identity(self, ontid):
@@ -55,3 +58,9 @@ class WalletData(object):
             if self.identities[index].ontid == ontid:
                 del self.identities[index]
                 break
+
+    def get_identity_by_ontid(self, ontid: str):
+        for identity in self.identities:
+            if identity.ontid == ontid:
+                return identity
+        return None

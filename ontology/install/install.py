@@ -19,3 +19,7 @@ try:
     import base58
 except ModuleNotFoundError:
     os.system('pip install base58')
+try:
+    import requests
+except ModuleNotFoundError:
+    os.system('pip install requests')

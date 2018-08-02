@@ -10,7 +10,7 @@ from ontology.core.program import ProgramBuilder
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
 
-sdk = OntologySdk()
+sdk = OntologySdk.get_instance()
 rpc_address = "http://polaris3.ont.io:20336"
 sdk.rpc.set_address(rpc_address)
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
@@ -24,9 +24,9 @@ multi_addr = Address.address_from_multi_pubKeys(2, pubkeys)
 
 
 class TestOntologySdk(TestCase):
-    def test_open_wallet(self):
-        a = sdk.open_wallet("./wallet/test.json")
-        print(a)
+    # def test_open_wallet(self):
+    #     a = sdk.open_wallet("./wallet/test.json")
+    #     print(a)
 
     def test_bb(self):
         print(sdk.rpc.get_balance(acc.get_address_base58()))

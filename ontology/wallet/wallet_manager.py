@@ -110,37 +110,34 @@ class WalletManager(object):
                 return self.wallet_in_mem.identities[index]
         return None
 
-    def create_random_identity(self, label: str, pwd: str):
+    def create_identity(self, label: str, pwd: str):
         priv_key = get_random_bytes(32)
         salt = get_random_bytes(16)
-        self.create_identity(label, pwd, salt, priv_key)
+        return self.__create_identity(label, pwd, salt, priv_key)
 
-    def create_identity(self, label: str, pwd: str, salt: bytes, private_key: bytes):
+    def __create_identity(self, label: str, pwd: str, salt: bytes, private_key: bytes):
         acct = self.create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
-        info.ontid = did_ont + Address.address_from_bytes_pubkey(acct.get_address().to_array()).to_base58()
+        info.ontid = did_ont + acct.get_address_base58()
         info.pubic_key = acct.serialize_public_key().hex()
         info.private_key = acct.serialize_private_key().hex()
         info.prikey_wif = acct.export_wif()
         info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
-        return info
+        return self.wallet_in_mem.get_identity_by_ontid(info.ontid)
 
     def create_identity_from_prikey(self, label: str, pwd: str, private_key: bytes):
         salt = get_random_bytes(16)
-        info = self.create_identity(label, pwd, salt, private_key)
+        identity = self.__create_identity(label, pwd, salt, private_key)
         private_key = None
-        for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ontid == info.ontid:
-                return self.wallet_in_mem.identities[index]
-        return None
+        return identity
 
-    def create_random_account(self, label: str, pwd: str):
+    def create_account(self, label: str, pwd: str):
         priv_key = get_random_bytes(32)
         salt = get_random_bytes(16)
-        self.create_account(label, pwd, salt, priv_key, True)
+        return self.__create_account(label, pwd, salt, priv_key, True)
 
-    def create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool):
+    def __create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool):
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
@@ -197,12 +194,10 @@ class WalletManager(object):
         return None
 
     def create_account_info(self, label: str, pwd: str, salt: bytes, private_key: bytes):
-        acct = self.create_account(label, pwd, salt, private_key, True)
+        acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()
         info.public_key = acct.serialize_public_key().hex()
-        info.private_key = acct.serialize_private_key().hex()
-        info.prikey_wif = acct.export_wif()
         info.encrypted_prikey = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
         return info

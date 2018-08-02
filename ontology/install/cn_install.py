@@ -19,3 +19,7 @@ try:
     import base58
 except ModuleNotFoundError:
     os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple base58')
+try:
+    import requests
+except ModuleNotFoundError:
+    os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple requests')

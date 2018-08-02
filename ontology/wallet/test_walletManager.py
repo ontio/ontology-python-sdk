@@ -24,8 +24,9 @@ class TestWalletManager(TestCase):
     def test_create_identity_from_prikey(self):
         wm = WalletManager()
         wm.open_wallet("./test6.json")
-        wm.create_identity_from_prikey("ide", "1", util.hex_to_bytes(
+        ide = wm.create_identity_from_prikey("ide", "1", util.hex_to_bytes(
             "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"))
+        print(ide)
 
     def test_create_random_account(self):
         wm = WalletManager()
