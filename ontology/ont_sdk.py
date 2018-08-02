@@ -13,7 +13,7 @@ class OntologySdk(object):
     def __init__(self):
         self.rpc = RpcClient()
         self.wallet_manager = WalletManager()
-        self.native_vm = NativeVm()
+        #self.native_vm = NativeVm()
 
     def sign_transaction(self, tx: Transaction, signer: Account):
         tx_hash = tx.hash256()
@@ -54,16 +54,6 @@ class OntologySdk(object):
         sig = Sig(pubkeys, m, [sig_data])
         tx.sigs.append(sig)
         return tx
-
-    def open_or_create_wallet(self, wallet_file):
-        if util.is_file_exist(wallet_file):
-            return self.open_wallet(wallet_file)
-        return self.create_wallet(wallet_file)
-
-    def create_wallet(self, wallet_file):
-        if util.is_file_exist(wallet_file):
-            raise IsADirectoryError("wallet file has already exist")
-        return self.wallet_manager.open_wallet(wallet_file)
 
     def open_wallet(self, wallet_file):
         return self.wallet_manager.open_wallet(wallet_file)

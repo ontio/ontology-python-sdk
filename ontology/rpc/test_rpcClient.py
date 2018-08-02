@@ -3,7 +3,7 @@ from binascii import a2b_hex
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
-from ontology.smart_contract.native_contract import asset
+from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.util import get_random_bytes
 
 rpc_address = "http://polaris1.ont.io:20336"
@@ -88,7 +88,7 @@ class TestRpcClient(TestCase):
         acct = Account(a2b_hex(private_key.encode()))
         private_key2 = get_random_bytes(32)
         acct2 = Account(private_key2)
-        tx = asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
+        tx = Asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
                                             acct2.get_address().to_base58(), 2, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         res = sdk.rpc.send_raw_transaction(tx)
@@ -99,7 +99,7 @@ class TestRpcClient(TestCase):
         acct = Account(a2b_hex(private_key.encode()))
         private_key2 = get_random_bytes(32)
         acct2 = Account(private_key2)
-        tx = asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
+        tx = Asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
                                             acct2.get_address().to_base58(), 2, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         res = sdk.rpc.send_raw_transaction_preexec(tx)

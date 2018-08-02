@@ -20,7 +20,8 @@ class Asset(object):
             raise ValueError("asset is not equal to ONT or ONG")
         return contract_address  # [20]byte
 
-    def new_transfer_transaction(self, asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
+    @staticmethod
+    def new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
                                  gas_limit: int, gas_price: int):
         contract_address = util.get_asset_address(asset)  # []bytes
         state = [{"from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(to_addr).to_array(),
@@ -96,10 +97,11 @@ class Asset(object):
     def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int):
         tx = self.new_withdraw_ong_transaction(claimer.get_address_base58(), recv_addr, amount,
-                                               payer.get_address_base58(), gas_limit,
-                                               gas_price)
+                                               payer.get_address_base58(), gas_limit,gas_price)
         tx = self.sdk.sign_transaction(tx, payer)
-        tx = self.sdk.add_sign_transaction(self, tx, claimer)
+        tx = self.sdk.add_sign_transaction(tx, claimer)
+        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        return res
 
     def send_approve(self, asset: str, send_addr: str, recv_addr: str, amount: int, payer: str,
                      gas_limit: int, gas_price: int):
@@ -108,7 +110,7 @@ class Asset(object):
                 "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
         unix_timenow = int(time())
-        tx = Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
                          invoke_code, bytearray(),
                          [], bytearray())
 

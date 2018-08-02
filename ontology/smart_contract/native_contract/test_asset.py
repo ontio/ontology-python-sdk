@@ -3,12 +3,11 @@ from unittest import TestCase
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
-from ontology.smart_contract.native_contract import asset
+from ontology.smart_contract.native_contract.asset import Asset
 import time
 
 rpc_address = "http://polaris3.ont.io:20336"
 sdk = OntologySdk()
-sdk.rpc.set_address(rpc_address)
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
 private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
 private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
@@ -104,26 +103,31 @@ class TestAsset(TestCase):
         assert allowance == allowance3
 
     def test_query_balance(self):
-        a = asset.Asset()
+        a = Asset(sdk)
         res = a.query_balance("ont", acc.get_address().to_base58())
         print(res)
 
     def test_query_allowance(self):
-        a = asset.Asset()
+        a = Asset(sdk)
         res = a.query_allowance("ont", acc.get_address().to_base58(), acc2.get_address().to_base58())
         print(res)
 
     def test_query_name(self):
-        a = asset.Asset()
+        a = Asset(sdk)
         res = a.query_name("ont")
         print(res)
 
     def test_query_symbol(self):
-        a = asset.Asset()
+        a = Asset(sdk)
         res = a.query_symbol("ont")
         print(res)
 
     def test_query_decimals(self):
-        a = asset.Asset()
+        a = Asset(sdk)
         res = a.query_decimals("ong")
+        print(res)
+
+    def test_send_withdraw_ong_transaction(self):
+        a = Asset(sdk)
+        res = a.send_withdraw_ong_transaction(acc, acc2.get_address_base58(), 1, acc3, 20000, 500)
         print(res)
