@@ -9,7 +9,7 @@ from ontology.account.account import Account
 
 class Asset(object):
     def __init__(self, sdk):
-        self.sdk = sdk
+        self.__sdk = sdk
 
     def get_asset_address(self, asset: str) -> bytearray:
         if asset.upper() == 'ONT':
@@ -38,7 +38,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return int(res, 16)
 
     def query_allowance(self, asset: str, from_addr: str, to_addr: str):
@@ -48,7 +48,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return res
 
     def unboundong(self, cli, addr: str):
@@ -60,7 +60,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return bytes.fromhex(res).decode()
 
     def query_symbol(self, asset: str):
@@ -69,7 +69,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return bytes.fromhex(res).decode()
 
     def query_decimals(self, asset: str):
@@ -78,7 +78,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return res
 
     def new_withdraw_ong_transaction(self, claimer_addr: str, recv_addr: str, amount: int, payer_addr: str,
@@ -98,9 +98,9 @@ class Asset(object):
                                       gas_limit: int, gas_price: int):
         tx = self.new_withdraw_ong_transaction(claimer.get_address_base58(), recv_addr, amount,
                                                payer.get_address_base58(), gas_limit,gas_price)
-        tx = self.sdk.sign_transaction(tx, payer)
-        tx = self.sdk.add_sign_transaction(tx, claimer)
-        res = self.sdk.rpc.send_raw_transaction_preexec(tx)
+        tx = self.__sdk.sign_transaction(tx, payer)
+        tx = self.__sdk.add_sign_transaction(tx, claimer)
+        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return res
 
     def send_approve(self, asset: str, send_addr: str, recv_addr: str, amount: int, payer: str,
