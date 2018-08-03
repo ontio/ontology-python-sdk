@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import hashlib
 import os.path
+from Cryptodome import Random
+
 from ontology.common.define import *
-from os import urandom
 
 
 def get_asset_address(asset: str) -> bytearray:
@@ -15,8 +19,7 @@ def get_asset_address(asset: str) -> bytearray:
 
 
 def get_random_bytes(length):
-    res = bytes(urandom(length))
-    return res
+    return Random.get_random_bytes(length)
 
 
 def hex_to_bytes(value: str) -> bytearray:
