@@ -1,5 +1,7 @@
+from ontology.core.program_info import ProgramInfo
 from ontology.crypto.key_type import KeyType
-from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG
+from ontology.io.binary_reader import BinaryReader
+from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG,PUSH1
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
 from ontology.utils.util import bytes_reader
@@ -50,6 +52,27 @@ class ProgramBuilder(object):
         return res
 
     @staticmethod
+    def read_bytes(reader: BinaryReader):
+        code = reader.ReadByte()
+        key_len = 0
+        if code == int.from_bytes(PUSHDATA4, 'little'):
+            temp = reader.ReadUInt32()
+            key_len = temp
+        elif code == int.from_bytes(PUSHDATA2, 'little'):
+            temp = reader.ReadUInt16()
+            key_len = int(temp)
+        elif code == int.from_bytes(PUSHDATA1, 'little'):
+            temp = reader.ReadUInt8()
+            key_len = int(temp)
+        elif code <= int.from_bytes(PUSHBYTES75, 'little') and code >= int.from_bytes(PUSHBYTES1, 'little'):
+            key_len = code - int.from_bytes(PUSHBYTES1, 'little') + 1
+        else:
+            key_len = 0
+        res = reader.ReadBytes(key_len)
+        return res
+
+
+    @staticmethod
     def compare_pubkey(o1):
         if KeyType.from_pubkey(o1) == KeyType.SM2:
             raise Exception("not supported")
@@ -76,6 +99,49 @@ class ProgramBuilder(object):
         builder.emit_push_integer(n)
         builder.emit(CHECKMULTISIG)
         return builder.to_array()
+
+    @staticmethod
+    def get_param_info(program: bytes):
+        ms = StreamManager.GetStream(program)
+        reader = BinaryReader(ms)
+        list = []
+        while True:
+            try:
+                res = ProgramBuilder.read_bytes(reader)
+            except:
+                break
+            list.append(res)
+        return list
+
+    @staticmethod
+    def get_program_info(program: bytes)->ProgramInfo:
+        length = len(program)
+        end = program[length - 1]
+        temp = program[:length-1]
+        ms = StreamManager.GetStream(temp)
+        reader = BinaryReader(ms)
+        info = ProgramInfo()
+        if end == int.from_bytes(CHECKSIG, 'little'):
+            pubkeys = ProgramBuilder.read_bytes(reader)
+            info.set_pubkey([pubkeys])
+            info.set_m(1)
+        elif end == int.from_bytes(CHECKMULTISIG, 'little'):
+            length = program[len(program)-2] - int.from_bytes(PUSH1, 'little')
+            m = reader.ReadByte() - int.from_bytes(PUSH1, 'little') + 1
+            pub = []
+            for i in range(length):
+                pub.append(reader.ReadVarBytes())
+            info.set_pubkey(pub)
+            info.set_m(m)
+        return info
+
+
+
+
+
+
+
+
 
 
 
