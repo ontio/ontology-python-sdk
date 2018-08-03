@@ -33,7 +33,7 @@ class Address(object):
         sb = Address.__COIN_VERSION + self.ZERO
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
-        return base58.b58encode(bytes(outb))
+        return base58.b58encode(bytes(outb)).decode('utf-8')
 
     def to_array(self):
         return self.ZERO
