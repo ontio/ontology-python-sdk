@@ -7,7 +7,7 @@ from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.util import get_random_bytes
 
 rpc_address = "http://polaris1.ont.io:20336"
-sdk = OntologySdk.get_instance()
+sdk = OntologySdk()
 sdk.rpc.set_address(rpc_address)
 
 

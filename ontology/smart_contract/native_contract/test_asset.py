@@ -8,7 +8,7 @@ import time
 from ontology.utils.util import get_random_bytes
 
 rpc_address = "http://polaris3.ont.io:20336"
-sdk = OntologySdk.get_instance()
+sdk = OntologySdk()
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
 private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
 private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"

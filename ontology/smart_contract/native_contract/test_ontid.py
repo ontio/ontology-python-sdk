@@ -13,7 +13,7 @@ private_key = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
 private_key2 = "c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07"
 acc = Account(a2b_hex(private_key.encode()), SignatureScheme.SHA256withECDSA)
 acc2 = Account(a2b_hex(private_key2.encode()), SignatureScheme.SHA256withECDSA)
-sdk = OntologySdk.get_instance()
+sdk = OntologySdk()
 sdk.rpc.set_address(rpc_address)
 did = "did:ont:" + acc2.get_address_base58()
 
