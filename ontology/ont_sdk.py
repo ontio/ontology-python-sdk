@@ -13,7 +13,6 @@ from ontology.core.program import ProgramBuilder
 
 class OntologySdk(object):
     _instance_lock = threading.Lock()
-    __instance = None
 
     def __init__(self):
         self.rpc = RpcClient()
@@ -21,17 +20,16 @@ class OntologySdk(object):
         self.__native_vm = None
         self.defaultSignScheme = SignatureScheme.SHA256withECDSA
 
-    @staticmethod
-    def get_instance():
-        if OntologySdk.__instance is None:
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(OntologySdk, "_instance"):
             with OntologySdk._instance_lock:
-                if OntologySdk.__instance is None:
-                    OntologySdk.__instance = OntologySdk()
-        return OntologySdk.__instance
+                if not hasattr(OntologySdk, "_instance"):
+                    OntologySdk._instance = object.__new__(cls)
+        return OntologySdk._instance
 
     def native_vm(self):
         if self.__native_vm is None:
-            self.__native_vm = NativeVm(OntologySdk.get_instance())
+            self.__native_vm = NativeVm(OntologySdk())
         return self.__native_vm
 
     def get_wallet_manager(self):

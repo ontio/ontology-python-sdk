@@ -9,7 +9,7 @@ from ontology.common.address import Address
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
 
-sdk = OntologySdk.get_instance()
+sdk = OntologySdk()
 rpc_address = "http://polaris3.ont.io:20336"
 sdk.rpc.set_address(rpc_address)
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
