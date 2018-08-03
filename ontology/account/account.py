@@ -102,4 +102,17 @@ class Account(object):
         data += checksum[0:4]
         return base58.b58encode(data)
 
+    def get_privatekey_from_wif(self, wif: str):
+        if wif is None or wif is "":
+            raise Exception("none wif")
+        data = base58.b58decode(wif)
+        if len(data) != 38 or data[0] != 0x80 or data[33] != 0x01:
+            raise Exception("wif wrong")
+        checksum = Digest.hash256(data[0:34])
+        for i in range(4):
+            if data[len(data) - 4 + i] != checksum[i]:
+                raise Exception("wif wrong")
+        return data[1:33]
+
+
 
