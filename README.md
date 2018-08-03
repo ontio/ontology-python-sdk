@@ -2,6 +2,8 @@
 
 <p align="center" class="version">Version 0.1.0</p>
 
+<!-- TOC -->
+
 - [Introduction](#introduction)
 - [Preparations](#preparations)
 - [RPC interface function list](#rpc-interface-function-list)
@@ -15,6 +17,8 @@
 - [Contribution](#contribution)
 - [Site](#site)
 - [License](#license)
+
+<!-- /TOC -->
 
 
 ## Introduction
