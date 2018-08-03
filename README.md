@@ -2,7 +2,10 @@
 
 <p align="center" class="version">Version 0.1.0</p>
 
+<!-- TOC -->
+
 - [Introduction](#introduction)
+- [Preparations](#preparations)
 - [RPC interface function list](#rpc-interface-function-list)
 - [Wallet function list](#wallet-function-list)
   - [Digit account](#digit-account)
@@ -11,12 +14,30 @@
   - [Native digit asset](#native-digit-asset)
 - [Identity function list](#identity-function-list)
   - [ONT ID](#ont-id)
+- [Contribution](#contribution)
+- [Site](#site)
+- [License](#license)
+
+<!-- /TOC -->
 
 
 ## Introduction
 Ontology Python SDK function consists of four parts, RPC interface, wallet, asset, and identity. For RPC interface, it is responsible to interact with the Ontology blockchain, including querying and sending transactions. For wallet, it manages wallet file and store the encrypted private key of the asset account and identity. The function of asset can transfer ONT/ONG, check account balance, withdraw ONT/ONG and so on. The function of identity can send request to register ONT ID and get DDO object. In addition to these four parts, SDK also support constructing, deploying, and invoking a smart contract. 
 
+## Preparations
 
+To avoid installing wrong package, we recommend you to run
+the Python script to install all the third-party package that our SDK is needed in the `setup_package` folder.
+
+```python
+python3 ./setup_package/cn_install.py
+```
+
+or
+
+```python
+python3 ./setup_package/install.py
+```
 
 ## RPC interface function list
 
