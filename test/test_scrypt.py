@@ -33,8 +33,8 @@ class TestScrypt(unittest.TestCase):
 
     def test_generate_kd(self):
         scrypt = Scrypt()
-        password = bytes("passwordtest", encoding="utf-8")
-        salt = bytes([0xfa, 0xa4, 0x88, 0x3d])
+        password = 'passwordtest'
+        salt = "".join(map(chr, bytes([0xfa, 0xa4, 0x88, 0x3d])))
         kd1 = scrypt.generate_kd(password, salt)
         kd2 = bytes.fromhex(
             "9f0632e05eab137baae6e0a83300341531e8638612a08042d3a4074578869af1ccf5008e434d2cae9477f9e6e4c0571ab65a60e32e"
