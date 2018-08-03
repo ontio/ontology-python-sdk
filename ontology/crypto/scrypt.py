@@ -36,6 +36,6 @@ class Scrypt:
     def get_p(self):
         return self.p
 
-    def generate_kd(self, password: bytes, salt: bytes):
+    def generate_kd(self, password: str, salt: str):
         dk = KDF.scrypt(password, salt, self.dk_len, self.n, self.r, self.p)
         return dk
