@@ -5,6 +5,7 @@ from ontology.core.sig import Sig
 from ontology.core.transaction import Transaction
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_vm import NativeVm
+from ontology.smart_contract.neo_vm import NeoVm
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.rpc.rpc import RpcClient
 from ontology.common import define as Common
@@ -18,6 +19,7 @@ class OntologySdk(object):
         self.rpc = RpcClient()
         self.wallet_manager = WalletManager()
         self.__native_vm = None
+        self.__neo_vm = None
         self.defaultSignScheme = SignatureScheme.SHA256withECDSA
 
     def __new__(cls, *args, **kwargs):
@@ -31,6 +33,11 @@ class OntologySdk(object):
         if self.__native_vm is None:
             self.__native_vm = NativeVm(OntologySdk._instance)
         return self.__native_vm
+
+    def neo_vm(self):
+        if self.__neo_vm is None:
+            self.__neo_vm = NeoVm(OntologySdk._instance)
+        return self.__neo_vm
 
     def get_wallet_manager(self):
         if self.wallet_manager is None:

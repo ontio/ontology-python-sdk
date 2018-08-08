@@ -8,7 +8,7 @@ from binascii import b2a_hex, a2b_hex
 
 
 class Transaction(object):
-    def __init__(self, version = None, tx_type= None, nonce= None, gas_price= None, gas_limit= None, payer= None, payload= None,
+    def __init__(self, version= 0, tx_type= None, nonce= None, gas_price= None, gas_limit= None, payer= None, payload= None,
                  attributes= None, sigs= None, hash= None):
         self.version = version
         self.tx_type = tx_type
@@ -30,12 +30,17 @@ class Transaction(object):
         writer.WriteUInt64(self.gas_price)
         writer.WriteUInt64(self.gas_limit)
         writer.WriteBytes(bytes(self.payer))
-        writer.WriteVarBytes(bytes(self.payload))
+        self.serialize_exclusive_data(writer)
+        if hasattr(self, "payload"):
+            writer.WriteVarBytes(bytes(self.payload))
         writer.WriteVarInt(len(self.attributes))
         ms.flush()
         res = ms.ToArray()
         StreamManager.ReleaseStream(ms)
         return res
+
+    def serialize_exclusive_data(self, writer):
+        pass
 
     def hash256(self) -> bytes:
         tx_serial = self.serialize_unsigned()
