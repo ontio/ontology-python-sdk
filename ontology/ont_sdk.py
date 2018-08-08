@@ -29,13 +29,16 @@ class OntologySdk(object):
 
     def native_vm(self):
         if self.__native_vm is None:
-            self.__native_vm = NativeVm(OntologySdk())
+            self.__native_vm = NativeVm(OntologySdk._instance)
         return self.__native_vm
 
     def get_wallet_manager(self):
         if self.wallet_manager is None:
             self.wallet_manager = WalletManager()
         return self.wallet_manager
+
+    def set_rpc(self, rpc_addr: str):
+        self.rpc.set_address(rpc_addr)
 
     def get_rpc(self):
         if self.rpc is None:
