@@ -3,9 +3,9 @@ from ontology.smart_contract.neo_contract.abi.parameter import Parameter
 
 class AbiFunction(object):
 
-    def __init__(self, name: str, returntype: str, parameters:[]):
+    def __init__(self, name: str, return_type: str, parameters: []):
         self.name = name
-        self.returntype = returntype
+        self.return_type = return_type
         self.parameters = parameters
 
     def set_params_value(self, *objs):
@@ -21,4 +21,3 @@ class AbiFunction(object):
         for p in self.parameters:
             if p.name == name:
                 return p
-

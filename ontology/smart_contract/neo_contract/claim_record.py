@@ -1,12 +1,10 @@
 import json
 from collections import namedtuple
 from time import time
-
 from ontology.account.account import Account
 from ontology.common.address import Address
 from ontology.core.transaction import Transaction
 from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
-
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 
 

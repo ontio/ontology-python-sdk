@@ -44,19 +44,19 @@ class TestNeoVm(TestCase):
         print(sdk.native_vm().asset().unboundong(acc4.get_address_base58()))
 
         if False:
-            tx = sdk.native_vm().asset().new_transfer_transaction("ont",acc2.get_address_base58(),
-                                                                      acc.get_address_base58(), 120,
-                                                                      acc.get_address_base58(), 20000, 500)
+            tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc2.get_address_base58(),
+                                                                  acc.get_address_base58(), 120,
+                                                                  acc.get_address_base58(), 20000, 500)
             sdk.sign_transaction(tx, acc)
             sdk.add_sign_transaction(tx, acc2)
             res = sdk.rpc.send_raw_transaction(tx)
             print(res)
         if False:
-            tx = sdk.native_vm().asset().new_withdraw_ong_transaction(acc4.get_address_base58(),acc4.get_address_base58(),1352419563015000,
-                                                                 acc4.get_address_base58(),20000,500)
+            tx = sdk.native_vm().asset().new_withdraw_ong_transaction(acc4.get_address_base58(),
+                                                                      acc4.get_address_base58(), 1352419563015000,
+                                                                      acc4.get_address_base58(), 20000, 500)
             sdk.sign_transaction(tx, acc4)
             sdk.rpc.send_raw_transaction(tx)
-
 
     def test_make_deploy_transaction(self):
         sdk.set_rpc(rpc_address)
@@ -64,7 +64,8 @@ class TestNeoVm(TestCase):
         code = "54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566"
         codeaddr = Address.address_from_vm_code(code)
         print(codeaddr.to_hex_string())
-        tx = sdk.neo_vm().make_deploy_transaction(code,True,"name","v1.0","author","email","desp",acc4.get_address_base58(),20000000,500)
+        tx = sdk.neo_vm().make_deploy_transaction(code, True, "name", "v1.0", "author", "email", "desp",
+                                                  acc4.get_address_base58(), 20000000, 500)
         sdk.sign_transaction(tx, acc4)
         res = sdk.rpc.send_raw_transaction(tx)
         print(res)
@@ -84,5 +85,5 @@ class TestNeoVm(TestCase):
         print(codeaddr.to_hex_string())
         contract_addr = bytearray(codeaddr.to_array())
         print(contract_addr.hex())
-        res = sdk.neo_vm().sendTransaction(contract_addr,None,None,0,0,func,True)
+        res = sdk.neo_vm().send_transaction(contract_addr, None, None, 0, 0, func, True)
         print(res)

@@ -1,8 +1,8 @@
 
 class AbiEvent(object):
-    def __init__(self, name: str, returntype: str, parameters: []):
+    def __init__(self, name: str, return_type: str, parameters: []):
         self.name = name
-        self.returntype = returntype
+        self.return_type = return_type
         self.parameters = parameters
 
     def get_parameters(self):

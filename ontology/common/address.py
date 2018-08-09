@@ -29,6 +29,7 @@ class Address(object):
     def address_from_multi_pubKeys(m: int, pubkeys: []):
         return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pubkeys)))
 
+    # this function is for contract
     @staticmethod
     def address_from_vm_code(code: str):
         return Address(Address.to_script_hash(bytearray.fromhex(code)))
@@ -42,6 +43,7 @@ class Address(object):
     def to_array(self):
         return self.ZERO
 
+    # this function is for contract
     def to_hex_string(self):
         temp = bytearray(self.ZERO)
         temp.reverse()
