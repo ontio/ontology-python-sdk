@@ -27,7 +27,7 @@ class BuildParams(object):
         return BuildParams.create_code_params_script(param_list)
 
     @staticmethod
-    def create_code_params_script(param_list: []):
+    def create_code_params_script(param_list: [])->bytearray:
         builder = ParamsBuilder()
         length = len(param_list)
         for j in range(length):
@@ -47,7 +47,7 @@ class BuildParams(object):
                 print(builder.to_array().hex())
                 builder.emit_push_integer(len(param_list[i]))
                 builder.emit(PACK)
-        return builder.to_array()
+        return bytearray(builder.to_array())
 
     @staticmethod
     def create_code_params_script_builder(param_list: [], builder: ParamsBuilder):
