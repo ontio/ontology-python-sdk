@@ -5,7 +5,6 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
 from ontology.smart_contract.native_contract.asset import Asset
 import time
-from ontology.utils.util import get_random_bytes
 
 rpc_address = "http://polaris3.ont.io:20336"
 sdk = OntologySdk()

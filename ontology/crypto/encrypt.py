@@ -1,4 +1,3 @@
-from ontology.wallet.control import ProtectedKey
 from os import urandom
 
 
