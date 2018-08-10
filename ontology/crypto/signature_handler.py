@@ -32,6 +32,8 @@ class SignatureHandler(object):
                 msg,
                 ec.ECDSA(hashes.SHA384())
             )
+        else:
+            raise RuntimeError
         sign = SignatureHandler.dsa_der_to_plain(signature)
         return sign
 
