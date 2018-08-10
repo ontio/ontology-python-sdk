@@ -14,7 +14,7 @@ class ParamsBuilder:
     def emit_push_bool(self, data: bool):
         return self.emit(PUSHT) if data else self.emit(PUSHF)
 
-    def emit_push_integer(self, num):
+    def emit_push_integer(self, num: int):
         if num == -1:
             return self.emit(PUSHM1)
         elif num == 0:
@@ -23,8 +23,16 @@ class ParamsBuilder:
             return self.emit(int.from_bytes(PUSH1, 'little') - 1 + num)
         elif num < 0x10000:
             return self.emit_push_byte_array(num.to_bytes(2, "little"))
-        else:
+        elif num.bit_length() < 32:
             return self.emit_push_byte_array(num.to_bytes(4, "little"))
+        elif num.bit_length() < 40:
+            return self.emit_push_byte_array(num.to_bytes(5, "little"))
+        elif num.bit_length() < 48:
+            return self.emit_push_byte_array(num.to_bytes(6, "little"))
+        elif num.bit_length() < 56:
+            return self.emit_push_byte_array(num.to_bytes(7, "little"))
+        else:
+            return self.emit_push_byte_array(num.to_bytes(8, "little"))
 
     def emit_push_byte_array(self, data):
         l = len(data)

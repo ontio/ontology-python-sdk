@@ -26,7 +26,7 @@ class HttpRequest(object):
 
 
 class RpcClient(object):
-    def __init__(self, qid=0, addr=rpc_address):
+    def __init__(self, qid=0, addr=None):
         self.qid = qid
         self.addr = addr
 

@@ -42,20 +42,6 @@ def uint256_from_hex_string(s: str) -> bytearray:
     return uint256_parse_from_bytes(to_array_reverse(hx))
 
 
-def address_from_vm_code(code: bytearray) -> bytearray:
-    m = hashlib.sha256()
-    m.update(code)
-    temp = m.digest()
-    h = hashlib.new('ripemd160')
-    h.update(temp)
-    return h.digest()  # [20]byte
-
-
-def get_contract_address(contract_code: str) -> bytearray:
-    code = bytearray.fromhex(contract_code)
-    return address_from_vm_code(code)  # [20]byte
-
-
 def is_file_exist(file_path: str) -> bool:
     return os.path.isfile(file_path)
 
