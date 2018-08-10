@@ -60,7 +60,6 @@ class BinaryReader(object):
         except Exception as e:
             raise e
             #logger.error("ord expected character but got none")
-        return 0
 
     def ReadBytes(self, length):
         """
