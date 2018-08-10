@@ -6,20 +6,20 @@ import os
 try:
     import Cryptodome
 except ModuleNotFoundError:
-    os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple pycryptodomex')
+    os.system('pip3 install --index-url https://pypi.tuna.tsinghua.edu.cn/simple pycryptodomex')
 try:
     import cryptography
 except ModuleNotFoundError:
-    os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple cryptography')
+    os.system('pip3 install --index-url https://pypi.tuna.tsinghua.edu.cn/simple cryptography')
 try:
     import ecdsa
 except ModuleNotFoundError:
-    os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple ecdsa')
+    os.system('pip3 install --index-url https://pypi.tuna.tsinghua.edu.cn/simple ecdsa')
 try:
     import base58
 except ModuleNotFoundError:
-    os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple base58')
+    os.system('pip3 install --index-url https://pypi.tuna.tsinghua.edu.cn/simple base58')
 try:
     import requests
 except ModuleNotFoundError:
-    os.system('pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple requests')
+    os.system('pip3 install --index-url https://pypi.tuna.tsinghua.edu.cn/simple requests')
