@@ -33,11 +33,14 @@ class RpcClient(object):
     def set_address(self, addr):
         self.addr = addr
 
-    def set_json_rpc_version(self, method, param=[]):
+    def set_json_rpc_version(self, method, param=None):
         JsonRpcRequest["jsonrpc"] = JSON_RPC_VERSION
         JsonRpcRequest["id"] = "1"
         JsonRpcRequest["method"] = method
-        JsonRpcRequest["params"] = param
+        if param == None:
+            JsonRpcRequest["params"] = list()
+        else:
+            JsonRpcRequest["params"] = param
         return JsonRpcRequest
 
     def get_version(self) -> str:
@@ -143,7 +146,7 @@ class RpcClient(object):
         rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())
-        #print(res)
+        # print(res)
         err = res["error"]
         if err > 0:
             raise RuntimeError("error > 0")
