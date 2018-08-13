@@ -53,7 +53,7 @@ class ProgramBuilder(object):
 
     @staticmethod
     def read_bytes(reader: BinaryReader):
-        code = reader.ReadByte()
+        code = reader.read_ord_byte()
         key_len = 0
         if code == int.from_bytes(PUSHDATA4, 'little'):
             temp = reader.ReadUInt32()
@@ -68,7 +68,7 @@ class ProgramBuilder(object):
             key_len = code - int.from_bytes(PUSHBYTES1, 'little') + 1
         else:
             key_len = 0
-        res = reader.ReadBytes(key_len)
+        res = reader.read_bytes(key_len)
         return res
 
 
@@ -127,7 +127,7 @@ class ProgramBuilder(object):
             info.set_m(1)
         elif end == int.from_bytes(CHECKMULTISIG, 'little'):
             length = program[len(program)-2] - int.from_bytes(PUSH1, 'little')
-            m = reader.ReadByte() - int.from_bytes(PUSH1, 'little') + 1
+            m = reader.read_ord_byte() - int.from_bytes(PUSH1, 'little') + 1
             pub = []
             for i in range(length):
                 pub.append(reader.ReadVarBytes())

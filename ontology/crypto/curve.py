@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 from enum import Enum, unique
 from cryptography.hazmat.primitives.asymmetric import ec
 
@@ -10,7 +11,6 @@ class Curve(Enum):
     P256 = ec.SECP256R1()
     P384 = ec.SECP384R1()
     P521 = ec.SECP521R1()
-
 
     @staticmethod
     def from_label(label: int):
@@ -23,4 +23,3 @@ class Curve(Enum):
             return Curve.P384.name
         elif Curve.P521.value == label:
             return Curve.P521.name
-

@@ -1,10 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Description:
     Binary Reader
 
 Usage:
-    from neocore.IO.BinaryReader import BinaryReader
+    from ontology.io.binary_reader import BinaryReader
 """
+
 import sys
 import struct
 import binascii
@@ -38,25 +42,31 @@ class BinaryReader(object):
         """
         return struct.unpack(fmt, self.stream.read(length))[0]
 
-    def ReadByte(self, do_ord=True):
+    def read_ord_byte(self):
         """
         Read a single byte.
 
-        Args:
-            do_ord (bool): (default True) convert the byte to an ordinal first.
+        Returns:
+            int: an integer representing the Unicode code point of that character.
+        """
+        try:
+            return ord(self.stream.read(1))
+        except Exception as e:
+            raise RuntimeError(e)
+
+    def read_byte(self):
+        """
+        Read a single byte.
 
         Returns:
             bytes: a single byte if successful. 0 (int) if an exception occurred.
         """
         try:
-            if do_ord:
-                return ord(self.stream.read(1))
             return self.stream.read(1)
         except Exception as e:
-            raise e
-            # logger.error("ord expected character but got none")
+            raise RuntimeError(e)
 
-    def ReadBytes(self, length):
+    def read_bytes(self, length):
         """
         Read the specified number of bytes from the stream.
 
@@ -218,7 +228,7 @@ class BinaryReader(object):
         Returns:
             int:
         """
-        fb = self.ReadByte()
+        fb = self.read_ord_byte()
         if fb is 0:
             return fb
         value = 0
@@ -248,7 +258,7 @@ class BinaryReader(object):
             bytes:
         """
         length = self.ReadVarInt(max)
-        return self.ReadBytes(length)
+        return self.read_bytes(length)
 
     def ReadString(self):
         """
@@ -282,7 +292,7 @@ class BinaryReader(object):
         Returns:
             bytes:
         """
-        return self.ReadBytes(length).rstrip(b'\x00')
+        return self.read_bytes(length).rstrip(b'\x00')
 
     def ReadSerializableArray(self, class_name, max=sys.maxsize):
         """
@@ -319,7 +329,7 @@ class BinaryReader(object):
         """
         items = []
         for i in range(0, 2000):
-            data = self.ReadBytes(64)
+            data = self.read_bytes(64)
             ba = bytearray(binascii.unhexlify(data))
             ba.reverse()
             items.append(ba.hex().encode('utf-8'))
@@ -335,7 +345,7 @@ class BinaryReader(object):
         len = self.ReadVarInt()
         items = []
         for i in range(0, len):
-            ba = bytearray(self.ReadBytes(32))
+            ba = bytearray(self.read_bytes(32))
             ba.reverse()
             items.append(ba.hex())
         return items

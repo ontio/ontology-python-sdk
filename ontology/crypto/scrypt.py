@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from Cryptodome.Protocol import KDF
+"""
+Description:
+    Derive key from a passphrase.
 
+Usage:
+    from ontology.crypto.scrypt import Scrypt
+"""
+
+from Cryptodome.Protocol import KDF
 
 
 class Scrypt:
