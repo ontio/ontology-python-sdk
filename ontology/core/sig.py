@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from ontology.core.program_info import ProgramInfo
 from ontology.crypto.key_type import KeyType
 from ontology.io.binary_reader import BinaryReader

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
