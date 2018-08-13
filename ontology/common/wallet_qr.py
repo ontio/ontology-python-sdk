@@ -13,7 +13,7 @@ class WalletQR(object):
     def export_identity_qrcode(self, wallet_file_or_scrypt, identity: Identity):
         control = identity.controls[0]
         address = identity.ontid[8:]
-        d = {}
+        d = dict()
         d["type"] = "I"
         d["label"] = identity.label
         d["key"] = control.key
@@ -29,7 +29,7 @@ class WalletQR(object):
         return d
 
     def export_account_qrcode(self, wallet_file_or_scrypt, account: AccountData):
-        d = {}
+        d = dict()
         d["type"] = "I"
         d["label"] = account.label
         d["key"] = account.key
@@ -43,8 +43,8 @@ class WalletQR(object):
         d["salt"] = account.salt
         return d
 
-    def get_prikey_from_qrcode(self, qrcode: str, password: str):
-        d = json.loads(qrcode)
+    def get_prikey_from_qrcode(self, qr_code: str, password: str):
+        d = json.loads(qr_code)
         key = d["key"]
         address = d["address"]
         salt = d["salt"]

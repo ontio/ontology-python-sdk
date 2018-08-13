@@ -19,7 +19,7 @@ class ParamsBuilder:
             return self.emit(PUSHM1)
         elif num == 0:
             return self.emit(PUSH0)
-        elif num > 0 and num < 16:
+        elif 0 < num < 16:
             return self.emit(int.from_bytes(PUSH1, 'little') - 1 + num)
         elif num < 0x10000:
             return self.emit_push_byte_array(num.to_bytes(2, "little"))
