@@ -10,11 +10,6 @@ import struct
 import binascii
 import importlib
 
-# from logzero import logger
-# from neocore.Fixed8 import Fixed8
-# from neocore.UInt160 import UInt160
-# from neocore.UInt256 import UInt256
-
 
 class BinaryReader(object):
     """docstring for BinaryReader"""
@@ -59,7 +54,7 @@ class BinaryReader(object):
             return self.stream.read(1)
         except Exception as e:
             raise e
-            #logger.error("ord expected character but got none")
+            # logger.error("ord expected character but got none")
 
     def ReadBytes(self, length):
         """
@@ -305,35 +300,15 @@ class BinaryReader(object):
         klass = getattr(importlib.import_module(module), klassname)
         length = self.ReadVarInt(max=max)
         items = []
-        #        logger.info("READING ITEM %s %s " % (length, class_name))
         try:
             for i in range(0, length):
                 item = klass()
                 item.Deserialize(self)
-                #                logger.info("deserialized item %s %s " % ( i, item))
                 items.append(item)
         except Exception as e:
-            logger.error("Couldn't deserialize %s " % e)
+            raise RuntimeError("Couldn't deserialize %s " % e)
 
         return items
-
-    def ReadUInt256(self):
-        """
-        Read a UInt256 value from the stream.
-
-        Returns:
-            UInt256:
-        """
-        return UInt256(data=bytearray(self.ReadBytes(32)))
-
-    def ReadUInt160(self):
-        """
-        Read a UInt160 value from the stream.
-
-        Returns:
-            UInt160:
-        """
-        return UInt160(data=bytearray(self.ReadBytes(20)))
 
     def Read2000256List(self):
         """
@@ -364,13 +339,3 @@ class BinaryReader(object):
             ba.reverse()
             items.append(ba.hex())
         return items
-
-    def ReadFixed8(self):
-        """
-        Read a Fixed8 value.
-
-        Returns:
-            neocore.Fixed8
-        """
-        fval = self.ReadInt64()
-        return Fixed8(fval)
