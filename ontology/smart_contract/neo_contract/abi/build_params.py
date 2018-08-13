@@ -38,6 +38,7 @@ class BuildParams(object):
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
             elif isinstance(param_list[i], dict):
+                # TODO
                 builder.emit_push_byte_array(BuildParams.get_map_bytes())
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
@@ -60,6 +61,7 @@ class BuildParams(object):
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
             elif isinstance(param_list[i], dict):
+                # TODO
                 builder.emit_push_byte_array(BuildParams.get_map_bytes())
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
