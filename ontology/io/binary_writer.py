@@ -38,7 +38,7 @@ class BinaryWriter(object):
         super(BinaryWriter, self).__init__()
         self.stream = stream
 
-    def WriteByte(self, value):
+    def write_byte(self, value):
         """
         Write a single byte to the stream.
 
@@ -52,7 +52,7 @@ class BinaryWriter(object):
         elif type(value) is int:
             self.stream.write(bytes([value]))
 
-    def WriteBytes(self, value, unhex=True):
+    def write_bytes(self, value, unhex=True):
         """
         Write a `bytes` type to the stream.
 
@@ -82,7 +82,7 @@ class BinaryWriter(object):
         Returns:
             int: the number of bytes written.
         """
-        return self.WriteBytes(struct.pack(fmt, data), unhex=False)
+        return self.write_bytes(struct.pack(fmt, data), unhex=False)
 
     def WriteChar(self, value):
         """
@@ -96,7 +96,7 @@ class BinaryWriter(object):
         """
         return self.pack('c', value)
 
-    def WriteFloat(self, value, little_endian=True):
+    def write_float(self, value, little_endian=True):
         """
         Pack the value as a float and write 4 bytes to the stream.
 
@@ -113,7 +113,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sf' % endian, value)
 
-    def WriteDouble(self, value, little_endian=True):
+    def write_double(self, value, little_endian=True):
         """
         Pack the value as a double and write 8 bytes to the stream.
 
@@ -130,7 +130,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sd' % endian, value)
 
-    def WriteInt8(self, value, little_endian=True):
+    def write_int8(self, value, little_endian=True):
         """
         Pack the value as a signed byte and write 1 byte to the stream.
 
@@ -147,7 +147,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sb' % endian, value)
 
-    def WriteUInt8(self, value, little_endian=True):
+    def write_uint8(self, value, little_endian=True):
         """
         Pack the value as an unsigned byte and write 1 byte to the stream.
 
@@ -164,7 +164,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sB' % endian, value)
 
-    def WriteBool(self, value):
+    def write_bool(self, value):
         """
         Pack the value as a bool and write 1 byte to the stream.
 
@@ -176,7 +176,7 @@ class BinaryWriter(object):
         """
         return self.pack('?', value)
 
-    def WriteInt16(self, value, little_endian=True):
+    def write_int16(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 2 bytes to the stream.
 
@@ -193,7 +193,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sh' % endian, value)
 
-    def WriteUInt16(self, value, little_endian=True):
+    def write_uint16(self, value, little_endian=True):
         """
         Pack the value as an unsigned integer and write 2 bytes to the stream.
 
@@ -210,7 +210,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sH' % endian, value)
 
-    def WriteInt32(self, value, little_endian=True):
+    def write_int32(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 4 bytes to the stream.
 
@@ -227,7 +227,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%si' % endian, value)
 
-    def WriteUInt32(self, value, little_endian=True):
+    def write_uint32(self, value, little_endian=True):
         """
         Pack the value as an unsigned integer and write 4 bytes to the stream.
 
@@ -244,7 +244,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sI' % endian, value)
 
-    def WriteInt64(self, value, little_endian=True):
+    def write_int64(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 8 bytes to the stream.
 
@@ -261,7 +261,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sq' % endian, value)
 
-    def WriteUInt64(self, value, little_endian=True):
+    def write_uint64(self, value, little_endian=True):
         """
         Pack the value as an unsigned integer and write 8 bytes to the stream.
 
@@ -278,7 +278,7 @@ class BinaryWriter(object):
             endian = ">"
         return self.pack('%sQ' % endian, value)
 
-    def WriteVarInt(self, value, little_endian=True):
+    def write_var_int(self, value, little_endian=True):
         """
         Write an integer value in a space saving way to the stream.
 
@@ -305,21 +305,21 @@ class BinaryWriter(object):
             raise Exception('%d too small.' % value)
 
         elif value < 0xfd:
-            return self.WriteByte(value)
+            return self.write_byte(value)
 
         elif value <= 0xffff:
-            self.WriteByte(0xfd)
-            return self.WriteUInt16(value, little_endian)
+            self.write_byte(0xfd)
+            return self.write_uint16(value, little_endian)
 
         elif value <= 0xFFFFFFFF:
-            self.WriteByte(0xfe)
-            return self.WriteUInt32(value, little_endian)
+            self.write_byte(0xfe)
+            return self.write_uint32(value, little_endian)
 
         else:
-            self.WriteByte(0xff)
-            return self.WriteUInt64(value, little_endian)
+            self.write_byte(0xff)
+            return self.write_uint64(value, little_endian)
 
-    def WriteVarBytes(self, value, little_endian=True):
+    def write_var_bytes(self, value, little_endian=True):
         """
         Write an integer value in a space saving way to the stream.
 
@@ -331,11 +331,11 @@ class BinaryWriter(object):
             int: the number of bytes written.
         """
         length = len(value)
-        self.WriteVarInt(length, little_endian)
+        self.write_var_int(length, little_endian)
 
-        return self.WriteBytes(value, unhex=False)
+        return self.write_bytes(value, unhex=False)
 
-    def WriteVarString(self, value, encoding="utf-8"):
+    def write_var_str(self, value, encoding="utf-8"):
         """
         Write a string value to the stream.
 
@@ -350,10 +350,10 @@ class BinaryWriter(object):
         ba = bytearray(value)
         byts = binascii.hexlify(ba)
         string = byts.decode(encoding)
-        self.WriteVarInt(length)
-        self.WriteBytes(string)
+        self.write_var_int(length)
+        self.write_bytes(string)
 
-    def WriteFixedString(self, value, length):
+    def write_fixed_str(self, value, length):
         """
         Write a string value to the stream.
 
@@ -365,14 +365,14 @@ class BinaryWriter(object):
         slen = len(towrite)
         if slen > length:
             raise Exception("string longer than fixed length: %s " % length)
-        self.WriteBytes(towrite)
+        self.write_bytes(towrite)
         diff = length - slen
 
         while diff > 0:
-            self.WriteByte(0)
+            self.write_byte(0)
             diff -= 1
 
-    def WriteSerializableArray(self, array):
+    def write_serializable_array(self, array):
         """
         Write an array of serializable objects to the stream.
 
@@ -380,13 +380,13 @@ class BinaryWriter(object):
             array(list): a list of serializable objects. i.e. extending neo.IO.Mixins.SerializableMixin
         """
         if array is None:
-            self.WriteByte(0)
+            self.write_byte(0)
         else:
-            self.WriteVarInt(len(array))
+            self.write_var_int(len(array))
             for item in array:
                 item.Serialize(self)
 
-    def Write2000256List(self, arr):
+    def write_2000256_list(self, arr):
         """
         Write an array of 64 byte items to the stream.
 
@@ -396,9 +396,9 @@ class BinaryWriter(object):
         for item in arr:
             ba = bytearray(binascii.unhexlify(item))
             ba.reverse()
-            self.WriteBytes(ba)
+            self.write_bytes(ba)
 
-    def WriteHashes(self, arr):
+    def write_hashes(self, arr):
         """
         Write an array of hashes to the stream.
 
@@ -406,14 +406,14 @@ class BinaryWriter(object):
             arr (list): a list of 32 byte hashes.
         """
         length = len(arr)
-        self.WriteVarInt(length)
+        self.write_var_int(length)
         for item in arr:
             ba = bytearray(binascii.unhexlify(item))
             ba.reverse()
             #            logger.info("WRITING HASH %s " % ba)
-            self.WriteBytes(ba)
+            self.write_bytes(ba)
 
-    def WriteFixed8(self, value, unsigned=False):
+    def write_fixed8(self, value, unsigned=False):
         """
         Write a Fixed8 value to the stream.
 
@@ -425,5 +425,5 @@ class BinaryWriter(object):
             int: the number of bytes written
         """
         #        if unsigned:
-        #            return self.WriteUInt64(int(value.value))
-        return self.WriteInt64(value.value)
+        #            return self.write_uint64(int(value.value))
+        return self.write_int64(value.value)

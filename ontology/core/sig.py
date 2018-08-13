@@ -25,8 +25,8 @@ class Sig(object):
             verification_script = ProgramBuilder.program_from_multi_pubkey(self.M, self.public_keys)
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
-        writer.WriteVarBytes(invoke_script)
-        writer.WriteVarBytes(verification_script)
+        writer.write_var_bytes(invoke_script)
+        writer.write_var_bytes(verification_script)
         ms.flush()
         res = ms.ToArray()
         res = bytes_reader(res)
@@ -42,8 +42,8 @@ class Sig(object):
     @staticmethod
     def deserialize(reader: BinaryReader):
 
-        invocation_script = reader.ReadVarBytes()
-        verification_script = reader.ReadVarBytes()
+        invocation_script = reader.read_var_bytes()
+        verification_script = reader.read_var_bytes()
         sig = Sig()
         sig.sig_data = ProgramBuilder.get_param_info(invocation_script)
         info = ProgramBuilder.get_program_info(verification_script)
