@@ -14,3 +14,7 @@ class TestBinaryReader(unittest.TestCase):
         reader_stream = StreamManager.GetStream(writer_stream.getbuffer())
         reader = BinaryReader(reader_stream)
         self.assertEqual(reader.ReadVarInt(), value)
+
+
+if __name__ == '__main__':
+    unittest.main()
