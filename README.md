@@ -184,10 +184,7 @@ If you want to contribute, we strongly recommend that you to read the [Google Py
 `function_parameter_name`,
 `local_var_name`.
 
-Function names, variable names, and filenames should be descriptive; eschew
-abbreviation. In particular, do not use abbreviations that are ambiguous or
-unfamiliar to readers outside your project, and do not abbreviate by deleting
-letters within a word.
+Function names, variable names, and filenames should be descriptive; eschew abbreviation. In particular, do not use abbreviations that are ambiguous or unfamiliar to readers outside your project, and do not abbreviate by deleting letters within a word.
 
 Always use a `.py` filename extension. Never use dashe
 
