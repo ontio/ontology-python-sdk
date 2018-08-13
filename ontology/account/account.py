@@ -47,6 +47,9 @@ class Account(object):
     def get_address_base58(self):
         return self.__address.to_base58()
 
+    def get_address_hex(self):
+        return self.__address.to_reverse_hex_str()
+
     def get_public_key(self):
         return self.__publicKey
 
@@ -113,6 +116,3 @@ class Account(object):
             if data[len(data) - 4 + i] != checksum[i]:
                 raise Exception("wif wrong")
         return data[1:33]
-
-
-

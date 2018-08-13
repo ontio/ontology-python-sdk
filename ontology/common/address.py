@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from ontology.core.program import ProgramBuilder
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.vm.op_code import CHECKSIG
@@ -43,8 +46,13 @@ class Address(object):
     def to_array(self):
         return self.ZERO
 
-    # this function is for contract
-    def to_hex_string(self):
+    def to_byte_array(self):
+        return bytearray(self.ZERO)
+
+    def to_hex_str(self):
+        return bytearray(self.ZERO).hex()
+
+    def to_reverse_hex_str(self):
         temp = bytearray(self.ZERO)
         temp.reverse()
         return temp.hex()

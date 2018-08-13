@@ -85,7 +85,6 @@ class OntologySdk(object):
         else:
             for i in range(len(tx.sigs)):
                 if tx.sigs[i].public_keys == pubkeys:
-                    print(type(tx.sigs[i].sig_data))
                     if len(tx.sigs[i].sig_data) + 1 > len(pubkeys):
                         raise Exception("too more sigData")
                     if tx.sigs[i].M != m:
