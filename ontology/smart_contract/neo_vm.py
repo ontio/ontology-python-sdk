@@ -17,35 +17,35 @@ class NeoVm(object):
     def claim_record(self):
         return ClaimRecord(self.__sdk)
 
-    def send_transaction(self, contract_addr: bytearray, acct: Account, payer_acct: Account, gas_limit: int,
+    def send_transaction(self, contract_address: bytearray, acct: Account, payer_acct: Account, gas_limit: int,
                          gas_price: int, func: AbiFunction, pre_exec: bool):
         params = bytearray()
         if func is not None:
             params = BuildParams.serialize_abi_function(func)
-            print(params.hex())
         if pre_exec:
-            tx = self.make_invoke_transaction(bytearray(contract_addr), func.name, bytearray(params), None, 0, 0)
+            tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), None, 0, 0)
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
             return self.__sdk.rpc.send_raw_transaction_preexec(tx)
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         params.append(0x67)
-        for i in contract_addr:
+        for i in contract_address:
             params.append(i)
-        tx = Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, payer_acct.get_address_base58(),
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address_base58(),
                          params, bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, acct)
         if payer_acct is not None and acct.get_address_base58() != payer_acct.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer_acct)
         return self.__sdk.rpc.send_raw_transaction(tx)
 
-    def make_deploy_transaction(self, code_str: str, need_storage: bool, name: str, code_version: str, author: str,
+    @staticmethod
+    def make_deploy_transaction(code_str: str, need_storage: bool, name: str, code_version: str, author: str,
                                 email: str, desp: str, payer: str, gas_limit: int, gas_price: int):
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         deploy_tx = DeployTransaction()
         deploy_tx.payer = Address.decodeBase58(payer).to_array()
         deploy_tx.attributes = bytearray()
-        deploy_tx.nonce = unix_timenow
+        deploy_tx.nonce = unix_time_now
         deploy_tx.code = bytearray.fromhex(code_str)
         deploy_tx.code_version = code_version
         deploy_tx.version = 0
@@ -58,7 +58,8 @@ class NeoVm(object):
         deploy_tx.description = desp
         return deploy_tx
 
-    def make_invoke_transaction(self, code_addr: bytearray, method: str, params: bytearray, payer: bytes,
+    @staticmethod
+    def make_invoke_transaction(code_addr: bytearray, params: bytearray, payer: bytes,
                                 gas_limit: int, gas_price: int):
         params += bytearray([0x67])
         params += code_addr
@@ -66,8 +67,8 @@ class NeoVm(object):
         invoke_tx.version = 0
         invoke_tx.sigs = bytearray()
         invoke_tx.attributes = bytearray()
-        unix_timenow = int(time())
-        invoke_tx.nonce = unix_timenow
+        unix_time_now = int(time())
+        invoke_tx.nonce = unix_time_now
         invoke_tx.code = params
         invoke_tx.gas_limit = gas_limit
         invoke_tx.gas_price = gas_price

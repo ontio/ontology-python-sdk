@@ -41,3 +41,6 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(account.serialize_public_key().hex(), hex_public_key)
         self.assertEqual(account.export_wif(), wif)
         self.assertEqual(account.get_address_base58(), base58_addr)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -27,16 +27,18 @@ Ontology Python SDK function consists of four parts, RPC interface, wallet, asse
 ## Preparations
 
 To avoid installing wrong package, we recommend you to run
-the Python script to install all the third-party package that our SDK is needed in the `setup_package` folder.
+the following Python script to install all the third-party package that our SDK is needed.
 
 ```python
-python3 ./setup_package/cn_install.py
+cd setup_package
+python3 cn_install.py
 ```
 
 or
 
 ```python
-python3 ./setup_package/install.py
+cd setup_package
+python3 install.py
 ```
 
 ## RPC interface function list

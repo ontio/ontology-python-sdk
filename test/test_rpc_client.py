@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from binascii import a2b_hex
-from unittest import TestCase
+import unittest
 
 from ontology.account.account import Account
 from ontology.common.address import Address
@@ -24,7 +24,7 @@ pubkeys = [acc.get_public_key(), acc2.get_public_key(), acc3.get_public_key()]
 multi_addr = Address.address_from_multi_pubKeys(2, pubkeys)
 
 
-class TestRpcClient(TestCase):
+class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
         res = sdk.rpc.get_version()
         self.assertEquals("v1.0.1", res)
@@ -153,3 +153,7 @@ class TestRpcClient(TestCase):
         tx = sdk.sign_transaction(tx, acct)
         res = sdk.rpc.send_raw_transaction_preexec(tx)
         self.assertEqual(res, '01')
+
+
+if __name__ == '__main__':
+    unittest.main()
