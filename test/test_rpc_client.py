@@ -123,10 +123,6 @@ class TestRpcClient(unittest.TestCase):
         res = sdk.rpc.get_smart_contract(s)
         self.assertEqual(res['Description'], 'Ontology Network ONT Token')
 
-    def test_get_generate_block_time(self):
-        res = sdk.rpc.get_generate_block_time()
-        print(res)
-
     def test_get_merkle_proof(self):
         s = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
         res = sdk.rpc.get_merkle_proof(s)

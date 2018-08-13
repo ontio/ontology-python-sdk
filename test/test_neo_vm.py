@@ -105,7 +105,7 @@ class TestNeoVm(unittest.TestCase):
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
         code_hex_address = '362cb5608b3eca61d4846591ebb49688900fedd0'
         code_address = Address.address_from_vm_code(code)
-        self.assertEqual(code_address.to_hex_string(), code_hex_address)
+        self.assertEqual(code_address.to_reverse_hex_str(), code_hex_address)
 
     def test_make_deploy_transaction(self):
         sdk.set_rpc(rpc_address)

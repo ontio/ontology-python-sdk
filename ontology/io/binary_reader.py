@@ -42,29 +42,20 @@ class BinaryReader(object):
         """
         return struct.unpack(fmt, self.stream.read(length))[0]
 
-    def read_ord_byte(self):
+    def read_byte(self, do_ord=True):
         """
         Read a single byte.
-
-        Returns:
-            int: an integer representing the Unicode code point of that character.
-        """
-        try:
-            return ord(self.stream.read(1))
-        except Exception as e:
-            raise RuntimeError(e)
-
-    def read_byte(self):
-        """
-        Read a single byte.
-
+        Args:
+            do_ord (bool): (default True) convert the byte to an ordinal first.
         Returns:
             bytes: a single byte if successful. 0 (int) if an exception occurred.
         """
         try:
+            if do_ord:
+                return ord(self.stream.read(1))
             return self.stream.read(1)
         except Exception as e:
-            raise RuntimeError(e)
+            raise e
 
     def read_bytes(self, length):
         """
@@ -79,7 +70,7 @@ class BinaryReader(object):
         value = self.stream.read(length)
         return value
 
-    def ReadBool(self):
+    def read_bool(self):
         """
         Read 1 byte as a boolean value from the stream.
 
@@ -88,7 +79,7 @@ class BinaryReader(object):
         """
         return self.unpack('?')
 
-    def ReadChar(self):
+    def read_char(self):
         """
         Read 1 byte as a character from the stream.
 
@@ -97,127 +88,167 @@ class BinaryReader(object):
         """
         return self.unpack('c')
 
-    def ReadFloat(self, endian="<"):
+    def read_float(self, little_endian=True):
         """
         Read 4 bytes as a float value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             float:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack("%sf" % endian, 4)
 
-    def ReadDouble(self, endian="<"):
+    def read_double(self, little_endian=True):
         """
         Read 8 bytes as a double value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             float:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack("%sd" % endian, 8)
 
-    def ReadInt8(self, endian="<"):
+    def read_int8(self, little_endian=True):
         """
         Read 1 byte as a signed integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sb' % endian)
 
-    def ReadUInt8(self, endian="<"):
+    def read_uint8(self, little_endian=True):
         """
         Read 1 byte as an unsigned integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sB' % endian)
 
-    def ReadInt16(self, endian="<"):
+    def read_int16(self, little_endian=True):
         """
         Read 2 byte as a signed integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sh' % endian, 2)
 
-    def ReadUInt16(self, endian="<"):
+    def read_uint16(self, little_endian=True):
         """
         Read 2 byte as an unsigned integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sH' % endian, 2)
 
-    def ReadInt32(self, endian="<"):
+    def read_int32(self, little_endian=True):
         """
         Read 4 bytes as a signed integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%si' % endian, 4)
 
-    def ReadUInt32(self, endian="<"):
+    def read_uint32(self, little_endian=True):
         """
         Read 4 bytes as an unsigned integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sI' % endian, 4)
 
-    def ReadInt64(self, endian="<"):
+    def read_int64(self, little_endian=True):
         """
         Read 8 bytes as a signed integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sq' % endian, 8)
 
-    def ReadUInt64(self, endian="<"):
+    def read_uint64(self, little_endian=True):
         """
         Read 8 bytes as an unsigned integer value from the stream.
 
         Args:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int:
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.unpack('%sQ' % endian, 8)
 
-    def ReadVarInt(self, max=sys.maxsize):
+    def read_var_int(self, max=sys.maxsize):
         """
         Read a variable length integer from the stream.
         The NEO network protocol supports encoded storage for space saving. See: http://docs.neo.org/en-us/node/network-protocol.html#convention
@@ -228,16 +259,16 @@ class BinaryReader(object):
         Returns:
             int:
         """
-        fb = self.read_ord_byte()
+        fb = self.read_byte()
         if fb is 0:
             return fb
         value = 0
         if hex(fb) == '0xfd':
-            value = self.ReadUInt16()
+            value = self.read_uint16()
         elif hex(fb) == '0xfe':
-            value = self.ReadUInt32()
+            value = self.read_uint32()
         elif hex(fb) == '0xff':
-            value = self.ReadUInt64()
+            value = self.read_uint64()
         else:
             value = fb
 
@@ -246,10 +277,9 @@ class BinaryReader(object):
 
         return int(value)
 
-    def ReadVarBytes(self, max=sys.maxsize):
+    def read_var_bytes(self, max=sys.maxsize):
         """
         Read a variable length of bytes from the stream.
-        The NEO network protocol supports encoded storage for space saving. See: http://docs.neo.org/en-us/node/network-protocol.html#convention
 
         Args:
             max (int): (Optional) maximum number of bytes to read.
@@ -257,20 +287,20 @@ class BinaryReader(object):
         Returns:
             bytes:
         """
-        length = self.ReadVarInt(max)
+        length = self.read_var_int(max)
         return self.read_bytes(length)
 
-    def ReadString(self):
+    def read_str(self):
         """
         Read a string from the stream.
 
         Returns:
             str:
         """
-        length = self.ReadUInt8()
+        length = self.read_uint8()
         return self.unpack(str(length) + 's', length)
 
-    def ReadVarString(self, max=sys.maxsize):
+    def read_var_str(self, max=sys.maxsize):
         """
         Similar to `ReadString` but expects a variable length indicator instead of the fixed 1 byte indicator.
 
@@ -280,10 +310,10 @@ class BinaryReader(object):
         Returns:
             bytes:
         """
-        length = self.ReadVarInt(max)
+        length = self.read_var_int(max)
         return self.unpack(str(length) + 's', length)
 
-    def ReadFixedString(self, length):
+    def read_fixed_str(self, length):
         """
         Read a fixed length string from the stream.
         Args:
@@ -294,7 +324,7 @@ class BinaryReader(object):
         """
         return self.read_bytes(length).rstrip(b'\x00')
 
-    def ReadSerializableArray(self, class_name, max=sys.maxsize):
+    def read_serializable_array(self, class_name, max=sys.maxsize):
         """
         Deserialize a stream into the object specific by `class_name`.
 
@@ -308,7 +338,7 @@ class BinaryReader(object):
         module = '.'.join(class_name.split('.')[:-1])
         klassname = class_name.split('.')[-1]
         klass = getattr(importlib.import_module(module), klassname)
-        length = self.ReadVarInt(max=max)
+        length = self.read_var_int(max=max)
         items = []
         try:
             for i in range(0, length):
@@ -320,7 +350,7 @@ class BinaryReader(object):
 
         return items
 
-    def Read2000256List(self):
+    def read_2000256_list(self):
         """
         Read 2000 times a 64 byte value from the stream.
 
@@ -335,14 +365,14 @@ class BinaryReader(object):
             items.append(ba.hex().encode('utf-8'))
         return items
 
-    def ReadHashes(self):
+    def read_hashes(self):
         """
         Read Hash values from the stream.
 
         Returns:
             list: a list of hash values. Each value is of the bytearray type.
         """
-        len = self.ReadVarInt()
+        len = self.read_var_int()
         items = []
         for i in range(0, len):
             ba = bytearray(self.read_bytes(32))

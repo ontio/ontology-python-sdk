@@ -17,10 +17,10 @@ class DeployTransaction(Transaction):
         self.tx_type = 0xd0
 
     def serialize_exclusive_data(self, writer: BinaryWriter):
-        writer.WriteVarBytes(self.code)
-        writer.WriteBool(self.need_storage)
-        writer.WriteVarString(self.name)
-        writer.WriteVarString(self.code_version)
-        writer.WriteVarString(self.author)
-        writer.WriteVarString(self.email)
-        writer.WriteVarString(self.description)
+        writer.write_var_bytes(self.code)
+        writer.write_bool(self.need_storage)
+        writer.write_var_str(self.name)
+        writer.write_var_str(self.code_version)
+        writer.write_var_str(self.author)
+        writer.write_var_str(self.email)
+        writer.write_var_str(self.description)

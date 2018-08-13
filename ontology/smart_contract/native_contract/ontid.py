@@ -85,15 +85,15 @@ class OntId(object):
         ms = StreamManager.GetStream(a2b_hex(ddo))
         reader = BinaryReader(ms)
         try:
-            publickey_bytes = reader.ReadVarBytes()
+            publickey_bytes = reader.read_var_bytes()
         except Exception as e:
             raise e
         try:
-            attribute_bytes = reader.ReadVarBytes()
+            attribute_bytes = reader.read_var_bytes()
         except Exception as e:
             attribute_bytes = bytearray()
         try:
-            recovery_bytes = reader.ReadVarBytes()
+            recovery_bytes = reader.read_var_bytes()
         except Exception as e:
             recovery_bytes = bytearray()
         pubKey_list = []
@@ -102,10 +102,10 @@ class OntId(object):
             reader2 = BinaryReader(ms)
             while True:
                 try:
-                    index = reader2.ReadInt32()
+                    index = reader2.read_int32()
                     d = {}
                     d['PubKeyId'] = ontid + "#keys-" + str(index)
-                    pubkey = reader2.ReadVarBytes()
+                    pubkey = reader2.read_var_bytes()
                     if len(pubkey) == 33:
                         d["Type"] = KeyType.ECDSA.name
                         d["Curve"] = Curve.P256.name
@@ -126,12 +126,12 @@ class OntId(object):
             while True:
                 try:
                     d = {}
-                    key = reader2.ReadVarBytes()
+                    key = reader2.read_var_bytes()
                     if len(key) == 0:
                         break
                     d["Key"] = str(key, 'utf-8')
-                    d["Type"] = str(reader2.ReadVarBytes(), 'utf-8')
-                    d["Value"] = str(reader2.ReadVarBytes(), 'utf-8')
+                    d["Type"] = str(reader2.read_var_bytes(), 'utf-8')
+                    d["Value"] = str(reader2.read_var_bytes(), 'utf-8')
                     attribute_list.append(d)
                 except Exception as e:
                     break

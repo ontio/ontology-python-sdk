@@ -13,10 +13,10 @@ class TestBinaryReader(unittest.TestCase):
         value = 123
         writer_stream = StreamManager.GetStream()
         writer = BinaryWriter(writer_stream)
-        writer.WriteVarInt(value)
+        writer.write_var_int(value)
         reader_stream = StreamManager.GetStream(writer_stream.getbuffer())
         reader = BinaryReader(reader_stream)
-        self.assertEqual(reader.ReadVarInt(), value)
+        self.assertEqual(reader.read_var_int(), value)
 
 
 if __name__ == '__main__':

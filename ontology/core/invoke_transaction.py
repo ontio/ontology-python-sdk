@@ -13,4 +13,4 @@ class InvokeTransaction(Transaction):
         self.code = None
 
     def serialize_exclusive_data(self, writer: BinaryWriter):
-        writer.WriteVarBytes(self.code)
+        writer.write_var_bytes(self.code)
