@@ -168,7 +168,7 @@ Signed-off-by: Your Name <youremail@yourhost.com>
 
 ## Naming
 
-If you want to contribute, we strongly recommend that you recommend [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md).
+If you want to contribute, we strongly recommend that you to read the [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md).
 
 ### Overview
 
