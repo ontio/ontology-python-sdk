@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import binascii
 from ecdsa import SECP256k1, ecdsa, util, NIST256p, SigningKey
 from ontology.crypto.curve import Curve
@@ -12,7 +13,7 @@ class Signature(object):
         self.__value = signature_value
 
     @staticmethod
-    def ec_get_pubkey_by_prikey(privateKey:bytes, curveName):
+    def ec_get_pubkey_by_prikey(privateKey: bytes, curveName):
         if curveName == Curve.P256:
             private_key = SigningKey.from_string(string=(privateKey), curve=NIST256p)
             # public_key = private_key.get_verifying_key().to_string()
@@ -36,4 +37,3 @@ class Signature(object):
         bs.append(self.__scheme.value)
         bs += bytearray.fromhex(self.__value)
         return bs
-

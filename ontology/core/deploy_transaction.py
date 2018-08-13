@@ -3,7 +3,10 @@ from ontology.io.binary_writer import BinaryWriter
 
 
 class DeployTransaction(Transaction):
-    def __init__(self, code = None, need_storage = None, name = None, version = None, author = None, email = None, description = None):
+    def __init__(self, code=None, need_storage=None, name=None, version=None, author=None, email=None,
+                 description=None):
+        # TODO
+        super(Transaction, self).__init__()
         self.code = code
         self.need_storage = need_storage
         self.name = name
@@ -21,4 +24,3 @@ class DeployTransaction(Transaction):
         writer.WriteVarString(self.author)
         writer.WriteVarString(self.email)
         writer.WriteVarString(self.description)
-

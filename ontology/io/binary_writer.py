@@ -1,4 +1,6 @@
-# -*- coding:utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Description:
     Binary Writer
@@ -6,12 +8,9 @@ Description:
 Usage:
     from neocore.IO.BinaryWriter import BinaryWriter
 """
-import sys
-import os
-import inspect
+
 import struct
 import binascii
-
 
 
 def swap32(i):
@@ -24,8 +23,6 @@ def swap32(i):
         int:
     """
     return struct.unpack("<I", struct.pack(">I", i))[0]
-
-
 
 
 class BinaryWriter(object):
@@ -99,56 +96,72 @@ class BinaryWriter(object):
         """
         return self.pack('c', value)
 
-    def WriteFloat(self, value, endian="<"):
+    def WriteFloat(self, value, little_endian=True):
         """
         Pack the value as a float and write 4 bytes to the stream.
 
         Args:
             value (number): the value to write to the stream.
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sf' % endian, value)
 
-    def WriteDouble(self, value, endian="<"):
+    def WriteDouble(self, value, little_endian=True):
         """
         Pack the value as a double and write 8 bytes to the stream.
 
         Args:
             value (number): the value to write to the stream.
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sd' % endian, value)
 
-    def WriteInt8(self, value, endian="<"):
+    def WriteInt8(self, value, little_endian=True):
         """
         Pack the value as a signed byte and write 1 byte to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sb' % endian, value)
 
-    def WriteUInt8(self, value, endian="<"):
+    def WriteUInt8(self, value, little_endian=True):
         """
         Pack the value as an unsigned byte and write 1 byte to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sB' % endian, value)
 
     def WriteBool(self, value):
@@ -163,95 +176,115 @@ class BinaryWriter(object):
         """
         return self.pack('?', value)
 
-    def WriteInt16(self, value, endian="<"):
+    def WriteInt16(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 2 bytes to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sh' % endian, value)
 
-    def WriteUInt16(self, value, endian="<"):
+    def WriteUInt16(self, value, little_endian=True):
         """
         Pack the value as an unsigned integer and write 2 bytes to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sH' % endian, value)
 
-    def WriteInt32(self, value, endian="<"):
+    def WriteInt32(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 4 bytes to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%si' % endian, value)
 
-    def WriteUInt32(self, value, endian="<"):
+    def WriteUInt32(self, value, little_endian=True):
         """
         Pack the value as an unsigned integer and write 4 bytes to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sI' % endian, value)
 
-    def WriteInt64(self, value, endian="<"):
+    def WriteInt64(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 8 bytes to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sq' % endian, value)
 
-    def WriteUInt64(self, value, endian="<"):
+    def WriteUInt64(self, value, little_endian=True):
         """
         Pack the value as an unsigned integer and write 8 bytes to the stream.
 
         Args:
             value:
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
         return self.pack('%sQ' % endian, value)
 
-
-
-
-    def WriteVarInt(self, value, endian="<"):
+    def WriteVarInt(self, value, little_endian=True):
         """
         Write an integer value in a space saving way to the stream.
-        Read more about variable size encoding here: http://docs.neo.org/en-us/node/network-protocol.html#convention
 
         Args:
             value (int):
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian (bool): specify the endianness. (Default) Little endian.
 
         Raises:
             TypeError: if `value` is not of type int.
@@ -260,6 +293,11 @@ class BinaryWriter(object):
         Returns:
             int: the number of bytes written.
         """
+        if little_endian:
+            endian = "<"
+        else:
+            endian = ">"
+
         if not isinstance(value, int):
             raise TypeError('%s not int type.' % value)
 
@@ -271,37 +309,35 @@ class BinaryWriter(object):
 
         elif value <= 0xffff:
             self.WriteByte(0xfd)
-            return self.WriteUInt16(value, endian)
+            return self.WriteUInt16(value, little_endian)
 
         elif value <= 0xFFFFFFFF:
             self.WriteByte(0xfe)
-            return self.WriteUInt32(value, endian)
+            return self.WriteUInt32(value, little_endian)
 
         else:
             self.WriteByte(0xff)
-            return self.WriteUInt64(value, endian)
+            return self.WriteUInt64(value, little_endian)
 
-    def WriteVarBytes(self, value, endian="<"):
+    def WriteVarBytes(self, value, little_endian=True):
         """
         Write an integer value in a space saving way to the stream.
-        Read more about variable size encoding here: http://docs.neo.org/en-us/node/network-protocol.html#convention
 
         Args:
             value (bytes):
-            endian (str): specify the endianness. (Default) Little endian ('<'). Use '>' for big endian.
+            little_endian=endian (bool): specify the endianness. (Default) Little endian.
 
         Returns:
             int: the number of bytes written.
         """
         length = len(value)
-        self.WriteVarInt(length, endian)
+        self.WriteVarInt(length, little_endian)
 
         return self.WriteBytes(value, unhex=False)
 
     def WriteVarString(self, value, encoding="utf-8"):
         """
         Write a string value to the stream.
-        Read more about variable size encoding here: http://docs.neo.org/en-us/node/network-protocol.html#convention
 
         Args:
             value (string): value to write to the stream.
@@ -391,5 +427,3 @@ class BinaryWriter(object):
         #        if unsigned:
         #            return self.WriteUInt64(int(value.value))
         return self.WriteInt64(value.value)
-
-

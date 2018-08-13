@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
@@ -72,7 +74,7 @@ class Transaction(object):
         tx.nonce = reader.ReadUInt32()
         tx.gas_price = reader.ReadUInt64()
         tx.gas_limit = reader.ReadUInt64()
-        tx.payer = reader.ReadBytes(20)
+        tx.payer = reader.read_bytes(20)
         tx.payload = reader.ReadVarBytes()
         attri_len = reader.ReadVarInt()
         if attri_len is 0:

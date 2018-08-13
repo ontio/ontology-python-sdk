@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Description:
     MemoryStream
 Usage:
-    from neo.IO.MemoryStream import MemoryStream
+    from ontology.io.memory_stream import MemoryStream
 """
 
 from io import BytesIO
