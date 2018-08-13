@@ -11,7 +11,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 
 rpc_address = "http://polaris3.ont.io:20336"
-rpc_address = "http://127.0.0.1:20336"
+# rpc_address = "http://127.0.0.1:20336"
 sdk = OntologySdk()
 
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
