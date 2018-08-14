@@ -42,7 +42,7 @@ class TestAesHandler(unittest.TestCase):
         mac, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(plain_text, hdr, key, iv)
         iv = Random.new().read(AES.block_size)
         decrypt_out = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, hdr, mac, key, iv)
-        self.assertNotEquals(plain_text, decrypt_out)
+        self.assertNotEqual(plain_text, decrypt_out)
 
     def test_aes_ctr(self):
         key = b'Sixteen byte key'
