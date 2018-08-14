@@ -56,12 +56,12 @@ class Account(object):
     def get_signature_scheme(self):
         return self.__signature_scheme
 
-    def export_gcm_encrypted_private_key(self, password: str, salt: bytes, n: int):
+    def export_gcm_encrypted_private_key(self, password: str, salt: str, n: int):
         r = 8
         p = 8
         dk_len = 64
         scrypt = Scrypt(n, r, p, dk_len)
-        derivedkey = scrypt.generate_kd(password.encode(), salt)
+        derivedkey = scrypt.generate_kd(password, salt)
         iv = derivedkey[0:12]
         derivedhalf2 = derivedkey[32:64]
         mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__privateKey,
