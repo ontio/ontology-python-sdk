@@ -112,3 +112,36 @@ def bytes_reader(b):
     for i in range(len(b) // 2):
         res += bytearray.fromhex(b[2 * i:2 * i + 2].decode())
     return res
+
+
+def bigint_to_neo_bytes(data: int):
+    data_bytes = int_to_bytearray(data)
+    if len(data_bytes) == 0:
+        return bytearray()
+    b = data_bytes[0]
+    if data < 0:
+        for i in len(data_bytes):
+            data_bytes[i] = ~b
+        temp = int.from_bytes(data_bytes,"little")
+        temp2 = temp+1
+        bs = int_to_bytearray(temp2)
+        if b>>7 == 1:
+            res = bs[:]+bytearray([255])
+            return res
+        return bs
+    else:
+        if b>>7 == 1:
+            res  = data_bytes[:] + bytearray([0])
+            return res
+        return data_bytes
+
+
+def int_to_bytearray(data: int):
+    bit_length = data.bit_length() // 8
+    t = data.bit_length() / 8
+    if bit_length < t:
+        bit_length += 1
+    data_bytes = data.to_bytes(bit_length, "little")
+    return bytearray(data_bytes)
+
+

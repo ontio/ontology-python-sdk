@@ -17,6 +17,7 @@ class ClaimRecord(object):
 
     def make_commit(self, issuerOntid: str, subjectOntid: str, claimId: str, payer: str,
                     gas_limit: int, gas_price: int):
+        # TODO
         abi = json.loads(self.abi, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         abi_info = AbiInfo(abi.hash, abi.entrypoint, abi.functions, abi.events)
         func = abi_info.get_function("Commit")
