@@ -1,5 +1,5 @@
 import json
-from ontology.smart_contract.neo_contract.abi.struct import Struct
+from ontology.smart_contract.neo_contract.abi.struct_type import Struct
 
 
 class Parameter(object):

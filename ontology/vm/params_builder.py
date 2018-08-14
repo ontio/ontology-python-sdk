@@ -1,4 +1,5 @@
-from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PACK, PUSH0, PUSH1, PUSHM1, \
+from ontology.utils import util
+from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PUSH0, PUSH1, PUSHM1, \
     PUSHBYTES75, APPCALL
 from ontology.io.memory_stream import MemoryStream
 from binascii import a2b_hex
@@ -21,18 +22,20 @@ class ParamsBuilder:
             return self.emit(PUSH0)
         elif 0 < num < 16:
             return self.emit(int.from_bytes(PUSH1, 'little') - 1 + num)
-        elif num < 0x10000:
-            return self.emit_push_byte_array(num.to_bytes(2, "little"))
-        elif num.bit_length() < 32:
-            return self.emit_push_byte_array(num.to_bytes(4, "little"))
-        elif num.bit_length() < 40:
-            return self.emit_push_byte_array(num.to_bytes(5, "little"))
-        elif num.bit_length() < 48:
-            return self.emit_push_byte_array(num.to_bytes(6, "little"))
-        elif num.bit_length() < 56:
-            return self.emit_push_byte_array(num.to_bytes(7, "little"))
-        else:
-            return self.emit_push_byte_array(num.to_bytes(8, "little"))
+        # elif num < 0x10000:
+        #     return self.emit_push_byte_array(num.to_bytes(2, "little"))
+        # elif num.bit_length() < 32:
+        #     return self.emit_push_byte_array(num.to_bytes(4, "little"))
+        # elif num.bit_length() < 40:
+        #     return self.emit_push_byte_array(num.to_bytes(5, "little"))
+        # elif num.bit_length() < 48:
+        #     return self.emit_push_byte_array(num.to_bytes(6, "little"))
+        # elif num.bit_length() < 56:
+        #     return self.emit_push_byte_array(num.to_bytes(7, "little"))
+        # else:
+        #     return self.emit_push_byte_array(num.to_bytes(8, "little"))
+        bs = util.bigint_to_neo_bytes(num)
+        return self.emit_push_byte_array(bs)
 
     def emit_push_byte_array(self, data):
         l = len(data)

@@ -1,5 +1,6 @@
 from enum import Enum
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.utils import util
 from ontology.vm.op_code import PACK
 from ontology.vm.params_builder import ParamsBuilder
 
@@ -38,8 +39,7 @@ class BuildParams(object):
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
             elif isinstance(param_list[i], dict):
-                # TODO
-                builder.emit_push_byte_array(BuildParams.get_map_bytes())
+                builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
                 print(builder.to_array().hex())
@@ -61,8 +61,7 @@ class BuildParams(object):
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
             elif isinstance(param_list[i], dict):
-                # TODO
-                builder.emit_push_byte_array(BuildParams.get_map_bytes())
+                builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
                 builder.emit_push_integer(len(param_list[i]))
@@ -72,6 +71,20 @@ class BuildParams(object):
     @staticmethod
     def get_map_bytes(param_dict: {}):
         builder = ParamsBuilder()
-        builder.emit(BuildParams.Type.maptype)
-        builder.emit_push_integer(len(param_dict))
+        builder.emit(BuildParams.Type.maptype.value)
+        builder.emit(util.bigint_to_neo_bytes(len(param_dict)))
+        for key, value in param_dict.items():
+            builder.emit(BuildParams.Type.bytearraytype.value)
+            builder.emit_push_byte_array(str(key).encode())
+            if isinstance(value, bytearray) or isinstance(value, bytes):
+                builder.emit(BuildParams.Type.bytearraytype.value)
+                builder.emit_push_byte_array(bytearray(value))
+            elif isinstance(value, str):
+                builder.emit(BuildParams.Type.bytearraytype.value)
+                builder.emit_push_byte_array(value.encode())
+            elif isinstance(value, int):
+                builder.emit(BuildParams.Type.integertype.value)
+                builder.emit_push_integer(int(value))
+            else:
+                raise Exception("param error")
         return builder.to_array()
