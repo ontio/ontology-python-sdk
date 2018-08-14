@@ -15,6 +15,11 @@
 - [Identity function list](#identity-function-list)
   - [ONT ID](#ont-id)
 - [Contribution](#contribution)
+- [Naming](#naming)
+  - [Overview](#overview)
+  - [Names to Avoid](#names-to-avoid)
+  - [Naming Convention](#naming-convention)
+  - [Guidelines derived from Guido's Recommendations](#guidelines-derived-from-guidos-recommendations)
 - [Site](#site)
 - [License](#license)
 
@@ -160,6 +165,125 @@ particular solution was implemented.
 
 Reported-by: whoever-reported-it
 Signed-off-by: Your Name <youremail@yourhost.com>
+
+## Naming
+
+If you want to contribute, we strongly recommend that you to read the [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md).
+
+### Overview
+
+`module_name`,
+`package_name`,
+`ClassName`,
+`method_name`,
+`ExceptionName`,
+`function_name`,
+`GLOBAL_CONSTANT_NAME`,
+`global_var_name`,
+`instance_var_name`,
+`function_parameter_name`,
+`local_var_name`.
+
+Function names, variable names, and filenames should be descriptive; eschew abbreviation. In particular, do not use abbreviations that are ambiguous or unfamiliar to readers outside your project, and do not abbreviate by deleting letters within a word.
+
+Always use a `.py` filename extension. Never use dashe
+
+### Names to Avoid
+
+- single character names except for counters or iterators. You may use "e" as an exception identifier in try/except statements.
+- dashes (`-`) in any package/module name
+- `__double_leading_and_trailing_underscore__` names (reserved by Python)
+
+### Naming Convention
+
+- "Internal" means internal to a module or protected or private within a class.
+
+- Prepending a single underscore (`_`) has some support for protecting module variables and functions (not included with `from module import *`). While prepending a double underscore (`__` aka "dunder") to an instance variable or method effectively makes the variable or method private to its class (using name mangling) we discourage its use as it impacts readability and testability and isn't *really* private.
+
+- Place related classes and top-level functions together in a module. Unlike Java, there is no need to limit yourself to one class per module.
+
+- Use CapWords for class names, but lower\_with\_under.py for module names. **Although there are some old modules named CapWords.py, this is now discouraged because it's confusing when the module happens to be named after a class.** ("wait -- did I write `import StringIO` or `from StringIO import StringIO`?")
+
+- Underscores may appear in *unittest* method names starting with `test` to separate logical components of the name, even if those components use CapWords. One possible pattern is `test<MethodUnderTest>_<state>`; for example `testPop_EmptyStack` is okay. There is no One Correct Way to name test methods.
+
+### Guidelines derived from Guido's Recommendations
+
+<table rules="all" border="1" summary="Guidelines from Guido's Recommendations"
+       cellspacing="2" cellpadding="2">
+
+  <tr>
+    <th>Type</th>
+    <th>Public</th>
+    <th>Internal</th>
+  </tr>
+
+  <tr>
+    <td>Packages</td>
+    <td><code>lower_with_under</code></td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>Modules</td>
+    <td><code>lower_with_under</code></td>
+    <td><code>_lower_with_under</code></td>
+  </tr>
+
+  <tr>
+    <td>Classes</td>
+    <td><code>CapWords</code></td>
+    <td><code>_CapWords</code></td>
+  </tr>
+
+  <tr>
+    <td>Exceptions</td>
+    <td><code>CapWords</code></td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>Functions</td>
+    <td><code>lower_with_under()</code></td>
+    <td><code>_lower_with_under()</code></td>
+  </tr>
+
+  <tr>
+    <td>Global/Class Constants</td>
+    <td><code>CAPS_WITH_UNDER</code></td>
+    <td><code>_CAPS_WITH_UNDER</code></td>
+  </tr>
+
+  <tr>
+    <td>Global/Class Variables</td>
+    <td><code>lower_with_under</code></td>
+    <td><code>_lower_with_under</code></td>
+  </tr>
+
+  <tr>
+    <td>Instance Variables</td>
+    <td><code>lower_with_under</code></td>
+    <td><code>_lower_with_under</code> (protected)</td>
+  </tr>
+
+  <tr>
+    <td>Method Names</td>
+    <td><code>lower_with_under()</code></td>
+    <td><code>_lower_with_under()</code> (protected)</td>
+  </tr>
+
+  <tr>
+    <td>Function/Method Parameters</td>
+    <td><code>lower_with_under</code></td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>Local Variables</td>
+    <td><code>lower_with_under</code></td>
+    <td></td>
+  </tr>
+
+</table>
 
 
 ## Site
