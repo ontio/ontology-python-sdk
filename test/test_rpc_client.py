@@ -27,17 +27,17 @@ multi_addr = Address.address_from_multi_pubKeys(2, pubkeys)
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
         res = sdk.rpc.get_version()
-        self.assertEquals("v1.0.1", res)
+        self.assertEqual("v1.0.1", res)
 
     def test_get_block_by_hash(self):
         hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
         res = sdk.rpc.get_block_by_hash(hash)
-        self.assertEquals(res['Hash'], hash)
+        self.assertEqual(res['Hash'], hash)
 
     def test_get_block_by_height(self):
         height = 0
         res = sdk.rpc.get_block_by_hash(height)
-        self.assertEquals(res['Header']['Height'], height)
+        self.assertEqual(res['Header']['Height'], height)
 
     def test_get_block_count(self):
         res = sdk.rpc.get_block_count()
@@ -45,11 +45,11 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_current_block_hash(self):
         res = sdk.rpc.get_current_block_hash()
-        self.assertEquals(len(res), 64)
+        self.assertEqual(len(res), 64)
 
     def test_get_block_hash_by_height(self):
         res = sdk.rpc.get_block_hash_by_height(0)
-        self.assertEquals(len(res), 64)
+        self.assertEqual(len(res), 64)
 
     def test_get_balance(self):
         s = "ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6"
