@@ -73,7 +73,7 @@ class Account(object):
         return encrypted_key_str.decode()
 
     @staticmethod
-    def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, address: str, salt: bytes, n: int,
+    def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, address: str, salt: str, n: int,
                                     scheme: SignatureScheme):
         r = 8
         p = 8

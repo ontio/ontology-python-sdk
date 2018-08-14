@@ -15,7 +15,7 @@ class TestWalletManager(TestCase):
     def test_import_identity(self):
         wm = WalletManager()
         wm.open_wallet("./test.json")
-        salt = get_random_bytes(16)
+        salt = util.get_random_str(16)
         privete_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(a2b_hex(privete_key.encode()))
         enpri = acct.export_gcm_encrypted_private_key("1", salt, 16384)
