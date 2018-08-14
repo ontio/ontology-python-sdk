@@ -136,7 +136,7 @@ class Asset(object):
 
     def send_transfer_from(self, asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,
                            payer: Account, gas_limit: int, gas_price: int):
-        if sender == None or payer == None:
+        if sender is None or payer is None:
             raise ValueError("parameters should not be null")
         if amount <= 0 or gas_price < 0 or gas_limit < 0:
             raise ValueError("amount or gasprice or gaslimit should not be less than 0")

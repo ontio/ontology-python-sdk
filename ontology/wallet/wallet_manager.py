@@ -154,7 +154,7 @@ class WalletManager(object):
 
         acct.address = account.get_address_base58()
         # set label
-        if label == None or label == "":
+        if label is None or label == "":
             label = str(uuid.uuid4())[0:8]
         if account_flag:
             for index in range(len(self.wallet_in_mem.accounts)):

@@ -28,7 +28,7 @@ class Nep5(object):
         return self.__send_init(acct, payer, gaslimit, gasprice, True)
 
     def __send_init(self, acct: Account, payer_acct: Account, gas_limit: int, gas_price: int, pre_exec=False):
-        if self.contract_addr == None or self.contract_addr == "":
+        if self.contract_addr is None or self.contract_addr == "":
             raise Exception("null code_address")
         abi = json.loads(self.nep5_abi, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         abi_info = AbiInfo(abi.hash, abi.entrypoint, abi.functions, abi.events)

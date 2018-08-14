@@ -64,7 +64,7 @@ class OntologySdk(object):
         return tx
 
     def add_sign_transaction(self, tx: Transaction, signer: Account):
-        if tx.sigs == None or len(tx.sigs) == 0:
+        if tx.sigs is None or len(tx.sigs) == 0:
             tx.sigs = []
         elif len(tx.sigs) >= Common.TX_MAX_SIG_SIZE:
             raise Exception("the number of transaction signatures should not be over 16")
@@ -78,7 +78,7 @@ class OntologySdk(object):
         pubkeys = ProgramBuilder.sort_publickeys(pubkeys)
         tx_hash = tx.hash256()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
-        if tx.sigs == None or len(tx.sigs) == 0:
+        if tx.sigs is None or len(tx.sigs) == 0:
             tx.sigs = []
         elif len(tx.sigs) >= Common.TX_MAX_SIG_SIZE:
             raise Exception("the number of transaction signatures should not be over 16")

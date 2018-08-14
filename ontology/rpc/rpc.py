@@ -3,7 +3,6 @@ from ontology.rpc.define import *
 import json
 from ontology.core.transaction import Transaction
 from ontology.common.address import Address
-from ontology.rpc.define import rpc_address
 from ontology.utils.util import get_asset_address
 
 
@@ -37,7 +36,7 @@ class RpcClient(object):
         JsonRpcRequest["jsonrpc"] = JSON_RPC_VERSION
         JsonRpcRequest["id"] = "1"
         JsonRpcRequest["method"] = method
-        if param == None:
+        if param is None:
             JsonRpcRequest["params"] = list()
         else:
             JsonRpcRequest["params"] = param
