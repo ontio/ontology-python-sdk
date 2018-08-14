@@ -100,7 +100,7 @@ class WalletManager(object):
     def set_signature_scheme(self, scheme):
         self.scheme = scheme
 
-    def import_identity(self, label: str, encrypted_privkey: str, pwd: str, salt: bytes, address: str):
+    def import_identity(self, label: str, encrypted_privkey: str, pwd: str, salt: str, address: str):
         private_key = Account.get_gcm_decoded_private_key(encrypted_privkey, pwd, address, salt,
                                                           Scrypt().get_n(), self.scheme)
         info = self.__create_identity(label, pwd, salt, private_key)
@@ -115,7 +115,7 @@ class WalletManager(object):
         salt = get_random_bytes(16)
         return self.__create_identity(label, pwd, salt, priv_key)
 
-    def __create_identity(self, label: str, pwd: str, salt: bytes, private_key: bytes):
+    def __create_identity(self, label: str, pwd: str, salt: str, private_key: bytes):
         acct = self.__create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
         info.ontid = did_ont + acct.get_address_base58()
@@ -132,13 +132,13 @@ class WalletManager(object):
         private_key = None
         return identity
 
-    def create_account(self, label: str, pwd: str)->AccountData:
+    def create_account(self, label: str, pwd: str) -> AccountData:
         priv_key = get_random_bytes(32)
         salt = get_random_bytes(16)
         account = self.__create_account(label, pwd, salt, priv_key, True)
         return self.wallet_file.get_account_by_address(account.get_address_base58())
 
-    def __create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool):
+    def __create_account(self, label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool):
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
@@ -165,7 +165,7 @@ class WalletManager(object):
                 acct.isDefault = True
                 self.wallet_in_mem.defaultAccountAddress = acct.address
             acct.label = label
-            acct.salt = base64.b64encode(salt).decode()
+            acct.salt = base64.b64encode(salt.encode())
             acct.publicKey = account.serialize_public_key().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
@@ -178,13 +178,13 @@ class WalletManager(object):
             if len(self.wallet_in_mem.identities) == 0:
                 idt.isDefault = True
                 self.wallet_in_mem.defaultOntid = idt.ontid
-            ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt).decode(), address=acct.address,
+            ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt), address=acct.address,
                           public_key=account.serialize_public_key().hex())
             idt.controls.append(ctl)
             self.wallet_in_mem.identities.append(idt)
         return account
 
-    def import_account(self, label: str, encrypted_prikey: str, pwd: str, base58_addr: str, salt: bytes):
+    def import_account(self, label: str, encrypted_prikey: str, pwd: str, base58_addr: str, salt: str):
         private_key = Account.get_gcm_decoded_private_key(encrypted_prikey, pwd, base58_addr, salt, Scrypt().get_n(),
                                                           self.scheme)
         info = self.create_account_info(label, pwd, salt, private_key)
@@ -194,7 +194,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def create_account_info(self, label: str, pwd: str, salt: bytes, private_key: bytes):
+    def create_account_info(self, label: str, pwd: str, salt: str, private_key: bytes):
         acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()

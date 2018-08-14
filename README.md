@@ -77,8 +77,8 @@ The wallet function includes three parts, digit account, digit identity, and mne
 
  |     | Main   Function |    
  |:-----|:--------|
-|   1 | import_account(self, label: str, encrypted_prikey: str, pwd: str, base58_addr: str, salt: bytes)   |   
-|   2 | create_account(self, label: str, pwd: str, salt: bytes, priv_key: bytes, account_flag: bool)   |
+|   1 | import_account(self, label: str, encrypted_prikey: str, pwd: str, base58_addr: str, salt: str)   |   
+|   2 | create_account(self, label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool)   |
 |   3 | create_random_account(self, label: str, pwd: str)|   
 |   4 | create_account_from_prikey(self, label: str, pwd: str, private_key: bytes)    |   
 |   5 | get_account(self, address: str, pwd: str)    |   
@@ -88,8 +88,8 @@ The wallet function includes three parts, digit account, digit identity, and mne
 
  |     | Main   Function |       
  |:-----|:--------|
-|   1 | import_identity(self, label: str, encrypted_privkey: str, pwd: str, salt: bytes, address: str) |   
-|   2 | create_identity(self, label: str, pwd: str, salt: bytes, private_key: bytes)          |   
+|   1 | import_identity(self, label: str, encrypted_privkey: str, pwd: str, salt: str, address: str) |   
+|   2 | create_identity(self, label: str, pwd: str, salt: str, private_key: bytes)          |   
 |   3 | create_identity_from_prikey(self, label: str, pwd: str, private_key: bytes)       |   
  |  4 | create_random_identity(self, label: str, pwd: str)           |    
 
