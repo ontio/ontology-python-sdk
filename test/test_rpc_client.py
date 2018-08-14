@@ -106,7 +106,7 @@ class TestRpcClient(unittest.TestCase):
     def test_get_smart_contract_event_by_txhash(self):
         s = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
         res = sdk.rpc.get_smart_contract_event_by_txhash(s)
-        self.assertEquals(res['TxHash'], s)
+        self.assertEqual(res['TxHash'], s)
 
     def test_get_smart_contract_event_by_block(self):
         b = 0
