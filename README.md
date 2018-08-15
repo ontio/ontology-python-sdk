@@ -77,7 +77,7 @@ The wallet function includes three parts, digit account, digit identity, and mne
 
  |     | Main   Function |    
  |:-----|:--------|
-|   1 | import_account(self, label: str, encrypted_prikey: str, pwd: str, base58_addr: str, salt: str)   |   
+|   1 | import_account(self, label: str, encrypted_pri_key: str, pwd: str, base58_addr: str, salt: str)   |   
 |   2 | create_account(self, label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool)   |
 |   3 | create_random_account(self, label: str, pwd: str)|   
 |   4 | create_account_from_prikey(self, label: str, pwd: str, private_key: bytes)    |   
@@ -119,14 +119,14 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
 
  |     | Main   Function |          
  |:-----|:--------|
- |   1 | new_registry_ontid_transaction(self, ontid: str, pubkey: str, payer: str, gas_limit: int, gas_price: int)      |
-|    2 | new_add_attribute_transaction(self, ontid: str, pubkey: str, attris: list, payer: str, gas_limit: int, gas_price: int)  |  
-|    3 | new_remove_attribute_transaction(self, ontid: str, pubkey: bytearray, path: str, payer: str, gas_limit: int, gas_price: int) |  
- |   4 | new_add_pubkey_transaction(self, ontid: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,gas_limit: int, gas_price: int)      |  
- |   5 | new_remove_pubkey_transaction(self, ontid: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str, gas_limit: int, gas_price: int)                       |  
- |   6 | new_add_recovery_transaction(self, ontid: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,gas_price: int)    | 
- |   7 | new_get_ddo_transaction(self, ontid: str)      |                                                                                                 
- |   8 | parse_ddo(self, ontid: str, ddo: str)                 | 
+ |   1 | new_registry_ontid_transaction(self, ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int)      |
+|    2 | new_add_attribute_transaction(self, ont_id: str, pubkey: str, attris: list, payer: str, gas_limit: int, gas_price: int)  |  
+|    3 | new_remove_attribute_transaction(self, ont_id: str, pubkey: bytearray, path: str, payer: str, gas_limit: int, gas_price: int) |  
+ |   4 | new_add_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,gas_limit: int, gas_price: int)      |  
+ |   5 | new_remove_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str, gas_limit: int, gas_price: int)                       |  
+ |   6 | new_add_recovery_transaction(self, ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,gas_price: int)    | 
+ |   7 | new_get_ddo_transaction(self, ont_id: str)      |                                                                                                 
+ |   8 | parse_ddo(self, ont_id: str, ddo: str)                 | 
                                                                                                    
 
 
