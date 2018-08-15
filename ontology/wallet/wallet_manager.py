@@ -74,14 +74,6 @@ class WalletManager(object):
     def save(self):
         with open(self.wallet_path, "w") as f:
             json.dump(self.wallet_in_mem, f, default=lambda obj: obj.__dict__, indent=4)
-        # f.close()
-        # f = open(wallet_path, 'r+')
-        # s = f.read()
-        # while "enc_alg" in s:
-        #     s = s.replace("enc_alg", "enc-alg")
-        # f.seek(0)
-        # f.write(s)
-        # f.close()
 
     def get_wallet(self):
         return self.wallet_in_mem
