@@ -39,7 +39,6 @@ class OntId(object):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
-        print("invoke_code", invoke_code.hex())
         unix_timenow = int(time())
         return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
                            [], bytearray())
@@ -56,7 +55,6 @@ class OntId(object):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": remove_pubkey,"pubkey_or_recovery": pubkey_or_recovery}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeKey", args)
-        print("invoke_code", invoke_code.hex())
         unix_timenow = int(time())
         return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
                            [], bytearray())
@@ -65,7 +63,6 @@ class OntId(object):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "recovery": Address.decodeBase58(recovery).to_array(), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addRecovery", args)
-        print("invoke_code", invoke_code.hex())
         unix_timenow = int(time())
         return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
                            [], bytearray())
@@ -111,7 +108,6 @@ class OntId(object):
                         d["Curve"] = Curve.P256.name
                         d["Value"] = pubkey.hex()
                     else:
-                        print(pubkey)
                         d["Type"] = KeyType.from_label(pubkey[0])
                         d["Curve"] = Curve.from_label(pubkey[1])
                         d["Value"] = pubkey.hex()
@@ -140,7 +136,6 @@ class OntId(object):
         d2["Attributes"] = attribute_list
         if len(recovery_bytes) != 0:
             addr = Address(recovery_bytes)
-            print(addr.to_base58())
             d2["Recovery"] = addr.to_base58()
         d2["OntId"] = ont_id
         return d2
