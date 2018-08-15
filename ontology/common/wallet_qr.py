@@ -12,7 +12,7 @@ class WalletQR(object):
 
     def export_identity_qrcode(self, wallet_file_or_scrypt, identity: Identity):
         control = identity.controls[0]
-        address = identity.ontid[8:]
+        address = identity.ont_id[8:]
         d = dict()
         d["type"] = "I"
         d["label"] = identity.label

@@ -10,5 +10,5 @@ class NativeVm(object):
     def asset(self):
         return Asset(self.__sdk)
 
-    def ontid(self):
+    def ont_id(self):
         return OntId(self.__sdk)
