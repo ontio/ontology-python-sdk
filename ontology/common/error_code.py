@@ -30,8 +30,8 @@ class ErrorCode:
     pri_key_length_error = get_error.__func__(51013, "Account Error,Prikey length error")
     encrypted_pri_key_error = get_error.__func__(51014, "Account Error,Prikey length error")
     encrypted_pri_key_address_password_err = get_error.__func__(51015,
-                                                                "Account Error,encryptedPriKey address password not match.")
-    encript_private_key_error = get_error.__func__(51016, "Account Error, encript privatekey error,")
+                                                                "Account Error,encrypted private key address password not match.")
+    encrypt_private_key_error = get_error.__func__(51016, "Account Error, encrypt private key error,")
 
     param_length_err = get_error.__func__(52001, "Uint256 Error,param length error")
     checksum_not_validate = get_error.__func__(52002, "Base58 Error,Checksum does not validate")
@@ -74,19 +74,20 @@ class ErrorCode:
     def param_err(msg: str):
         return ErrorCode.get_error(58005, msg)
 
-    DidNull = get_error.__func__(58006, "OntIdTx Error,SendDid or receiverDid is null in metaData")
-    NotExistCliamIssuer = get_error.__func__(58007, "OntIdTx Error,Not exist cliam issuer")
-    NotFoundPublicKeyId = get_error.__func__(58008, "OntIdTx Error,not found PublicKeyId")
-    PublicKeyIdErr = get_error.__func__(58009, "OntIdTx Error,PublicKeyId err")
-    BlockHeightNotMatch = get_error.__func__(58010, "OntIdTx Error,BlockHeight not match")
-    NodesNotMatch = get_error.__func__(58011, "OntIdTx Error,nodes not match")
-    ResultIsNull = get_error.__func__(58012, "OntIdTx Error,result is null")
-    CreateOntIdClaimErr = get_error.__func__(58013, "OntIdTx Error, createOntIdClaim error")
-    VerifyOntIdClaimErr = get_error.__func__(58014, "OntIdTx Error, verifyOntIdClaim error")
-    WriteVarBytesError = get_error.__func__(58015, "OntIdTx Error, writeVarBytes error")
-    SendRawTransactionPreExec = get_error.__func__(58016, "OntIdTx Error, sendRawTransaction PreExec error")
-    SenderAmtNotEqPasswordAmt = get_error.__func__(58017, "OntIdTx Error, senders amount is not equal password amount")
-    ExpireErr = get_error.__func__(58017, "OntIdTx Error, expire is wrong")
+    did_null = get_error.__func__(58006, "OntIdTx Error,SendDid or receiverDid is null in metaData")
+    not_exist_claim_issuer = get_error.__func__(58007, "OntIdTx Error,Not exist claim issuer")
+    not_found_public_key_id = get_error.__func__(58008, "OntIdTx Error,not found PublicKeyId")
+    public_key_id_err = get_error.__func__(58009, "OntIdTx Error,PublicKeyId err")
+    block_height_not_match = get_error.__func__(58010, "OntIdTx Error,BlockHeight not match")
+    nodes_not_match = get_error.__func__(58011, "OntIdTx Error,nodes not match")
+    result_is_null = get_error.__func__(58012, "OntIdTx Error,result is null")
+    create_ont_id_claim_err = get_error.__func__(58013, "OntIdTx Error, createOntIdClaim error")
+    verify_ont_id_claim_err = get_error.__func__(58014, "OntIdTx Error, verifyOntIdClaim error")
+    write_var_bytes_error = get_error.__func__(58015, "OntIdTx Error, writeVarBytes error")
+    send_raw_transaction_pre_exec = get_error.__func__(58016, "OntIdTx Error, sendRawTransaction PreExec error")
+    sender_amt_not_eq_password_amt = get_error.__func__(58017,
+                                                        "OntIdTx Error, senders amount is not equal password amount")
+    expire_err = get_error.__func__(58017, "OntIdTx Error, expire is wrong")
 
     @staticmethod
     def get_status_err(msg: str):
@@ -110,14 +111,14 @@ class ErrorCode:
 
     # abi error
     set_params_value_value_num_error = get_error.__func__(58401, "AbiFunction Error,setParamsValue value num error")
-    ConnectUrlErr = get_error.__func__(58402, "Interfaces Error,connect error:")
+    connect_url_err = get_error.__func__(58402, "Interfaces Error,connect error:")
 
     @staticmethod
-    def connect_url_err(msg: str):
+    def connect_err(msg: str):
         return ErrorCode.get_error(58403, "connect error: " + msg)
 
     # WalletManager Error
-    GetAccountByAddressErr = get_error.__func__(58501, "WalletManager Error,getAccountByAddress err")
+    get_account_by_address_err = get_error.__func__(58501, "WalletManager Error,getAccountByAddress err")
 
     @staticmethod
     def other_error(msg: str):
