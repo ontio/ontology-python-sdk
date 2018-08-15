@@ -27,7 +27,7 @@ class TestErrorCode(unittest.TestCase):
         code = 58403
         msg = 'TEST'
         desc = "connect error: " + msg
-        value = ErrorCode.connect_url_err(msg)
+        value = ErrorCode.connect_err(msg)
         self.assertEqual(json.loads(value)["Error"], code)
         self.assertEqual(json.loads(value)["Desc"], desc)
 

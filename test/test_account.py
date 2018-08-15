@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import base64
 import unittest
 
-from ontology.account.account import Account
 from ontology.utils import util
+from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
@@ -13,7 +14,7 @@ class TestAccount(unittest.TestCase):
         private_key = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         account = Account(util.hex_to_bytes(private_key),
                           SignatureScheme.SHA256withECDSA)
-        
+
         salt = util.get_random_str(16)
         enc_private_key = account.export_gcm_encrypted_private_key("1", salt, 16384)
         import_private_key = account.get_gcm_decoded_private_key(enc_private_key, "1", account.get_address_base58(),
@@ -21,6 +22,14 @@ class TestAccount(unittest.TestCase):
                                                                  16384,
                                                                  SignatureScheme.SHA256withECDSA)
         self.assertEqual(import_private_key.hex(), private_key)
+
+    def test_get_gcm_decoded_private_key(self):
+        private_key = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
+        salt = base64.b64decode("pwLIUKAf2bAbTseH/WYrfQ==".encode('ascii')).decode('latin-1')
+        account = Account(util.hex_to_bytes(private_key),
+                          SignatureScheme.SHA256withECDSA)
+        enc_private_key = account.export_gcm_encrypted_private_key("1", salt, 16384)
+        self.assertEqual(enc_private_key, 'Yl1e9ugbVADd8a2SbAQ56UfUvr3e9hD2eNXAM9xNjhnefB+YuNXDFvUrIRaYth+L')
 
     def test_generate_signature(self):
         raw_hex_data = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
