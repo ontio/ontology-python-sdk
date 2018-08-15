@@ -17,7 +17,7 @@ from ontology.crypto.digest import Digest
 
 
 class Account(object):
-    def __init__(self, private_key: bytes, scheme=SignatureScheme.SHA256withECDSA):
+    def __init__(self, private_key: str, scheme=SignatureScheme.SHA256withECDSA):
         self.__signature_scheme = scheme
         if scheme == SignatureScheme.SHA256withECDSA:
             self.__keyType = KeyType.ECDSA
@@ -31,15 +31,15 @@ class Account(object):
             self.__keyType = KeyType.ECDSA
         else:
             raise TypeError
-        self.__privateKey = private_key  # 32 bytes
+        self.__private_key = a2b_hex(private_key.encode())  # 32 bytes
         self.__curve_name = Curve.P256
-        self.__publicKey = Signature.ec_get_pubkey_by_prikey(private_key, self.__curve_name)  # 33 bytes
+        self.__publicKey = Signature.ec_get_pubkey_by_prikey(self.__private_key, self.__curve_name)  # 33 bytes
         self.__address = Address.address_from_bytes_pubkey(self.__publicKey)  # address is a class type
 
     def generate_signature(self, msg: bytes, signature_scheme: SignatureScheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:
             handler = SignatureHandler(self.__keyType, signature_scheme)
-            signature_value = handler.generateSignature(b2a_hex(self.__privateKey), msg)
+            signature_value = handler.generateSignature(b2a_hex(self.__private_key), msg)
             byte_signature = Signature(signature_scheme, signature_value).to_byte()
         else:
             raise TypeError
@@ -68,7 +68,7 @@ class Account(object):
         derivedkey = scrypt.generate_kd(password, salt)
         iv = derivedkey[0:12]
         derivedhalf2 = derivedkey[32:64]
-        mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__privateKey,
+        mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__private_key,
                                                                   self.__address.to_base58().encode(),
                                                                   derivedhalf2,
                                                                   iv)
@@ -78,7 +78,7 @@ class Account(object):
 
     @staticmethod
     def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, address: str, salt: str, n: int,
-                                    scheme: SignatureScheme):
+                                    scheme: SignatureScheme) -> str:
         r = 8
         p = 8
         dk_len = 64
@@ -90,13 +90,14 @@ class Account(object):
         mac_tag = a2b_hex(encrypted_key[64:96])
         cipher_text = a2b_hex(encrypted_key[0:64])
         pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address.encode(), mac_tag, derivedhalf2, iv)
+        pri_key = b2a_hex(pri_key).decode('ascii')
         acct = Account(pri_key, scheme)
         if acct.get_address().to_base58() != address:
             raise RuntimeError
         return pri_key
 
     def serialize_private_key(self):
-        return self.__privateKey
+        return self.__private_key
 
     def serialize_public_key(self):
         return self.__publicKey

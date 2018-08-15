@@ -53,7 +53,8 @@ class WalletManager(object):
                                    enc_alg=r.identities[index].controls[0].enc_alg,
                                    hash_value=r.identities[index].controls[0].hash,
                                    public_key=r.identities[index].controls[0].publicKey)]
-                temp = Identity(r.identities[index].ont_id, r.identities[index].label, r.identities[index].lock, control)
+                temp = Identity(r.identities[index].ont_id, r.identities[index].label, r.identities[index].lock,
+                                control)
                 identities.append(temp)
 
             accounts = []
@@ -108,7 +109,7 @@ class WalletManager(object):
         salt = get_random_str(16)
         return self.__create_identity(label, pwd, salt, priv_key)
 
-    def __create_identity(self, label: str, pwd: str, salt: str, private_key: bytes):
+    def __create_identity(self, label: str, pwd: str, salt: str, private_key: str):
         acct = self.__create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
         info.ont_id = did_ont + acct.get_address_base58()
@@ -119,19 +120,19 @@ class WalletManager(object):
         info.address_u160 = acct.get_address().to_array().hex()
         return self.wallet_in_mem.get_identity_by_ontid(info.ont_id)
 
-    def create_identity_from_prikey(self, label: str, pwd: str, private_key: bytes):
+    def create_identity_from_prikey(self, label: str, pwd: str, private_key: str):
         salt = get_random_str(16)
         identity = self.__create_identity(label, pwd, salt, private_key)
         private_key = None
         return identity
 
     def create_account(self, label: str, pwd: str) -> AccountData:
-        priv_key = get_random_bytes(32)
+        priv_key = get_random_str(32)
         salt = get_random_str(16)
         account = self.__create_account(label, pwd, salt, priv_key, True)
         return self.wallet_file.get_account_by_address(account.get_address_base58())
 
-    def __create_account(self, label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool):
+    def __create_account(self, label: str, pwd: str, salt: str, priv_key: str, account_flag: bool):
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
@@ -190,7 +191,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def create_account_info(self, label: str, pwd: str, salt: str, private_key: bytes):
+    def create_account_info(self, label: str, pwd: str, salt: str, private_key: str):
         acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()
@@ -200,7 +201,7 @@ class WalletManager(object):
         info.salt = salt
         return info
 
-    def create_account_from_prikey(self, label: str, pwd: str, private_key: bytes):
+    def create_account_from_prikey(self, label: str, pwd: str, private_key: str):
         salt = get_random_str(16)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):

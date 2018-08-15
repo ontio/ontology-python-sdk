@@ -76,14 +76,14 @@ class Asset(object):
         res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
         return bytes.fromhex(res).decode()
 
-    def query_decimals(self, asset: str):
+    def query_decimals(self, asset: str) -> str:
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "decimals", bytearray())
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
-        return res
+        decimal = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        return decimal
 
     def new_withdraw_ong_transaction(self, claimer_addr: str, recv_addr: str, amount: int, payer_addr: str,
                                      gas_limit: int,
@@ -118,14 +118,14 @@ class Asset(object):
                            invoke_code, bytearray(), [], bytearray())
 
     def send_approve(self, asset, sender: Account, recv_addr: str, amount: int, payer: Account,
-                     gas_limit: int, gas_price: int):
+                     gas_limit: int, gas_price: int) -> str:
         tx = self.new_approve(asset, sender.get_address_base58(), recv_addr, amount, payer.get_address_base58(),
                               gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
         flag = self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256().hex() if flag else None
+        return flag
 
     def new_transfer_from(self, asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int,
                           payer: str, gas_limit: int, gas_price: int) -> Transaction:
@@ -150,4 +150,11 @@ class Asset(object):
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
         flag = self.__sdk.rpc.send_raw_transaction_preexec(tx)
-        return tx.hash256().hex() if flag else None
+        # original:
+        # return tx.hash256().hex() if flag else None
+        # now:
+        # TODO: TEST
+        if flag:
+            return tx.hash256(is_hex=True)
+        else:
+            return None
