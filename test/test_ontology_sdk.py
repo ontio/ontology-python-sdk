@@ -36,7 +36,7 @@ class TestOntologySdk(TestCase):
         os.remove(path)
 
     def test_add_multi_sign_transaction(self):
-        print(multi_address.to_base58())
+        self.assertEqual(multi_address.to_base58(), 'AcAR5ZhtxiS66ydXrKWTZMXo13LcsvgYnD')
         tx = sdk.native_vm().asset().new_transfer_transaction("ong", acct1.get_address_base58(),
                                                               multi_address.to_base58(),
                                                               100000000,
