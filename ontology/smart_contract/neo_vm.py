@@ -23,7 +23,7 @@ class NeoVm(object):
         if func is not None:
             params = BuildParams.serialize_abi_function(func)
         if pre_exec:
-            tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), None, 0, 0)
+            tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
             return self.__sdk.rpc.send_raw_transaction_preexec(tx)
@@ -72,7 +72,7 @@ class NeoVm(object):
         invoke_tx.code = params
         invoke_tx.gas_limit = gas_limit
         invoke_tx.gas_price = gas_price
-        if payer is not None:
+        if isinstance(payer, bytes) and payer != b'':
             invoke_tx.payer = payer
         else:
             invoke_tx.payer = Address(ZERO_ADDRESS).to_array()
