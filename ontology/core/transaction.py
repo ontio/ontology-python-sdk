@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from binascii import b2a_hex, a2b_hex
+
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
-from binascii import b2a_hex, a2b_hex
 
 
 class Transaction(object):
-    def __init__(self, version= 0, tx_type= None, nonce= None, gas_price= None, gas_limit= None, payer= None, payload= None,
-                 attributes= None, sigs= None, hash= None):
+    def __init__(self, version=0, tx_type=None, nonce=None, gas_price=None, gas_limit=None, payer=None, payload=None,
+                 attributes=None, sigs=None, hash=None):
         self.version = version
         self.tx_type = tx_type
         self.nonce = nonce
@@ -44,13 +45,25 @@ class Transaction(object):
     def serialize_exclusive_data(self, writer):
         pass
 
-    def hash256(self) -> bytes:
+    def explorer_hash256(self) -> str:
         tx_serial = self.serialize_unsigned()
         tx_serial = a2b_hex(tx_serial)
-        r = Digest.hash256(tx_serial)
-        return a2b_hex(b2a_hex(r))
+        digest = Digest.hash256(tx_serial)
+        if isinstance(digest, bytes):
+            return b2a_hex(digest[::-1]).decode('ascii')
+        else:
+            return ''
 
-    def serialize(self) -> bytes:
+    def hash256(self, is_hex: bool = False) -> bytes or str:
+        tx_serial = self.serialize_unsigned()
+        tx_serial = a2b_hex(tx_serial)
+        r = Digest.hash256(tx_serial, is_hex)
+        if isinstance(r, bytes) or isinstance(r, str):
+            return r
+        else:
+            raise RuntimeError
+
+    def serialize(self, is_hex: bool = False) -> bytes:
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.write_bytes(self.serialize_unsigned())
@@ -62,7 +75,10 @@ class Transaction(object):
         ms.flush()
         temp = ms.ToArray()
         StreamManager.ReleaseStream(ms)
-        return a2b_hex(temp)
+        if is_hex:
+            return temp
+        else:
+            return a2b_hex(temp)
 
     @staticmethod
     def deserialize_from(txbytes: bytes):
@@ -84,7 +100,3 @@ class Transaction(object):
         for i in range(sigs_len):
             tx.sigs.append(Sig.deserialize(reader))
         return tx
-
-
-
-

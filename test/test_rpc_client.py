@@ -9,7 +9,7 @@ from ontology.common.address import Address
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
 from ontology.smart_contract.native_contract.asset import Asset
-from ontology.utils.util import get_random_bytes
+from ontology.utils.util import get_random_bytes, get_random_str
 
 sdk = OntologySdk()
 rpc_address = "http://polaris3.ont.io:20336"
@@ -17,9 +17,9 @@ sdk.rpc.set_address(rpc_address)
 private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
 private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
 private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
-acc = Account(a2b_hex(private_key.encode()), SignatureScheme.SHA256withECDSA)
-acc2 = Account(a2b_hex(private_key2.encode()), SignatureScheme.SHA256withECDSA)
-acc3 = Account(a2b_hex(private_key3.encode()), SignatureScheme.SHA256withECDSA)
+acc = Account(private_key, SignatureScheme.SHA256withECDSA)
+acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
+acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 pubkeys = [acc.get_public_key(), acc2.get_public_key(), acc3.get_public_key()]
 multi_addr = Address.address_from_multi_pubKeys(2, pubkeys)
 
@@ -31,29 +31,30 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_block_by_hash(self):
         hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
-        res = sdk.rpc.get_block_by_hash(hash)
-        self.assertEqual(res['Hash'], hash)
+        block = sdk.rpc.get_block_by_hash(hash)
+        self.assertEqual(block['Hash'], hash)
 
     def test_get_block_by_height(self):
         height = 0
-        res = sdk.rpc.get_block_by_hash(height)
-        self.assertEqual(res['Header']['Height'], height)
+        block = sdk.rpc.get_block_by_hash(height)
+        self.assertEqual(block['Header']['Height'], height)
 
     def test_get_block_count(self):
-        res = sdk.rpc.get_block_count()
-        self.assertGreater(res, 103712)
+        count = sdk.rpc.get_block_count()
+        self.assertGreater(count, 103712)
 
     def test_get_current_block_hash(self):
-        res = sdk.rpc.get_current_block_hash()
-        self.assertEqual(len(res), 64)
+        current_block_hash = sdk.rpc.get_current_block_hash()
+        self.assertEqual(len(current_block_hash), 64)
 
     def test_get_block_hash_by_height(self):
-        res = sdk.rpc.get_block_hash_by_height(0)
-        self.assertEqual(len(res), 64)
+        height = 0
+        block_hash = sdk.rpc.get_block_hash_by_height(height)
+        self.assertEqual(len(block_hash), 64)
 
     def test_get_balance(self):
-        s = "ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6"
-        address_balance = sdk.rpc.get_balance(s)
+        base58_address = "ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6"
+        address_balance = sdk.rpc.get_balance(base58_address)
         try:
             address_balance['ont']
         except KeyError:
@@ -91,11 +92,11 @@ class TestRpcClient(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
 
     def test_get_allowance(self):
-        private_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
+        pri_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
         scheme = SignatureScheme.SHA256withECDSA
-        acct = Account(a2b_hex(private_key.encode()), scheme)
-        res = sdk.rpc.get_allowance(acct.get_address_base58())
-        self.assertEqual(res, '0')
+        acct = Account(pri_key, scheme)
+        allowance = sdk.rpc.get_allowance(acct.get_address_base58())
+        self.assertEqual(allowance, '0')
 
     def test_get_storage(self):
         addr = "0100000000000000000000000000000000000000"
@@ -130,19 +131,20 @@ class TestRpcClient(unittest.TestCase):
 
     def test_send_raw_transaction(self):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(a2b_hex(private_key.encode()))
-        private_key2 = get_random_bytes(32)
-        acct2 = Account(private_key2)
+        acct = Account(private_key)
+        length = 64
+        pri_key2 = get_random_str(length)
+        acct2 = Account(pri_key2)
         tx = Asset.new_transfer_transaction("ont", acct.get_address_base58(),
                                             acct2.get_address_base58(), 2, acct.get_address_base58(), 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(len(res), 64)
+        self.assertEqual(len(res), length)
 
     def test_send_raw_transaction_preexec(self):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(a2b_hex(private_key.encode()))
-        private_key2 = get_random_bytes(32)
+        acct = Account(private_key)
+        private_key2 = get_random_str(64)
         acct2 = Account(private_key2)
         tx = Asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
                                             acct2.get_address().to_base58(), 2, acct.get_address_base58(), 20000, 500)

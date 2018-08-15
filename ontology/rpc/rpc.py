@@ -48,49 +48,49 @@ class RpcClient(object):
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def get_block_by_hash(self, hash_value: str):
+    def get_block_by_hash(self, hash_value: str) -> dict:
         rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK, [hash_value, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
-        return res
+        dict_block = json.loads(r.content.decode())["result"]
+        return dict_block
 
-    def get_block_by_height(self, height):
+    def get_block_by_height(self, height: int) -> dict:
         rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK, [height, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
-        return res
+        block = json.loads(r.content.decode())["result"]
+        return block
 
-    def get_block_count(self):
+    def get_block_count(self) -> int:
         rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK_COUNT)
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
-        return res
+        count = json.loads(r.content.decode())["result"]
+        return count
 
-    def get_current_block_hash(self):
+    def get_current_block_hash(self) -> str:
         rpc_struct = self.set_json_rpc_version(RPC_GET_CURRENT_BLOCK_HASH)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def get_block_hash_by_height(self, height):
+    def get_block_hash_by_height(self, height: int) -> str:
         rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK_HASH, [height, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
-        return res
+        block_hash = json.loads(r.content.decode())["result"]
+        return block_hash
 
-    def get_balance(self, addr):
-        rpc_struct = self.set_json_rpc_version(RPC_GET_BALANCE, [addr, 1])
+    def get_balance(self, base58_address: str) -> dict:
+        rpc_struct = self.set_json_rpc_version(RPC_GET_BALANCE, [base58_address, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())["result"]
         return res
 
-    def get_allowance(self, addr):
+    def get_allowance(self, base58_address: str) -> str:
         contract_address = get_asset_address("ont")
         rpc_struct = self.set_json_rpc_version(RPC_GET_ALLOWANCE,
-                                               ["ong", Address((contract_address)).to_base58(), addr])
+                                               ["ong", Address((contract_address)).to_base58(), base58_address])
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
-        return res
+        allowance = json.loads(r.content.decode())["result"]
+        return allowance
 
     def get_storage(self, addr, key):
         rpc_struct = self.set_json_rpc_version(RPC_GET_STORAGE, [addr, key, 1])

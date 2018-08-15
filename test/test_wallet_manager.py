@@ -25,7 +25,7 @@ class TestWalletManager(unittest.TestCase):
         wm.open_wallet(path)
         salt = util.get_random_str(16)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(a2b_hex(private_key.encode()))
+        acct = Account(private_key)
         enpri = acct.export_gcm_encrypted_private_key("1", salt, 16384)
         wm.import_identity("label2", enpri, "1", salt, acct.get_address_base58())
         os.remove(path)
@@ -34,8 +34,8 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        ide = wm.create_identity_from_prikey("ide", "1", util.hex_to_bytes(
-            "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"))
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        ide = wm.create_identity_from_prikey("ide", "1", private_key)
         self.assertEqual(ide.label, 'ide')
         self.assertEqual(ide.ont_id, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
         os.remove(path)
@@ -54,8 +54,8 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        account = wm.create_account_from_prikey("myaccount", "1", util.hex_to_bytes(
-            "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"))
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        account = wm.create_account_from_prikey("myaccount", "1", private_key)
         wm.save()
         self.assertEqual(account.address, 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
         os.remove(path)

@@ -14,57 +14,68 @@ class OntId(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
-    def new_registry_ontid_transaction(self, ont_id: str,pubkey: str, payer: str, gas_limit: int,gas_price: int):
+    def new_registry_ontid_transaction(self, ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
         unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+                           invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_add_attribute_transaction(self, ont_id: str, pubkey: str, attris: list, payer: str, gas_limit: int,gas_price: int):
+    def new_add_attribute_transaction(self, ont_id: str, pubkey: str, attris: list, payer: str, gas_limit: int,
+                                      gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "length": len(attris)}
         for i in range(len(attris)):
-            args["key"+str(i)] = bytes(attris[i]["key"].encode())
+            args["key" + str(i)] = bytes(attris[i]["key"].encode())
             args["type" + str(i)] = bytes(attris[i]["type"].encode())
             args["value" + str(i)] = bytes(attris[i]["value"].encode())
         args["pubkey"] = pubkey
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addAttributes", args)
         unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+                           invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_remove_attribute_transaction(self, ont_id: str, pubkey: bytearray,path: str, payer: str, gas_limit: int,gas_price: int):
+    def new_remove_attribute_transaction(self, ont_id: str, pubkey: bytearray, path: str, payer: str, gas_limit: int,
+                                         gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
         unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+                           invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_add_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str, gas_limit: int, gas_price: int):
+    def new_add_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,
+                                   gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode(), "pubkey": new_pubkey,"pubkey_or_recovery": pubkey_or_recovery}
+        args = {"ontid": ont_id.encode(), "pubkey": new_pubkey, "pubkey_or_recovery": pubkey_or_recovery}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addKey", args)
         unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+                           invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_remove_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes , remove_pubkey: bytes, payer: str, gas_limit: int, gas_price: int):
+    def new_remove_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str,
+                                      gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode(), "pubkey": remove_pubkey,"pubkey_or_recovery": pubkey_or_recovery}
+        args = {"ontid": ont_id.encode(), "pubkey": remove_pubkey, "pubkey_or_recovery": pubkey_or_recovery}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeKey", args)
         unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+                           invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_add_rcovery_transaction(self, ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int, gas_price: int):
+    def new_add_rcovery_transaction(self, ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,
+                                    gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "recovery": Address.decodeBase58(recovery).to_array(), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addRecovery", args)
         unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(), invoke_code, bytearray(),
+        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+                           invoke_code, bytearray(),
                            [], bytearray())
 
     def new_get_ddo_transaction(self, ont_id: str):
@@ -76,9 +87,9 @@ class OntId(object):
         return Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(),
                            [], bytearray())
 
-    def parse_ddo(self, ont_id: str, ddo: str):
+    def parse_ddo(self, ont_id: str, ddo: str) -> dict:
         if ddo == "":
-            return ""
+            return dict()
         ms = StreamManager.GetStream(a2b_hex(ddo))
         reader = BinaryReader(ms)
         try:
