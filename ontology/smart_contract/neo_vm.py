@@ -31,7 +31,7 @@ class NeoVm(object):
         params.append(0x67)
         for i in contract_address:
             params.append(i)
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address_base58(),
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_array(),
                          params, bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, acct)
         if payer_acct is not None and acct.get_address_base58() != payer_acct.get_address_base58():
