@@ -37,7 +37,7 @@ class TestWalletManager(unittest.TestCase):
         ide = wm.create_identity_from_prikey("ide", "1", util.hex_to_bytes(
             "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"))
         self.assertEqual(ide.label, 'ide')
-        self.assertEqual(ide.ontid, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
+        self.assertEqual(ide.ont_id, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
         os.remove(path)
 
     def test_import_account(self):

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import hashlib
 import os.path
 from Cryptodome import Random
 
@@ -124,7 +123,7 @@ def bigint_to_neo_bytes(data: int):
         return bytearray()
     b = data_bytes[0]
     if data < 0:
-        for i in len(data_bytes):
+        for i in range(len(data_bytes)):
             data_bytes[i] = ~b
         temp = int.from_bytes(data_bytes, "little")
         temp2 = temp + 1

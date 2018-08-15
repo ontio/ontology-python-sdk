@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from time import time
+
 from ontology.utils import util
 from ontology.vm.build_vm import build_native_invoke_code
-from time import time
 from ontology.core.transaction import Transaction
 from ontology.common.address import Address
 from ontology.common.define import *

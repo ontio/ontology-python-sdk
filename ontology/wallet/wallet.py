@@ -4,24 +4,30 @@ from ontology.wallet.identity import Identity
 
 
 class WalletData(object):
-    def __init__(self, name="MyWallet", version="1.1", create_time="", default_ontid="", default_account_address="",
-                 scrypt=Scrypt(), identities=[], accounts=[]):
+    def __init__(self, name: str = "MyWallet", version: str = "1.1", create_time: str = "", default_id: str = "",
+                 default_address="", scrypt: Scrypt = None, identities: list = None, accounts: list = None):
+        if scrypt is None:
+            scrypt = Scrypt()
+        if identities is None:
+            identities = list()
+        if accounts is None:
+            accounts = list()
         self.name = name
         self.version = version
-        self.createTime = create_time
-        self.defaultOntid = default_ontid
-        self.defaultAccountAddress = default_account_address
-        self.scrypt = scrypt  # Scrypt class
-        self.identities = identities  # a list of Identity class
-        self.accounts = accounts  # a list of AccountData class
+        self.create_time = create_time
+        self.default_ont_id = default_id
+        self.default_account_address = default_address
+        self.scrypt = scrypt
+        self.identities = identities
+        self.accounts = accounts
 
     def clone(self):
         wallet = WalletData()
         wallet.name = self.name
         wallet.version = self.version
-        wallet.createTime = self.createTime
-        wallet.defaultOntid = self.defaultOntid
-        wallet.defaultAccountAddress = self.defaultAccountAddress
+        wallet.create_time = self.create_time
+        wallet.default_ont_id = self.default_ont_id
+        wallet.default_account_address = self.default_account_address
         wallet.scrypt = self.scrypt
         wallet.accounts = self.accounts
         wallet.identities = self.identities
@@ -49,18 +55,18 @@ class WalletData(object):
 
     def add_identity(self, id: Identity):
         for identity in self.identities:
-            if identity.ontid == id.ontid:
-                raise Exception("")
+            if identity.ont_id == id.ont_id:
+                raise Exception("ont id is equal.")
         self.identities.append(id)
 
-    def remove_identity(self, ontid):
+    def remove_identity(self, ont_id):
         for index in range(len(self.identities)):
-            if self.identities[index].ontid == ontid:
+            if self.identities[index].ont_id == ont_id:
                 del self.identities[index]
                 break
 
-    def get_identity_by_ontid(self, ontid: str):
+    def get_identity_by_ontid(self, ont_id: str):
         for identity in self.identities:
-            if identity.ontid == ontid:
+            if identity.ont_id == ont_id:
                 return identity
         return None

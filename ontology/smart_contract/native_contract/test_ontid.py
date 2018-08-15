@@ -18,7 +18,7 @@ sdk.rpc.set_address(rpc_address)
 did = "did:ont:" + acc2.get_address_base58()
 
 
-class test_ontid(TestCase):
+class TestOntId(TestCase):
 
     def test_new_registry_ontid_transaction(self):
         tx = sdk.native_vm().ontid().new_registry_ontid_transaction(did, acc2.get_public_key(),acc.get_address_base58(), 20000, 500)

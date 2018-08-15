@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 from binascii import a2b_hex
 from unittest import TestCase
 
@@ -9,6 +10,7 @@ from ontology.common.address import Address
 from ontology.core.program import ProgramBuilder
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
+from ontology.wallet.wallet import WalletData
 
 rpc_address = "http://polaris3.ont.io:20336"
 sdk = OntologySdk()
@@ -28,11 +30,13 @@ multi_address = Address.address_from_multi_pubKeys(2, pub_keys)
 
 class TestOntologySdk(TestCase):
     def test_open_wallet(self):
-        a = sdk.open_wallet("./wallet/test.json")
-        print(a)
+        path = os.path.join(os.getcwd(), 'test.json')
+        wallet = sdk.open_wallet(path)
+        self.assertTrue(wallet, isinstance(wallet, WalletData))
+        os.remove(path)
 
     def test_add_multi_sign_transaction(self):
-        print(multi_address.to_base58())
+        self.assertEqual(multi_address.to_base58(), 'AcAR5ZhtxiS66ydXrKWTZMXo13LcsvgYnD')
         tx = sdk.native_vm().asset().new_transfer_transaction("ong", acct1.get_address_base58(),
                                                               multi_address.to_base58(),
                                                               100000000,

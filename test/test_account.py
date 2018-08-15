@@ -6,10 +6,22 @@ import unittest
 
 from ontology.utils import util
 from ontology.account.account import Account
+from ontology.wallet.wallet import WalletData
+from ontology.wallet.account import AccountData
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class TestAccount(unittest.TestCase):
+    def test_account_data_constructor(self):
+        data = AccountData()
+        self.assertEqual(data.algorithm, 'ECDSA')
+
+    def test_wallet_data_clone(self):
+        ont_id = 'test_ont_id'
+        w = WalletData(default_id=ont_id)
+        clone_wallet = w.clone()
+        self.assertEqual(clone_wallet.__dict__['default_ont_id'], ont_id)
+
     def test_export_gcm_encrypted_private_key(self):
         private_key = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         account = Account(util.hex_to_bytes(private_key),

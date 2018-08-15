@@ -1,4 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import base64
+import base58
 from binascii import b2a_hex, a2b_hex
+
 from ontology.crypto.curve import Curve
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler
@@ -8,8 +14,6 @@ from ontology.crypto.key_type import KeyType
 from ontology.crypto.aes_handler import AESHandler
 from ontology.crypto.scrypt import Scrypt
 from ontology.crypto.digest import Digest
-import base64
-import base58
 
 
 class Account(object):

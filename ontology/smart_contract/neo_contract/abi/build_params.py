@@ -42,7 +42,6 @@ class BuildParams(object):
                 builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
-                print(builder.to_array().hex())
                 builder.emit_push_integer(len(param_list[i]))
                 builder.emit(PACK)
         return bytearray(builder.to_array())

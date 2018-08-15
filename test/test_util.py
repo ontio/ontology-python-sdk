@@ -47,6 +47,10 @@ class TestUtil(unittest.TestCase):
         length = 2048
         self.assertEqual(len(util.get_random_str(length)), length)
 
+    def test_bigint_to_neo_bytes(self):
+        bs = util.bigint_to_neo_bytes(1)
+        self.assertEqual(bs.hex(), '01')
+
 
 if __name__ == '__main__':
     unittest.main()
