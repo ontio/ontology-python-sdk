@@ -127,7 +127,7 @@ class WalletManager(object):
         return identity
 
     def create_account(self, label: str, pwd: str) -> AccountData:
-        priv_key = get_random_str(32)
+        priv_key = get_random_str(64)
         salt = get_random_str(16)
         account = self.__create_account(label, pwd, salt, priv_key, True)
         return self.wallet_file.get_account_by_address(account.get_address_base58())
@@ -140,8 +140,7 @@ class WalletManager(object):
         else:
             raise ValueError("scheme type is error")
         # set key
-        if pwd != None:
-            from Cryptodome.Util.py3compat import tobytes, bord, _copy_bytes
+        if pwd is not None:
             acct.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
             pwd = None
         else:

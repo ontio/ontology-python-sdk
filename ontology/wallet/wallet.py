@@ -42,6 +42,9 @@ class WalletData(object):
             raise Exception("no the account")
         return self.accounts.remove(account)
 
+    def get_accounts(self):
+        return self.accounts
+
     def get_account_by_index(self, index: int):
         if index < 0 or index >= len(self.accounts):
             return ValueError("wrong account index")
