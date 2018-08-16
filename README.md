@@ -68,7 +68,7 @@ python3 install.py
  | 15   | send_raw_transaction (transaction)                     |
  | 16   | send_raw_transaction_pre_exec (transaction)            |
  | 17   | get_node_count ()                                      |
- | 17   | get_gas_price ()                                       |
+ | 18   | get_gas_price ()                                       |
 
 ## Wallet function list
 
