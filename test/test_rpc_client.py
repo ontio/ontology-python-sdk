@@ -28,7 +28,7 @@ class TestRpcClient(unittest.TestCase):
         version = sdk.rpc.get_version()
         self.assertEqual("v1.0.1", version)
 
-    def test_get_node_cout(self):
+    def test_get_node_count(self):
         count = sdk.rpc.get_node_count()
         self.assertEqual(count, 11)
 
@@ -47,7 +47,7 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_block_by_height(self):
         height = 0
-        block = sdk.rpc.get_block_by_hash(height)
+        block = sdk.rpc.get_block_by_height(height)
         self.assertEqual(block['Header']['Height'], height)
 
     def test_get_block_count(self):
