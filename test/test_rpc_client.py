@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from binascii import a2b_hex
 import unittest
 
-from ontology.account.account import Account
-from ontology.common.address import Address
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
+from ontology.common.address import Address
+from ontology.account.account import Account
+from ontology.utils.util import get_random_str
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
-from ontology.utils.util import get_random_bytes, get_random_str
 
 sdk = OntologySdk()
 rpc_address = "http://polaris3.ont.io:20336"
@@ -28,6 +27,18 @@ class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
         version = sdk.rpc.get_version()
         self.assertEqual("v1.0.1", version)
+
+    def test_get_node_cout(self):
+        count = sdk.rpc.get_node_count()
+        self.assertEqual(count, 11)
+
+    def test_get_gas_price(self):
+        price = sdk.rpc.get_gas_price()
+        self.assertGreater(price, 0)
+
+    def test_get_network_id(self):
+        network_id = sdk.rpc.get_network_id()
+        self.assertGreaterEqual(network_id, 0)
 
     def test_get_block_by_hash(self):
         block_hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
