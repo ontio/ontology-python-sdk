@@ -42,7 +42,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return int(res, 16)
 
     def query_allowance(self, asset: str, from_addr: str, to_addr: str):
@@ -52,7 +52,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
     def unboundong(self, addr: str):
@@ -64,7 +64,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return bytes.fromhex(res).decode()
 
     def query_symbol(self, asset: str):
@@ -73,7 +73,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return bytes.fromhex(res).decode()
 
     def query_decimals(self, asset: str) -> str:
@@ -82,7 +82,7 @@ class Asset(object):
         unix_timenow = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
-        decimal = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        decimal = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return decimal
 
     def new_withdraw_ong_transaction(self, claimer_addr: str, recv_addr: str, amount: int, payer_addr: str,
@@ -104,7 +104,7 @@ class Asset(object):
                                                payer.get_address_base58(), gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, payer)
         tx = self.__sdk.add_sign_transaction(tx, claimer)
-        res = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
     def new_approve(self, asset: str, send_addr: str, recv_addr: str, amount: int, payer: str,
@@ -149,7 +149,7 @@ class Asset(object):
         tx = self.__sdk.sign_transaction(tx, sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
-        flag = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+        flag = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         # original:
         # return tx.hash256().hex() if flag else None
         # now:

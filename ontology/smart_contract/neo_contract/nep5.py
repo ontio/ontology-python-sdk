@@ -40,7 +40,7 @@ class Nep5(object):
                              params, bytearray(), [], bytearray())
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
-            obj = self.__sdk.rpc.send_raw_transaction_preexec(tx)
+            obj = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
             if int(obj["Result"]) is not 1:
                 raise Exception("send_raw_transaction PreExec error:", obj)
             return obj["Gas"]

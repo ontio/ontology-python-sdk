@@ -26,13 +26,13 @@ multi_addr = Address.address_from_multi_pubKeys(2, pubkeys)
 
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
-        res = sdk.rpc.get_version()
-        self.assertEqual("v1.0.1", res)
+        version = sdk.rpc.get_version()
+        self.assertEqual("v1.0.1", version)
 
     def test_get_block_by_hash(self):
-        hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
-        block = sdk.rpc.get_block_by_hash(hash)
-        self.assertEqual(block['Hash'], hash)
+        block_hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
+        block = sdk.rpc.get_block_by_hash(block_hash)
+        self.assertEqual(block['Hash'], block_hash)
 
     def test_get_block_by_height(self):
         height = 0
@@ -92,65 +92,65 @@ class TestRpcClient(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
 
     def test_get_allowance(self):
-        pri_key = '99bbd375c745088b372c6fc2ab38e2fb6626bc552a9da47fc3d76baa21537a1c'
-        scheme = SignatureScheme.SHA256withECDSA
-        acct = Account(pri_key, scheme)
-        allowance = sdk.rpc.get_allowance(acct.get_address_base58())
+        base58_address = "AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA"
+        allowance = sdk.rpc.get_allowance(base58_address)
         self.assertEqual(allowance, '0')
 
     def test_get_storage(self):
-        addr = "0100000000000000000000000000000000000000"
+        contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
-        res = sdk.rpc.get_storage(addr, key)
-        self.assertEqual(res, 1000000000)
+        value = sdk.rpc.get_storage(contract_address, key)
+        self.assertEqual(value, 1000000000)
 
-    def test_get_smart_contract_event_by_txhash(self):
-        s = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
-        res = sdk.rpc.get_smart_contract_event_by_txhash(s)
-        self.assertEqual(res['TxHash'], s)
+    def test_get_smart_contract_event_by_tx_hash(self):
+        tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        self.assertEqual(event['TxHash'], tx_hash)
 
     def test_get_smart_contract_event_by_block(self):
-        b = 0
-        res = sdk.rpc.get_smart_contract_event_by_block(b)
-        self.assertEqual(res[0]['State'], 1)
+        height = 0
+        event = sdk.rpc.get_smart_contract_event_by_height(height)
+        self.assertEqual(event[0]['State'], 1)
 
     def test_get_raw_transaction(self):
-        hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
-        res = sdk.rpc.get_raw_transaction(hash)
-        self.assertEqual(res['Hash'], hash)
+        tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
+        tx = sdk.rpc.get_raw_transaction(tx_hash)
+        self.assertEqual(tx['Hash'], tx_hash)
 
     def test_get_smart_contract(self):
-        s = "0239dcf9b4a46f15c5f23f20d52fac916a0bac0d"
-        res = sdk.rpc.get_smart_contract(s)
-        self.assertEqual(res['Description'], 'Ontology Network ONT Token')
+        contract_address = "0239dcf9b4a46f15c5f23f20d52fac916a0bac0d"
+        contract = sdk.rpc.get_smart_contract(contract_address)
+        self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
 
     def test_get_merkle_proof(self):
-        s = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
-        res = sdk.rpc.get_merkle_proof(s)
-        self.assertEqual(res['Type'], 'MerkleProof')
+        tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
+        proof = sdk.rpc.get_merkle_proof(tx_hash)
+        self.assertEqual(proof['Type'], 'MerkleProof')
 
     def test_send_raw_transaction(self):
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key)
+        pri_key_1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(pri_key_1)
         length = 64
-        pri_key2 = get_random_str(length)
-        acct2 = Account(pri_key2)
-        tx = Asset.new_transfer_transaction("ont", acct.get_address_base58(),
-                                            acct2.get_address_base58(), 2, acct.get_address_base58(), 20000, 500)
+        pri_key_2 = get_random_str(length)
+        acct2 = Account(pri_key_2)
+        b58_address_1 = acct.get_address_base58()
+        b58_address_2 = acct2.get_address_base58()
+        tx = Asset.new_transfer_transaction("ont", b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
-        res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(len(res), length)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(tx_hash, tx.explorer_hash256())
 
-    def test_send_raw_transaction_preexec(self):
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key)
-        private_key2 = get_random_str(64)
-        acct2 = Account(private_key2)
-        tx = Asset.new_transfer_transaction("ont", acct.get_address().to_base58(),
-                                            acct2.get_address().to_base58(), 2, acct.get_address_base58(), 20000, 500)
+    def test_send_raw_transaction_pre_exec(self):
+        pri_key_1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(pri_key_1)
+        pri_key2 = get_random_str(64)
+        acct2 = Account(pri_key2)
+        b58_address_1 = acct.get_address_base58()
+        b58_address_2 = acct2.get_address_base58()
+        tx = Asset.new_transfer_transaction("ont", b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
-        res = sdk.rpc.send_raw_transaction_preexec(tx)
-        self.assertEqual(res, '01')
+        result = sdk.rpc.send_raw_transaction_pre_exec(tx)
+        self.assertEqual(result, '01')
 
 
 if __name__ == '__main__':
