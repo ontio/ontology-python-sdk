@@ -1,4 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 RPC_GET_VERSION = "getversion"
+RPC_GET_NODE_COUNT = "getconnectioncount"
+RPC_GET_GAS_PRICE = "getgasprice"
+RPC_GET_NETWORK_ID = "getnetworkid"
 RPC_GET_TRANSACTION = "getrawtransaction"
 RPC_SEND_TRANSACTION = "sendrawtransaction"
 RPC_GET_BLOCK = "getblock"

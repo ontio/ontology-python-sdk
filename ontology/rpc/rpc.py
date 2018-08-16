@@ -1,6 +1,10 @@
-import requests
-from ontology.rpc.define import *
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import json
+import requests
+
+from ontology.rpc.define import *
 from ontology.core.transaction import Transaction
 from ontology.common.address import Address
 from ontology.utils.util import get_asset_address
@@ -32,7 +36,8 @@ class RpcClient(object):
     def set_address(self, addr):
         self.addr = addr
 
-    def set_json_rpc_version(self, method, param=None):
+    @staticmethod
+    def set_json_rpc_version(method, param=None):
         JsonRpcRequest["jsonrpc"] = JSON_RPC_VERSION
         JsonRpcRequest["id"] = "1"
         JsonRpcRequest["method"] = method
@@ -50,10 +55,49 @@ class RpcClient(object):
             the version information of the connected node.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_VERSION, [])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_VERSION, [])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         version = json.loads(r.content.decode())["result"]
         return version
+
+    def get_node_count(self) -> int:
+        """
+        This interface is used to get the current number of connections for the node in current network.
+
+        Return:
+            the number of connections.
+        """
+
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_NODE_COUNT, [])
+        r = HttpRequest.request("post", self.addr, rpc_struct)
+        count = json.loads(r.content.decode())["result"]
+        return count
+
+    def get_gas_price(self) -> int:
+        """
+        This interface is used to get the gas price in current network.
+
+        Return:
+            the value of gas price.
+        """
+
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_GAS_PRICE, [])
+        r = HttpRequest.request("post", self.addr, rpc_struct)
+        price = json.loads(r.content.decode())["result"]['gasprice']
+        return price
+
+    def get_network_id(self) -> int:
+        """
+        This interface is used to get the network id of current network.
+
+        Return:
+            the network id of current network.
+        """
+
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_NETWORK_ID, [])
+        r = HttpRequest.request("post", self.addr, rpc_struct)
+        id = json.loads(r.content.decode())["result"]
+        return id
 
     def get_block_by_hash(self, block_hash: str) -> dict:
         """
@@ -67,7 +111,7 @@ class RpcClient(object):
             the block information of the specified block hash.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK, [block_hash, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK, [block_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         dict_block = json.loads(r.content.decode())["result"]
         return dict_block
@@ -80,7 +124,7 @@ class RpcClient(object):
             the decimal total number of blocks in current network.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK, [height, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK, [height, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         block = json.loads(r.content.decode())["result"]
         return block
@@ -93,7 +137,7 @@ class RpcClient(object):
             the decimal total number of blocks in current network.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK_COUNT)
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK_COUNT)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         count = json.loads(r.content.decode())["result"]
         return count
@@ -106,7 +150,7 @@ class RpcClient(object):
             the hexadecimal hash value of the highest block in current network.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_CURRENT_BLOCK_HASH)
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_CURRENT_BLOCK_HASH)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())["result"]
         return res
@@ -123,7 +167,7 @@ class RpcClient(object):
             the hexadecimal hash value of the specified block height.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_BLOCK_HASH, [height, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK_HASH, [height, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         block_hash = json.loads(r.content.decode())["result"]
         return block_hash
@@ -140,7 +184,7 @@ class RpcClient(object):
             the value of account balance in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_BALANCE, [base58_address, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BALANCE, [base58_address, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         balance = json.loads(r.content.decode())["result"]
         return balance
@@ -160,7 +204,7 @@ class RpcClient(object):
 
         contract_address = get_asset_address("ont")
         b58_contract_address = Address(contract_address).to_base58()
-        rpc_struct = self.set_json_rpc_version(RPC_GET_ALLOWANCE, ["ong", b58_contract_address, base58_address])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_ALLOWANCE, ["ong", b58_contract_address, base58_address])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         allowance = json.loads(r.content.decode())["result"]
         return allowance
@@ -180,7 +224,7 @@ class RpcClient(object):
             the information of smart contract event in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         s = json.loads(r.content.decode())["result"]
         s = bytearray.fromhex(s)
@@ -200,7 +244,7 @@ class RpcClient(object):
             the information of smart contract event in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         event = json.loads(r.content.decode())["result"]
         return event
@@ -217,7 +261,7 @@ class RpcClient(object):
             the information of smart contract event in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [height, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [height, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         event = json.loads(r.content.decode())["result"]
         return event
@@ -234,7 +278,7 @@ class RpcClient(object):
             the information of transaction in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_hash, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         tx = json.loads(r.content.decode())["result"]
         return tx
@@ -251,7 +295,7 @@ class RpcClient(object):
             the information of smart contract in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_SMART_CONTRACT, [contract_address, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT, [contract_address, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         contract = json.loads(r.content.decode())["result"]
         return contract
@@ -268,7 +312,7 @@ class RpcClient(object):
             the merkle proof in dictionary form.
         """
 
-        rpc_struct = self.set_json_rpc_version(RPC_GET_MERKLE_PROOF, [tx_hash, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_MERKLE_PROOF, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         proof = json.loads(r.content.decode())["result"]
         return proof
@@ -287,7 +331,7 @@ class RpcClient(object):
 
         buf = tx.serialize()
         tx_data = buf.hex()
-        rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         tx_hash = json.loads(r.content.decode())["result"]
         return tx_hash
@@ -306,7 +350,7 @@ class RpcClient(object):
 
         buf = tx.serialize()
         tx_data = buf.hex()
-        rpc_struct = self.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         res = json.loads(r.content.decode())
         err = res["error"]
