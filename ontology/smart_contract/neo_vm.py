@@ -26,7 +26,7 @@ class NeoVm(object):
             tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
-            return self.__sdk.rpc.send_raw_transaction_preexec(tx)
+            return self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         unix_time_now = int(time())
         params.append(0x67)
         for i in contract_address:
