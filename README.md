@@ -83,6 +83,7 @@ The wallet function includes three parts, digit account, digit identity, and mne
  | 3    | create_random_account(self, label: str, pwd: str)                                               |
  | 4    | create_account_from_prikey(self, label: str, pwd: str, private_key: bytes)                      |
  | 5    | get_account(self, address: str, pwd: str)                                                       |
+ | 6    | get_accounts()                                                                                  |
 
 ### Digit identity
 

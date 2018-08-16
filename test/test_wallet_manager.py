@@ -8,7 +8,6 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.account.account import Account
 from ontology.utils import util
-from binascii import a2b_hex
 
 
 class TestWalletManager(unittest.TestCase):
@@ -17,6 +16,18 @@ class TestWalletManager(unittest.TestCase):
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
+        os.remove(path)
+
+    def test_get_accounts(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        password = "password"
+        size = 5
+        for i in range(size):
+            wm.create_account('', password)
+        accounts = wm.get_wallet().get_accounts()
+        self.assertEqual(len(accounts), size)
         os.remove(path)
 
     def test_import_identity(self):

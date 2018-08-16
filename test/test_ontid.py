@@ -31,10 +31,10 @@ class TestOntId(unittest.TestCase):
 
     def test_new_get_ddo_transaction(self):
         tx = sdk.native_vm().ont_id().new_get_ddo_transaction(did)
-        ddo = sdk.rpc.send_raw_transaction_pre_exec(tx)
+        out_ddo = sdk.rpc.send_raw_transaction_pre_exec(tx)
         estimate_ddo = "26010000002102d3d048aca7bdee582a611d0b8acc45642950dc6167aee63abbdcd1a5781c63190014d2c124dd088190f709b684e0bc676d70c41b3776"
-        self.assertEqual(estimate_ddo, ddo)
-        parsed_ddo = sdk.native_vm().ont_id().parse_ddo(did, ddo)
+        self.assertEqual(estimate_ddo, out_ddo)
+        parsed_ddo = sdk.native_vm().ont_id().parse_ddo(did, out_ddo)
         self.assertEqual(parsed_ddo['Owners'][0]['PubKeyId'][:len(did)], did)
 
     def test_new_add_attribute_transaction(self):
