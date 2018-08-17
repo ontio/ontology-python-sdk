@@ -111,3 +111,6 @@ class WalletData(object):
             if identity.ont_id == ont_id:
                 return identity
         return None
+
+    def get_identities(self):
+        return self.identities
