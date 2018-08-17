@@ -76,6 +76,12 @@ class WalletData(object):
     def get_default_account_address(self):
         return self.default_account_address
 
+    def get_default_account(self):
+        for acct in self.accounts:
+            if acct.is_default:
+                return acct
+        raise SDKException(ErrorCode.get_default_account_err)
+
     def get_account_by_index(self, index: int):
         if index < 0 or index >= len(self.accounts):
             return ValueError("wrong account index")
