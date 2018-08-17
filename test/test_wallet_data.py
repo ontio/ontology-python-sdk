@@ -98,6 +98,20 @@ class TestWalletData(unittest.TestCase):
             id_list.remove(rand_id)
             self.assertEqual(len(w.identities), size - i - 1)
 
+    def test_get_identities(self):
+        test_id = "test_ont_id"
+        w = WalletData(default_id=test_id)
+        size = 10
+        id_list = list()
+        for i in range(size):
+            rand_id = random.randint(0, 1000000000)
+            identity = Identity(ont_id=rand_id)
+            w.add_identity(identity)
+            id_list.append(rand_id)
+            self.assertEqual(len(w.identities), i + 1)
+        identities = w.get_identities()
+        self.assertEqual(len(identities), size)
+
 
 if __name__ == '__main__':
     unittest.main()
