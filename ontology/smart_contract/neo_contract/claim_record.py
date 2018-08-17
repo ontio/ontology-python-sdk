@@ -24,5 +24,5 @@ class ClaimRecord(object):
         func.set_params_value(bytes(claimId.encode()), bytes(issuerOntid.encode()), bytes(subjectOntid.encode()))
         params = BuildParams.serialize_abi_function(func)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
-                           params, bytearray(), [], bytearray())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer), params, bytearray(),
+                           [], bytearray())

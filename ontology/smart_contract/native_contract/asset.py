@@ -31,9 +31,9 @@ class Asset(object):
     def new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
                                  gas_limit: int, gas_price: int):
         contract_address = util.get_asset_address(asset)  # []bytes
-        raw_from = Address.b58decode(from_addr).to_array()
-        raw_to = Address.b58decode(to_addr).to_array()
-        raw_payer = Address.b58decode(payer).to_array()
+        raw_from = Address.b58decode(from_addr)
+        raw_to = Address.b58decode(to_addr)
+        raw_payer = Address.b58decode(payer)
         state = [{"from": raw_from, "to": raw_to, "amount": amount}]
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
         unix_time_now = int(time())
@@ -41,7 +41,7 @@ class Asset(object):
                            bytearray())
 
     def query_balance(self, asset: str, b58_address: str) -> int:
-        raw_address = Address.b58decode(b58_address).to_array()
+        raw_address = Address.b58decode(b58_address)
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "balanceOf", raw_address)
         unix_time_now = int(time())
@@ -52,8 +52,8 @@ class Asset(object):
 
     def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> str:
         contract_address = util.get_asset_address(asset)
-        raw_from = Address.b58decode(b58_from_address).to_array()
-        raw_to = Address.b58decode(b58_to_address).to_array()
+        raw_from = Address.b58decode(b58_from_address)
+        raw_to = Address.b58decode(b58_to_address)
         args = {"from": raw_from, "to": raw_to}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "allowance", args)
         unix_time_now = int(time())
@@ -97,13 +97,13 @@ class Asset(object):
                                      gas_limit: int, gas_price: int) -> Transaction:
         ont_contract_address = util.get_asset_address("ont")
         ong_contract_address = util.get_asset_address("ong")
-        args = {"sender": Address.b58decode(claimer_addr).to_array(), "from": ont_contract_address,
-                "to": Address.b58decode(recv_addr).to_array(),
+        args = {"sender": Address.b58decode(claimer_addr), "from": ont_contract_address,
+                "to": Address.b58decode(recv_addr),
                 "value": amount}
         invoke_code = build_native_invoke_code(ong_contract_address, bytes([0]), "transferFrom", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer_addr).to_array(),
-                           invoke_code, bytearray(), [], bytearray())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer_addr), invoke_code,
+                           bytearray(), [], bytearray())
 
     def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int) -> str:
@@ -118,9 +118,9 @@ class Asset(object):
     def new_approve(asset: str, send_addr: str, recv_addr: str, amount: int, payer: str, gas_limit: int,
                     gas_price: int) -> Transaction:
         contract_address = util.get_asset_address(asset)  # []bytes
-        raw_send = Address.b58decode(send_addr).to_array()
-        raw_recv = Address.b58decode(recv_addr).to_array()
-        raw_payer = Address.b58decode(payer).to_array()
+        raw_send = Address.b58decode(send_addr)
+        raw_recv = Address.b58decode(recv_addr)
+        raw_payer = Address.b58decode(payer)
         args = {"from": raw_send, "to": raw_recv, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
         unix_time_now = int(time())
@@ -141,10 +141,10 @@ class Asset(object):
     @staticmethod
     def new_transfer_from(asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int, payer: str,
                           gas_limit: int, gas_price: int) -> Transaction:
-        raw_sender = Address.b58decode(send_addr).to_array()
-        raw_from = Address.b58decode(from_addr).to_array()
-        raw_to = Address.b58decode(recv_addr).to_array()
-        raw_payer = Address.b58decode(payer).to_array()
+        raw_sender = Address.b58decode(send_addr)
+        raw_from = Address.b58decode(from_addr)
+        raw_to = Address.b58decode(recv_addr)
+        raw_payer = Address.b58decode(payer)
         contract_address = util.get_asset_address(asset)  # []bytes
         args = {"sender": raw_sender, "from": raw_from, "to": raw_to, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transferFrom", args)
