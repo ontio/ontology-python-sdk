@@ -6,6 +6,8 @@ import unittest
 
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.wallet.wallet_manager import WalletManager
+from ontology.exception.exception import SDKException
+from ontology.common.error_code import ErrorCode
 from ontology.account.account import Account
 from ontology.utils import util
 
@@ -30,7 +32,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(len(accounts), size)
         os.remove(path)
 
-    def test_set_default_account(self):
+    def test_set_default_account_by_index(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
@@ -40,10 +42,28 @@ class TestWalletManager(unittest.TestCase):
             wm.create_account('', password)
         accounts = wm.get_wallet().get_accounts()
         self.assertEqual(len(accounts), size)
+        self.assertRaises(SDKException, wm.get_wallet().set_default_account_by_index, size)
         for index in range(size):
-            wm.get_wallet().set_default_account(index)
-            self.assertEqual(accounts[index].address, wm.get_wallet().get_default_account_address())
+            wm.get_wallet().set_default_account_by_index(index)
+            default_address = wm.get_wallet().get_default_account_address()
+            self.assertEqual(accounts[index].address, default_address)
         os.remove(path)
+
+    def test_set_default_account_by_address(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        password = "password"
+        size = 3
+        for i in range(size):
+            wm.create_account('', password)
+        accounts = wm.get_wallet().get_accounts()
+        self.assertEqual(len(accounts), size)
+        self.assertRaises(SDKException, wm.get_wallet().set_default_account_by_address, '1')
+        for acct in accounts:
+            wm.get_wallet().set_default_account_by_address(acct.address)
+            default_address = wm.get_wallet().get_default_account_address()
+            self.assertEqual(default_address, acct.address)
 
     def test_import_identity(self):
         wm = WalletManager()
