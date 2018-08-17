@@ -68,7 +68,7 @@ class ErrorCode:
 
     # OntIdTx Error
     null_code_hash = get_error.__func__(58003, "OntIdTx Error,null codeHash")
-    param_error = get_error.__func__(58004, "param error,")
+    param_error = get_error.__func__(58004, "param error")
 
     @staticmethod
     def param_err(msg: str):
