@@ -12,7 +12,7 @@ class AccountData(object):
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.hash = hash_value
-        self.isDefault = is_default
+        self.is_default = is_default
         self.key = key
         self.label = label
         self.lock = lock
