@@ -12,4 +12,4 @@ class Identity(object):
         self.label = label
         self.lock = lock
         self.controls = controls
-        self.is_default = False
+        self.isDefault = False

@@ -48,7 +48,7 @@ class WalletManager(object):
 
             identities = []
             for index in range(len(r.identities)):
-                r_identities = r.identities()[index]
+                r_identities = r.identities[index]
                 control = [Control(id=r_identities.controls[0].id,
                                    algorithm=r_identities.controls[0].algorithm,
                                    param=r_identities.controls[0].parameters,
@@ -64,7 +64,7 @@ class WalletManager(object):
             for index in range(len(r.accounts)):
                 temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
                                    sign_scheme=r.accounts[index].signatureScheme,
-                                   is_default=r.accounts[index].is_default,
+                                   isDefault=r.accounts[index].isDefault,
                                    lock=r.accounts[index].lock, address=r.accounts[index].address,
                                    algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
                                    key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
@@ -156,7 +156,7 @@ class WalletManager(object):
                     raise ValueError("wallet account exists")
 
             if len(self.wallet_in_mem.accounts) == 0:
-                acct.is_default = True
+                acct.isDefault = True
                 self.wallet_in_mem.default_account_address = acct.address
             acct.label = label
             acct.salt = base64.b64encode(salt.encode()).decode('ascii')
@@ -170,7 +170,7 @@ class WalletManager(object):
             idt.ont_id = did_ont + acct.address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
-                idt.is_default = True
+                idt.isDefault = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.address,
@@ -227,13 +227,13 @@ class WalletManager(object):
 
     def get_default_identity(self) -> Identity:
         for identity in self.wallet_in_mem.identities:
-            if identity.is_default:
+            if identity.isDefault:
                 return identity
         raise SDKException(ErrorCode.param_error)
 
     def get_default_account(self) -> AccountData:
         for acct in self.wallet_in_mem.accounts:
-            if acct.is_default:
+            if acct.isDefault:
                 return acct
         raise SDKException(ErrorCode.get_default_account_err)
 
