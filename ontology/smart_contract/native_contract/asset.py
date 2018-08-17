@@ -107,8 +107,9 @@ class Asset(object):
 
     def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int) -> str:
-        tx = Asset.new_withdraw_ong_transaction(claimer.get_address_base58(), recv_addr, amount,
-                                                payer.get_address_base58(), gas_limit, gas_price)
+        b58_claimer = claimer.get_address_base58()
+        b58_payer = payer.get_address_base58()
+        tx = Asset.new_withdraw_ong_transaction(b58_claimer, recv_addr, amount, b58_payer, gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, payer)
         tx = self.__sdk.add_sign_transaction(tx, claimer)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
