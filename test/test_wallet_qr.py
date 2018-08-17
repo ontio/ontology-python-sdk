@@ -14,7 +14,7 @@ class TestWalletQR(unittest.TestCase):
         wm = WalletManager()
         pwd = "1"
         hex_private_key = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
-        identity = wm.create_identity_from_prikey("sss", pwd, hex_private_key)
+        identity = wm.create_identity_from_pri_key("sss", pwd, hex_private_key)
         wqr = WalletQR()
         d = wqr.export_identity_qrcode(wm.wallet_file, identity)
 

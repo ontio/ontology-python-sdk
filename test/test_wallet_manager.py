@@ -30,6 +30,21 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(len(accounts), size)
         os.remove(path)
 
+    def test_set_default_account(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        password = "password"
+        size = 3
+        for i in range(size):
+            wm.create_account('', password)
+        accounts = wm.get_wallet().get_accounts()
+        self.assertEqual(len(accounts), size)
+        index = 1
+        wm.get_wallet().set_default_account(index)
+        self.assertEqual(accounts[index].address, wm.get_wallet().get_default_account_address())
+        os.remove(path)
+
     def test_import_identity(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -46,7 +61,7 @@ class TestWalletManager(unittest.TestCase):
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        ide = wm.create_identity_from_prikey("ide", "1", private_key)
+        ide = wm.create_identity_from_pri_key("ide", "1", private_key)
         self.assertEqual(ide.label, 'ide')
         self.assertEqual(ide.ont_id, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
         os.remove(path)
