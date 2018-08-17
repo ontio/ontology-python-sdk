@@ -40,9 +40,9 @@ class TestWalletManager(unittest.TestCase):
             wm.create_account('', password)
         accounts = wm.get_wallet().get_accounts()
         self.assertEqual(len(accounts), size)
-        index = 1
-        wm.get_wallet().set_default_account(index)
-        self.assertEqual(accounts[index].address, wm.get_wallet().get_default_account_address())
+        for index in range(size):
+            wm.get_wallet().set_default_account(index)
+            self.assertEqual(accounts[index].address, wm.get_wallet().get_default_account_address())
         os.remove(path)
 
     def test_import_identity(self):
