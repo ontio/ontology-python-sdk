@@ -15,7 +15,8 @@ class Asset(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
-    def get_asset_address(self, asset: str) -> bytearray:
+    @staticmethod
+    def get_asset_address(asset: str) -> bytearray:
         if asset.upper() == 'ONT':
             contract_address = ONT_CONTRACT_ADDRESS
         elif asset.upper() == 'ONG':
@@ -85,9 +86,9 @@ class Asset(object):
         decimal = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return decimal
 
-    def new_withdraw_ong_transaction(self, claimer_addr: str, recv_addr: str, amount: int, payer_addr: str,
-                                     gas_limit: int,
-                                     gas_price: int):
+    @staticmethod
+    def new_withdraw_ong_transaction(claimer_addr: str, recv_addr: str, amount: int, payer_addr: str,
+                                     gas_limit: int, gas_price: int):
         ont_contract_address = util.get_asset_address("ont")
         ong_contract_address = util.get_asset_address("ong")
         args = {"sender": Address.decodeBase58(claimer_addr).to_array(), "from": ont_contract_address,
@@ -100,15 +101,16 @@ class Asset(object):
 
     def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int):
-        tx = self.new_withdraw_ong_transaction(claimer.get_address_base58(), recv_addr, amount,
+        tx = Asset.new_withdraw_ong_transaction(claimer.get_address_base58(), recv_addr, amount,
                                                payer.get_address_base58(), gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, payer)
         tx = self.__sdk.add_sign_transaction(tx, claimer)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
-    def new_approve(self, asset: str, send_addr: str, recv_addr: str, amount: int, payer: str,
-                    gas_limit: int, gas_price: int) -> Transaction:
+    @staticmethod
+    def new_approve(asset: str, send_addr: str, recv_addr: str, amount: int, payer: str, gas_limit: int,
+                    gas_price: int) -> Transaction:
         contract_address = util.get_asset_address(asset)  # []bytes
         args = {"from": Address.decodeBase58(send_addr).to_array(), "to": Address.decodeBase58(recv_addr).to_array(),
                 "amount": amount}
@@ -117,18 +119,19 @@ class Asset(object):
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
                            invoke_code, bytearray(), [], bytearray())
 
-    def send_approve(self, asset, sender: Account, recv_addr: str, amount: int, payer: Account,
-                     gas_limit: int, gas_price: int) -> str:
-        tx = self.new_approve(asset, sender.get_address_base58(), recv_addr, amount, payer.get_address_base58(),
-                              gas_limit, gas_price)
+    def send_approve(self, asset, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int,
+                     gas_price: int) -> str:
+        tx = Asset.new_approve(asset, sender.get_address_base58(), recv_addr, amount, payer.get_address_base58(),
+                               gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
         flag = self.__sdk.rpc.send_raw_transaction(tx)
         return flag
 
-    def new_transfer_from(self, asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int,
-                          payer: str, gas_limit: int, gas_price: int) -> Transaction:
+    @staticmethod
+    def new_transfer_from(asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int, payer: str,
+                          gas_limit: int, gas_price: int) -> Transaction:
         contract_address = util.get_asset_address(asset)  # []bytes
         args = {"sender": Address.decodeBase58(send_addr).to_array(),
                 "from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(recv_addr).to_array(),
@@ -144,8 +147,8 @@ class Asset(object):
             raise ValueError("parameters should not be null")
         if amount <= 0 or gas_price < 0 or gas_limit < 0:
             raise ValueError("amount or gasprice or gaslimit should not be less than 0")
-        tx = self.new_transfer_from(asset, sender.get_address_base58(), from_addr, recv_addr, amount,
-                                    payer.get_address_base58(), gas_limit, gas_price)
+        tx = Asset.new_transfer_from(asset, sender.get_address_base58(), from_addr, recv_addr, amount,
+                                     payer.get_address_base58(), gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
