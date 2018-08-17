@@ -333,8 +333,11 @@ class RpcClient(object):
         tx_data = buf.hex()
         rpc_struct = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
         r = HttpRequest.request("post", self.addr, rpc_struct)
-        tx_hash = json.loads(r.content.decode())["result"]
-        return tx_hash
+        data = json.loads(r.content.decode())
+        res = data["result"]
+        if data["error"] != 0:
+            raise Exception(res)
+        return res
 
     def send_raw_transaction_pre_exec(self, tx: Transaction):
         """
