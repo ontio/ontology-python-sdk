@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
 
 
 class ErrorCode:
     @staticmethod
-    def get_error(code: int, msg: str) -> json:
+    def get_error(code: int, msg: str) -> dict:
         data = dict()
         data['error'] = code
         data['desc'] = msg
@@ -55,7 +54,7 @@ class ErrorCode:
     target_hashes_err = get_error.__func__(54002, "targetHashes error")
 
     @staticmethod
-    def constructed_root_hash_err(msg: str) -> json:
+    def constructed_root_hash_err(msg: str) -> dict:
         return ErrorCode.get_error(54003, "Other Error, " + msg)
 
     assert_failed_hash_full_tree = get_error.__func__(54004, "assert failed in hash full tree")
@@ -89,7 +88,7 @@ class ErrorCode:
     expire_err = get_error.__func__(58017, "OntIdTx Error, expire is wrong")
 
     @staticmethod
-    def get_status_err(msg: str) -> json:
+    def get_status_err(msg: str) -> dict:
         return ErrorCode.get_error(58017, "GetStatus Error," + msg)
 
     # OntAsset Error
@@ -113,12 +112,12 @@ class ErrorCode:
     connect_url_err = get_error.__func__(58402, "Interfaces Error, connect error:")
 
     @staticmethod
-    def connect_err(msg: str) -> json:
+    def connect_err(msg: str) -> dict:
         return ErrorCode.get_error(58403, "connect error: " + msg)
 
     # WalletManager Error
     get_account_by_address_err = get_error.__func__(58501, "WalletManager Error, getAccountByAddress err")
 
     @staticmethod
-    def other_error(msg: str) -> json:
+    def other_error(msg: str) -> dict:
         return ErrorCode.get_error(59000, "Other Error, " + msg)
