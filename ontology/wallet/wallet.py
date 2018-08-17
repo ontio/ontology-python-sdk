@@ -50,14 +50,28 @@ class WalletData(object):
     def get_accounts(self):
         return self.accounts
 
-    # TODO: implement and test
-    def set_default_account(self, index: int):
-        if index > len(self.accounts):
+    def set_default_account_by_index(self, index: int):
+        if index >= len(self.accounts):
             raise SDKException(ErrorCode.param_error)
         for acct in self.accounts:
             acct.is_default = False
         self.accounts[index].is_default = True
-        self.default_account_address=self.accounts[index].address
+        self.default_account_address = self.accounts[index].address
+
+    def set_default_account_by_address(self, b58_address: str):
+        flag = True
+        index = -1
+        for acct in self.accounts:
+            index += 1
+            if acct.address == b58_address:
+                flag = False
+                break
+        if flag:
+            raise SDKException(ErrorCode.get_account_by_address_err)
+        for acct in self.accounts:
+            acct.is_default = False
+        self.accounts[index].is_default = True
+        self.default_account_address = b58_address
 
     def get_default_account_address(self):
         return self.default_account_address
