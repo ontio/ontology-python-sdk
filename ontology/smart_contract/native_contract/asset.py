@@ -4,11 +4,13 @@
 from time import time
 
 from ontology.utils import util
-from ontology.vm.build_vm import build_native_invoke_code
-from ontology.core.transaction import Transaction
-from ontology.common.address import Address
 from ontology.common.define import *
+from ontology.common.address import Address
 from ontology.account.account import Account
+from ontology.common.error_code import ErrorCode
+from ontology.core.transaction import Transaction
+from ontology.exception.exception import SDKException
+from ontology.vm.build_vm import build_native_invoke_code
 
 
 class Asset(object):
@@ -102,7 +104,7 @@ class Asset(object):
     def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int):
         tx = Asset.new_withdraw_ong_transaction(claimer.get_address_base58(), recv_addr, amount,
-                                               payer.get_address_base58(), gas_limit, gas_price)
+                                                payer.get_address_base58(), gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, payer)
         tx = self.__sdk.add_sign_transaction(tx, claimer)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
@@ -144,9 +146,9 @@ class Asset(object):
     def send_transfer_from(self, asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,
                            payer: Account, gas_limit: int, gas_price: int):
         if sender is None or payer is None:
-            raise ValueError("parameters should not be null")
+            raise SDKException(ErrorCode.param_err('parameters should not be null'))
         if amount <= 0 or gas_price < 0 or gas_limit < 0:
-            raise ValueError("amount or gasprice or gaslimit should not be less than 0")
+            raise SDKException(ErrorCode.param_error)
         tx = Asset.new_transfer_from(asset, sender.get_address_base58(), from_addr, recv_addr, amount,
                                      payer.get_address_base58(), gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, sender)
