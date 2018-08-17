@@ -90,7 +90,7 @@ class TestRpcClient(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
-        multi_address_balance = sdk.rpc.get_balance(multi_addr.to_base58())
+        multi_address_balance = sdk.rpc.get_balance(multi_addr.b58encode())
         try:
             multi_address_balance['ont']
         except KeyError:

@@ -43,7 +43,7 @@ class NeoVm(object):
                                 email: str, desp: str, payer: str, gas_limit: int, gas_price: int):
         unix_time_now = int(time())
         deploy_tx = DeployTransaction()
-        deploy_tx.payer = Address.decodeBase58(payer).to_array()
+        deploy_tx.payer = Address.b58decode(payer).to_array()
         deploy_tx.attributes = bytearray()
         deploy_tx.nonce = unix_time_now
         deploy_tx.code = bytearray.fromhex(code_str)

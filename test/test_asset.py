@@ -44,7 +44,7 @@ class TestAsset(unittest.TestCase):
         gas_limit = 20000
         gas_price = 500
         gas = 20000 *500
-        tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address().to_base58(),
+        tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address().b58encode(),
                                                               acc2.get_address_base58(), 1, acc2.get_address_base58(),
                                                               gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acc)
@@ -78,12 +78,12 @@ class TestAsset(unittest.TestCase):
 
     def test_query_balance(self):
         a = Asset(sdk)
-        res = a.query_balance("ont", acc.get_address().to_base58())
+        res = a.query_balance("ont", acc.get_address().b58encode())
         self.assertTrue(isinstance(res, int))
 
     def test_query_allowance(self):
         a = Asset(sdk)
-        res = a.query_allowance("ont", acc.get_address().to_base58(), acc2.get_address().to_base58())
+        res = a.query_allowance("ont", acc.get_address().b58encode(), acc2.get_address().b58encode())
         self.assertEqual(res, '01')
 
     def test_query_name(self):

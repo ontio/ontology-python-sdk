@@ -19,7 +19,7 @@ class OntId(object):
         args = {"ontid": ont_id.encode(), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
                            invoke_code, bytearray(),
                            [], bytearray())
 
@@ -34,7 +34,7 @@ class OntId(object):
         args["pubkey"] = pubkey
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addAttributes", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
                            invoke_code, bytearray(),
                            [], bytearray())
 
@@ -44,7 +44,7 @@ class OntId(object):
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
                            invoke_code, bytearray(),
                            [], bytearray())
 
@@ -54,7 +54,7 @@ class OntId(object):
         args = {"ontid": ont_id.encode(), "pubkey": new_pubkey, "pubkey_or_recovery": pubkey_or_recovery}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addKey", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
                            invoke_code, bytearray(),
                            [], bytearray())
 
@@ -64,17 +64,17 @@ class OntId(object):
         args = {"ontid": ont_id.encode(), "pubkey": remove_pubkey, "pubkey_or_recovery": pubkey_or_recovery}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeKey", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
                            invoke_code, bytearray(),
                            [], bytearray())
 
     def new_add_rcovery_transaction(self, ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,
                                     gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode(), "recovery": Address.decodeBase58(recovery).to_array(), "pubkey": pubkey}
+        args = {"ontid": ont_id.encode(), "recovery": Address.b58decode(recovery).to_array(), "pubkey": pubkey}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addRecovery", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
                            invoke_code, bytearray(),
                            [], bytearray())
 
@@ -147,6 +147,6 @@ class OntId(object):
         d2["Attributes"] = attribute_list
         if len(recovery_bytes) != 0:
             addr = Address(recovery_bytes)
-            d2["Recovery"] = addr.to_base58()
+            d2["Recovery"] = addr.b58encode()
         d2["OntId"] = ont_id
         return d2

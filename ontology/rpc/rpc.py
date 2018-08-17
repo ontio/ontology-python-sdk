@@ -203,7 +203,7 @@ class RpcClient(object):
         """
 
         contract_address = get_asset_address("ont")
-        b58_contract_address = Address(contract_address).to_base58()
+        b58_contract_address = Address(contract_address).b58encode()
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_ALLOWANCE, ["ong", b58_contract_address, base58_address])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         allowance = json.loads(r.content.decode())["result"]

@@ -49,7 +49,7 @@ class Account(object):
         return self.__address  # __address is a class not a string or bytes
 
     def get_address_base58(self):
-        return self.__address.to_base58()
+        return self.__address.b58encode()
 
     def get_address_hex(self):
         return self.__address.to_reverse_hex_str()
@@ -69,7 +69,7 @@ class Account(object):
         iv = derivedkey[0:12]
         derivedhalf2 = derivedkey[32:64]
         mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__private_key,
-                                                                  self.__address.to_base58().encode(),
+                                                                  self.__address.b58encode().encode(),
                                                                   derivedhalf2,
                                                                   iv)
         encrypted_key = b2a_hex(cipher_text) + b2a_hex(mac_tag)
@@ -92,7 +92,7 @@ class Account(object):
         pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address.encode(), mac_tag, derivedhalf2, iv)
         pri_key = b2a_hex(pri_key).decode('ascii')
         acct = Account(pri_key, scheme)
-        if acct.get_address().to_base58() != address:
+        if acct.get_address().b58encode() != address:
             raise RuntimeError
         return pri_key
 

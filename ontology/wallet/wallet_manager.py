@@ -191,7 +191,7 @@ class WalletManager(object):
     def create_account_info(self, label: str, pwd: str, salt: str, private_key: str):
         acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
-        info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).to_base58()
+        info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).b58encode()
         info.public_key = acct.serialize_public_key().hex()
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()

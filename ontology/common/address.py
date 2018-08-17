@@ -37,7 +37,7 @@ class Address(object):
     def address_from_vm_code(code: str):
         return Address(Address.to_script_hash(bytearray.fromhex(code)))
 
-    def to_base58(self):
+    def b58encode(self):
         sb = Address.__COIN_VERSION + self.ZERO
         c256 = Digest.hash256(sb)[0:4]
         outb = sb + bytearray(c256)
@@ -58,8 +58,8 @@ class Address(object):
         return temp.hex()
 
     @staticmethod
-    def decodeBase58(addr):
-        data = base58.b58decode(addr)
+    def b58decode(address: str):
+        data = base58.b58decode(address)
         if len(data) != 25:
             raise TypeError
         if data[0] != int.from_bytes(Address.__COIN_VERSION, "little"):
