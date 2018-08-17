@@ -14,7 +14,9 @@ from ontology.account.account import Account
 from ontology.utils.util import is_file_exist
 from ontology.wallet.wallet import WalletData
 from ontology.wallet.account import AccountData
+from ontology.common.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
+from ontology.exception.exception import SDKException
 from ontology.wallet.identity import Identity, did_ont
 from ontology.wallet.identity_info import IdentityInfo
 from ontology.crypto.signature_scheme import SignatureScheme
@@ -46,18 +48,17 @@ class WalletManager(object):
 
             identities = []
             for index in range(len(r.identities)):
-                control = [Control(id=r.identities[index].controls[0].id,
-                                   algorithm=r.identities[index].controls[0].algorithm,
-                                   param=r.identities[index].controls[0].parameters,
-                                   key=r.identities[index].controls[0].key,
-                                   address=r.identities[index].controls[0].address,
-                                   salt=r.identities[index].controls[0].salt,
-                                   enc_alg=r.identities[index].controls[0].enc_alg,
-                                   hash_value=r.identities[index].controls[0].hash,
-                                   public_key=r.identities[index].controls[0].publicKey)]
-                temp = Identity(r.identities[index].ont_id, r.identities[index].label, r.identities[index].lock,
-                                control)
-                identities.append(temp)
+                r_identities = r.identities()[index]
+                control = [Control(id=r_identities.controls[0].id,
+                                   algorithm=r_identities.controls[0].algorithm,
+                                   param=r_identities.controls[0].parameters,
+                                   key=r_identities.controls[0].key,
+                                   address=r_identities.controls[0].address,
+                                   salt=r_identities.controls[0].salt,
+                                   enc_alg=r_identities.controls[0].enc_alg,
+                                   hash_value=r_identities.controls[0].hash,
+                                   public_key=r_identities.controls[0].publicKey)]
+                identities.append(Identity(r_identities.ont_id, r_identities.label, r_identities.lock, control))
 
             accounts = []
             for index in range(len(r.accounts)):
@@ -223,3 +224,16 @@ class WalletManager(object):
                 private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
                 return Account(private_key, self.scheme)
         return None
+
+    def get_default_identity(self) -> Identity:
+        for identity in self.wallet_in_mem.identities:
+            if identity.is_default:
+                return identity
+        raise SDKException(ErrorCode.param_error)
+
+    def get_default_account(self) -> AccountData:
+        for acct in self.wallet_in_mem.accounts:
+            if acct.is_default:
+                return acct
+        raise SDKException(ErrorCode.get_default_account_err)
+
