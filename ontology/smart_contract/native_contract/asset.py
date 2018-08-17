@@ -55,7 +55,7 @@ class Asset(object):
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
-    def unboundong(self, addr: str):
+    def unbound_ong(self, addr: str):
         return self.__sdk.rpc.get_allowance(addr)
 
     def query_name(self, asset: str):
