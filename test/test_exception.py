@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import unittest
+
 from ontology.common.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.exception.exception import SDKRuntimeException
-
-import unittest
 
 
 class TestSDKException(unittest.TestCase):
