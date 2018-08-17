@@ -104,6 +104,7 @@ class WalletData(object):
             if self.identities[index].ont_id == ont_id:
                 del self.identities[index]
                 break
+        raise SDKException(ErrorCode.param_error)
 
     def get_identity_by_ont_id(self, ont_id: str):
         for identity in self.identities:
