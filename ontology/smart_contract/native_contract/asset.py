@@ -31,17 +31,17 @@ class Asset(object):
         state = [{"from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(to_addr).to_array(),
                   "amount": amount}]
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
-        unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        unix_time_now = int(time())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
                            invoke_code, bytearray(), [], bytearray())
 
     def query_balance(self, asset: str, addr: str):
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "balanceOf",
                                                Address.decodeBase58(addr).to_array())
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
-        tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return int(res, 16)
 
@@ -49,9 +49,9 @@ class Asset(object):
         contract_address = util.get_asset_address(asset)
         args = {"from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(to_addr).to_array()}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "allowance", args)
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
-        tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
@@ -61,27 +61,27 @@ class Asset(object):
     def query_name(self, asset: str):
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "name", bytearray())
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
-        tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return bytes.fromhex(res).decode()
 
     def query_symbol(self, asset: str):
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "symbol", bytearray())
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
-        tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return bytes.fromhex(res).decode()
 
     def query_decimals(self, asset: str) -> str:
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "decimals", bytearray())
-        unix_timenow = int(time())
+        unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_array()
-        tx = Transaction(0, 0xd1, unix_timenow, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
         decimal = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return decimal
 
@@ -94,8 +94,8 @@ class Asset(object):
                 "to": Address.decodeBase58(recv_addr).to_array(),
                 "value": amount}
         invoke_code = build_native_invoke_code(ong_contract_address, bytes([0]), "transferFrom", args)
-        unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer_addr).to_array(),
+        unix_time_now = int(time())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer_addr).to_array(),
                            invoke_code, bytearray(), [], bytearray())
 
     def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
@@ -113,8 +113,8 @@ class Asset(object):
         args = {"from": Address.decodeBase58(send_addr).to_array(), "to": Address.decodeBase58(recv_addr).to_array(),
                 "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
-        unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        unix_time_now = int(time())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
                            invoke_code, bytearray(), [], bytearray())
 
     def send_approve(self, asset, sender: Account, recv_addr: str, amount: int, payer: Account,
@@ -134,8 +134,8 @@ class Asset(object):
                 "from": Address.decodeBase58(from_addr).to_array(), "to": Address.decodeBase58(recv_addr).to_array(),
                 "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transferFrom", args)
-        unix_timenow = int(time())
-        return Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
+        unix_time_now = int(time())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.decodeBase58(payer).to_array(),
                            invoke_code, bytearray(), [], bytearray())
 
     def send_transfer_from(self, asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,

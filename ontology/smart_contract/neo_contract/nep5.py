@@ -35,8 +35,8 @@ class Nep5(object):
         func = abi_info.get_function("init")
         if pre_exec:
             params = BuildParams.serialize_abi_function(func)
-            unix_timenow = int(time())
-            tx = Transaction(0, 0xd1, unix_timenow, gas_price, gas_limit, bytearray(),
+            unix_time_now = int(time())
+            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytearray(),
                              params, bytearray(), [], bytearray())
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
