@@ -153,10 +153,6 @@ class Asset(object):
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
         flag = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        # original:
-        # return tx.hash256().hex() if flag else None
-        # now:
-        # TODO: TEST
         if flag:
             return tx.hash256(is_hex=True)
         else:
