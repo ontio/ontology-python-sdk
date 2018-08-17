@@ -76,23 +76,26 @@ The wallet function includes three parts, digit account, digit identity, and mne
 
 ### Digit account
 
- |      | Main   Function                                                                                 |
- | :--- | :---------------------------------------------------------------------------------------------- |
- | 1    | import_account(self, label: str, encrypted_pri_key: str, pwd: str, base58_addr: str, salt: str) |
- | 2    | create_account(self, label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool)      |
- | 3    | create_random_account(self, label: str, pwd: str)                                               |
- | 4    | create_account_from_prikey(self, label: str, pwd: str, private_key: bytes)                      |
- | 5    | get_account(self, address: str, pwd: str)                                                       |
- | 6    | get_accounts()                                                                                  |
+ |      | Main   Function                                                                           |
+ | :--- | :---------------------------------------------------------------------------------------- |
+ | 1    | import_account(label: str, encrypted_pri_key: str, pwd: str, base58_addr: str, salt: str) |
+ | 2    | create_account(label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool)      |
+ | 3    | create_random_account(label: str, pwd: str)                                               |
+ | 4    | create_account_from_prikey(label: str, pwd: str, private_key: bytes)                      |
+ | 5    | get_account(address: str, pwd: str)                                                       |
+ | 6    | get_accounts()                                                                            |
+ | 7    | set_default_account_by_address(b58_address: str)                                          |
+ | 8    | set_default_account_by_index(index: int)                                                  |
+ | 9    | get_default_account_address()                                                             |
 
 ### Digit identity
 
- |      | Main   Function                                                                              |
- | :--- | :------------------------------------------------------------------------------------------- |
- | 1    | import_identity(self, label: str, encrypted_pri_key: str, pwd: str, salt: str, address: str) |
- | 2    | create_identity(self, label: str, pwd: str, salt: str, private_key: bytes)                   |
- | 3    | create_identity_from_pri_key(self, label: str, pwd: str, private_key: bytes)                  |
- | 4    | create_random_identity(self, label: str, pwd: str)                                           |
+ |      | Main   Function                                                                        |
+ | :--- | :------------------------------------------------------------------------------------- |
+ | 1    | import_identity(label: str, encrypted_pri_key: str, pwd: str, salt: str, address: str) |
+ | 2    | create_identity(label: str, pwd: str, salt: str, private_key: bytes)                   |
+ | 3    | create_identity_from_pri_key(label: str, pwd: str, private_key: bytes)                 |
+ | 4    | create_random_identity(label: str, pwd: str)                                           |
 
 ## Asset function list
 
@@ -101,32 +104,32 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
 ### Native digit asset
 
 
- |      | Main   Function                                                                                                                                   |
- | :--- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
- | 1    | new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str, gas_limit: int, gas_price: int)                       |
- | 2    | query_balance(self, asset: str, addr: str)                                                                                                        |
- | 3    | query_allowance(self, asset: str, from_addr: str, to_addr: str)                                                                                   |
- | 4    | query_name(self, asset: str)                                                                                                                      |
- | 5    | query_symbol(self, asset: str)                                                                                                                    |
- | 6    | query_decimals(self, asset: str)                                                                                                                  |
- | 7    | send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                |
- | 8    | send_approve(self, asset: str, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                      |
- | 9    | send_transfer_from(self, asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,payer: Account, gas_limit: int, gas_price: int) |
+ |      | Main   Function                                                                                                                             |
+ | :--- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+ | 1    | new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str, gas_limit: int, gas_price: int)                 |
+ | 2    | query_balance(asset: str, addr: str)                                                                                                        |
+ | 3    | query_allowance(asset: str, from_addr: str, to_addr: str)                                                                                   |
+ | 4    | query_name(asset: str)                                                                                                                      |
+ | 5    | query_symbol(asset: str)                                                                                                                    |
+ | 6    | query_decimals(asset: str)                                                                                                                  |
+ | 7    | send_withdraw_ong_transaction(claimer: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                |
+ | 8    | send_approve(asset: str, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                      |
+ | 9    | send_transfer_from(asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,payer: Account, gas_limit: int, gas_price: int) |
  
 ## Identity function list 
 
 ### ONT ID
 
- |      | Main   Function                                                                                                                               |
- | :--- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
- | 1    | new_registry_ontid_transaction(self, ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int)                                    |
- | 2    | new_add_attribute_transaction(self, ont_id: str, pubkey: str, attris: list, payer: str, gas_limit: int, gas_price: int)                       |
- | 3    | new_remove_attribute_transaction(self, ont_id: str, pubkey: bytearray, path: str, payer: str, gas_limit: int, gas_price: int)                 |
- | 4    | new_add_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,gas_limit: int, gas_price: int)        |
- | 5    | new_remove_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str, gas_limit: int, gas_price: int) |
- | 6    | new_add_recovery_transaction(self, ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,gas_price: int)                      |
- | 7    | new_get_ddo_transaction(self, ont_id: str)                                                                                                    |
- | 8    | parse_ddo(self, ont_id: str, ddo: str)                                                                                                        |
+ |      | Main   Function                                                                                                                         |
+ | :--- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+ | 1    | new_registry_ontid_transaction(ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int)                                    |
+ | 2    | new_add_attribute_transaction(ont_id: str, pubkey: str, attris: list, payer: str, gas_limit: int, gas_price: int)                       |
+ | 3    | new_remove_attribute_transaction(ont_id: str, pubkey: bytearray, path: str, payer: str, gas_limit: int, gas_price: int)                 |
+ | 4    | new_add_pubkey_transaction(ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,gas_limit: int, gas_price: int)        |
+ | 5    | new_remove_pubkey_transaction(ont_id: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str, gas_limit: int, gas_price: int) |
+ | 6    | new_add_recovery_transaction(ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,gas_price: int)                      |
+ | 7    | new_get_ddo_transaction(ont_id: str)                                                                                                    |
+ | 8    | parse_ddo(ont_id: str, ddo: str)                                                                                                        |
 
 ## Contribution
 
