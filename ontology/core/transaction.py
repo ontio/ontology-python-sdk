@@ -68,10 +68,8 @@ class Transaction(object):
         writer = BinaryWriter(ms)
         writer.write_bytes(self.serialize_unsigned())
         writer.write_var_int(len(self.sigs))
-
         for sig in self.sigs:
             writer.write_bytes(sig.serialize())
-
         ms.flush()
         temp = ms.ToArray()
         StreamManager.ReleaseStream(ms)

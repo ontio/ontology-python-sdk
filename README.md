@@ -109,7 +109,7 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
  | :--- | :------------------------------------------------------------------------------------------------------------------------------------------ |
  | 1    | new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str, gas_limit: int, gas_price: int)                 |
  | 2    | query_balance(asset: str, addr: str)                                                                                                        |
- | 3    | query_allowance(asset: str, from_addr: str, to_addr: str)                                                                                   |
+ | 3    | query_allowance(asset: str, b58_from_address: str, b58_to_address: str)                                                                                   |
  | 4    | query_name(asset: str)                                                                                                                      |
  | 5    | query_symbol(asset: str)                                                                                                                    |
  | 6    | query_decimals(asset: str)                                                                                                                  |
