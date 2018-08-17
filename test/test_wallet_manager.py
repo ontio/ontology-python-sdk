@@ -66,6 +66,21 @@ class TestWalletManager(unittest.TestCase):
             self.assertEqual(default_address, acct.address)
         os.remove(path)
 
+    def test_get_default_account(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        password = "password"
+        size = 3
+        for i in range(size):
+            wm.create_account('', password)
+        accounts = wm.get_wallet().get_accounts()
+        self.assertEqual(len(accounts), size)
+        for acct in accounts:
+            wm.get_wallet().set_default_account_by_address(acct.address)
+            default_account = wm.get_wallet().get_default_account()
+            self.assertEqual(default_account.address, acct.address)
+
     def test_import_identity(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
