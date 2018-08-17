@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 import unittest
 
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.exception.exception import SDKException
-from ontology.common.error_code import ErrorCode
 from ontology.account.account import Account
 from ontology.utils import util
 
@@ -30,6 +30,45 @@ class TestWalletManager(unittest.TestCase):
             wm.create_account('', password)
         accounts = wm.get_wallet().get_accounts()
         self.assertEqual(len(accounts), size)
+        os.remove(path)
+
+    def test_set_default_identity_by_index(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        size = 3
+        for i in range(size):
+            private_key = util.get_random_str(64)
+            wm.create_identity_from_pri_key("ide", str(i), private_key)
+        identities = wm.get_wallet().get_identities()
+        self.assertEqual(len(identities), size)
+        self.assertRaises(SDKException, wm.get_wallet().set_default_identity_by_index, size)
+        for index in range(size):
+            wm.get_wallet().set_default_identity_by_index(index)
+            default_identity = wm.get_default_identity()
+            self.assertEqual(identities[index], default_identity)
+        os.remove(path)
+
+    def test_set_default_identity_by_ont_id(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        password = "password"
+        size = 3
+        for i in range(size):
+            private_key = util.get_random_str(64)
+            wm.create_identity_from_pri_key("ide", str(i), private_key)
+        identities = wm.get_wallet().get_identities()
+        self.assertEqual(len(identities), size)
+        self.assertRaises(SDKException, wm.get_wallet().set_default_identity_by_ont_id, '')
+        ont_id_list = list()
+        for identity in wm.get_wallet().identities:
+            ont_id_list.append(identity.ont_id)
+        for index in range(size * 5):
+            rand_ont_id = random.choice(ont_id_list)
+            wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
+            default_identity = wm.get_default_identity()
+            self.assertEqual(rand_ont_id, default_identity.ont_id)
         os.remove(path)
 
     def test_set_default_account_by_index(self):
@@ -78,7 +117,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(len(accounts), size)
         for acct in accounts:
             wm.get_wallet().set_default_account_by_address(acct.address)
-            default_account = wm.get_wallet().get_default_account()
+            default_account = wm.get_default_account()
             self.assertEqual(default_account.address, acct.address)
 
     def test_import_identity(self):
