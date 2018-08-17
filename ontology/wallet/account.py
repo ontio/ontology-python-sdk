@@ -5,14 +5,14 @@
 class AccountData(object):
     def __init__(self, address: str = '', enc_alg: str = "aes-256-gcm", key: str = "", algorithm="ECDSA", salt="",
                  param: dict = None, label: str = "", public_key: str = "", sign_scheme: str = "SHA256withECDSA",
-                 is_default: bool = True, lock: bool = False, hash_value: str = "sha256"):
+                 isDefault: bool = True, lock: bool = False, hash_value: str = "sha256"):
         if param is None:
             param = {"curve": "P-256"}
         self.address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.hash = hash_value
-        self.is_default = is_default
+        self.isDefault = isDefault
         self.key = key
         self.label = label
         self.lock = lock

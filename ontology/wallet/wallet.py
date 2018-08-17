@@ -54,8 +54,8 @@ class WalletData(object):
         if index >= len(self.accounts):
             raise SDKException(ErrorCode.param_error)
         for acct in self.accounts:
-            acct.is_default = False
-        self.accounts[index].is_default = True
+            acct.isDefault = False
+        self.accounts[index].isDefault = True
         self.default_account_address = self.accounts[index].address
 
     def set_default_account_by_address(self, b58_address: str):
@@ -69,8 +69,8 @@ class WalletData(object):
         if flag:
             raise SDKException(ErrorCode.get_account_by_address_err)
         for i in range(len(self.accounts)):
-            self.accounts[i].is_default = False
-        self.accounts[index].is_default = True
+            self.accounts[i].isDefault = False
+        self.accounts[index].isDefault = True
         self.default_account_address = b58_address
 
     def get_default_account_address(self):
@@ -122,17 +122,17 @@ class WalletData(object):
         if index >= identities_len:
             raise SDKException(ErrorCode.param_error)
         for i in range(identities_len):
-            self.identities[i].is_default = False
+            self.identities[i].isDefault = False
             if i == index:
-                self.identities[index].is_default = True
+                self.identities[index].isDefault = True
 
     def set_default_identity_by_ont_id(self, ont_id: str):
         flag = True
         for identity in self.identities:
             if identity.ont_id == ont_id:
-                identity.is_default = True
+                identity.isDefault = True
                 flag = False
             else:
-                identity.is_default = False
+                identity.isDefault = False
         if flag:
             raise SDKException(ErrorCode.param_error)
