@@ -1,12 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 class AccountData(object):
-    def __init__(self, address='', enc_alg="aes-256-gcm", key="", algorithm="ECDSA", salt="", param={"curve": "P-256"},
-                 label="", public_key="", sign_scheme="SHA256withECDSA", is_default=True, lock=False,
-                 hash_value="sha256"):
+    def __init__(self, address: str = '', enc_alg: str = "aes-256-gcm", key: str = "", algorithm="ECDSA", salt="",
+                 param: dict = None, label: str = "", public_key: str = "", sign_scheme: str = "SHA256withECDSA",
+                 is_default: bool = True, lock: bool = False, hash_value: str = "sha256"):
+        if param is None:
+            param = {"curve": "P-256"}
         self.address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.hash = hash_value
-        self.isDefault = is_default
+        self.is_default = is_default
         self.key = key
         self.label = label
         self.lock = lock

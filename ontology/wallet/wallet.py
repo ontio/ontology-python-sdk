@@ -1,6 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from ontology.crypto.scrypt import Scrypt
-from ontology.wallet.account import AccountData
 from ontology.wallet.identity import Identity
+from ontology.wallet.account import AccountData
+from ontology.common.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 
 
 class WalletData(object):
@@ -45,6 +50,38 @@ class WalletData(object):
     def get_accounts(self):
         return self.accounts
 
+    def set_default_account_by_index(self, index: int):
+        if index >= len(self.accounts):
+            raise SDKException(ErrorCode.param_error)
+        for acct in self.accounts:
+            acct.is_default = False
+        self.accounts[index].is_default = True
+        self.default_account_address = self.accounts[index].address
+
+    def set_default_account_by_address(self, b58_address: str):
+        flag = True
+        index = -1
+        for acct in self.accounts:
+            index += 1
+            if acct.address == b58_address:
+                flag = False
+                break
+        if flag:
+            raise SDKException(ErrorCode.get_account_by_address_err)
+        for acct in self.accounts:
+            acct.is_default = False
+        self.accounts[index].is_default = True
+        self.default_account_address = b58_address
+
+    def get_default_account_address(self):
+        return self.default_account_address
+
+    def get_default_account(self):
+        for acct in self.accounts:
+            if acct.is_default:
+                return acct
+        raise SDKException(ErrorCode.get_default_account_err)
+
     def get_account_by_index(self, index: int):
         if index < 0 or index >= len(self.accounts):
             return ValueError("wrong account index")
@@ -68,7 +105,7 @@ class WalletData(object):
                 del self.identities[index]
                 break
 
-    def get_identity_by_ontid(self, ont_id: str):
+    def get_identity_by_ont_id(self, ont_id: str):
         for identity in self.identities:
             if identity.ont_id == ont_id:
                 return identity
