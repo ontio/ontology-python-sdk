@@ -34,7 +34,7 @@ class WalletManager(object):
         self.wallet_path = wallet_path
         if is_file_exist(wallet_path) is False:
             # create a new wallet file
-            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+            self.wallet_in_mem.createTime = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
             self.save()
         # wallet file exists now
         self.wallet_file = self.load()
@@ -96,8 +96,11 @@ class WalletManager(object):
             return res
 
     def save(self):
-        with open(self.wallet_path, "w") as f:
-            json.dump(self.wallet_in_mem, f, default=lambda obj: obj.__dict__, indent=4)
+        fstr = json.dumps(self.wallet_in_mem, default=lambda obj: obj.__dict__, sort_keys=True, indent=4)
+        temp = fstr.replace("enc_", "enc-")
+        f = open(self.wallet_path, "w")
+        f.write(temp)
+        f.close()
 
     def get_wallet(self):
         return self.wallet_in_mem
