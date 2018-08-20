@@ -13,10 +13,17 @@ from ontology.utils import util
 
 
 class TestWalletManager(unittest.TestCase):
+    def test_aa(self):
+        wm = WalletManager()
+        wm.open_wallet("test9.json")
+        wm.create_account("ss", "111111")
+        wm.create_identity("ss", "111111")
+        wm.write_wallet()
+
     def test_open_wallet(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
-        wm.open_wallet(path)
+        wm.open_wallet("./test.json")
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         os.remove(path)
 
@@ -63,12 +70,12 @@ class TestWalletManager(unittest.TestCase):
         self.assertRaises(SDKException, wm.get_wallet().set_default_identity_by_ont_id, '')
         ont_id_list = list()
         for identity in wm.get_wallet().identities:
-            ont_id_list.append(identity.ont_id)
+            ont_id_list.append(identity.ontid)
         for index in range(size * 5):
             rand_ont_id = random.choice(ont_id_list)
             wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
             default_identity = wm.get_default_identity()
-            self.assertEqual(rand_ont_id, default_identity.ont_id)
+            self.assertEqual(rand_ont_id, default_identity.ontid)
         os.remove(path)
 
     def test_set_default_account_by_index(self):

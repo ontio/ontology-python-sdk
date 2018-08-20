@@ -19,9 +19,9 @@ class WalletData(object):
             accounts = list()
         self.name = name
         self.version = version
-        self.create_time = create_time
-        self.default_ont_id = default_id
-        self.default_account_address = default_address
+        self.createTime = create_time
+        self.defaultOntid = default_id
+        self.defaultAccountAddress = default_address
         self.scrypt = scrypt
         self.identities = identities
         self.accounts = accounts
@@ -30,9 +30,9 @@ class WalletData(object):
         wallet = WalletData()
         wallet.name = self.name
         wallet.version = self.version
-        wallet.create_time = self.create_time
-        wallet.default_ont_id = self.default_ont_id
-        wallet.default_account_address = self.default_account_address
+        wallet.createTime = self.createTime
+        wallet.defaultOntid = self.defaultOntid
+        wallet.defaultAccountAddress = self.defaultAccountAddress
         wallet.scrypt = self.scrypt
         wallet.accounts = self.accounts
         wallet.set_identities(self.identities)
@@ -56,7 +56,7 @@ class WalletData(object):
         for acct in self.accounts:
             acct.isDefault = False
         self.accounts[index].isDefault = True
-        self.default_account_address = self.accounts[index].address
+        self.defaultAccountAddress = self.accounts[index].address
 
     def set_default_account_by_address(self, b58_address: str):
         flag = True
@@ -71,10 +71,10 @@ class WalletData(object):
         for i in range(len(self.accounts)):
             self.accounts[i].isDefault = False
         self.accounts[index].isDefault = True
-        self.default_account_address = b58_address
+        self.defaultAccountAddress = b58_address
 
     def get_default_account_address(self):
-        return self.default_account_address
+        return self.defaultAccountAddress
 
     def get_account_by_index(self, index: int):
         if index < 0 or index >= len(self.accounts):
@@ -100,20 +100,20 @@ class WalletData(object):
 
     def add_identity(self, id: Identity):
         for identity in self.identities:
-            if identity.ont_id == id.ont_id:
+            if identity.ontid == id.ontid:
                 raise Exception("ont id is equal.")
         self.identities.append(id)
 
     def remove_identity(self, ont_id):
         for index in range(len(self.identities)):
-            if self.identities[index].ont_id == ont_id:
+            if self.identities[index].ontid == ont_id:
                 del self.identities[index]
                 return
         raise SDKException(ErrorCode.param_error)
 
     def get_identity_by_ont_id(self, ont_id: str) -> Identity or None:
         for identity in self.identities:
-            if identity.ont_id == ont_id:
+            if identity.ontid == ont_id:
                 return identity
         return None
 
@@ -129,7 +129,7 @@ class WalletData(object):
     def set_default_identity_by_ont_id(self, ont_id: str):
         flag = True
         for identity in self.identities:
-            if identity.ont_id == ont_id:
+            if identity.ontid == ont_id:
                 identity.isDefault = True
                 flag = False
             else:

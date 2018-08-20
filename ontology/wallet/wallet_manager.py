@@ -34,7 +34,7 @@ class WalletManager(object):
         self.wallet_path = wallet_path
         if is_file_exist(wallet_path) is False:
             # create a new wallet file
-            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+            self.wallet_in_mem.createTime = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
             self.save()
         # wallet file exists now
         self.wallet_file = self.load()
@@ -43,41 +43,64 @@ class WalletManager(object):
 
     def load(self):
         with open(self.wallet_path, "r") as f:
-            r = json.load(f, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-            scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dk_len)
-
+            fstr = f.read()
+            r = json.loads(fstr.replace("enc-", "enc_"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+            # r = json.load(f, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+            scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dkLen)
             identities = []
-            for index in range(len(r.identities)):
-                r_identities = r.identities[index]
-                control = [Control(id=r_identities.controls[0].id,
-                                   algorithm=r_identities.controls[0].algorithm,
-                                   param=r_identities.controls[0].parameters,
-                                   key=r_identities.controls[0].key,
-                                   address=r_identities.controls[0].address,
-                                   salt=r_identities.controls[0].salt,
-                                   enc_alg=r_identities.controls[0].enc_alg,
-                                   hash_value=r_identities.controls[0].hash,
-                                   public_key=r_identities.controls[0].publicKey)]
-                identities.append(Identity(r_identities.ont_id, r_identities.label, r_identities.lock, control))
+            try:
+                for index in range(len(r.identities)):
+                    r_identities = r.identities[index]
+                    control = [Control(id=r_identities.controls[0].id,
+                                       algorithm=r_identities.controls[0].algorithm,
+                                       param=r_identities.controls[0].parameters,
+                                       key=r_identities.controls[0].key,
+                                       address=r_identities.controls[0].address,
+                                       salt=r_identities.controls[0].salt,
+                                       enc_alg=r_identities.controls[0].enc_alg,
+                                       hash_value=r_identities.controls[0].hash,
+                                       public_key=r_identities.controls[0].publicKey)]
+                    identities.append(Identity(r_identities.ont_id, r_identities.label, r_identities.lock, control))
+            except AttributeError as e:
+                pass
 
             accounts = []
-            for index in range(len(r.accounts)):
-                temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
-                                   sign_scheme=r.accounts[index].signatureScheme,
-                                   isDefault=r.accounts[index].isDefault,
-                                   lock=r.accounts[index].lock, address=r.accounts[index].address,
-                                   algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
-                                   key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
-                                   salt=r.accounts[index].salt, hash_value=r.accounts[index].hash)
-                accounts.append(temp)
-
-            res = WalletData(r.name, r.version, r.create_time, r.default_ont_id, r.default_account_address, scrypt,
+            try:
+                for index in range(len(r.accounts)):
+                    temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
+                                       sign_scheme=r.accounts[index].signatureScheme,
+                                       isDefault=r.accounts[index].isDefault,
+                                       lock=r.accounts[index].lock, address=r.accounts[index].address,
+                                       algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
+                                       key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
+                                       salt=r.accounts[index].salt)
+                    accounts.append(temp)
+            except AttributeError as e:
+                pass
+            default_ont_id = ""
+            try:
+                default_ont_id = r.defaultOntid
+            except AttributeError as e:
+                pass
+            default_account_address = ""
+            try:
+                default_account_address = r.defaultAccountAddress
+            except AttributeError as e:
+                pass
+            try:
+                create_time = r.createTime
+            except Exception as e:
+                pass
+            res = WalletData(r.name, r.version, create_time, default_ont_id, default_account_address, scrypt,
                              identities, accounts)
             return res
 
     def save(self):
-        with open(self.wallet_path, "w") as f:
-            json.dump(self.wallet_in_mem, f, default=lambda obj: obj.__dict__, indent=4)
+        fstr = json.dumps(self.wallet_in_mem, default=lambda obj: obj.__dict__, sort_keys=True, indent=4)
+        temp = fstr.replace("enc_", "enc-")
+        f = open(self.wallet_path, "w")
+        f.write(temp)
+        f.close()
 
     def get_wallet(self):
         return self.wallet_in_mem
@@ -107,7 +130,7 @@ class WalletManager(object):
         return None
 
     def create_identity(self, label: str, pwd: str):
-        priv_key = get_random_bytes(32)
+        priv_key = get_random_str(64)
         salt = get_random_str(16)
         return self.__create_identity(label, pwd, salt, priv_key)
 
@@ -134,6 +157,7 @@ class WalletManager(object):
         return self.wallet_file.get_account_by_address(account.get_address_base58())
 
     def __create_account(self, label: str, pwd: str, salt: str, priv_key: str, account_flag: bool):
+        print(priv_key)
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
@@ -157,7 +181,7 @@ class WalletManager(object):
 
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.isDefault = True
-                self.wallet_in_mem.default_account_address = acct.address
+                self.wallet_in_mem.defaultAccountAddress = acct.address
             acct.label = label
             acct.salt = base64.b64encode(salt.encode()).decode('ascii')
             acct.publicKey = account.serialize_public_key().hex()
@@ -167,11 +191,11 @@ class WalletManager(object):
                 if self.wallet_in_mem.identities[index].ont_id == did_ont + acct.address:
                     raise ValueError("wallet identity exists")
             idt = Identity()
-            idt.ont_id = did_ont + acct.address
+            idt.ontid = did_ont + acct.address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
                 idt.isDefault = True
-                self.wallet_in_mem.default_ont_id = idt.ont_id
+                self.wallet_in_mem.defaultOntid = idt.ontid
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.address,
                           public_key=account.serialize_public_key().hex())
