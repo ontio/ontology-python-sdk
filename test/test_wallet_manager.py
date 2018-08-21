@@ -60,7 +60,6 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = "password"
         size = 3
         for i in range(size):
             private_key = util.get_random_str(64)
