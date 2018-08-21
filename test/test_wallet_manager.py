@@ -23,7 +23,7 @@ class TestWalletManager(unittest.TestCase):
     def test_open_wallet(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
-        wm.open_wallet("./test.json")
+        wm.open_wallet(path)
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         os.remove(path)
 
