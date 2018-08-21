@@ -126,6 +126,7 @@ class TestWalletManager(unittest.TestCase):
             wm.get_wallet().set_default_account_by_address(acct.address)
             default_account = wm.get_default_account()
             self.assertEqual(default_account.address, acct.address)
+        os.remove(path)
 
     def test_import_identity(self):
         wm = WalletManager()
