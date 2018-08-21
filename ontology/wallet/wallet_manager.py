@@ -157,7 +157,6 @@ class WalletManager(object):
         return self.wallet_file.get_account_by_address(account.get_address_base58())
 
     def __create_account(self, label: str, pwd: str, salt: str, priv_key: str, account_flag: bool):
-        print(priv_key)
         account = Account(priv_key, self.scheme)
         # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
