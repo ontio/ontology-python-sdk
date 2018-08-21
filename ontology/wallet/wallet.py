@@ -40,7 +40,7 @@ class WalletData(object):
                                         is_default=dict_identity['isDefault'])
                 except KeyError:
                     raise SDKException(ErrorCode.param_error)
-                identities[index] = identity
+                self.identities.append(identity)
             else:
                 self.identities = identities
                 break
@@ -57,7 +57,7 @@ class WalletData(object):
                                        is_default=dict_account['isDefault'], lock=dict_account['lock'])
                 except KeyError:
                     raise SDKException(ErrorCode.param_error)
-                accounts[index] = acct
+                self.accounts.append(acct)
             else:
                 self.accounts = accounts
             break
