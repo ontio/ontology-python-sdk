@@ -96,11 +96,10 @@ class WalletManager(object):
             return res
 
     def save(self):
-        fstr = json.dumps(self.wallet_in_mem, default=lambda obj: obj.__dict__, sort_keys=True, indent=4)
-        temp = fstr.replace("enc_", "enc-")
-        f = open(self.wallet_path, "w")
-        f.write(temp)
-        f.close()
+        with open(self.wallet_path, "w") as f:
+            fstr = json.dumps(self.wallet_in_mem, default=lambda obj: obj.__dict__, sort_keys=True, indent=4)
+            temp = fstr.replace("enc_", "enc-")
+            f.write(temp)
 
     def get_wallet(self):
         return self.wallet_in_mem
@@ -125,7 +124,7 @@ class WalletManager(object):
                                                       Scrypt().get_n(), self.scheme)
         info = self.__create_identity(label, pwd, salt, pri_key)
         for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ont_id == info.ont_id:
+            if self.wallet_in_mem.identities[index].ontid == info.ontid:
                 return self.wallet_in_mem.identities[index]
         return None
 
@@ -259,4 +258,3 @@ class WalletManager(object):
             if acct.isDefault:
                 return acct
         raise SDKException(ErrorCode.get_default_account_err)
-
