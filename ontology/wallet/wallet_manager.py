@@ -12,6 +12,7 @@ from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.util import is_file_exist
 from ontology.wallet.wallet import WalletData
+from ontology.utils.util import get_random_str
 from ontology.wallet.account import AccountData
 from ontology.common.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
@@ -19,7 +20,6 @@ from ontology.exception.exception import SDKException
 from ontology.wallet.identity import Identity, did_ont
 from ontology.wallet.identity_info import IdentityInfo
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.utils.util import get_random_str
 
 
 class WalletManager(object):
@@ -129,11 +129,11 @@ class WalletManager(object):
                     raise ValueError("wallet account exists")
 
             if len(self.wallet_in_mem.accounts) == 0:
-                acct.isDefault = True
+                acct.is_default = True
                 self.wallet_in_mem.default_account_address = acct.address
             acct.label = label
             acct.salt = base64.b64encode(salt.encode()).decode('ascii')
-            acct.publicKey = account.serialize_public_key().hex()
+            acct.public_key = account.serialize_public_key().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
             for index in range(len(self.wallet_in_mem.identities)):
@@ -143,7 +143,7 @@ class WalletManager(object):
             idt.ont_id = did_ont + acct.address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
-                idt.isDefault = True
+                idt.is_default = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.address,
@@ -200,12 +200,12 @@ class WalletManager(object):
 
     def get_default_identity(self) -> Identity:
         for identity in self.wallet_in_mem.identities:
-            if identity.isDefault:
+            if identity.is_default:
                 return identity
         raise SDKException(ErrorCode.param_error)
 
     def get_default_account(self) -> AccountData:
         for acct in self.wallet_in_mem.accounts:
-            if acct.isDefault:
+            if acct.is_default:
                 return acct
         raise SDKException(ErrorCode.get_default_account_err)

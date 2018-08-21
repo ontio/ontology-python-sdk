@@ -11,28 +11,28 @@ class AccountData(object):
         self.address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
-        self.isDefault = is_default
+        self.is_default = is_default
         self.key = key
         self.label = label
         self.lock = lock
         self.parameters = param
         self.salt = salt
-        self.publicKey = public_key
-        self.signatureScheme = sign_scheme
+        self.public_key = public_key
+        self.signature_scheme = sign_scheme
 
     def __iter__(self):
         data = dict()
         data['address'] = self.address
         data['algorithm'] = self.algorithm
         data['enc-alg'] = self.enc_alg
-        data['isDefault'] = self.isDefault
+        data['isDefault'] = self.is_default
         data['key'] = self.key
         data['label'] = self.label
         data['lock'] = self.lock
         data['parameters'] = self.parameters
         data['salt'] = self.salt
-        data['publicKey'] = self.publicKey
-        data['signatureScheme'] = self.signatureScheme
+        data['publicKey'] = self.public_key
+        data['signatureScheme'] = self.signature_scheme
         for key, value in data.items():
             yield (key, value)
 
@@ -43,7 +43,7 @@ class AccountData(object):
         self.address = address
 
     def set_public_key(self, public_key):
-        self.publicKey = public_key
+        self.public_key = public_key
 
     def set_key(self, key):
         self.key = key
@@ -55,7 +55,7 @@ class AccountData(object):
         return self.address
 
     def get_public_key(self):
-        return self.publicKey
+        return self.public_key
 
     def get_key(self):
         return self.key

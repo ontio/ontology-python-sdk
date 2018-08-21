@@ -12,7 +12,7 @@ class Identity(object):
         self.label = label
         self.lock = lock
         self.controls = controls
-        self.isDefault = is_default
+        self.is_default = is_default
 
     def __iter__(self):
         data = dict()
@@ -20,6 +20,6 @@ class Identity(object):
         data['label'] = self.label
         data['lock'] = self.lock
         data['controls'] = self.controls
-        data['isDefault'] = self.isDefault
+        data['isDefault'] = self.is_default
         for key, value in data.items():
             yield (key, value)

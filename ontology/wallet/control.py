@@ -15,7 +15,7 @@ class Control(object):
         self.key = key
         self.parameters = param
         self.salt = salt
-        self.publicKey = public_key
+        self.public_key = public_key
 
     def __iter__(self):
         data = dict()
@@ -27,7 +27,7 @@ class Control(object):
         data['key'] = self.key
         data['parameters'] = self.parameters
         data['salt'] = self.salt
-        data['publicKey'] = self.publicKey
+        data['publicKey'] = self.public_key
         for key, value in data.items():
             yield (key, value)
 
