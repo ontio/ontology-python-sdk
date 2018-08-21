@@ -32,6 +32,53 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    def test_wallet_data(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'wallet.dat')
+        wm.open_wallet(path)
+        self.assertTrue(isinstance(wm, WalletManager))
+        self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
+
+        size = 32
+        dict_wallet_in_mem = wm.wallet_in_mem.__dict__
+        self.assertEqual(dict_wallet_in_mem['name'], 'MyWallet')
+        self.assertEqual(dict_wallet_in_mem['version'], '1.1')
+        self.assertEqual(len(dict_wallet_in_mem['accounts']), size)
+
+        dict_accounts = wm.wallet_in_mem.accounts[0].__dict__
+        self.assertEqual(dict_accounts['address'], 'Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT')
+        self.assertEqual(dict_accounts['algorithm'], 'ECDSA')
+        self.assertEqual(dict_accounts['enc_alg'], 'aes-256-gcm')
+        self.assertEqual(dict_accounts['is_default'], True)
+        self.assertEqual(dict_accounts['key'], 'O6/Ens58XsV4+TqbKIZ5qgM76pTC0KsufNYV3VKDmHtG6VFvDZUblVWSAM6XBwKk')
+        self.assertEqual(dict_accounts['label'], '')
+        self.assertEqual(dict_accounts['lock'], False)
+        self.assertEqual(dict_accounts['parameters']['curve'], 'P-256')
+        self.assertEqual(dict_accounts['salt'], 'OkX96EG0OaCNUFD3hdc50Q==')
+        self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
+
+        dict_accounts = wm.wallet_in_mem.accounts[15].__dict__
+        self.assertEqual(dict_accounts['address'], 'AZy1ApV47jLM4m4a2MSx92hzwpDcMtn96z')
+        self.assertEqual(dict_accounts['enc_alg'], 'aes-256-gcm')
+        self.assertEqual(dict_accounts['is_default'], False)
+        self.assertEqual(dict_accounts['key'], 'ATqEeReytF1Ma16KJKWlvnSmHeH7p8l5Es3Ngp/62l/1Pp4K4fhAaXOfahZ6g8Wd')
+        self.assertEqual(dict_accounts['label'], '4c0638c9')
+        self.assertEqual(dict_accounts['lock'], False)
+        self.assertEqual(dict_accounts['parameters']['curve'], 'P-256')
+        self.assertEqual(dict_accounts['salt'], 'tJHCzvar3e5dPkIyXswx5w==')
+        self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
+
+        dict_accounts = wm.wallet_in_mem.accounts[31].__dict__
+        self.assertEqual(dict_accounts['address'], 'Aa4diLddFtHg5fU7Nf71q3KwBmu21D4ZyM')
+        self.assertEqual(dict_accounts['enc_alg'], 'aes-256-gcm')
+        self.assertEqual(dict_accounts['is_default'], False)
+        self.assertEqual(dict_accounts['key'], 'epWSyUe9VUI81WIe30ul2B/ahjHhc1sXRg7IJjV2jk39BPzkrMbIa5p9UOOrAZ3e')
+        self.assertEqual(dict_accounts['label'], '')
+        self.assertEqual(dict_accounts['lock'], False)
+        self.assertEqual(dict_accounts['parameters']['curve'], 'P-256')
+        self.assertEqual(dict_accounts['salt'], 'DqS/T2FmSmYabWdW1vQYzQ==')
+        self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
+
     def test_get_accounts(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
