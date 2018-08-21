@@ -1,6 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 class Control(object):
-    def __init__(self, id="", address='', enc_alg="aes-256-gcm", key="", algorithm='ECDSA', salt="",
-                 param={"curve": "P-256"}, hash_value="sha256", public_key=""):
+    def __init__(self, id="", address='', enc_alg="aes-256-gcm", key="", algorithm='ECDSA', salt="", param=None,
+                 hash_value="sha256", public_key=""):
+        if param is None:
+            param = {"curve": "P-256"}
         self.address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
