@@ -20,7 +20,7 @@ from ontology.exception.exception import SDKException
 from ontology.wallet.identity import Identity, did_ont
 from ontology.wallet.identity_info import IdentityInfo
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.utils.util import get_random_bytes, get_random_str
+from ontology.utils.util import get_random_str
 
 
 class WalletManager(object):
