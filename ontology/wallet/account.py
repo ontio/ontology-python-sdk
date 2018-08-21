@@ -20,6 +20,22 @@ class AccountData(object):
         self.publicKey = public_key
         self.signatureScheme = sign_scheme
 
+    def __iter__(self):
+        data = dict()
+        data['address'] = self.address
+        data['algorithm'] = self.algorithm
+        data['enc-alg'] = self.enc_alg
+        data['isDefault'] = self.isDefault
+        data['key'] = self.key
+        data['label'] = self.label
+        data['lock'] = self.lock
+        data['parameters'] = self.parameters
+        data['salt'] = self.salt
+        data['publicKey'] = self.publicKey
+        data['signatureScheme'] = self.signatureScheme
+        for key, value in data.items():
+            yield (key, value)
+
     def set_label(self, label: str):
         self.label = label
 

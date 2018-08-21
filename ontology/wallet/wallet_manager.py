@@ -34,7 +34,7 @@ class WalletManager(object):
         self.wallet_path = wallet_path
         if is_file_exist(wallet_path) is False:
             # create a new wallet file
-            self.wallet_in_mem.createTime = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
             self.save()
         # wallet file exists now
         self.wallet_file = self.load()
@@ -43,63 +43,15 @@ class WalletManager(object):
 
     def load(self):
         with open(self.wallet_path, "r") as f:
-            fstr = f.read()
-            r = json.loads(fstr.replace("enc-", "enc_"), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-            # r = json.load(f, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-            scrypt = Scrypt(r.scrypt.n, r.scrypt.r, r.scrypt.p, r.scrypt.dkLen)
-            identities = []
-            try:
-                for index in range(len(r.identities)):
-                    r_identities = r.identities[index]
-                    control = [Control(id=r_identities.controls[0].id,
-                                       algorithm=r_identities.controls[0].algorithm,
-                                       param=r_identities.controls[0].parameters,
-                                       key=r_identities.controls[0].key,
-                                       address=r_identities.controls[0].address,
-                                       salt=r_identities.controls[0].salt,
-                                       enc_alg=r_identities.controls[0].enc_alg,
-                                       hash_value=r_identities.controls[0].hash,
-                                       public_key=r_identities.controls[0].publicKey)]
-                    identities.append(Identity(r_identities.ont_id, r_identities.label, r_identities.lock, control))
-            except AttributeError as e:
-                pass
-
-            accounts = []
-            try:
-                for index in range(len(r.accounts)):
-                    temp = AccountData(label=r.accounts[index].label, public_key=r.accounts[index].publicKey,
-                                       sign_scheme=r.accounts[index].signatureScheme,
-                                       isDefault=r.accounts[index].isDefault,
-                                       lock=r.accounts[index].lock, address=r.accounts[index].address,
-                                       algorithm=r.accounts[index].algorithm, param=r.accounts[index].parameters,
-                                       key=r.accounts[index].key, enc_alg=r.accounts[index].enc_alg,
-                                       salt=r.accounts[index].salt)
-                    accounts.append(temp)
-            except AttributeError as e:
-                pass
-            default_ont_id = ""
-            try:
-                default_ont_id = r.defaultOntid
-            except AttributeError as e:
-                pass
-            default_account_address = ""
-            try:
-                default_account_address = r.defaultAccountAddress
-            except AttributeError as e:
-                pass
-            try:
-                create_time = r.createTime
-            except Exception as e:
-                pass
-            res = WalletData(r.name, r.version, create_time, default_ont_id, default_account_address, scrypt,
-                             identities, accounts)
-            return res
+            obj = json.load(f)
+            wallet = WalletData(name=obj['name'], version=obj['version'], create_time=obj['createTime'],
+                                default_id=obj['defaultOntid'], default_address=obj['defaultAccountAddress'],
+                                scrypt=obj['scrypt'], identities=obj['identities'], accounts=obj['accounts'])
+        return wallet
 
     def save(self):
         with open(self.wallet_path, "w") as f:
-            fstr = json.dumps(self.wallet_in_mem, default=lambda obj: obj.__dict__, sort_keys=True, indent=4)
-            temp = fstr.replace("enc_", "enc-")
-            f.write(temp)
+            json.dump(self.wallet_in_mem, f, default=lambda obj: dict(obj), indent=4)
 
     def get_wallet(self):
         return self.wallet_in_mem
@@ -124,7 +76,7 @@ class WalletManager(object):
                                                       Scrypt().get_n(), self.scheme)
         info = self.__create_identity(label, pwd, salt, pri_key)
         for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ontid == info.ontid:
+            if self.wallet_in_mem.identities[index].ont_id == info.ont_id:
                 return self.wallet_in_mem.identities[index]
         return None
 
@@ -179,7 +131,7 @@ class WalletManager(object):
 
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.isDefault = True
-                self.wallet_in_mem.defaultAccountAddress = acct.address
+                self.wallet_in_mem.default_account_address = acct.address
             acct.label = label
             acct.salt = base64.b64encode(salt.encode()).decode('ascii')
             acct.publicKey = account.serialize_public_key().hex()
@@ -189,11 +141,11 @@ class WalletManager(object):
                 if self.wallet_in_mem.identities[index].ont_id == did_ont + acct.address:
                     raise ValueError("wallet identity exists")
             idt = Identity()
-            idt.ontid = did_ont + acct.address
+            idt.ont_id = did_ont + acct.address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
                 idt.isDefault = True
-                self.wallet_in_mem.defaultOntid = idt.ontid
+                self.wallet_in_mem.default_ont_id = idt.ont_id
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.address,
                           public_key=account.serialize_public_key().hex())
