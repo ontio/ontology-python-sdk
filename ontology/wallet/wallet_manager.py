@@ -5,7 +5,6 @@ import json
 import uuid
 import base64
 from datetime import datetime
-from collections import namedtuple
 
 from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.control import Control
