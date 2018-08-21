@@ -13,12 +13,16 @@ from ontology.utils import util
 
 
 class TestWalletManager(unittest.TestCase):
-    def test_aa(self):
+    def test_create_write(self):
         wm = WalletManager()
-        wm.open_wallet("test9.json")
-        wm.create_account("ss", "111111")
-        wm.create_identity("ss", "111111")
+        path = os.path.join(os.getcwd(), 'test.json')
+        wm.open_wallet(path)
+        password = 'password'
+        label = 'label'
+        wm.create_account(label, password)
+        wm.create_identity(label, password)
         wm.write_wallet()
+        os.remove(path)
 
     def test_open_wallet(self):
         wm = WalletManager()
