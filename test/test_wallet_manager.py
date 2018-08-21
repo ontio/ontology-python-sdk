@@ -73,12 +73,12 @@ class TestWalletManager(unittest.TestCase):
         self.assertRaises(SDKException, wm.get_wallet().set_default_identity_by_ont_id, '')
         ont_id_list = list()
         for identity in wm.get_wallet().identities:
-            ont_id_list.append(identity.ontid)
+            ont_id_list.append(identity.ont_id)
         for index in range(size * 5):
             rand_ont_id = random.choice(ont_id_list)
             wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
             default_identity = wm.get_default_identity()
-            self.assertEqual(rand_ont_id, default_identity.ontid)
+            self.assertEqual(rand_ont_id, default_identity.ont_id)
         os.remove(path)
 
     def test_set_default_account_by_index(self):

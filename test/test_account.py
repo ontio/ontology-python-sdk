@@ -25,7 +25,6 @@ class TestAccount(unittest.TestCase):
     def test_export_gcm_encrypted_private_key(self):
         private_key = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         account = Account(private_key, SignatureScheme.SHA256withECDSA)
-
         salt = util.get_random_str(16)
         enc_private_key = account.export_gcm_encrypted_private_key("1", salt, 16384)
         import_private_key = account.get_gcm_decoded_private_key(enc_private_key, "1", account.get_address_base58(),

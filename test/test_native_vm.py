@@ -34,13 +34,13 @@ class TestNativeVm(unittest.TestCase):
 
     def test_native_vm_withdraw_ong(self):
         sdk.set_rpc(rpc_address)
-        tx = sdk.native_vm().asset().new_withdraw_ong_transaction(acct4.get_address_base58(),
-                                                                  acct4.get_address_base58(), 1352419563015000,
-                                                                  acct4.get_address_base58(), 20000, 500)
-        sdk.sign_transaction(tx, acct4)
-        hex_address = acct4.get_address_hex()
+        payer = acct2
+        b58_payer = payer.get_address_base58()
+        tx = sdk.native_vm().asset().new_withdraw_ong_transaction(b58_payer, b58_payer, 1352419563015000, b58_payer,
+                                                                  20000, 500)
+        sdk.sign_transaction(tx, payer)
         res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(res[11:51], hex_address)
+        self.assertEqual(len(res), 64)
 
 
 if __name__ == '__main__':
