@@ -19,6 +19,15 @@ class Scrypt:
         self.p = p
         self.dkLen = dk_len
 
+    def __iter__(self):
+        data = dict()
+        data['n'] = self.n
+        data['r'] = self.r
+        data['p'] = self.p
+        data['dkLen'] = self.dkLen
+        for key, value in data.items():
+            yield (key, value)
+
     def set_dk_len(self, dk_len: int):
         self.dkLen = dk_len
 

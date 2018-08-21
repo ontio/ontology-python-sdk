@@ -1,4 +1,8 @@
-class AccountInfo():
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+class AccountInfo:
     def __init__(self):
         self.address_base58 = ""
         self.public_key = ""
