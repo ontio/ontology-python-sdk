@@ -130,7 +130,7 @@ class WalletData(object):
 
     def get_account_by_index(self, index: int):
         if index < 0 or index >= len(self.accounts):
-            return ValueError("wrong account index")
+            raise SDKException(ErrorCode.get_account_by_index_err)
         return self.accounts[index]
 
     def get_account_by_address(self, address: str):
