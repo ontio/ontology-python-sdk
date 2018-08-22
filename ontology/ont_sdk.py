@@ -61,7 +61,8 @@ class OntologySdk(object):
         self.defaultSignScheme = scheme
         self.wallet_manager.set_signature_scheme(scheme)
 
-    def sign_transaction(self, tx: Transaction, signer: Account):
+    @staticmethod
+    def sign_transaction(tx: Transaction, signer: Account):
         tx_hash = tx.hash256()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
         sig = [Sig([signer.get_public_key()], 1, [sig_data])]
