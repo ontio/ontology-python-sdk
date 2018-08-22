@@ -3,16 +3,18 @@
 
 import threading
 
-from ontology.account.account import Account
 from ontology.core.sig import Sig
-from ontology.core.transaction import Transaction
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.smart_contract.native_vm import NativeVm
-from ontology.smart_contract.neo_vm import NeoVm
-from ontology.wallet.wallet_manager import WalletManager
 from ontology.rpc.rpc import RpcClient
 from ontology.common import define as Common
+from ontology.account.account import Account
+from ontology.smart_contract.neo_vm import NeoVm
 from ontology.core.program import ProgramBuilder
+from ontology.common.error_code import ErrorCode
+from ontology.core.transaction import Transaction
+from ontology.exception.exception import SDKException
+from ontology.smart_contract.native_vm import NativeVm
+from ontology.wallet.wallet_manager import WalletManager
+from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class OntologySdk(object):
@@ -70,7 +72,7 @@ class OntologySdk(object):
         if tx.sigs is None or len(tx.sigs) == 0:
             tx.sigs = []
         elif len(tx.sigs) >= Common.TX_MAX_SIG_SIZE:
-            raise Exception("the number of transaction signatures should not be over 16")
+            raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         tx_hash = tx.hash256()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
         sig = Sig([signer.serialize_public_key()], 1, [sig_data])
@@ -84,14 +86,14 @@ class OntologySdk(object):
         if tx.sigs is None or len(tx.sigs) == 0:
             tx.sigs = []
         elif len(tx.sigs) >= Common.TX_MAX_SIG_SIZE:
-            raise Exception("the number of transaction signatures should not be over 16")
+            raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         else:
             for i in range(len(tx.sigs)):
                 if tx.sigs[i].public_keys == pubkeys:
                     if len(tx.sigs[i].sig_data) + 1 > len(pubkeys):
-                        raise Exception("too more sigData")
+                        raise SDKException(ErrorCode.param_err('too more sigData'))
                     if tx.sigs[i].M != m:
-                        raise Exception("M error")
+                        raise SDKException(ErrorCode.param_err('M error'))
                     tx.sigs[i].sig_data.append(sig_data)
                     return tx
         sig = Sig(pubkeys, m, [sig_data])

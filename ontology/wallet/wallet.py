@@ -153,7 +153,7 @@ class WalletData(object):
     def add_identity(self, id: Identity):
         for identity in self.identities:
             if identity.ont_id == id.ont_id:
-                raise Exception("ont id is equal.")
+                raise SDKException(ErrorCode.other_error('add identity failed, OntId conflict.'))
         self.identities.append(id)
 
     def remove_identity(self, ont_id):

@@ -5,9 +5,11 @@ import json
 import requests
 
 from ontology.rpc.define import *
-from ontology.core.transaction import Transaction
 from ontology.common.address import Address
+from ontology.common.error_code import ErrorCode
 from ontology.utils.util import get_asset_address
+from ontology.core.transaction import Transaction
+from ontology.exception.exception import SDKException
 
 
 class HttpRequest(object):
@@ -336,7 +338,7 @@ class RpcClient(object):
         data = json.loads(r.content.decode())
         res = data["result"]
         if data["error"] != 0:
-            raise Exception(res)
+            raise SDKException(ErrorCode.other_error(res))
         return res
 
     def send_raw_transaction_pre_exec(self, tx: Transaction):

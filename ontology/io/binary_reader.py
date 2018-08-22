@@ -14,6 +14,9 @@ import struct
 import binascii
 import importlib
 
+from ontology.common.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+
 
 class BinaryReader(object):
     """docstring for BinaryReader"""
@@ -55,7 +58,7 @@ class BinaryReader(object):
                 return ord(self.stream.read(1))
             return self.stream.read(1)
         except Exception as e:
-            raise e
+            raise SDKException(ErrorCode.param_err(e.args[0]))
 
     def read_bytes(self, length):
         """
@@ -273,7 +276,7 @@ class BinaryReader(object):
             value = fb
 
         if value > max:
-            raise Exception("Invalid format")
+            raise SDKException(ErrorCode.param_err('Invalid format'))
 
         return int(value)
 
@@ -346,7 +349,7 @@ class BinaryReader(object):
                 item.Deserialize(self)
                 items.append(item)
         except Exception as e:
-            raise RuntimeError("Couldn't deserialize %s " % e)
+            raise SDKException(ErrorCode.param_err("Couldn't deserialize %s" % e))
 
         return items
 

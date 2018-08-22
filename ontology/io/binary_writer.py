@@ -12,6 +12,9 @@ Usage:
 import struct
 import binascii
 
+from ontology.common.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+
 
 def swap32(i):
     """
@@ -287,8 +290,8 @@ class BinaryWriter(object):
             little_endian (bool): specify the endianness. (Default) Little endian.
 
         Raises:
-            TypeError: if `value` is not of type int.
-            Exception: if `value` is < 0.
+            SDKException: if `value` is not of type int.
+            SDKException: if `value` is < 0.
 
         Returns:
             int: the number of bytes written.
@@ -299,10 +302,10 @@ class BinaryWriter(object):
             endian = ">"
 
         if not isinstance(value, int):
-            raise TypeError('%s not int type.' % value)
+            raise SDKException(ErrorCode.param_err('%s not int type.' % value))
 
         if value < 0:
-            raise Exception('%d too small.' % value)
+            raise SDKException(ErrorCode.param_err('%d too small.' % value))
 
         elif value < 0xfd:
             return self.write_byte(value)
@@ -364,7 +367,7 @@ class BinaryWriter(object):
         towrite = value.encode('utf-8')
         slen = len(towrite)
         if slen > length:
-            raise Exception("string longer than fixed length: %s " % length)
+            raise SDKException(ErrorCode.param_err('string longer than fixed length: %s' % length))
         self.write_bytes(towrite)
         diff = length - slen
 
