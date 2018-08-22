@@ -96,7 +96,7 @@ class WalletData(object):
     def remove_account(self, address: str):
         account = self.get_account_by_address(address)
         if account is None:
-            raise Exception("no the account")
+            raise SDKException(ErrorCode.get_account_by_address_err)
         return self.accounts.remove(account)
 
     def get_accounts(self):
