@@ -20,7 +20,7 @@ acc = Account(private_key, SignatureScheme.SHA256withECDSA)
 acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 pubkeys = [acc.get_public_key(), acc2.get_public_key(), acc3.get_public_key()]
-multi_addr = Address.address_from_multi_pubKeys(2, pubkeys)
+multi_addr = Address.address_from_multi_pub_keys(2, pubkeys)
 
 
 class TestRpcClient(unittest.TestCase):
