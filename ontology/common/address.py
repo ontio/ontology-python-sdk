@@ -31,8 +31,8 @@ class Address(object):
         return addr
 
     @staticmethod
-    def address_from_multi_pubKeys(m: int, pubkeys: []):
-        return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pubkeys)))
+    def address_from_multi_pub_keys(m: int, pub_keys: []):
+        return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pub_keys)))
 
     # this function is for contract
     @staticmethod
@@ -60,7 +60,7 @@ class Address(object):
         return temp.hex()
 
     @staticmethod
-    def b58decode(address: str, is_bytes=True):
+    def b58decode(address: str) -> bytes:
         data = base58.b58decode(address)
         if len(data) != 25:
             raise SDKException(ErrorCode.param_error)
@@ -69,7 +69,8 @@ class Address(object):
         checksum = Digest.hash256(data[0:21])
         if data[21:25] != checksum[0:4]:
             raise SDKException(ErrorCode.param_error)
-        if is_bytes:
-            return data[1:21]
-        else:
-            return Address(data[1:21])
+        return data[1:21]
+
+    @staticmethod
+    def decode_base58(address: str):
+        return Address(Address.b58decode(address))
