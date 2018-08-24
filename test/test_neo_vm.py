@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import json
-from binascii import a2b_hex
 from collections import namedtuple
 import unittest
 
-from ontology.account.account import Account
-from ontology.common.address import Address
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
+from ontology.common.address import Address
+from ontology.account.account import Account
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 
 rpc_address = 'http://polaris3.ont.io:20336'
@@ -131,11 +130,15 @@ class TestNeoVm(unittest.TestCase):
                   '"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],' \
                   '"returntype":"Any"},{"name":"Hello","parameters":[{"name":"msg","type":"String"}],' \
                   '"returntype":"Void"}],"events":[]} '
-        abi = json.loads(abi_str, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-        abi_info = AbiInfo(abi.hash, abi.entrypoint, abi.functions, abi.events)
-        func = abi_info.get_function("Hello")
-        func.set_params_value("value")
+        abi = json.loads(abi_str)
+        abi_info = AbiInfo(abi['hash'], abi['entrypoint'], abi['functions'], abi['events'])
+        func = abi_info.get_function("Main")
+        func.set_params_value(("Hello", "args"))
         contract_address = Address.address_from_vm_code(code).to_byte_array()
+        res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
+        self.assertEqual(res, '00')
+        func = abi_info.get_function("Hello")
+        func.set_params_value(("value",))
         res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
         self.assertEqual(res, '01')
 
