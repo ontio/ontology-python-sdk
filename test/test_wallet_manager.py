@@ -5,11 +5,11 @@ import os
 import random
 import unittest
 
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.wallet.wallet_manager import WalletManager
-from ontology.exception.exception import SDKException
-from ontology.account.account import Account
 from ontology.utils import util
+from ontology.account.account import Account
+from ontology.exception.exception import SDKException
+from ontology.wallet.wallet_manager import WalletManager
+from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class TestWalletManager(unittest.TestCase):
@@ -83,7 +83,7 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = "password"
+        password = 'password'
         size = 5
         for i in range(size):
             wm.create_account('', password)
@@ -136,7 +136,7 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = "password"
+        password = 'password'
         size = 3
         for i in range(size):
             wm.create_account('', password)
@@ -154,7 +154,7 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = "password"
+        password = 'password'
         size = 3
         for i in range(size):
             wm.create_account('', password)
@@ -172,7 +172,7 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = "password"
+        password = 'password'
         size = 3
         for i in range(size):
             wm.create_account('', password)
@@ -212,9 +212,12 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        wm.open_wallet("./test.json")
-        wm.import_account("label2", "Yl1e9ugbVADd8a2SbAQ56UfUvr3e9hD2eNXAM9xNjhnefB+YuNXDFvUrIRaYth+L", "1",
-                          "AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve", "pwLIUKAf2bAbTseH/WYrfQ==")
+        label = 'label'
+        encrypted_pri_key = 'Yl1e9ugbVADd8a2SbAQ56UfUvr3e9hD2eNXAM9xNjhnefB+YuNXDFvUrIRaYth+L'
+        password = '1'
+        b58_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b64_salt = 'pwLIUKAf2bAbTseH/WYrfQ=='
+        wm.import_account(label, encrypted_pri_key, password, b58_address, b64_salt)
         wm.save()
         os.remove(path)
 

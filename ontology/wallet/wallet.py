@@ -96,7 +96,7 @@ class WalletData(object):
     def remove_account(self, address: str):
         account = self.get_account_by_address(address)
         if account is None:
-            raise Exception("no the account")
+            raise SDKException(ErrorCode.get_account_by_address_err)
         return self.accounts.remove(account)
 
     def get_accounts(self):
@@ -130,7 +130,7 @@ class WalletData(object):
 
     def get_account_by_index(self, index: int):
         if index < 0 or index >= len(self.accounts):
-            return ValueError("wrong account index")
+            raise SDKException(ErrorCode.get_account_by_index_err)
         return self.accounts[index]
 
     def get_account_by_address(self, address: str):
@@ -153,7 +153,7 @@ class WalletData(object):
     def add_identity(self, id: Identity):
         for identity in self.identities:
             if identity.ont_id == id.ont_id:
-                raise Exception("ont id is equal.")
+                raise SDKException(ErrorCode.other_error('add identity failed, OntId conflict.'))
         self.identities.append(id)
 
     def remove_identity(self, ont_id):

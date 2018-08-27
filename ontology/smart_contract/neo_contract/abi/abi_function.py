@@ -8,13 +8,13 @@ class AbiFunction(object):
         self.return_type = return_type
         self.parameters = parameters
 
-    def set_params_value(self, *objs):
+    def set_params_value(self, objs):
         if len(objs) != len(self.parameters):
             raise Exception("parameter error")
         temp = self.parameters
         self.parameters = []
         for i in range(len(objs)):
-            self.parameters.append(Parameter(temp[i].name, temp[i].type))
+            self.parameters.append(Parameter(temp[i]['name'], temp[i]['type']))
             self.parameters[i].set_value(objs[i])
 
     def get_parameter(self, name):

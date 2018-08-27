@@ -23,7 +23,7 @@ class TestAddress(unittest.TestCase):
         b58_address = address.b58encode()
         zero = Address.b58decode(b58_address)
         self.assertEqual(rand_code, zero)
-        decode_address = Address.b58decode(b58_address, is_bytes=False)
+        decode_address = Address.decode_base58(b58_address)
         self.assertTrue(isinstance(decode_address, Address))
         self.assertEqual(rand_code, decode_address.to_array())
 

@@ -80,14 +80,13 @@ The wallet function includes three parts, digit account, digit identity, and mne
  | :--- | :---------------------------------------------------------------------------------------- |
  | 1    | import_account(label: str, encrypted_pri_key: str, pwd: str, base58_addr: str, salt: str) |
  | 2    | create_account(label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool)      |
- | 3    | create_random_account(label: str, pwd: str)                                               |
- | 4    | create_account_from_prikey(label: str, pwd: str, private_key: bytes)                      |
- | 5    | get_account(address: str, pwd: str)                                                       |
- | 6    | get_accounts()                                                                            |
- | 7    | get_default_account()                                                                     |
- | 8    | set_default_account_by_address(b58_address: str)                                          |
- | 9    | set_default_account_by_index(index: int)                                                  |
- | 10   | get_default_account_address()                                                             |
+ | 3    | create_account_from_prikey(label: str, pwd: str, private_key: bytes)                      |
+ | 4    | get_account(address: str, pwd: str)                                                       |
+ | 5    | get_accounts()                                                                            |
+ | 6    | get_default_account()                                                                     |
+ | 7    | set_default_account_by_address(b58_address: str)                                          |
+ | 8    | set_default_account_by_index(index: int)                                                  |
+ | 9   | get_default_account_address()                                                             |
 
 ### Digit identity
 
@@ -96,7 +95,6 @@ The wallet function includes three parts, digit account, digit identity, and mne
  | 1    | import_identity(label: str, encrypted_pri_key: str, pwd: str, salt: str, address: str) |
  | 2    | create_identity(label: str, pwd: str, salt: str, private_key: bytes)                   |
  | 3    | create_identity_from_pri_key(label: str, pwd: str, private_key: bytes)                 |
- | 4    | create_random_identity(label: str, pwd: str)                                           |
 
 ## Asset function list
 

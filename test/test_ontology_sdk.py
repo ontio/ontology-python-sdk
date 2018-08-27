@@ -25,7 +25,7 @@ acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 
 pub_keys = [acct1.get_public_key(), acct2.get_public_key(), acct3.get_public_key()]
-multi_address = Address.address_from_multi_pubKeys(2, pub_keys)
+multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 
 class TestOntologySdk(TestCase):

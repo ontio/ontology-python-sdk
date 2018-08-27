@@ -43,9 +43,27 @@ class WalletManager(object):
     def load(self):
         with open(self.wallet_path, "r") as f:
             obj = json.load(f)
-            wallet = WalletData(name=obj['name'], version=obj['version'], create_time=obj['createTime'],
-                                default_id=obj['defaultOntid'], default_address=obj['defaultAccountAddress'],
-                                scrypt=obj['scrypt'], identities=obj['identities'], accounts=obj['accounts'])
+            try:
+                create_time = obj['createTime']
+            except KeyError:
+                create_time = ''
+            try:
+                default_id = obj['defaultOntid']
+            except KeyError:
+                default_id = ''
+            try:
+                default_address = obj['defaultAccountAddress']
+            except KeyError:
+                default_address = ''
+            try:
+                identities = obj['identities']
+            except KeyError:
+                identities = list()
+            try:
+                wallet = WalletData(obj['name'], obj['version'], create_time, default_id, default_address,
+                                    obj['scrypt'], identities, obj['accounts'])
+            except KeyError as e:
+                raise SDKException(ErrorCode.param_err('wallet file format error: %s.' % e))
         return wallet
 
     def save(self):
@@ -162,7 +180,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def create_account_info(self, label: str, pwd: str, salt: str, private_key: str):
+    def create_account_info(self, label: str, pwd: str, salt: str, private_key: str) -> AccountInfo:
         acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).b58encode()
@@ -172,7 +190,7 @@ class WalletManager(object):
         info.salt = salt
         return info
 
-    def create_account_from_prikey(self, label: str, pwd: str, private_key: str):
+    def create_account_from_prikey(self, label: str, pwd: str, private_key: str) -> Account or None:
         salt = get_random_str(16)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
@@ -180,7 +198,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, address: str, pwd: str):
+    def get_account(self, address: str, pwd: str) -> Account or None:
         for index in range(len(self.wallet_in_mem.accounts)):
             if self.wallet_in_mem.accounts[index].address == address:
                 key = self.wallet_in_mem.accounts[index].key

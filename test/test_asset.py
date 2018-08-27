@@ -43,8 +43,8 @@ class TestAsset(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
         gas_limit = 20000
         gas_price = 500
-        gas = 20000 *500
-        tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address().b58encode(),
+        gas = 20000 * 500
+        tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address_base58(),
                                                               acc2.get_address_base58(), 1, acc2.get_address_base58(),
                                                               gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acc)

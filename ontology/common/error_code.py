@@ -118,6 +118,7 @@ class ErrorCode:
     # WalletManager Error
     get_account_by_address_err = get_error.__func__(58501, "WalletManager Error, get account by address error")
     get_default_account_err = get_error.__func__(58502, "WalletManager Error, get default account error")
+    get_account_by_index_err = get_error.__func__(58503, 'WalletManager Error, get account by index error')
 
     @staticmethod
     def other_error(msg: str) -> dict:
