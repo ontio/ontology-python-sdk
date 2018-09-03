@@ -48,7 +48,9 @@ class Asset(object):
         payer = Address(ZERO_ADDRESS).to_array()
         tx = Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(), [], bytearray())
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return int(res, 16)
+        r = bytearray.fromhex(res)
+        r.reverse()
+        return int(r.hex(), 16)
 
     def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> str:
         contract_address = util.get_asset_address(asset)
