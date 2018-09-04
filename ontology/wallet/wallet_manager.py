@@ -119,6 +119,13 @@ class WalletManager(object):
         return identity
 
     def create_account(self, label: str, pwd: str) -> AccountData:
+        """
+        This interface is used to create account by seeting password and label.
+
+        :param label: str
+        :param pwd: str
+        :return: AccountData
+        """
         pri_key = get_random_str(64)
         salt = get_random_str(16)
         account = self.__create_account(label, pwd, salt, pri_key, True)
@@ -170,9 +177,23 @@ class WalletManager(object):
             self.wallet_in_mem.identities.append(idt)
         return account
 
-    def import_account(self, label: str, encrypted_pri_key: str, pwd: str, base58_addr: str, base64_salt: str):
+    def import_account(self, label: str, encrypted_pri_key: str, pwd: str, base58_address: str,
+                       base64_salt: str) -> AccountData or None:
+        """
+        This interface is used to import account by providing account data.
+
+        :param label: str, wallet label
+        :param encrypted_pri_key: str, an encrypted private key in base64 encoding from
+        :param pwd: str, a password which is used to encrypt and decrypt the private key
+        :param base58_address: str, a base58 encode  wallet address value
+        :param base64_salt: str, a base64 encode salt value which is used in the encryption of private key
+        :return:
+            if succeed, return an data structure which contain the information of a wallet account
+            if failed, return a None object
+        """
         salt = base64.b64decode(base64_salt.encode('ascii')).decode('latin-1')
-        private_key = Account.get_gcm_decoded_private_key(encrypted_pri_key, pwd, base58_addr, salt, Scrypt().get_n(),
+        private_key = Account.get_gcm_decoded_private_key(encrypted_pri_key, pwd, base58_address, salt,
+                                                          Scrypt().get_n(),
                                                           self.scheme)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
@@ -190,7 +211,15 @@ class WalletManager(object):
         info.salt = salt
         return info
 
-    def create_account_from_prikey(self, label: str, pwd: str, private_key: str) -> Account or None:
+    def create_account_from_private_key(self, label: str, pwd: str, private_key: str) -> AccountData or None:
+        """
+        This interface is used to create account by providing an encrypted private key and it's decrypt password.
+
+        :param label: str
+        :param pwd: str
+        :param private_key: str
+        :return: AccountData or None
+        """
         salt = get_random_str(16)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
@@ -198,7 +227,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, address: str, pwd: str) -> Account or None:
+    def get_account(self, address: str, pwd: str) -> AccountData or None:
         for index in range(len(self.wallet_in_mem.accounts)):
             if self.wallet_in_mem.accounts[index].address == address:
                 key = self.wallet_in_mem.accounts[index].key

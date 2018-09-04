@@ -169,6 +169,6 @@ class Asset(object):
             tx = self.__sdk.add_sign_transaction(tx, payer)
         flag = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         if flag:
-            return tx.hash256(is_hex=True)
+            return tx.hash256_hex()
         else:
             return ''

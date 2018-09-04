@@ -80,7 +80,7 @@ The wallet function includes three parts, digit account, digit identity, and mne
  | :--- | :---------------------------------------------------------------------------------------- |
  | 1    | import_account(label: str, encrypted_pri_key: str, pwd: str, base58_addr: str, salt: str) |
  | 2    | create_account(label: str, pwd: str, salt: str, priv_key: bytes, account_flag: bool)      |
- | 3    | create_account_from_prikey(label: str, pwd: str, private_key: bytes)                      |
+ | 3    | create_account_from_private_key(label: str, pwd: str, private_key: bytes)                      |
  | 4    | get_account(address: str, pwd: str)                                                       |
  | 5    | get_accounts()                                                                            |
  | 6    | get_default_account()                                                                     |

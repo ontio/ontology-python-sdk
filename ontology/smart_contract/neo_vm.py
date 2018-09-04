@@ -2,9 +2,11 @@ from time import time
 from ontology.account.account import Account
 from ontology.common.address import Address
 from ontology.common.define import ZERO_ADDRESS
+from ontology.common.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
+from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
@@ -33,10 +35,12 @@ class NeoVm(object):
             params.append(0x67)
             for i in contract_address:
                 params.append(i)
+            if payer_acct is None:
+                raise SDKException(ErrorCode.param_err('payer account is None.'))
             tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_array(),
                              params, bytearray(), [], bytearray())
             self.__sdk.sign_transaction(tx, acct)
-            if payer_acct is not None and acct.get_address_base58() != payer_acct.get_address_base58():
+            if acct.get_address_base58() != payer_acct.get_address_base58():
                 self.__sdk.add_sign_transaction(tx, payer_acct)
             return self.__sdk.rpc.send_raw_transaction(tx)
 

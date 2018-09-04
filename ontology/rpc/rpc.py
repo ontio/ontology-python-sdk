@@ -22,12 +22,15 @@ class HttpRequest(object):
     @staticmethod
     def request(method, url, payload):
         header = {'Content-type': 'application/json'}
-        if method == "post":
-            res = requests.post(url, json=payload, headers=header, timeout=HttpRequest._timeout)
-            return res
-        elif method == "get":
-            res = requests.get(url, params=json.dumps(payload), timeout=HttpRequest._timeout)
-            return res
+        try:
+            if method == "post":
+                res = requests.post(url, json=payload, headers=header, timeout=HttpRequest._timeout)
+                return res
+            elif method == "get":
+                res = requests.get(url, params=json.dumps(payload), timeout=HttpRequest._timeout)
+                return res
+        except requests.exceptions.MissingSchema as e:
+            raise SDKException(ErrorCode.connect_err(e.args[0]))
 
 
 class RpcClient(object):
@@ -249,6 +252,8 @@ class RpcClient(object):
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         event = json.loads(r.content.decode())["result"]
+        if event is None:
+            raise SDKException(ErrorCode.other_error('get smart contract event failed, the result is null.'))
         return event
 
     def get_smart_contract_event_by_height(self, height: int) -> dict:
@@ -272,14 +277,9 @@ class RpcClient(object):
         """
         This interface is used to get the corresponding transaction information based on the specified hash value.
 
-        Args:
-         tx_hash (str):
-            a hexadecimal hash value.
-
-        Return:
-            the information of transaction in dictionary form.
+        :param tx_hash: str, a hexadecimal hash value.
+        :return: dict
         """
-
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         tx = json.loads(r.content.decode())["result"]
