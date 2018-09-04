@@ -52,6 +52,9 @@ class Account(object):
         return self.__address.b58encode()
 
     def get_address_hex(self):
+        return self.__address.to_hex_str()
+
+    def get_address_hex_reverse(self):
         return self.__address.to_reverse_hex_str()
 
     def get_public_key(self):
