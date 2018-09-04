@@ -45,7 +45,7 @@ class Transaction(object):
     def serialize_exclusive_data(self, writer):
         pass
 
-    def explorer_hash256(self) -> str:
+    def hash256_explorer(self) -> str:
         tx_serial = self.serialize_unsigned()
         tx_serial = a2b_hex(tx_serial)
         digest = Digest.hash256(tx_serial)
@@ -54,11 +54,20 @@ class Transaction(object):
         else:
             return ''
 
-    def hash256(self, is_hex: bool = False) -> bytes or str:
+    def hash256_bytes(self) -> bytes:
         tx_serial = self.serialize_unsigned()
         tx_serial = a2b_hex(tx_serial)
-        r = Digest.hash256(tx_serial, is_hex)
-        if isinstance(r, bytes) or isinstance(r, str):
+        r = Digest.hash256(tx_serial, False)
+        if isinstance(r, bytes):
+            return r
+        else:
+            raise RuntimeError
+
+    def hash256_hex(self) -> str:
+        tx_serial = self.serialize_unsigned()
+        tx_serial = a2b_hex(tx_serial)
+        r = Digest.hash256(tx_serial, True)
+        if isinstance(r, str):
             return r
         else:
             raise RuntimeError
