@@ -26,7 +26,7 @@ multi_addr = Address.address_from_multi_pub_keys(2, pubkeys)
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
         version = sdk.rpc.get_version()
-        self.assertEqual("v1.0.2", version)
+        self.assertEqual("v1.0.3-rc", version)
 
     def test_get_node_count(self):
         count = sdk.rpc.get_node_count()
@@ -149,7 +149,7 @@ class TestRpcClient(unittest.TestCase):
         tx = Asset.new_transfer_transaction("ont", b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(tx_hash, tx.explorer_hash256())
+        self.assertEqual(tx_hash, tx.hash256_explorer())
 
     def test_send_raw_transaction_pre_exec(self):
         pri_key_1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'

@@ -8,6 +8,7 @@ import unittest
 from ontology.utils import util
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
+from ontology.wallet.account import AccountData
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 
@@ -217,18 +218,21 @@ class TestWalletManager(unittest.TestCase):
         password = '1'
         b58_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         b64_salt = 'pwLIUKAf2bAbTseH/WYrfQ=='
-        wm.import_account(label, encrypted_pri_key, password, b58_address, b64_salt)
+        account = wm.import_account(label, encrypted_pri_key, password, b58_address, b64_salt)
+        self.assertTrue(isinstance(account, AccountData))
         wm.save()
         os.remove(path)
 
-    def test_create_account_from_prikey(self):
+    def test_create_account_from_private_key(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        account = wm.create_account_from_prikey("myaccount", "1", private_key)
+        label = 'hello_account'
+        password = 'password'
+        account = wm.create_account_from_private_key(label, password, private_key)
         wm.save()
-        self.assertEqual(account.address, 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
+        self.assertEqual(account.get_address(), 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
         os.remove(path)
 
 

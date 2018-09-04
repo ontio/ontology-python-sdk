@@ -36,7 +36,7 @@ class TestNativeVm(unittest.TestCase):
         sdk.set_rpc(rpc_address)
         payer = acct2
         b58_payer = payer.get_address_base58()
-        tx = sdk.native_vm().asset().new_withdraw_ong_transaction(b58_payer, b58_payer, 1352419563015000, b58_payer,
+        tx = sdk.native_vm().asset().new_withdraw_ong_transaction(b58_payer, b58_payer, 1, b58_payer,
                                                                   20000, 500)
         sdk.sign_transaction(tx, payer)
         res = sdk.rpc.send_raw_transaction(tx)
