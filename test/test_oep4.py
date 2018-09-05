@@ -1,111 +1,55 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 import json
-import os
 import time
 import unittest
 
-from ontology.account.account import Account
-from ontology.common.address import Address
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
-from ontology.smart_contract.neo_contract.oep4 import Oep4
-from ontology.wallet.wallet_manager import WalletManager
+from ontology.account.account import Account
+from ontology.exception.exception import SDKException
+from ontology.crypto.signature_scheme import SignatureScheme
 
 remote_rpc_address = "http://polaris3.ont.io:20336"
 local_rpc_address = 'http://localhost:20336'
 
 
 class TestOep4(unittest.TestCase):
-    def test_set_abi(self):
+    def test_get_abi(self):
         oep4_abi = '{"hash":"0x678259ca02f319d43095ceb243697e36c111e8ab","entrypoint":"Main","functions":[{"name":"Name","parameters":[],"returntype":"String"},{"name":"Symbol","parameters":[],"returntype":"String"},{"name":"Decimal","parameters":[],"returntype":"Integer"},{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],"returntype":"Any"},{"name":"Init","parameters":[],"returntype":"Boolean"},{"name":"Transfer","parameters":[{"name":"from","type":"ByteArray"},{"name":"to","type":"ByteArray"},{"name":"value","type":"Integer"}],"returntype":"Boolean"},{"name":"TransferMulti","parameters":[{"name":"args","type":"Array"}],"returntype":"Boolean"},{"name":"BalanceOf","parameters":[{"name":"address","type":"ByteArray"}],"returntype":"Integer"},{"name":"TotalSupply","parameters":[],"returntype":"Integer"},{"name":"Approve","parameters":[{"name":"owner","type":"ByteArray"},{"name":"spender","type":"ByteArray"},{"name":"amount","type":"Integer"}],"returntype":"Boolean"},{"name":"TransferFrom","parameters":[{"name":"spender","type":"ByteArray"},{"name":"from","type":"ByteArray"},{"name":"to","type":"ByteArray"},{"name":"amount","type":"Integer"}],"returntype":"Boolean"},{"name":"Allowance","parameters":[{"name":"owner","type":"ByteArray"},{"name":"spender","type":"ByteArray"}],"returntype":"Integer"}],"events":[{"name":"transfer","parameters":[{"name":"from","type":"ByteArray"},{"name":"to","type":"ByteArray"},{"name":"value","type":"Integer"}],"returntype":"Void"},{"name":"approval","parameters":[{"name":"onwer","type":"ByteArray"},{"name":"spender","type":"ByteArray"},{"name":"value","type":"Integer"}],"returntype":"Void"}]}'
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep_4 = Oep4()
-        oep_4.read_abi(path)
-        self.assertEqual(json.loads(oep4_abi), oep_4.get_abi())
-        oep_4.set_abi(oep4_abi)
-        self.assertEqual(json.loads(oep4_abi), oep_4.get_abi())
-
-    # def test_deploy_remote(self):
-    #     private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-    #     acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-    #     sdk = OntologySdk()
-    #     sdk.rpc.set_address(remote_rpc_address)
-    #     print('private key:')
-    #     print(binascii.b2a_hex(acct.serialize_private_key()).decode('utf-8'))
-    #     print('b58_address:')
-    #     b58_acct = acct.get_address_base58()
-    #     print(b58_acct)
-    #     print('balance: ')
-    #     print(sdk.rpc.get_balance(b58_acct))
-    #     with open('oep4.avm', 'r') as f:
-    #         code = f.read()
-    #         gas_limit = 21000000
-    #         gas_price = 500
-    #         tx = sdk.neo_vm().make_deploy_transaction(code, True, 'XIN', 'v1.0', 'DINGXIN', 'xin@mail.com',
-    #                                                   'test oep4 token', b58_acct, gas_limit, gas_price)
-    #         sdk.sign_transaction(tx, acct)
-    #         res = sdk.rpc.send_raw_transaction(tx)
-    #         print(res)
-    #
-    # def test_deploy_local(self):
-    #     wm = WalletManager()
-    #     path = os.path.join(os.getcwd(), 'oep4_wallet.dat')
-    #     wm.open_wallet(path)
-    #     password = '1'
-    #     acct = wm.get_account(address='AevnsY2aGCdi61CLLFZoXMYuTeaYMC4DT1', pwd=password)
-    #     sdk = OntologySdk()
-    #     sdk.rpc.set_address(local_rpc_address)
-    #     print('private key:')
-    #     print(binascii.b2a_hex(acct.serialize_private_key()).decode('utf-8'))
-    #     print('b58_address:')
-    #     b58_acct = acct.get_address_base58()
-    #     print(b58_acct)
-    #     print('balance: ')
-    #     print(sdk.rpc.get_balance(b58_acct))
-    #     with open('oep4.avm', 'r') as f:
-    #         code = f.read()
-    #         gas_limit = 21000000
-    #         gas_price = 0
-    #         tx = sdk.neo_vm().make_deploy_transaction(code, True, 'XIN', 'v1.0', 'DINGXIN', 'xin@mail.com',
-    #                                                   'test oep4 token', b58_acct, gas_limit, gas_price)
-    #         sdk.sign_transaction(tx, acct)
-    #         res = sdk.rpc.send_raw_transaction(tx)
-    #         print(res)
+        sdk = OntologySdk()
+        self.assertEqual(json.loads(oep4_abi), sdk.neo_vm().oep4().get_abi())
 
     def test_get_name(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         self.assertEqual('DXToken', oep4.get_name())
 
     def test_get_symbol(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         self.assertEqual('DX', oep4.get_symbol())
 
     def test_get_decimal(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         self.assertEqual(8, oep4.get_decimal())
 
     def test_init(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         gas_limit = 20000000
@@ -114,19 +58,19 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(len(tx_hash), 64)
 
     def test_get_total_supply(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         self.assertEqual(10000000000000, oep4.get_total_supply())
 
     def test_transfer(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
@@ -140,11 +84,11 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(len(result), 64)
 
     def test_balance_of(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
@@ -157,11 +101,11 @@ class TestOep4(unittest.TestCase):
         self.assertGreaterEqual(balance, 10)
 
     def test_transfer_multi(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
@@ -190,14 +134,14 @@ class TestOep4(unittest.TestCase):
 
         transfer1 = [array_from_address1, array_to_address1, value_list[0]]
         transfer2 = [array_from_address2, array_to_address2, value_list[1]]
-        payer_accounts = [acct1, acct2, acct3]
+        signers = [acct1, acct2, acct3]
         args.append(transfer1)
         args.append(transfer2)
 
         gas_limit = 20000000
         gas_price = 500
 
-        tx_hash = oep4.transfer_multi(payer_accounts, gas_limit, gas_price, args)
+        tx_hash = oep4.transfer_multi(signers[0], signers, gas_limit, gas_price, args)
         self.assertEqual(64, len(tx_hash))
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
@@ -215,11 +159,11 @@ class TestOep4(unittest.TestCase):
             self.assertTrue(raised, e)
 
     def test_approve(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
@@ -245,11 +189,11 @@ class TestOep4(unittest.TestCase):
             self.assertTrue(raised, e)
 
     def test_allowance(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
@@ -260,11 +204,11 @@ class TestOep4(unittest.TestCase):
         self.assertGreaterEqual(allowance, 0)
 
     def test_transfer_from(self):
-        oep4 = Oep4(network=remote_rpc_address)
-        path = os.path.join(os.getcwd(), 'oep4.avm')
-        oep4.read_code(path)
-        path = os.path.join(os.getcwd(), 'oep4.json')
-        oep4.read_abi(path)
+        sdk = OntologySdk()
+        sdk.set_rpc(remote_rpc_address)
+        contract_address = '5c5e855f500b6bffbacf130a827a8835f50ae76f'
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
         private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
