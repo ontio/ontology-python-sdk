@@ -31,7 +31,6 @@ Ontology Python SDK function consists of four parts, RPC interface, wallet, asse
 
 ## Preparations
 
-
 Installation requires a Python 3.7 or later environment.
 
 ```bash
