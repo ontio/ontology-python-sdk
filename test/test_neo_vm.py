@@ -134,7 +134,7 @@ class TestNeoVm(unittest.TestCase):
         abi_info = AbiInfo(abi['hash'], abi['entrypoint'], abi['functions'], abi['events'])
         func = abi_info.get_function("Main")
         func.set_params_value(("Hello", "args"))
-        contract_address = Address.address_from_vm_code(code).to_byte_array()
+        contract_address = Address.address_from_vm_code(code).to_array()
         res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
         self.assertEqual(res, '00')
         func = abi_info.get_function("Hello")
