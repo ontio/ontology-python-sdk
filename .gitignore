@@ -4,7 +4,6 @@
 *.xml
 *.DS_Store
 *.json
-*.txt
 venv
 .vs
 .idea
