@@ -34,22 +34,23 @@ class Address(object):
     def address_from_multi_pub_keys(m: int, pub_keys: []):
         return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pub_keys)))
 
-    # this function is for contract
     @staticmethod
     def address_from_vm_code(code: str):
+        """
+        generate contract address from avm bytecode.
+        :param code: str
+        :return: Address
+        """
         return Address(Address.to_script_hash(bytearray.fromhex(code)))
 
     def b58encode(self):
-        sb = Address.__COIN_VERSION + self.ZERO
-        c256 = Digest.hash256(sb)[0:4]
-        outb = sb + bytearray(c256)
-        return base58.b58encode(bytes(outb)).decode('utf-8')
+        script_builder = Address.__COIN_VERSION + self.ZERO
+        c256 = Digest.hash256(script_builder)[0:4]
+        out_byte_array = script_builder + bytearray(c256)
+        return base58.b58encode(bytes(out_byte_array)).decode('utf-8')
 
     def to_array(self):
         return self.ZERO
-
-    def to_byte_array(self):
-        return bytearray(self.ZERO)
 
     def to_hex_str(self):
         return bytearray(self.ZERO).hex()
@@ -60,7 +61,7 @@ class Address(object):
         return temp.hex()
 
     @staticmethod
-    def b58decode(address: str) -> bytes:
+    def b58decode(address: str):
         data = base58.b58decode(address)
         if len(data) != 25:
             raise SDKException(ErrorCode.param_error)
@@ -69,8 +70,4 @@ class Address(object):
         checksum = Digest.hash256(data[0:21])
         if data[21:25] != checksum[0:4]:
             raise SDKException(ErrorCode.param_error)
-        return data[1:21]
-
-    @staticmethod
-    def decode_base58(address: str):
-        return Address(Address.b58decode(address))
+        return Address(data[1:21])
