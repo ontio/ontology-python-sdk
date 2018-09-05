@@ -1,6 +1,6 @@
 <h1 align="center">Python SDK For Ontology</h1>
 
-<p align="center" class="version">Version 0.1.0</p>
+<p align="center" class="version">Version 0.1.1</p>
 
 <!-- TOC -->
 
@@ -32,24 +32,10 @@ Ontology Python SDK function consists of four parts, RPC interface, wallet, asse
 ## Preparations
 
 
-python version requirement:
-```
-python 3.7 or above
-```
+Installation requires a Python 3.7 or later environment.
 
-To avoid installing wrong package, we recommend you to run
-the following Python script to install all the third-party package that our SDK is needed.
-
-```python
-cd setup_package
-python3 cn_install.py
-```
-
-or
-
-```python
-cd setup_package
-python3 install.py
+```bash
+pip install ontology-python-sdk
 ```
 
 ## RPC interface function list
