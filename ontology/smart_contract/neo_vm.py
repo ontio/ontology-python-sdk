@@ -1,32 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from time import time
-from ontology.account.account import Account
+
 from ontology.common.address import Address
+from ontology.account.account import Account
 from ontology.common.define import ZERO_ADDRESS
 from ontology.common.error_code import ErrorCode
 from ontology.core.transaction import Transaction
+from ontology.exception.exception import SDKException
+from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.exception.exception import SDKException
+from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
 
 
 class NeoVm(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
+    def oep4(self):
+        return Oep4(self.__sdk)
+
     def claim_record(self):
         return ClaimRecord(self.__sdk)
 
-    def send_transaction(self, contract_address: bytearray, acct: Account, payer_acct: Account, gas_limit: int,
+    def send_transaction(self, contract_address: bytes or bytearray, acct: Account, payer_acct: Account, gas_limit: int,
                          gas_price: int, func: AbiFunction, pre_exec: bool):
         if func is not None:
             params = BuildParams.serialize_abi_function(func)
         else:
             params = bytearray()
         if pre_exec:
-            tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
+            if isinstance(contract_address, bytes):
+                tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
+            elif isinstance(contract_address, bytearray):
+                tx = NeoVm.make_invoke_transaction(contract_address, bytearray(params), b'', 0, 0)
+            else:
+                raise SDKException(ErrorCode.param_err('the data type of contract address is incorrect.'))
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
             return self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
@@ -49,7 +62,7 @@ class NeoVm(object):
                                 email: str, desp: str, payer: str, gas_limit: int, gas_price: int):
         unix_time_now = int(time())
         deploy_tx = DeployTransaction()
-        deploy_tx.payer = Address.b58decode(payer)
+        deploy_tx.payer = Address.b58decode(payer).to_array()
         deploy_tx.attributes = bytearray()
         deploy_tx.nonce = unix_time_now
         deploy_tx.code = bytearray.fromhex(code_str)
