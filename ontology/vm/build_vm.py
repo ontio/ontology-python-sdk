@@ -1,14 +1,17 @@
-from ontology.vm.params_builder import ParamsBuilder
-from ontology.vm.op_code import *
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from ontology.utils import util
+from ontology.vm.op_code import *
+from ontology.vm.params_builder import ParamsBuilder
 
 
-def build_native_invoke_code(contractAddres, cversion, method, params):
+def build_native_invoke_code(contract_address: bytearray, version: bytes, method: str, params):
     builder = ParamsBuilder()
     build_neo_vm_param(builder, params)
     builder.emit_push_byte_array(method.encode())
-    builder.emit_push_byte_array(contractAddres)
-    builder.emit_push_integer(int.from_bytes(cversion, 'little'))
+    builder.emit_push_byte_array(contract_address)
+    builder.emit_push_integer(int.from_bytes(version, 'little'))
     builder.emit(SYSCALL)
     builder.emit_push_byte_array("Ontology.Native.Invoke".encode())
     return builder.to_array()
@@ -38,4 +41,3 @@ def build_neo_vm_param(builder, params):
             build_neo_vm_param(builder, params[i])
         builder.emit_push_integer(len(params))
         builder.emit(PACK)
-
