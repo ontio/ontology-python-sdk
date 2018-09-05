@@ -31,6 +31,12 @@ Ontology Python SDK function consists of four parts, RPC interface, wallet, asse
 
 ## Preparations
 
+
+python version requirement:
+```
+python 3.7 or above
+```
+
 To avoid installing wrong package, we recommend you to run
 the following Python script to install all the third-party package that our SDK is needed.
 
