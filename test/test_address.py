@@ -21,11 +21,10 @@ class TestAddress(unittest.TestCase):
         rand_code = util.get_random_bytes(length)
         address = Address(rand_code)
         b58_address = address.b58encode()
-        zero = Address.b58decode(b58_address)
+        zero = Address.b58decode(b58_address).to_array()
         self.assertEqual(rand_code, zero)
-        decode_address = Address.decode_base58(b58_address)
-        self.assertTrue(isinstance(decode_address, Address))
-        self.assertEqual(rand_code, decode_address.to_array())
+        decode_address = Address.b58decode(b58_address).to_array()
+        self.assertEqual(rand_code, decode_address)
 
 
 if __name__ == '__main__':
