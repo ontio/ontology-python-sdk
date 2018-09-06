@@ -253,8 +253,6 @@ class RpcClient(object):
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         event = json.loads(r.content.decode())["result"]
-        if event is None:
-            raise SDKException(ErrorCode.other_error('get smart contract event failed, the result is null.'))
         return event
 
     def get_smart_contract_event_by_height(self, height: int) -> dict:
