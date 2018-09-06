@@ -230,12 +230,13 @@ class RpcClient(object):
         """
 
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
+        print("rpc_struct:", rpc_struct)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         s = json.loads(r.content.decode())["result"]
-        s = bytearray.fromhex(s)
-        value = (s[0]) | (s[1]) << 8 | (s[2]) << 16 | (s[3]) << 24 | (s[4]) << 32 | (s[5]) << 40 | (s[6]) << 48 | (
-            s[7]) << 56
-        return value
+        # s = bytearray.fromhex(s)
+        # value = (s[0]) | (s[1]) << 8 | (s[2]) << 16 | (s[3]) << 24 | (s[4]) << 32 | (s[5]) << 40 | (s[6]) << 48 | (
+        #     s[7]) << 56
+        return s
 
     def get_smart_contract_event_by_tx_hash(self, tx_hash: str) -> dict:
         """
