@@ -94,7 +94,7 @@ class Oep4(object):
         if is_hex:
             array_address = self.__contract_address
             array_address.reverse()
-            return binascii.b2a_hex(array_address)
+            return binascii.b2a_hex(array_address).decode('ascii')
         else:
             return self.__contract_address
 
