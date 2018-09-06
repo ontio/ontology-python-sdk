@@ -65,7 +65,7 @@ class Oep4(object):
             else:
                 raise SDKException(ErrorCode.param_err('the data type of the contract address unsupported.'))
         elif isinstance(contract_address, str) and len(contract_address) == 40:
-            self.__contract_address = binascii.a2b_hex(contract_address)
+            self.__contract_address = bytearray(binascii.a2b_hex(contract_address))
         else:
             raise SDKException(ErrorCode.param_err('the length of contract address should be 20 bytes.'))
 
