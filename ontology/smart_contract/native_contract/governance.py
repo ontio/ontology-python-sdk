@@ -99,7 +99,6 @@ class Governance(object):
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
-        print(res)
         return tx.hash256_explorer()
 
     def unauthorize_for_peer(self, account: Account, peer_publickeys: [], pos_lists: [], payer: Account, gas_limit: int, gas_price: int):

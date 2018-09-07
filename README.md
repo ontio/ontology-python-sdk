@@ -1,6 +1,6 @@
 <h1 align="center">Python SDK For Ontology</h1>
 
-<p align="center" class="version">Version 0.1.1</p>
+<p align="center" class="version">Version 0.1.2</p>
 
 <!-- TOC -->
 
@@ -93,7 +93,6 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
 
 ### Native digit asset
 
-
  |      | Main   Function                                                                                                                             |
  | :--- | :------------------------------------------------------------------------------------------------------------------------------------------ |
  | 1    | new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str, gas_limit: int, gas_price: int)                 |
@@ -105,7 +104,7 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
  | 7    | send_withdraw_ong_transaction(claimer: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                |
  | 8    | send_approve(asset: str, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                      |
  | 9    | send_transfer_from(asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,payer: Account, gas_limit: int, gas_price: int) |
- 
+
 ## Identity function list 
 
 ### ONT ID

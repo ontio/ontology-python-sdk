@@ -230,7 +230,6 @@ class RpcClient(object):
         """
 
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
-        print("rpc_struct:", rpc_struct)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         s = json.loads(r.content.decode())["result"]
         # s = bytearray.fromhex(s)
@@ -284,18 +283,17 @@ class RpcClient(object):
         tx = json.loads(r.content.decode())["result"]
         return tx
 
-    def get_smart_contract(self, contract_address) -> dict:
+    def get_smart_contract(self, contract_address: str) -> dict:
         """
         This interface is used to get the information of smart contract based on the specified hexadecimal hash value.
 
-        Args:
-         contract_address (str):
-            a hexadecimal hash value.
-
-        Return:
-            the information of smart contract in dictionary form.
+        :param contract_address: str, a hexadecimal hash value.
+        :return: the information of smart contract in dictionary form.
         """
-
+        if type(contract_address) != str:
+            raise SDKException(ErrorCode.param_err('a hexadecimal contract address is required.'))
+        if len(contract_address) != 40:
+            raise SDKException(ErrorCode.param_err('the length of the contract address should be 40 bytes.'))
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT, [contract_address, 1])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         contract = json.loads(r.content.decode())["result"]
@@ -359,7 +357,11 @@ class RpcClient(object):
         res = json.loads(r.content.decode())
         err = res["error"]
         if err > 0:
-            raise RuntimeError("error > 0")
+            try:
+                result = res['result']
+                raise RuntimeError(result)
+            except KeyError:
+                raise RuntimeError('send raw transaction pre-execute error')
         if res["result"]["State"] == 0:
             raise RuntimeError("State = 0")
         return res["result"]["Result"]
