@@ -8,6 +8,7 @@ NATIVE_TRANSFER = "transfer"
 NATIVE_TRANSFER_FROM = "transferFrom"
 NATIVE_APPROVE = "approve"
 NATIVE_ALLOWANCE = "allowance"
+DID_ONT = "did:ont:"
 
 # NeoVM invokes a smart contract return type
 
