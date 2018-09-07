@@ -230,7 +230,6 @@ class RpcClient(object):
         """
 
         rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
-        print("rpc_struct:", rpc_struct)
         r = HttpRequest.request("post", self.addr, rpc_struct)
         s = json.loads(r.content.decode())["result"]
         # s = bytearray.fromhex(s)
