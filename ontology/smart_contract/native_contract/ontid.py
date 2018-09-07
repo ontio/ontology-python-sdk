@@ -16,7 +16,7 @@ class OntId(object):
 
     def new_registry_ontid_transaction(self, ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode(), "pubkey": pubkey}
+        args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(pubkey)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
         unix_time_now = int(time())
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),

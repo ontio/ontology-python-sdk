@@ -114,7 +114,7 @@ class WalletManager(object):
         info.address_u160 = acct.get_address().to_array().hex()
         return self.wallet_in_mem.get_identity_by_ont_id(info.ont_id)
 
-    def create_identity_from_pri_key(self, label: str, pwd: str, private_key: str):
+    def create_identity_from_pri_key(self, label: str, pwd: str, private_key: str) -> Identity:
         salt = get_random_str(16)
         identity = self.__create_identity(label, pwd, salt, private_key)
         return identity

@@ -200,8 +200,7 @@ class Governance(object):
         return tx.hash256_explorer()
 
     def get_peer_unbind_ong(self, address: str):
-        block0 = self.__sdk.rpc.get_block_by_height(0)
-        timestamp0 = block0['Header']['Timestamp']
+        timestamp0 = 1530316800
         current_height = self.__sdk.rpc.get_block_count()
         block = self.__sdk.rpc.get_block_by_height(current_height - 1)
         timestamp = block['Header']['Timestamp'] - timestamp0
