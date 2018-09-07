@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import binascii
 import unittest
 
 from ontology.ont_sdk import OntologySdk
@@ -111,7 +112,10 @@ class TestRpcClient(unittest.TestCase):
         contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = sdk.rpc.get_storage(contract_address, key)
-        self.assertEqual(value, 1000000000)
+        array = bytearray(binascii.a2b_hex(value.encode('ascii')))
+        array.reverse()
+        value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+        self.assertEqual(1000000000, value)
 
     def test_get_smart_contract_event_by_tx_hash(self):
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
