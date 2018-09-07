@@ -6,6 +6,7 @@ import uuid
 import base64
 from datetime import datetime
 
+from ontology.common.define import DID_ONT
 from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.control import Control
 from ontology.common.address import Address
@@ -97,7 +98,7 @@ class WalletManager(object):
                 return self.wallet_in_mem.identities[index]
         return None
 
-    def create_identity(self, label: str, pwd: str):
+    def create_identity(self, label: str, pwd: str) -> Identity:
         priv_key = get_random_str(64)
         salt = get_random_str(16)
         return self.__create_identity(label, pwd, salt, priv_key)
@@ -227,7 +228,8 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, address: str, pwd: str) -> AccountData or None:
+    def get_account(self, address: str, pwd: str) -> Account or None:
+        address = address.replace(DID_ONT, '')
         for index in range(len(self.wallet_in_mem.accounts)):
             if self.wallet_in_mem.accounts[index].address == address:
                 key = self.wallet_in_mem.accounts[index].key
