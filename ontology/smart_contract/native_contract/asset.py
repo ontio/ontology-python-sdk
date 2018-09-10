@@ -45,6 +45,15 @@ class Asset(object):
         return Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, attributes,
                            signers, hash_value)
 
+    def send_transfer(self, asset: str, from_acct: Account, to_addr: str, amount: int, payer: Account,
+                                 gas_limit: int, gas_price: int):
+        tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), to_addr, amount, payer.get_address_base58(),
+                                            gas_limit, gas_price)
+        self.__sdk.sign_transaction(tx, from_acct)
+        if from_acct.get_address_base58() != payer.get_address_base58():
+            self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
     def query_balance(self, asset: str, b58_address: str) -> int:
         raw_address = Address.b58decode(b58_address).to_array()
         contract_address = util.get_asset_address(asset)
