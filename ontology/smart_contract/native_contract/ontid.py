@@ -1,4 +1,6 @@
 from time import time
+
+from ontology.account.account import Account
 from ontology.vm import build_vm
 from ontology.core.transaction import Transaction
 from ontology.crypto.key_type import KeyType
@@ -9,12 +11,15 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.crypto.curve import Curve
 from binascii import b2a_hex, a2b_hex
 
+from ontology.wallet.identity import Identity
+
 
 class OntId(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
-    def new_registry_ontid_transaction(self, ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int):
+    @staticmethod
+    def new_registry_ontid_transaction(ont_id: str, pubkey: str, payer: str, gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(pubkey)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
@@ -23,7 +28,16 @@ class OntId(object):
                            invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_add_attribute_transaction(self, ont_id: str, pubkey: str, attris: list, payer: str, gas_limit: int,
+    def send_registry_ontid(self, identity: Identity, password: str, payer: Account, gas_limit: int, gas_price: int):
+        tx = OntId.new_registry_ontid_transaction(identity.ont_id, identity.controls[0].public_key, payer.get_address_base58(),
+                                                  gas_limit, gas_price)
+        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    @staticmethod
+    def new_add_attribute_transaction(ont_id: str, pubkey: bytearray, attris: list, payer: str, gas_limit: int,
                                       gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "length": len(attris)}
@@ -38,7 +52,17 @@ class OntId(object):
                            invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_remove_attribute_transaction(self, ont_id: str, pubkey: bytearray, path: str, payer: str, gas_limit: int,
+    def send_add_attribute(self, identity: Identity, password: str, attris: list, payer: Account, gas_limit: int, gas_price: int):
+        print(identity.controls[0].public_key)
+        tx = OntId.new_add_attribute_transaction(identity.ont_id, bytearray.fromhex(identity.controls[0].public_key), attris, payer.get_address_base58(),
+                                                 gas_limit, gas_price)
+        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    @staticmethod
+    def new_remove_attribute_transaction(ont_id: str, pubkey: bytearray, path: str, payer: str, gas_limit: int,
                                          gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": pubkey}
@@ -48,7 +72,17 @@ class OntId(object):
                            invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_add_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,
+    def send_remove_attribute(self, identity: Identity, password: str, path: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
+        tx = OntId.new_remove_attribute_transaction(identity.ont_id, bytearray.fromhex(identity.controls[0].public_key), path, payer.get_address_base58(),
+                                                    gas_limit, gas_price)
+        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    @staticmethod
+    def new_add_pubkey_transaction(ont_id: str, pubkey_or_recovery: bytes, new_pubkey: bytes, payer: str,
                                    gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": new_pubkey, "pubkey_or_recovery": pubkey_or_recovery}
@@ -58,7 +92,25 @@ class OntId(object):
                            invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_remove_pubkey_transaction(self, ont_id: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str,
+    def send_add_pubkey(self, identity: Identity, password: str, new_public_key: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
+        tx = OntId.new_add_pubkey_transaction(identity.ont_id, bytearray.fromhex(identity.controls[0].public_key), bytearray.fromhex(new_public_key), payer.get_address_base58(),
+                                                    gas_limit, gas_price)
+        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    def send_add_pubkey_by_recovery(self, ont_id: str, recovery: Account, new_public_key: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
+        tx = OntId.new_add_pubkey_transaction(ont_id, recovery.get_address().to_array(), bytearray.fromhex(new_public_key), payer.get_address_base58(),
+                                                    gas_limit, gas_price)
+        self.__sdk.sign_transaction(tx, recovery)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    @staticmethod
+    def new_remove_pubkey_transaction(ont_id: str, pubkey_or_recovery: bytes, remove_pubkey: bytes, payer: str,
                                       gas_limit: int, gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": remove_pubkey, "pubkey_or_recovery": pubkey_or_recovery}
@@ -68,7 +120,26 @@ class OntId(object):
                            invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_add_rcovery_transaction(self, ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,
+    def send_remove_pubkey(self, identity: Identity, password: str, remove_pubkey: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
+        tx = OntId.new_remove_pubkey_transaction(identity.ont_id, bytearray.fromhex(identity.controls[0].public_key), bytearray.fromhex(remove_pubkey), payer.get_address_base58(),
+                                                    gas_limit, gas_price)
+        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    def send_remove_pubkey_by_recovery(self, ont_id: str, recovery: Account, remove_pubkey: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
+        tx = OntId.new_remove_pubkey_transaction(ont_id, recovery.get_address().to_array(), bytearray.fromhex(remove_pubkey), payer.get_address_base58(),
+                                                    gas_limit, gas_price)
+        self.__sdk.sign_transaction(tx, recovery)
+        if recovery.get_address_base58() != payer.get_address_base58():
+            self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    @staticmethod
+    def new_add_rcovery_transaction(ont_id: str, pubkey: bytes, recovery: str, payer: str, gas_limit: int,
                                     gas_price: int):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "recovery": Address.b58decode(recovery).to_array(), "pubkey": pubkey}
@@ -78,7 +149,17 @@ class OntId(object):
                            invoke_code, bytearray(),
                            [], bytearray())
 
-    def new_get_ddo_transaction(self, ont_id: str):
+    def send_add_rcovery(self, identity: Identity, password: str, recovery: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
+        tx = OntId.new_add_rcovery_transaction(identity.ont_id, bytearray.fromhex(identity.controls[0].public_key), recovery, payer.get_address_base58(),
+                                                    gas_limit, gas_price)
+        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    @staticmethod
+    def new_get_ddo_transaction(ont_id: str):
         contract_address = ONTID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode()}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
@@ -87,7 +168,13 @@ class OntId(object):
         return Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(),
                            [], bytearray())
 
-    def parse_ddo(self, ont_id: str, ddo: str) -> dict:
+    def send_get_ddo(self, ont_id):
+        tx = OntId.new_get_ddo_transaction(ont_id)
+        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        return OntId.parse_ddo(ont_id, res)
+
+    @staticmethod
+    def parse_ddo(ont_id: str, ddo: str) -> dict:
         if ddo == "":
             return dict()
         ms = StreamManager.GetStream(a2b_hex(ddo))
