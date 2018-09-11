@@ -105,7 +105,7 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_allowance(self):
         base58_address = "AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA"
-        allowance = sdk.rpc.get_allowance(base58_address)
+        allowance = sdk.rpc.get_allowance("ong", base58_address, base58_address)
         self.assertEqual(allowance, '0')
 
     def test_get_storage(self):
