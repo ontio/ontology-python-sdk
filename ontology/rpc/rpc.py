@@ -194,22 +194,20 @@ class RpcClient(object):
         balance = json.loads(r.content.decode())["result"]
         return balance
 
-    def get_allowance(self, base58_address: str) -> str:
+    def get_allowance(self, asset_name: str, from_address: str, to_address: str) -> str:
         """
         This interface is used to get the the allowance
         from transfer-from account to transfer-to account in current network.
 
         Args:
-         base58_address (str):
+         from_address (str):
             a base58 encoded account address
 
         Return:
-            the information of smart contract event in dictionary form.
+            the information of allowance in dictionary form.
         """
 
-        contract_address = get_asset_address("ont")
-        b58_contract_address = Address(contract_address).b58encode()
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_ALLOWANCE, ["ong", b58_contract_address, base58_address])
+        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_ALLOWANCE, [asset_name, from_address, to_address])
         r = HttpRequest.request("post", self.addr, rpc_struct)
         allowance = json.loads(r.content.decode())["result"]
         return allowance
