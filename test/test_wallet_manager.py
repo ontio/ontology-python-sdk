@@ -5,6 +5,7 @@ import os
 import random
 import unittest
 
+from ontology.common.address import Address
 from ontology.utils import util
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
@@ -79,6 +80,14 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(dict_accounts['parameters']['curve'], 'P-256')
         self.assertEqual(dict_accounts['salt'], 'DqS/T2FmSmYabWdW1vQYzQ==')
         self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
+
+    def test_get_account(self):
+        wm = WalletManager()
+        password = 'password'
+        wm.create_account('', password)
+        b58_address = wm.wallet_in_mem.default_account_address
+        acct = wm.get_account(b58_address, password)
+        self.assertEqual(acct.get_address_base58(), b58_address)
 
     def test_get_accounts(self):
         wm = WalletManager()
