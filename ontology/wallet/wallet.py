@@ -99,7 +99,12 @@ class WalletData(object):
             raise SDKException(ErrorCode.get_account_by_address_err)
         return self.accounts.remove(account)
 
-    def get_accounts(self):
+    def get_accounts(self) -> list:
+        """
+        This interface is used to get all the account information in WalletManager.
+
+        :return: an AccountData list which contain all the account information in WalletManager
+        """
         return self.accounts
 
     def set_default_account_by_index(self, index: int):
