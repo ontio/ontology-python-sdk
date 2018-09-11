@@ -78,8 +78,18 @@ class TestAsset(unittest.TestCase):
 
     def test_query_balance(self):
         a = Asset(sdk)
-        res = a.query_balance("ont", acc.get_address().b58encode())
+        res = a.query_balance("ont", acc.get_address_base58())
+        print(res)
         self.assertTrue(isinstance(res, int))
+
+    def test_send_transfer(self):
+        print(sdk.native_vm().asset().query_balance("ont", acc.get_address_base58()))
+        print(sdk.native_vm().asset().query_balance("ont", acc3.get_address_base58()))
+        txhash = sdk.native_vm().asset().send_transfer("ont",acc,acc3.get_address_base58(),100,acc,20000,500)
+        time.sleep(6)
+        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
+        print(sdk.native_vm().asset().query_balance("ont", acc.get_address_base58()))
+        print(sdk.native_vm().asset().query_balance("ont", acc3.get_address_base58()))
 
     def test_query_allowance(self):
         a = Asset(sdk)

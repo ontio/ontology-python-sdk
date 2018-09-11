@@ -1,5 +1,6 @@
 
 from ontology.smart_contract.native_contract.asset import Asset
+from ontology.smart_contract.native_contract.auth import Auth
 from ontology.smart_contract.native_contract.governance import Governance
 from ontology.smart_contract.native_contract.ontid import OntId
 
@@ -16,3 +17,6 @@ class NativeVm(object):
 
     def governance(self):
         return Governance(self.__sdk)
+
+    def auth(self):
+        return Auth(self.__sdk)
