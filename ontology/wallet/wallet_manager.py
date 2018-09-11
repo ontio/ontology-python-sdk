@@ -130,7 +130,7 @@ class WalletManager(object):
         pri_key = get_random_str(64)
         salt = get_random_str(16)
         account = self.__create_account(label, pwd, salt, pri_key, True)
-        return self.wallet_file.get_account_by_address(account.get_address_base58())
+        return self.wallet_in_mem.get_account_by_address(account.get_address_base58())
 
     def __create_account(self, label: str, pwd: str, salt: str, priv_key: str, account_flag: bool):
         account = Account(priv_key, self.scheme)
@@ -228,11 +228,11 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, b58_address: str, pwd: str) -> Account or None:
+    def get_account(self, b58_address: str, password: str) -> Account or None:
         """
 
-        :param address:
-        :param pwd:
+        :param b58_address: a base58 encode address
+        :param password: a password which is used to decrypt the encrypted private key.
         :return:
         """
         b58_address = b58_address.replace(DID_ONT, '')
@@ -241,7 +241,8 @@ class WalletManager(object):
                 key = self.wallet_in_mem.accounts[index].key
                 addr = self.wallet_in_mem.accounts[index].address
                 salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
+                private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, Scrypt().get_n(),
+                                                                  self.scheme)
                 return Account(private_key, self.scheme)
 
         for index in range(len(self.wallet_in_mem.identities)):
@@ -249,7 +250,8 @@ class WalletManager(object):
                 addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
                 key = self.wallet_in_mem.identities[index].controls[0].key
                 salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
-                private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
+                private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, Scrypt().get_n(),
+                                                                  self.scheme)
                 return Account(private_key, self.scheme)
         return None
 
