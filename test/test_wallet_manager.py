@@ -5,7 +5,6 @@ import os
 import random
 import unittest
 
-from ontology.common.address import Address
 from ontology.utils import util
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
@@ -19,10 +18,14 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = 'password'
+        password = util.get_random_str(10)
         label = 'label'
         wm.create_account(label, password)
+        default_account = wm.get_default_account()
+        self.assertEqual(label, default_account.label)
         wm.create_identity(label, password)
+        default_identity = wm.get_default_identity()
+        self.assertEqual(label, default_identity.label)
         wm.write_wallet()
         os.remove(path)
 
@@ -200,15 +203,21 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        salt = util.get_random_str(16)
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        private_key = util.get_random_str(64)
         acct = Account(private_key)
-        enpri = acct.export_gcm_encrypted_private_key("1", salt, 16384)
-        wm.import_identity("label2", enpri, "1", salt, acct.get_address_base58())
+        password = util.get_random_str(10)
+        salt = util.get_random_str(16)
+        scrypt_n = 16384
+        encrypted_private_key = acct.export_gcm_encrypted_private_key(password, salt, scrypt_n)
+        label = 'label'
+        b58_address = acct.get_address_base58()
+        wm.import_identity(label, encrypted_private_key, password, salt, b58_address)
+        identity = wm.get_default_identity()
+        self.assertEqual(label, identity.label)
         wm.write_wallet()
         os.remove(path)
 
-    def test_create_identity_from_prikey(self):
+    def test_create_identity_from_pri_key(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
