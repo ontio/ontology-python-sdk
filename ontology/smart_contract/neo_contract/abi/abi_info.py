@@ -14,7 +14,13 @@ class AbiInfo(object):
         else:
             self.events = events
 
-    def get_function(self, name: str):
+    def get_function(self, name: str) -> AbiFunction or None:
+        """
+        This interface is used to get an AbiFunction object from AbiInfo object by given function name.
+
+        :param name: the function name in abi file
+        :return: if succeed, an AbiFunction will constructed based on given function name
+        """
         for func in self.functions:
             if func['name'] == name:
                 return AbiFunction(func['name'], func['returntype'], func['parameters'])
