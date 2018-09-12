@@ -8,6 +8,12 @@ from ontology.common.define import *
 
 
 def get_asset_address(asset: str) -> bytearray:
+    """
+    This interface is used to get the smart contract address of ONT otr ONG.
+
+    :param asset: a string which is used to indicate which asset's contract address we want to get.
+    :return: the contract address of asset in the form of bytearray.
+    """
     if asset.upper() == 'ONT':
         contract_address = ONT_CONTRACT_ADDRESS
     elif asset.upper() == 'ONG':
@@ -17,11 +23,22 @@ def get_asset_address(asset: str) -> bytearray:
     return contract_address  # [20]byte
 
 
-def get_random_bytes(length):
+def get_random_bytes(length: int) -> bytes:
+    """
+    This interface is used to get a random byte string of the desired length.
+
+    :param length: the desired length of a random byte string.
+    :return: a random byte string of the desired length.
+    """
     return Random.get_random_bytes(length)
 
 
-def get_random_str(length):
+def get_random_str(length: int) -> str:
+    """
+
+    :param length:
+    :return: a random string of the desired length.
+    """
     return Random.get_random_bytes(length).hex()[:length]
 
 
