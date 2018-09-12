@@ -262,6 +262,11 @@ class WalletManager(object):
         raise SDKException(ErrorCode.param_error)
 
     def get_default_account(self) -> AccountData:
+        """
+        This interface is used to get the default account in WalletManager.
+
+        :return: an AccountData object that contain all the information of a default account
+        """
         for acct in self.wallet_in_mem.accounts:
             if acct.is_default:
                 return acct
