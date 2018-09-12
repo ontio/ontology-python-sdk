@@ -118,21 +118,22 @@ def bytes_reader(b):
 
 
 def bigint_to_neo_bytes(data: int):
+    if data == 0:
+        return bytearray()
     data_bytes = int_to_bytearray(data)
     if len(data_bytes) == 0:
         return bytearray()
-    b = data_bytes[0]
     if data < 0:
-        for i in range(len(data_bytes)):
-            data_bytes[i] = ~b
-        temp = int.from_bytes(data_bytes, "little")
-        temp2 = temp + 1
-        bs = int_to_bytearray(temp2)
+        data_bytes2 = int_to_bytearray(-data)
+        b = data_bytes2[0]
+        data_bytes.reverse()
         if b >> 7 == 1:
-            res = bs[:] + bytearray([255])
+            res = data_bytes[:] + bytearray([255])
             return res
-        return bs
+        return data_bytes
     else:
+        b = data_bytes[0]
+        data_bytes.reverse()
         if b >> 7 == 1:
             res = data_bytes[:] + bytearray([0])
             return res
@@ -142,7 +143,11 @@ def bigint_to_neo_bytes(data: int):
 def int_to_bytearray(data: int):
     bit_length = data.bit_length() // 8
     t = data.bit_length() / 8
-    if bit_length < t:
+    if bit_length <= t:
         bit_length += 1
-    data_bytes = data.to_bytes(bit_length, "little")
-    return bytearray(data_bytes)
+    return bytearray(data.to_bytes(bit_length, "big", signed=True))
+    # if data < 0:
+    #     return bytearray(data.to_bytes(bit_length, "big", signed=True))
+    # else:
+    #     return bytearray(data.to_bytes(bit_length, "little"))
+
