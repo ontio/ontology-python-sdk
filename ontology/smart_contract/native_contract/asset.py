@@ -96,7 +96,7 @@ class Asset(object):
 
     def unbound_ong(self, base58_address: str) -> str:
         contract_address = util.get_asset_address("ont")
-        return self.__sdk.rpc.get_allowance("ong", Address(bytearray.fromhex(contract_address)).b58encode(), base58_address)
+        return self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
 
     def query_name(self, asset: str) -> str:
         contract_address = util.get_asset_address(asset)
