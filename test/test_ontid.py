@@ -20,7 +20,7 @@ acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 did = "did:ont:" + acc2.get_address_base58()
 password = "111111"
-identity = sdk.wallet_manager.create_identity_from_pri_key("sss", "111111", private_key2)
+identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111", private_key2)
 
 
 
