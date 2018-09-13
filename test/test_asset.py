@@ -45,7 +45,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(1, decimals)
 
     def test_query_balance(self):
-        asset = Asset(sdk)
+        asset = sdk.native_vm().asset()
         private_key = util.get_random_str(64)
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_address = acct.get_address_base58()
@@ -60,17 +60,24 @@ class TestAsset(unittest.TestCase):
         asset = sdk.native_vm().asset()
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        allowance = asset.query_allowance("ont", b58_from_address, b58_to_address)
+        allowance = asset.query_allowance('ont', b58_from_address, b58_to_address)
         self.assertEqual(1, allowance)
+        allowance = asset.query_allowance('ong', b58_from_address, b58_to_address)
+        self.assertEqual(0, allowance)
 
     def test_new_transfer_transaction(self):
+        asset = sdk.native_vm().asset()
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
         private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
-        acc = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        to_acct = Account(private_key2, SignatureScheme.SHA256withECDSA)
 
-        balance_1 = sdk.rpc.get_balance(acc.get_address_base58())
-        balance_2 = sdk.rpc.get_balance(acc2.get_address_base58())
+        b58_from_address = from_acct.get_address_base58()
+        b58_to_address = to_acct.get_address_base58()
+        b58_payer_address = b58_from_address
+
+        balance_1 = sdk.rpc.get_balance(b58_from_address)
+        balance_2 = sdk.rpc.get_balance(b58_to_address)
 
         old_ont_balance_1 = 0
         old_ont_balance_2 = 0
@@ -91,16 +98,18 @@ class TestAsset(unittest.TestCase):
         gas_limit = 20000
         gas_price = 500
         gas = 20000 * 500
-        tx = sdk.native_vm().asset().new_transfer_transaction("ont", acc.get_address_base58(),
-                                                              acc2.get_address_base58(), 1, acc2.get_address_base58(),
-                                                              gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acc)
-        tx = sdk.add_sign_transaction(tx, acc2)
-        sdk.rpc.send_raw_transaction(tx)
+        amount = 1
+
+        tx = asset.new_transfer_transaction('ont', b58_from_address, b58_to_address, amount, b58_payer_address,
+                                            gas_limit, gas_price)
+        tx = sdk.sign_transaction(tx, from_acct)
+        tx = sdk.add_sign_transaction(tx, to_acct)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(64, len(tx_hash))
 
         time.sleep(6)
-        balance_1 = sdk.rpc.get_balance(acc.get_address_base58())
-        balance_2 = sdk.rpc.get_balance(acc2.get_address_base58())
+        balance_1 = sdk.rpc.get_balance(b58_from_address)
+        balance_2 = sdk.rpc.get_balance(b58_to_address)
 
         new_ont_balance_1 = 0
         new_ont_balance_2 = 0
@@ -120,8 +129,8 @@ class TestAsset(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
         self.assertEqual(int(old_ont_balance_1) - 1, int(new_ont_balance_1))
         self.assertEqual(int(old_ont_balance_2) + 1, int(new_ont_balance_2))
-        self.assertEqual(int(old_ong_balance_1), int(new_ong_balance_1))
-        self.assertEqual((int(old_ong_balance_2) - int(new_ong_balance_2)), gas)
+        self.assertEqual((int(old_ong_balance_1) - int(new_ong_balance_1)), gas)
+        self.assertEqual(int(old_ong_balance_2), int(new_ong_balance_2))
 
     def test_send_transfer(self):
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
@@ -138,14 +147,15 @@ class TestAsset(unittest.TestCase):
 
     def test_send_withdraw_ong_transaction(self):
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
-        private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
-        acc = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-        acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
+        private_key2 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
+        claimer = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        payer = Account(private_key2, SignatureScheme.SHA256withECDSA)
         asset = sdk.native_vm().asset()
-        res = asset.send_withdraw_ong_transaction(acc, acc2.get_address_base58(), 1, acc3, 20000, 500)
-        self.assertEqual(res, '01')
+        b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = asset.send_withdraw_ong_transaction(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
 
     def test_send_approve(self):
         private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
