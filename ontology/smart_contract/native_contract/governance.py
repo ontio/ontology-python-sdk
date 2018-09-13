@@ -205,6 +205,8 @@ class Governance(object):
         block = self.__sdk.rpc.get_block_by_height(current_height - 1)
         timestamp = block['Header']['Timestamp'] - timestamp0
         total_stake = self.get_total_stake(address)
+        if total_stake is None:
+            return 0
         return self.calc_unbind_ong(total_stake.stake, total_stake.time_offset, timestamp)
 
     def calc_unbind_ong(self, balance: int, start_offset: int, end_offset: int):
@@ -241,6 +243,8 @@ class Governance(object):
         address_bytes = Address.b58decode(address).to_array()
         key = total_bytes + address_bytes
         res = self.__sdk.rpc.get_storage(contract_address.hex(), key.hex())
+        if res is None or res == '':
+            return None
         stream = StreamManager.GetStream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         total_stake = TotalStake()
@@ -290,6 +294,8 @@ class Governance(object):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         contract_address.reverse()
         view = self.__sdk.rpc.get_storage(contract_address.hex(), self.GOVERNANCE_VIEW.encode().hex())
+        if view is None or view == '':
+            return None
         stream = StreamManager.GetStream(bytearray.fromhex(view))
         reader = BinaryReader(stream)
         governance_view = GovernanceView()
@@ -302,6 +308,8 @@ class Governance(object):
         peer_pool_bytes = self.PEER_POOL.encode('utf-8')
         key_bytes = peer_pool_bytes + a2b_hex(view_bytes)
         value = self.__sdk.rpc.get_storage(contract_address.hex(), key_bytes.hex())
+        if value is None or value == '':
+            return None
         stream3 = StreamManager.GetStream(bytearray.fromhex(value))
         reader2 = BinaryReader(stream3)
         length = reader2.read_int32()
