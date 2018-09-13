@@ -67,10 +67,10 @@ class Asset(object):
     def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> int:
         """
 
-        :param asset:
-        :param b58_from_address:
-        :param b58_to_address:
-        :return:
+        :param asset: a string which is used to indicate which asset's allowance we want to get.
+        :param b58_from_address: a base58 encode address which indicate where the allowance from.
+        :param b58_to_address: a base58 encode address which indicate where the allowance to.
+        :return: the amount of allowance in the from of int.
         """
         contract_address = util.get_asset_address(asset)
         raw_from = Address.b58decode(b58_from_address).to_array()
@@ -98,12 +98,25 @@ class Asset(object):
         return allowance
 
     @staticmethod
-    def new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
+    def new_transfer_transaction(asset: str, b58_from_address: str, b58_to_address: str, amount: int,
+                                 b58_payer_address: str,
                                  gas_limit: int, gas_price: int) -> Transaction:
+        """
+        This interface is used to generate a Transaction for transfer.
+
+        :param asset: a string which is used to indicate which asset we want to transfer.
+        :param b58_from_address: a base58 encode address which indicate where the asset from.
+        :param b58_to_address: a base58 encode address which indicate where the asset to.
+        :param amount: the amount of asset that will be transferred.
+        :param b58_payer_address: a base58 encode address which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a Transaction object which can be used for transfer.
+        """
         contract_address = util.get_asset_address(asset)
-        raw_from = Address.b58decode(from_addr).to_array()
-        raw_to = Address.b58decode(to_addr).to_array()
-        raw_payer = Address.b58decode(payer).to_array()
+        raw_from = Address.b58decode(b58_from_address).to_array()
+        raw_to = Address.b58decode(b58_to_address).to_array()
+        raw_payer = Address.b58decode(b58_payer_address).to_array()
         state = [{"from": raw_from, "to": raw_to, "amount": amount}]
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
         unix_time_now = int(time())
@@ -115,9 +128,9 @@ class Asset(object):
         return Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, attributes,
                            signers, hash_value)
 
-    def send_transfer(self, asset: str, from_acct: Account, to_addr: str, amount: int, payer: Account,
+    def send_transfer(self, asset: str, from_acct: Account, to_address: str, amount: int, payer: Account,
                       gas_limit: int, gas_price: int):
-        tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), to_addr, amount,
+        tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), to_address, amount,
                                             payer.get_address_base58(),
                                             gas_limit, gas_price)
         self.__sdk.sign_transaction(tx, from_acct)
@@ -215,11 +228,22 @@ class Asset(object):
                            invoke_code,
                            bytearray(), [], bytearray())
 
-    def send_withdraw_ong_transaction(self, claimer: Account, recv_addr: str, amount: int, payer: Account,
+    def send_withdraw_ong_transaction(self, claimer: Account, b58_recv_address: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int) -> str:
+        """
+        This interface is used to withdraw a amount of ong and transfer them to receive address.
+
+        :param claimer: the owner of ong that remained to claim.
+        :param b58_recv_address: the address that received the ong.
+        :param amount: the amount of ong want to claim.
+        :param payer: indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: hexadecimal transaction hash value.
+        """
         b58_claimer = claimer.get_address_base58()
         b58_payer = payer.get_address_base58()
-        tx = Asset.new_withdraw_ong_transaction(b58_claimer, recv_addr, amount, b58_payer, gas_limit, gas_price)
+        tx = Asset.new_withdraw_ong_transaction(b58_claimer, b58_recv_address, amount, b58_payer, gas_limit, gas_price)
         tx = self.__sdk.sign_transaction(tx, claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
@@ -227,11 +251,11 @@ class Asset(object):
         return tx.hash256_explorer()
 
     @staticmethod
-    def new_approve(asset: str, send_addr: str, recv_addr: str, amount: int, payer: str, gas_limit: int,
+    def new_approve(asset: str, send_address: str, recv_address: str, amount: int, payer: str, gas_limit: int,
                     gas_price: int) -> Transaction:
-        contract_address = util.get_asset_address(asset)  # []bytes
-        raw_send = Address.b58decode(send_addr).to_array()
-        raw_recv = Address.b58decode(recv_addr).to_array()
+        contract_address = util.get_asset_address(asset)
+        raw_send = Address.b58decode(send_address).to_array()
+        raw_recv = Address.b58decode(recv_address).to_array()
         raw_payer = Address.b58decode(payer).to_array()
         args = {"from": raw_send, "to": raw_recv, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
@@ -251,10 +275,10 @@ class Asset(object):
         return tx.hash256_explorer()
 
     @staticmethod
-    def new_transfer_from(asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int, payer: str,
+    def new_transfer_from(asset: str, send_addr: str, from_address: str, recv_addr: str, amount: int, payer: str,
                           gas_limit: int, gas_price: int) -> Transaction:
         raw_sender = Address.b58decode(send_addr).to_array()
-        raw_from = Address.b58decode(from_addr).to_array()
+        raw_from = Address.b58decode(from_address).to_array()
         raw_to = Address.b58decode(recv_addr).to_array()
         raw_payer = Address.b58decode(payer).to_array()
         contract_address = util.get_asset_address(asset)
