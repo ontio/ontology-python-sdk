@@ -85,7 +85,7 @@ The wallet function includes three parts, digit account, digit identity, and mne
  | :--- | :------------------------------------------------------------------------------------- |
  | 1    | import_identity(label: str, encrypted_pri_key: str, pwd: str, salt: str, address: str) |
  | 2    | create_identity(label: str, pwd: str, salt: str, private_key: bytes)                   |
- | 3    | create_identity_from_pri_key(label: str, pwd: str, private_key: bytes)                 |
+ | 3    | create_identity_from_private_key(label: str, pwd: str, private_key: bytes)                 |
 
 ## Asset function list
 
