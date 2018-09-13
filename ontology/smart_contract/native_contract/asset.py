@@ -19,6 +19,12 @@ class Asset(object):
 
     @staticmethod
     def get_asset_address(asset: str) -> bytearray:
+        """
+        This interface is used to get the ONT or ONG asset's address.
+
+        :param asset: a string which is used to indicate which asset's address we want to get.
+        :return: asset's adress in the form of bytearray.
+        """
         if asset.upper() == 'ONT':
             contract_address = ONT_CONTRACT_ADDRESS
         elif asset.upper() == 'ONG':
@@ -58,7 +64,14 @@ class Asset(object):
             balance = 0
         return balance
 
-    def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> str:
+    def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> int:
+        """
+
+        :param asset:
+        :param b58_from_address:
+        :param b58_to_address:
+        :return:
+        """
         contract_address = util.get_asset_address(asset)
         raw_from = Address.b58decode(b58_from_address).to_array()
         raw_to = Address.b58decode(b58_to_address).to_array()
@@ -75,8 +88,14 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return res
+        allowance = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        array = bytearray(binascii.a2b_hex(allowance.encode('ascii')))
+        array.reverse()
+        try:
+            allowance = int(binascii.b2a_hex(array).decode('ascii'), 16)
+        except ValueError:
+            allowance = 0
+        return allowance
 
     @staticmethod
     def new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
