@@ -71,7 +71,7 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
 
  |      | Main   Function                                                                                                                             |
  | :--- | :------------------------------------------------------------------------------------------------------------------------------------------ |
- | 1    | new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str, gas_limit: int, gas_price: int)                 |
+ | 1    | new_transfer_transaction(asset: str, from_address: str, to_address: str, amount: int, payer: str, gas_limit: int, gas_price: int)                 |
  | 2    | query_balance(asset: str, addr: str)                                                                                                        |
  | 3    | query_allowance(asset: str, b58_from_address: str, b58_to_address: str)                                                                                   |
  | 4    | query_name(asset: str)                                                                                                                      |
@@ -79,7 +79,7 @@ The asset includes native digit asset and Nep-5 smart constract digit asset. Nep
  | 6    | query_decimals(asset: str)                                                                                                                  |
  | 7    | send_withdraw_ong_transaction(claimer: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                |
  | 8    | send_approve(asset: str, sender: Account, recv_addr: str, amount: int, payer: Account, gas_limit: int, gas_price: int)                      |
- | 9    | send_transfer_from(asset: str, sender: Account, from_addr: str, recv_addr: str, amount: int,payer: Account, gas_limit: int, gas_price: int) |
+ | 9    | send_transfer_from(asset: str, sender: Account, from_address: str, recv_addr: str, amount: int,payer: Account, gas_limit: int, gas_price: int) |
  
 ## Identity function list 
 
