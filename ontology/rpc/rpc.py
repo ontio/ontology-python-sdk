@@ -60,9 +60,14 @@ class RpcClient(object):
             the version information of the connected node.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_VERSION, [])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        version = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_VERSION, [])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        version = json.loads(response.content.decode())["result"]
         return version
 
     def get_node_count(self) -> int:
@@ -73,9 +78,14 @@ class RpcClient(object):
             the number of connections.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_NODE_COUNT, [])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        count = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_NODE_COUNT, [])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        count = json.loads(response.content.decode())["result"]
         return count
 
     def get_gas_price(self) -> int:
@@ -86,9 +96,14 @@ class RpcClient(object):
             the value of gas price.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_GAS_PRICE, [])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        price = json.loads(r.content.decode())["result"]['gasprice']
+        payload = RpcClient.set_json_rpc_version(RPC_GET_GAS_PRICE, [])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        price = json.loads(response.content.decode())["result"]['gasprice']
         return price
 
     def get_network_id(self) -> int:
@@ -99,9 +114,14 @@ class RpcClient(object):
             the network id of current network.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_NETWORK_ID, [])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        id = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_NETWORK_ID, [])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        id = json.loads(response.content.decode())["result"]
         return id
 
     def get_block_by_hash(self, block_hash: str) -> dict:
@@ -116,9 +136,14 @@ class RpcClient(object):
             the block information of the specified block hash.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK, [block_hash, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        dict_block = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_BLOCK, [block_hash, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        dict_block = json.loads(response.content.decode())["result"]
         return dict_block
 
     def get_block_by_height(self, height: int) -> dict:
@@ -129,9 +154,14 @@ class RpcClient(object):
             the decimal total number of blocks in current network.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK, [height, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        block = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_BLOCK, [height, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        block = json.loads(response.content.decode())["result"]
         return block
 
     def get_block_count(self) -> int:
@@ -142,9 +172,14 @@ class RpcClient(object):
             the decimal total number of blocks in current network.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK_COUNT)
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        count = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_BLOCK_COUNT)
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        count = json.loads(response.content.decode())["result"]
         return count
 
     def get_current_block_hash(self) -> str:
@@ -155,9 +190,14 @@ class RpcClient(object):
             the hexadecimal hash value of the highest block in current network.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_CURRENT_BLOCK_HASH)
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_CURRENT_BLOCK_HASH)
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        res = json.loads(response.content.decode())["result"]
         return res
 
     def get_block_hash_by_height(self, height: int) -> str:
@@ -172,9 +212,14 @@ class RpcClient(object):
             the hexadecimal hash value of the specified block height.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BLOCK_HASH, [height, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        block_hash = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_BLOCK_HASH, [height, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        block_hash = json.loads(response.content.decode())["result"]
         return block_hash
 
     def get_balance(self, base58_address: str) -> dict:
@@ -189,9 +234,14 @@ class RpcClient(object):
             the value of account balance in dictionary form.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_BALANCE, [base58_address, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        balance = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_BALANCE, [base58_address, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        balance = json.loads(response.content.decode())["result"]
         return balance
 
     def get_allowance(self, asset_name: str, from_address: str, to_address: str) -> str:
@@ -207,9 +257,14 @@ class RpcClient(object):
             the information of allowance in dictionary form.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_ALLOWANCE, [asset_name, from_address, to_address])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        allowance = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_ALLOWANCE, [asset_name, from_address, to_address])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        allowance = json.loads(response.content.decode())["result"]
         return allowance
 
     def get_storage(self, contract_address: str, key: str) -> int:
@@ -227,9 +282,14 @@ class RpcClient(object):
             the information of smart contract event in dictionary form.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        s = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_STORAGE, [contract_address, key, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        s = json.loads(response.content.decode())["result"]
         # s = bytearray.fromhex(s)
         # value = (s[0]) | (s[1]) << 8 | (s[2]) << 16 | (s[3]) << 24 | (s[4]) << 32 | (s[5]) << 40 | (s[6]) << 48 | (
         #     s[7]) << 56
@@ -247,9 +307,14 @@ class RpcClient(object):
             the information of smart contract event in dictionary form.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        event = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        event = json.loads(response.content.decode())["result"]
         return event
 
     def get_smart_contract_event_by_height(self, height: int) -> dict:
@@ -264,9 +329,14 @@ class RpcClient(object):
             the information of smart contract event in dictionary form.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [height, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        event = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT_EVENT, [height, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        event = json.loads(response.content.decode())["result"]
         return event
 
     def get_raw_transaction(self, tx_hash: str) -> dict:
@@ -276,9 +346,14 @@ class RpcClient(object):
         :param tx_hash: str, a hexadecimal hash value.
         :return: dict
         """
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_hash, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        tx = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_TRANSACTION, [tx_hash, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        tx = json.loads(response.content.decode())["result"]
         return tx
 
     def get_smart_contract(self, contract_address: str) -> dict:
@@ -292,9 +367,14 @@ class RpcClient(object):
             raise SDKException(ErrorCode.param_err('a hexadecimal contract address is required.'))
         if len(contract_address) != 40:
             raise SDKException(ErrorCode.param_err('the length of the contract address should be 40 bytes.'))
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT, [contract_address, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        contract = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_SMART_CONTRACT, [contract_address, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        contract = json.loads(response.content.decode())["result"]
         return contract
 
     def get_merkle_proof(self, tx_hash: str) -> dict:
@@ -309,9 +389,14 @@ class RpcClient(object):
             the merkle proof in dictionary form.
         """
 
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_GET_MERKLE_PROOF, [tx_hash, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        proof = json.loads(r.content.decode())["result"]
+        payload = RpcClient.set_json_rpc_version(RPC_GET_MERKLE_PROOF, [tx_hash, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        proof = json.loads(response.content.decode())["result"]
         return proof
 
     def send_raw_transaction(self, tx: Transaction) -> str:
@@ -328,9 +413,14 @@ class RpcClient(object):
 
         buf = tx.serialize()
         tx_data = buf.hex()
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        data = json.loads(r.content.decode())
+        payload = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        data = json.loads(response.content.decode())
         res = data["result"]
         if data["error"] != 0:
             raise SDKException(ErrorCode.other_error(res))
@@ -350,9 +440,14 @@ class RpcClient(object):
 
         buf = tx.serialize()
         tx_data = buf.hex()
-        rpc_struct = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
-        r = HttpRequest.request("post", self.addr, rpc_struct)
-        res = json.loads(r.content.decode())
+        payload = RpcClient.set_json_rpc_version(RPC_SEND_TRANSACTION, [tx_data, 1])
+        try:
+            response = HttpRequest.request("post", self.addr, payload)
+        except requests.exceptions.ConnectTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.addr])))
+        except requests.exceptions.ConnectionError:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.addr])))
+        res = json.loads(response.content.decode())
         err = res["error"]
         if err > 0:
             try:
