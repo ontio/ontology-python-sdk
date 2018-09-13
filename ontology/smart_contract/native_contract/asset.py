@@ -108,8 +108,7 @@ class Asset(object):
 
     def unbound_ong(self, base58_address: str) -> str:
         contract_address = util.get_asset_address("ont")
-        return self.__sdk.rpc.get_allowance("ong", Address(bytearray.fromhex(contract_address)).b58encode(),
-                                            base58_address)
+        return self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
 
     def query_name(self, asset: str) -> str:
         """
@@ -202,10 +201,11 @@ class Asset(object):
         b58_claimer = claimer.get_address_base58()
         b58_payer = payer.get_address_base58()
         tx = Asset.new_withdraw_ong_transaction(b58_claimer, recv_addr, amount, b58_payer, gas_limit, gas_price)
-        tx = self.__sdk.sign_transaction(tx, payer)
-        tx = self.__sdk.add_sign_transaction(tx, claimer)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return res
+        tx = self.__sdk.sign_transaction(tx, claimer)
+        if claimer.get_address_base58() != payer.get_address_base58():
+            tx = self.__sdk.add_sign_transaction(tx, payer)
+        self.__sdk.rpc.send_raw_transaction(tx)
+        return tx.hash256_explorer()
 
     @staticmethod
     def new_approve(asset: str, send_addr: str, recv_addr: str, amount: int, payer: str, gas_limit: int,
@@ -228,8 +228,8 @@ class Asset(object):
         tx = self.__sdk.sign_transaction(tx, sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = self.__sdk.add_sign_transaction(tx, payer)
-        flag = self.__sdk.rpc.send_raw_transaction(tx)
-        return flag
+        self.__sdk.rpc.send_raw_transaction(tx)
+        return tx.hash256_explorer()
 
     @staticmethod
     def new_transfer_from(asset: str, send_addr: str, from_addr: str, recv_addr: str, amount: int, payer: str,
@@ -258,8 +258,5 @@ class Asset(object):
         tx = self.__sdk.sign_transaction(tx, sender)
         if b58_sender != b58_payer:
             tx = self.__sdk.add_sign_transaction(tx, payer)
-        flag = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        if flag:
-            return tx.hash256_hex()
-        else:
-            return ''
+        self.__sdk.rpc.send_raw_transaction(tx)
+        return tx.hash256_explorer()
