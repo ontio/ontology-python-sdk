@@ -132,7 +132,7 @@ class WalletManager(object):
         info.address_u160 = acct.get_address().to_array().hex()
         return self.wallet_in_mem.get_identity_by_ont_id(info.ont_id)
 
-    def create_identity_from_pri_key(self, label: str, pwd: str, private_key: str) -> Identity:
+    def create_identity_from_private_key(self, label: str, pwd: str, private_key: str) -> Identity:
         """
         This interface is used to create identity based on given label, password and private key.
 
