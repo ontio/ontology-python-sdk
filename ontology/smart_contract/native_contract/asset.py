@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import binascii
 from time import time
 
 from ontology.utils import util
@@ -27,34 +27,14 @@ class Asset(object):
             raise ValueError("asset is not equal to ONT or ONG")
         return contract_address
 
-    @staticmethod
-    def new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
-                                 gas_limit: int, gas_price: int) -> Transaction:
-        contract_address = util.get_asset_address(asset)
-        raw_from = Address.b58decode(from_addr).to_array()
-        raw_to = Address.b58decode(to_addr).to_array()
-        raw_payer = Address.b58decode(payer).to_array()
-        state = [{"from": raw_from, "to": raw_to, "amount": amount}]
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
-        unix_time_now = int(time())
-        version = 0
-        tx_type = 0xd1
-        attributes = bytearray()
-        signers = list()
-        hash_value = bytearray()
-        return Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, attributes,
-                           signers, hash_value)
-
-    def send_transfer(self, asset: str, from_acct: Account, to_addr: str, amount: int, payer: Account,
-                                 gas_limit: int, gas_price: int):
-        tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), to_addr, amount, payer.get_address_base58(),
-                                            gas_limit, gas_price)
-        self.__sdk.sign_transaction(tx, from_acct)
-        if from_acct.get_address_base58() != payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
-
     def query_balance(self, asset: str, b58_address: str) -> int:
+        """
+        This interface is used to query the account's ONT or ONG balance.
+
+        :param asset: a string which is used to indicate which asset we want to check the balance.
+        :param b58_address: a base58 encode account address.
+        :return: account balance.
+        """
         raw_address = Address.b58decode(b58_address).to_array()
         contract_address = util.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "balanceOf", raw_address)
@@ -69,10 +49,14 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        r = bytearray.fromhex(res)
-        r.reverse()
-        return int(r.hex(), 16)
+        balance = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        array = bytearray(binascii.a2b_hex(balance.encode('ascii')))
+        array.reverse()
+        try:
+            balance = int(binascii.b2a_hex(array).decode('ascii'), 16)
+        except ValueError:
+            balance = 0
+        return balance
 
     def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> str:
         contract_address = util.get_asset_address(asset)
@@ -94,11 +78,46 @@ class Asset(object):
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
+    @staticmethod
+    def new_transfer_transaction(asset: str, from_addr: str, to_addr: str, amount: int, payer: str,
+                                 gas_limit: int, gas_price: int) -> Transaction:
+        contract_address = util.get_asset_address(asset)
+        raw_from = Address.b58decode(from_addr).to_array()
+        raw_to = Address.b58decode(to_addr).to_array()
+        raw_payer = Address.b58decode(payer).to_array()
+        state = [{"from": raw_from, "to": raw_to, "amount": amount}]
+        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
+        unix_time_now = int(time())
+        version = 0
+        tx_type = 0xd1
+        attributes = bytearray()
+        signers = list()
+        hash_value = bytearray()
+        return Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, attributes,
+                           signers, hash_value)
+
+    def send_transfer(self, asset: str, from_acct: Account, to_addr: str, amount: int, payer: Account,
+                      gas_limit: int, gas_price: int):
+        tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), to_addr, amount,
+                                            payer.get_address_base58(),
+                                            gas_limit, gas_price)
+        self.__sdk.sign_transaction(tx, from_acct)
+        if from_acct.get_address_base58() != payer.get_address_base58():
+            self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
     def unbound_ong(self, base58_address: str) -> str:
         contract_address = util.get_asset_address("ont")
-        return self.__sdk.rpc.get_allowance("ong", Address(bytearray.fromhex(contract_address)).b58encode(), base58_address)
+        return self.__sdk.rpc.get_allowance("ong", Address(bytearray.fromhex(contract_address)).b58encode(),
+                                            base58_address)
 
     def query_name(self, asset: str) -> str:
+        """
+        This interface is used to query the asset's name of ONT or ONG.
+
+        :param asset: a string which is used to indicate which asset's name we want to get.
+        :return: asset's name in the form of string.
+        """
         contract_address = util.get_asset_address(asset)
         method = 'name'
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), method, bytearray())
@@ -117,6 +136,12 @@ class Asset(object):
         return bytes.fromhex(res).decode()
 
     def query_symbol(self, asset: str) -> str:
+        """
+        This interface is used to query the asset's symbol of ONT or ONG.
+
+        :param asset: a string which is used to indicate which asset's symbol we want to get.
+        :return: asset's symbol in the form of string.
+        """
         contract_address = util.get_asset_address(asset)
         method = 'symbol'
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), method, bytearray())
@@ -134,7 +159,13 @@ class Asset(object):
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return bytes.fromhex(res).decode()
 
-    def query_decimals(self, asset: str) -> str:
+    def query_decimals(self, asset: str) -> int:
+        """
+        This interface is used to query the asset's decimals of ONT or ONG.
+
+        :param asset: a string which is used to indicate which asset's decimals we want to get
+        :return: asset's decimals in the form of int
+        """
         contract_address = util.get_asset_address(asset)
         method = 'decimals'
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), method, bytearray())
@@ -150,7 +181,7 @@ class Asset(object):
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
         decimal = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return decimal
+        return int(decimal)
 
     @staticmethod
     def new_withdraw_ong_transaction(claimer_addr: str, recv_addr: str, amount: int, payer_addr: str,
@@ -222,7 +253,8 @@ class Asset(object):
             raise SDKException(ErrorCode.param_error)
         b58_payer = payer.get_address_base58()
         b58_sender = sender.get_address_base58()
-        tx = Asset.new_transfer_from(asset, b58_sender, from_address, recv_address, amount, b58_payer, gas_limit, gas_price)
+        tx = Asset.new_transfer_from(asset, b58_sender, from_address, recv_address, amount, b58_payer, gas_limit,
+                                     gas_price)
         tx = self.__sdk.sign_transaction(tx, sender)
         if b58_sender != b58_payer:
             tx = self.__sdk.add_sign_transaction(tx, payer)
