@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-from collections import namedtuple
 import unittest
 
 from ontology.ont_sdk import OntologySdk
