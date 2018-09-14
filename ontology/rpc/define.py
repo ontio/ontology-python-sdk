@@ -27,5 +27,5 @@ JSON_RPC_VERSION = "2.0"
 # JsonRpcRequest object in rpc
 JsonRpcRequest = {"jsonrpc": "", "id": "", "method": "", "params": ""}
 
-rpc_address = "http://polaris3.ont.io:20336"
-rest_address = "http://polaris1.ont.io:20334"
+rpc_address = 'http://polaris3.ont.io:20336'
+rest_address = 'http://polaris1.ont.io:20334'
