@@ -80,7 +80,7 @@ class Account(object):
         return encrypted_key_str.decode()
 
     @staticmethod
-    def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, address: str, salt: str, n: int,
+    def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, b58_address: str, salt: str, n: int,
                                     scheme: SignatureScheme) -> str:
         r = 8
         p = 8
@@ -92,10 +92,10 @@ class Account(object):
         encrypted_key = base64.b64decode(encrypted_key_str).hex()
         mac_tag = a2b_hex(encrypted_key[64:96])
         cipher_text = a2b_hex(encrypted_key[0:64])
-        pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, address.encode(), mac_tag, derivedhalf2, iv)
+        pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, b58_address.encode(), mac_tag, derivedhalf2, iv)
         pri_key = b2a_hex(pri_key).decode('ascii')
         acct = Account(pri_key, scheme)
-        if acct.get_address().b58encode() != address:
+        if acct.get_address().b58encode() != b58_address:
             raise RuntimeError
         return pri_key
 

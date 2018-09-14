@@ -99,10 +99,20 @@ class WalletData(object):
             raise SDKException(ErrorCode.get_account_by_address_err)
         return self.accounts.remove(account)
 
-    def get_accounts(self):
+    def get_accounts(self) -> list:
+        """
+        This interface is used to get all the account information in WalletManager.
+
+        :return: an AccountData list which contain all the account information in WalletManager
+        """
         return self.accounts
 
     def set_default_account_by_index(self, index: int):
+        """
+        This interface is used to set default account by given index.
+
+        :param index: an int value that indicate the account object in account list.
+        """
         if index >= len(self.accounts):
             raise SDKException(ErrorCode.param_error)
         for acct in self.accounts:
@@ -111,6 +121,11 @@ class WalletData(object):
         self.default_account_address = self.accounts[index].address
 
     def set_default_account_by_address(self, b58_address: str):
+        """
+        This interface is used to set default account by given base58 encode address.
+
+        :param b58_address: a base58 encode address.
+        """
         flag = True
         index = -1
         for acct in self.accounts:
@@ -125,7 +140,12 @@ class WalletData(object):
         self.accounts[index].is_default = True
         self.default_account_address = b58_address
 
-    def get_default_account_address(self):
+    def get_default_account_address(self) -> str:
+        """
+        This interface is used to get the default account's base58 encode address in WalletManager.
+
+        :return:
+        """
         return self.default_account_address
 
     def get_account_by_index(self, index: int):
@@ -170,6 +190,11 @@ class WalletData(object):
         return None
 
     def set_default_identity_by_index(self, index: int):
+        """
+        This interface is used to set default account by given an index value.
+
+        :param index: an int value that indicate the position of an account object in account list.
+        """
         identities_len = len(self.identities)
         if index >= identities_len:
             raise SDKException(ErrorCode.param_error)

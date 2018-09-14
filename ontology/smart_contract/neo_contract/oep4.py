@@ -147,7 +147,7 @@ class Oep4(object):
         :param payer_acct: an Account class that used to pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
-        :return:
+        :return: the hexadecimal transaction hash value.
         """
         func = self.__abi_info.get_function('Init')
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, acct, payer_acct, gas_limit, gas_price,
@@ -199,7 +199,7 @@ class Oep4(object):
 
         :param from_acct: an Account class that send the oep4 token.
         :param b58_to_address: a base58 encode address that receive the oep4 token.
-        :param value: an int value that indicate the amount oep4 token that will be transfer in this transaction.
+        :param value: an int value that indicate the amount oep4 token that will be transferred in this transaction.
         :param payer_acct: an Account class that used to pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
@@ -224,7 +224,7 @@ class Oep4(object):
     def transfer_multi(self, args: list, payer_acct: Account, signers: list, gas_limit: int, gas_price: int):
         """
         This interface is used to call the TransferMulti method in ope4
-        that allow transfer amount of token from multiple from-account to multiple to-account multiple times.The parameter is object array, the object is State struct, which contains three items.From is transfer sender, which SHOULD be 20-byte address.To is transfer receiver, which also SHOULD be 20-byte address. Amount is transfer value of token. If any of transfer fail, all of the transfers SHOULD be failed, and the method SHOULD throw an exception.
+        that allow transfer amount of token from multiple from-account to multiple to-account multiple times.
 
         :param args: a parameter list with each item contains three sub-items:
                 base58 encode transaction sender address,
@@ -275,7 +275,7 @@ class Oep4(object):
 
         :param owner_acct: an Account class that indicate the owner.
         :param b58_spender_address: a base58 encode address that be allowed to spend the oep4 token in owner's account.
-        :param amount: an int value that indicate the amount oep4 token that will be transfer in this transaction.
+        :param amount: an int value that indicate the amount oep4 token that will be transferred in this transaction.
         :param payer_acct: an Account class that used to pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
