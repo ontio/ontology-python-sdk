@@ -255,31 +255,30 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, b58_address: str, password: str) -> Account or None:
-        """
 
-        :param b58_address: a base58 encode address
+    def get_account(self, b58_address_or_ontid: str, pwd: str) -> Account or None:
+      """
+        :param b58_address_or_ontid: a base58 encode address or ontid
         :param password: a password which is used to decrypt the encrypted private key.
         :return:
         """
-        b58_address = b58_address.replace(DID_ONT, '')
-        for index in range(len(self.wallet_in_mem.accounts)):
-            if self.wallet_in_mem.accounts[index].address == b58_address:
-                key = self.wallet_in_mem.accounts[index].key
-                address = self.wallet_in_mem.accounts[index].address
-                salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                scrypt_n = Scrypt().get_n()
-                private_key = Account.get_gcm_decoded_private_key(key, password, address, salt, scrypt_n, self.scheme)
-                return Account(private_key, self.scheme)
-
-        for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ont_id == did_ont + b58_address:
-                address = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
-                key = self.wallet_in_mem.identities[index].controls[0].key
-                salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
-                scrypt_n = Scrypt().get_n()
-                private_key = Account.get_gcm_decoded_private_key(key, password, address, salt, scrypt_n, self.scheme)
-                return Account(private_key, self.scheme)
+        if address_or_ontid.startswith(DID_ONT):
+            for index in range(len(self.wallet_in_mem.identities)):
+                if self.wallet_in_mem.identities[index].ont_id == address_or_ontid:
+                    addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
+                    key = self.wallet_in_mem.identities[index].controls[0].key
+                    salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
+                    private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(),
+                                                                      self.scheme)
+                    return Account(private_key, self.scheme)
+        else:
+            for index in range(len(self.wallet_in_mem.accounts)):
+                if self.wallet_in_mem.accounts[index].address == address_or_ontid:
+                    key = self.wallet_in_mem.accounts[index].key
+                    addr = self.wallet_in_mem.accounts[index].address
+                    salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
+                    private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
+                    return Account(private_key, self.scheme)
         return None
 
     def get_default_identity(self) -> Identity:
