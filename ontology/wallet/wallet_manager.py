@@ -127,7 +127,7 @@ class WalletManager(object):
         info.ont_id = did_ont + acct.get_address_base58()
         info.pubic_key = acct.serialize_public_key().hex()
         info.private_key = acct.serialize_private_key().hex()
-        info.pri_key_wif = acct.export_wif()
+        info.pri_key_wif = acct.export_wif().encode('ascii')
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_array().hex()
         return self.wallet_in_mem.get_identity_by_ont_id(info.ont_id)
