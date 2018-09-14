@@ -9,18 +9,18 @@ from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 
 rpc_address = "http://127.0.0.1:20336"
-# rpc_address = "http://polaris3.ont.io:20336"
+# rpc_address = 'http://polaris3.ont.io:20336'
 sdk = OntologySdk()
 sdk.rpc.set_address(rpc_address)
-private_key1 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
+private_key1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
 private_key2 = "c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07"
-private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
+private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
 acc1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
 acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 did = "did:ont:" + acc2.get_address_base58()
 password = "111111"
-identity = sdk.wallet_manager.create_identity_from_pri_key("sss", "111111", private_key2)
+identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111", private_key2)
 
 
 

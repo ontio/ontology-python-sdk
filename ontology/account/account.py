@@ -6,14 +6,14 @@ import base58
 from binascii import b2a_hex, a2b_hex
 
 from ontology.crypto.curve import Curve
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.crypto.signature_handler import SignatureHandler
-from ontology.crypto.signature import Signature
+from ontology.crypto.digest import Digest
+from ontology.crypto.scrypt import Scrypt
 from ontology.common.address import Address
 from ontology.crypto.key_type import KeyType
+from ontology.crypto.signature import Signature
 from ontology.crypto.aes_handler import AESHandler
-from ontology.crypto.scrypt import Scrypt
-from ontology.crypto.digest import Digest
+from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.crypto.signature_handler import SignatureHandler
 
 
 class Account(object):
@@ -46,24 +46,55 @@ class Account(object):
         return byte_signature
 
     def get_address(self):
+        """
+
+        :return:
+        """
         return self.__address  # __address is a class not a string or bytes
 
-    def get_address_base58(self):
+    def get_address_base58(self) -> str:
+        """
+        This interface is used to get the base58 encode account address.
+
+        :return:
+        """
         return self.__address.b58encode()
 
     def get_address_hex(self):
+        """
+        This interface is used to get the little-endian hexadecimal account address.
+
+        :return: little-endian hexadecimal account address.
+        """
         return self.__address.to_hex_str()
 
     def get_address_hex_reverse(self):
+        """
+        This interface is used to get the big-endian hexadecimal account address.
+
+        :return: big-endian hexadecimal account address.
+        """
         return self.__address.to_reverse_hex_str()
 
     def get_public_key(self):
         return self.__publicKey
 
-    def get_signature_scheme(self):
+    def get_signature_scheme(self) -> SignatureScheme:
+        """
+        This interface allow to get he signature scheme used in account
+
+        :return: he signature scheme used in account.
+        """
         return self.__signature_scheme
 
     def export_gcm_encrypted_private_key(self, password: str, salt: str, n: int):
+        """
+
+        :param password:
+        :param salt:
+        :param n:
+        :return:
+        """
         r = 8
         p = 8
         dk_len = 64
@@ -82,6 +113,16 @@ class Account(object):
     @staticmethod
     def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, b58_address: str, salt: str, n: int,
                                     scheme: SignatureScheme) -> str:
+        """
+
+        :param encrypted_key_str:
+        :param password:
+        :param b58_address:
+        :param salt:
+        :param n:
+        :param scheme:
+        :return:
+        """
         r = 8
         p = 8
         dk_len = 64
@@ -100,20 +141,44 @@ class Account(object):
         return pri_key
 
     def serialize_private_key(self):
+        """
+        This interface is used to get the private key in the form of bytes.
+
+        :return: the private key in the form of bytes.
+        """
         return self.__private_key
 
-    def serialize_public_key(self):
+    def serialize_public_key(self) -> bytes:
+        """
+        This interface is used to get the public key in the form of bytes.
+
+        :return: the public key in the form of bytes.
+        """
         return self.__publicKey
 
-    def export_wif(self):
+    def export_wif(self) -> str:
+        """
+        This interface is used to get export ECDSA private key in the form of WIF which
+        is a way to encoding an ECDSA private key and make it easier to copy.
+
+        :return: a WIF encode private key.
+        """
         data = b'\x80'
         data = data + self.serialize_private_key()
         data += b'\01'
         checksum = Digest.hash256(data[0:34])
         data += checksum[0:4]
-        return base58.b58encode(data)
+        wif = base58.b58encode(data)
+        return wif.decode('ascii')
 
-    def get_privatekey_from_wif(self, wif: str):
+    @staticmethod
+    def get_private_key_from_wif(wif: str) -> bytes:
+        """
+        This interface is used to decode a WIF encode ECDSA private key.
+
+        :param wif: a WIF encode private key.
+        :return: a ECDSA private key in the form of bytes.
+        """
         if wif is None or wif is "":
             raise Exception("none wif")
         data = base58.b58decode(wif)

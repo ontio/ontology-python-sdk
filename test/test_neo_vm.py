@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-from collections import namedtuple
 import unittest
 
 from ontology.ont_sdk import OntologySdk
@@ -88,13 +87,13 @@ class TestNeoVm(unittest.TestCase):
 
     def test_unbound_ong(self):
         sdk.set_rpc(rpc_address)
-        acct1_unbound_ong = sdk.native_vm().asset().unbound_ong(acct1.get_address_base58())
+        acct1_unbound_ong = sdk.native_vm().asset().query_unbound_ong(acct1.get_address_base58())
         self.assertGreaterEqual(int(acct1_unbound_ong), 0)
-        acct2_unbound_ong = sdk.native_vm().asset().unbound_ong(acct4.get_address_base58())
+        acct2_unbound_ong = sdk.native_vm().asset().query_unbound_ong(acct4.get_address_base58())
         self.assertGreaterEqual(int(acct2_unbound_ong), 0)
-        acct3_unbound_ong = sdk.native_vm().asset().unbound_ong(acct4.get_address_base58())
+        acct3_unbound_ong = sdk.native_vm().asset().query_unbound_ong(acct4.get_address_base58())
         self.assertGreaterEqual(int(acct3_unbound_ong), 0)
-        acct4_unbound_ong = sdk.native_vm().asset().unbound_ong(acct4.get_address_base58())
+        acct4_unbound_ong = sdk.native_vm().asset().query_unbound_ong(acct4.get_address_base58())
         self.assertGreaterEqual(int(acct4_unbound_ong), 0)
 
     def test_address_from_vm_code(self):

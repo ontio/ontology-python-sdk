@@ -113,7 +113,7 @@ class TestWalletManager(unittest.TestCase):
         size = 3
         for i in range(size):
             private_key = util.get_random_str(64)
-            wm.create_identity_from_pri_key("ide", str(i), private_key)
+            wm.create_identity_from_private_key("ide", str(i), private_key)
         identities = wm.get_wallet().get_identities()
         self.assertEqual(len(identities), size)
         self.assertRaises(SDKException, wm.get_wallet().set_default_identity_by_index, size)
@@ -131,7 +131,7 @@ class TestWalletManager(unittest.TestCase):
         size = 3
         for i in range(size):
             private_key = util.get_random_str(64)
-            wm.create_identity_from_pri_key("ide", str(i), private_key)
+            wm.create_identity_from_private_key("ide", str(i), private_key)
         identities = wm.get_wallet().get_identities()
         self.assertEqual(len(identities), size)
         self.assertRaises(SDKException, wm.get_wallet().set_default_identity_by_ont_id, '')
@@ -222,7 +222,7 @@ class TestWalletManager(unittest.TestCase):
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        ide = wm.create_identity_from_pri_key("ide", "1", private_key)
+        ide = wm.create_identity_from_private_key("ide", "1", private_key)
         self.assertEqual(ide.label, 'ide')
         self.assertEqual(ide.ont_id, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
         wm.write_wallet()

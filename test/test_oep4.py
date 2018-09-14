@@ -11,7 +11,7 @@ from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
-remote_rpc_address = "http://polaris3.ont.io:20336"
+remote_rpc_address = 'http://polaris3.ont.io:20336'
 local_rpc_address = 'http://localhost:20336'
 
 
@@ -48,10 +48,16 @@ class TestOep4(unittest.TestCase):
     def test_get_decimal(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
+        contract_address1 = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
         oep4 = sdk.neo_vm().oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.set_contract_address(contract_address1)
         self.assertEqual(8, oep4.get_decimal())
+        contract_address2 = 'c8e9b4316f16ddc328708d8a60b5db04a950516f'
+        oep4.set_contract_address(contract_address2)
+        self.assertEqual(32, oep4.get_decimal())
+        contract_address3 = 'a60ec27d5ca6fb492e338de8f24a999dfda961cb'
+        oep4.set_contract_address(contract_address3)
+        self.assertEqual(255, oep4.get_decimal())
 
     def test_init(self):
         sdk = OntologySdk()
@@ -81,7 +87,7 @@ class TestOep4(unittest.TestCase):
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
         to_acct = Account(private_key2, SignatureScheme.SHA256withECDSA)
         gas_limit = 20000000
@@ -97,8 +103,8 @@ class TestOep4(unittest.TestCase):
         contract_address = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
         acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
         b58_address1 = acct1.get_address_base58()
@@ -114,9 +120,9 @@ class TestOep4(unittest.TestCase):
         contract_address = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
-        private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
         acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
         acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
@@ -168,8 +174,8 @@ class TestOep4(unittest.TestCase):
         contract_address = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         owner_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
         hex_owner_address = owner_acct.get_address_hex()
         spender = Account(private_key2, SignatureScheme.SHA256withECDSA)
@@ -199,8 +205,8 @@ class TestOep4(unittest.TestCase):
         contract_address = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
         acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
         b58_owner_address = acct1.get_address_base58()
@@ -214,9 +220,9 @@ class TestOep4(unittest.TestCase):
         contract_address = '6fe70af535887a820a13cfbaff6b0b505f855e5c'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-        private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
-        private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
         spender_acct = Account(private_key2, SignatureScheme.SHA256withECDSA)
 
         from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
