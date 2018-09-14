@@ -12,11 +12,11 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 
 sdk = OntologySdk()
-rpc_address = "http://polaris3.ont.io:20336"
+rpc_address = 'http://polaris3.ont.io:20336'
 sdk.rpc.set_address(rpc_address)
-private_key = "523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f"
-private_key2 = "75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf"
-private_key3 = "1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114"
+private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
 acc = Account(private_key, SignatureScheme.SHA256withECDSA)
 acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
@@ -150,7 +150,7 @@ class TestRpcClient(unittest.TestCase):
         acct2 = Account(pri_key_2)
         b58_address_1 = acct.get_address_base58()
         b58_address_2 = acct2.get_address_base58()
-        tx = Asset.new_transfer_transaction("ont", b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
+        tx = Asset.new_transfer_transaction('ont', b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
@@ -162,7 +162,7 @@ class TestRpcClient(unittest.TestCase):
         acct2 = Account(pri_key2)
         b58_address_1 = acct.get_address_base58()
         b58_address_2 = acct2.get_address_base58()
-        tx = Asset.new_transfer_transaction("ont", b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
+        tx = Asset.new_transfer_transaction('ont', b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(result, '01')

@@ -39,7 +39,7 @@ class TestGovernance(unittest.TestCase):
             print(d)
 
     def test_getbalance(self):
-        print(sdk.native_vm().asset().query_balance("ont", account1.get_address_base58()))
+        print(sdk.native_vm().asset().query_balance('ont', account1.get_address_base58()))
         print(sdk.native_vm().asset().query_balance("ong", account1.get_address_base58()))
 
     def test_register_candidate(self):
