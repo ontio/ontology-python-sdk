@@ -136,7 +136,7 @@ class Oep4(object):
         :return: the number of decimals used by the oep4 token.
         """
         decimals = self.__get_token_setting('Decimal')
-        return int(decimals)
+        return int(decimals[:2], 16)
 
     def init(self, acct: Account, payer_acct: Account, gas_limit: int, gas_price: int) -> str:
         """
