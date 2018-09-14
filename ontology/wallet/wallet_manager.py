@@ -228,23 +228,24 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         return None
 
-    def get_account(self, address: str, pwd: str) -> Account or None:
-        address = address.replace(DID_ONT, '')
-        for index in range(len(self.wallet_in_mem.accounts)):
-            if self.wallet_in_mem.accounts[index].address == address:
-                key = self.wallet_in_mem.accounts[index].key
-                addr = self.wallet_in_mem.accounts[index].address
-                salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
-                return Account(private_key, self.scheme)
-
-        for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ont_id == did_ont + address:
-                addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
-                key = self.wallet_in_mem.identities[index].controls[0].key
-                salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
-                private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
-                return Account(private_key, self.scheme)
+    def get_account(self, address_or_ontid: str, pwd: str) -> Account or None:
+        if address_or_ontid.startswith(DID_ONT):
+            for index in range(len(self.wallet_in_mem.identities)):
+                if self.wallet_in_mem.identities[index].ont_id == address_or_ontid:
+                    addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
+                    key = self.wallet_in_mem.identities[index].controls[0].key
+                    salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
+                    private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(),
+                                                                      self.scheme)
+                    return Account(private_key, self.scheme)
+        else:
+            for index in range(len(self.wallet_in_mem.accounts)):
+                if self.wallet_in_mem.accounts[index].address == address_or_ontid:
+                    key = self.wallet_in_mem.accounts[index].key
+                    addr = self.wallet_in_mem.accounts[index].address
+                    salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
+                    private_key = Account.get_gcm_decoded_private_key(key, pwd, addr, salt, Scrypt().get_n(), self.scheme)
+                    return Account(private_key, self.scheme)
         return None
 
     def get_default_identity(self) -> Identity:
