@@ -62,6 +62,7 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(admin_identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return res
 
@@ -73,7 +74,7 @@ class Auth(object):
         for i in range(len(ont_ids)):
             param['name' + str(i)] = ont_ids[i]
         param['key_no'] = key_no
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "assignFuncsToRole", param)
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "assignOntIDsToRole", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(admin_identity.ont_id, password)
