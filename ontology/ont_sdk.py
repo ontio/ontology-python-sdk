@@ -57,19 +57,34 @@ class OntologySdk(object):
             self.rpc = RpcClient()
         return self.rpc
 
-    def set_signaturescheme(self, scheme: SignatureScheme):
+    def set_signature_scheme(self, scheme: SignatureScheme):
         self.defaultSignScheme = scheme
         self.wallet_manager.set_signature_scheme(scheme)
 
     @staticmethod
-    def sign_transaction(tx: Transaction, signer: Account):
+    def sign_transaction(tx: Transaction, signer: Account) -> Transaction:
+        """
+        This interface is used to sign the transaction.
+
+        :param tx: a Transaction object which will be signed.
+        :param signer: an Account object which will sign the transaction.
+        :return: a Transaction object which has been signed.
+        """
         tx_hash = tx.hash256_bytes()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
-        sig = [Sig([signer.get_public_key()], 1, [sig_data])]
+        sig = [Sig([signer.get_public_key_bytes()], 1, [sig_data])]
         tx.sigs = sig
         return tx
 
-    def add_sign_transaction(self, tx: Transaction, signer: Account):
+    @staticmethod
+    def add_sign_transaction(tx: Transaction, signer: Account):
+        """
+        This interface is used to add signature into the transaction.
+
+        :param tx: a Transaction object which will be signed.
+        :param signer: an Account object which will sign the transaction.
+        :return: a Transaction object which has been signed.
+        """
         if tx.sigs is None or len(tx.sigs) == 0:
             tx.sigs = []
         elif len(tx.sigs) >= Common.TX_MAX_SIG_SIZE:
@@ -80,8 +95,18 @@ class OntologySdk(object):
         tx.sigs.append(sig)
         return tx
 
-    def add_multi_sign_transaction(self, tx: Transaction, m: int, pubkeys: [], signer: Account):
-        pubkeys = ProgramBuilder.sort_publickeys(pubkeys)
+    @staticmethod
+    def add_multi_sign_transaction(tx: Transaction, m: int, pub_keys: list, signer: Account):
+        """
+        This interface is used to generate an Transaction object which has multi signature.
+
+        :param tx: a Transaction object which will be signed.
+        :param m: the amount of signer.
+        :param pub_keys: a list of public keys.
+        :param signer: an Account object which will sign the transaction.
+        :return: a Transaction object which has been signed.
+        """
+        pub_keys = ProgramBuilder.sort_publickeys(pub_keys)
         tx_hash = tx.hash256_bytes()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
         if tx.sigs is None or len(tx.sigs) == 0:
@@ -90,14 +115,14 @@ class OntologySdk(object):
             raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         else:
             for i in range(len(tx.sigs)):
-                if tx.sigs[i].public_keys == pubkeys:
-                    if len(tx.sigs[i].sig_data) + 1 > len(pubkeys):
+                if tx.sigs[i].public_keys == pub_keys:
+                    if len(tx.sigs[i].sig_data) + 1 > len(pub_keys):
                         raise SDKException(ErrorCode.param_err('too more sigData'))
                     if tx.sigs[i].M != m:
                         raise SDKException(ErrorCode.param_err('M error'))
                     tx.sigs[i].sig_data.append(sig_data)
                     return tx
-        sig = Sig(pubkeys, m, [sig_data])
+        sig = Sig(pub_keys, m, [sig_data])
         tx.sigs.append(sig)
         return tx
 
