@@ -49,8 +49,8 @@ class TestAuth(unittest.TestCase):
         print(sdk.rpc.get_smart_contract("bc9795db0abe9d2d9ea565286a237dbf6b407165"))
 
     def test_register(self):
-        tx = sdk.native_vm().ont_id().new_registry_ontid_transaction(admin_identity.ont_id,admin_identity.controls[0].public_key,acc.get_address_base58(),20000,0)
-        tx2 = sdk.native_vm().ont_id().new_registry_ontid_transaction(new_admin_identity.ont_id,
+        tx = sdk.native_vm().ont_id().new_registry_ont_id_transaction(admin_identity.ont_id,admin_identity.controls[0].public_key,acc.get_address_base58(),20000,0)
+        tx2 = sdk.native_vm().ont_id().new_registry_ont_id_transaction(new_admin_identity.ont_id,
                                                                 new_admin_identity.controls[0].public_key, acc.get_address_base58(), 20000, 0)
         print(new_admin_identity.controls[0].public_key)
         print(acc3.serialize_public_key().hex())

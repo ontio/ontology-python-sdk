@@ -90,14 +90,24 @@ class WalletData(object):
         wallet.set_identities(self.identities)
         return wallet
 
-    def add_account(self, acc: AccountData):
-        self.accounts.append(acc)
+    def add_account(self, acct: AccountData):
+        """
+        This interface is used to add account into WalletData.
+
+        :param acct: an AccountData object.
+        """
+        self.accounts.append(acct)
 
     def remove_account(self, address: str):
+        """
+        This interface is used to remove account from WalletData.
+
+        :param address: a string address.
+        """
         account = self.get_account_by_address(address)
         if account is None:
             raise SDKException(ErrorCode.get_account_by_address_err)
-        return self.accounts.remove(account)
+        self.accounts.remove(account)
 
     def get_accounts(self) -> list:
         """

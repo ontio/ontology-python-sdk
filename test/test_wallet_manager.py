@@ -90,6 +90,7 @@ class TestWalletManager(unittest.TestCase):
         acct = wm.create_account('', password)
         self.assertTrue(isinstance(acct, AccountData))
         b58_address = wm.wallet_in_mem.default_account_address
+        print(b58_address)
         acct = wm.get_account(b58_address, password)
         self.assertEqual(acct.get_address_base58(), b58_address)
 

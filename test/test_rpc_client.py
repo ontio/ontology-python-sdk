@@ -14,13 +14,13 @@ from ontology.smart_contract.native_contract.asset import Asset
 sdk = OntologySdk()
 rpc_address = 'http://polaris3.ont.io:20336'
 sdk.rpc.set_address(rpc_address)
-private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
 private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
 private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-acc = Account(private_key, SignatureScheme.SHA256withECDSA)
+acc = Account(private_key1, SignatureScheme.SHA256withECDSA)
 acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-pubkeys = [acc.get_public_key(), acc2.get_public_key(), acc3.get_public_key()]
+pubkeys = [acc.get_public_key_bytes(), acc2.get_public_key_bytes(), acc3.get_public_key_bytes()]
 multi_addr = Address.address_from_multi_pub_keys(2, pubkeys)
 
 
@@ -143,14 +143,15 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(proof['Type'], 'MerkleProof')
 
     def test_send_raw_transaction(self):
-        pri_key_1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(pri_key_1)
-        length = 64
-        pri_key_2 = get_random_str(length)
-        acct2 = Account(pri_key_2)
-        b58_address_1 = acct.get_address_base58()
-        b58_address_2 = acct2.get_address_base58()
-        tx = Asset.new_transfer_transaction('ont', b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        b58_from_address = acct.get_address_base58()
+        b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
+        amount = 1
+        gas_price = 500
+        gas_limit = 20000
+        tx = Asset.new_transfer_transaction('ont', b58_from_address, b58_to_address, amount, b58_from_address,
+                                            gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())

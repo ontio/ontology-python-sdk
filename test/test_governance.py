@@ -20,7 +20,7 @@ class TestGovernance(unittest.TestCase):
         if identities is None or len(identities) == 0:
             identity = sdk.wallet_manager.create_identity("sss", password)
             account = sdk.wallet_manager.get_account(identity.ont_id, password)
-            tx = sdk.native_vm().ont_id().new_registry_ontid_transaction(identity.ont_id, account.serialize_public_key().hex(),
+            tx = sdk.native_vm().ont_id().new_registry_ont_id_transaction(identity.ont_id, account.serialize_public_key().hex(),
                                                                     account.get_address_base58(), 20000, 0)
             sdk.sign_transaction(tx, account)
             res = sdk.rpc.send_raw_transaction(tx)

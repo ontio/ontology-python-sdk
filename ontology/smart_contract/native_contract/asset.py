@@ -290,6 +290,8 @@ class Asset(object):
     def new_withdraw_ong_transaction(b58_claimer_address: str, b58_recv_address: str, amount: int,
                                      b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
         """
+        This interface is used to generate a Transaction object that
+        allow one account to withdraw an amount of ong and transfer them to receive address.
 
         :param b58_claimer_address: a base58 encode address which is used to indicate who is the claimer.
         :param b58_recv_address: a base58 encode address which is used to indicate who receive the claimed ong.

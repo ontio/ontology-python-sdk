@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import binascii
 import time
 import unittest
 
-from ontology.account.account import Account
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.exception.exception import SDKException
+from ontology.utils import util
 from ontology.ont_sdk import OntologySdk
+from ontology.account.account import Account
+from ontology.exception.exception import SDKException
+from ontology.crypto.signature_scheme import SignatureScheme
 
-rpc_address = "http://127.0.0.1:20336"
-# rpc_address = 'http://polaris3.ont.io:20336'
+# rpc_address = "http://127.0.0.1:20336"
+
+rpc_address = 'http://polaris3.ont.io:20336'
 sdk = OntologySdk()
 sdk.rpc.set_address(rpc_address)
-private_key1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key2 = "c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07"
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-acc1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
-acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-did = "did:ont:" + acc2.get_address_base58()
-password = "111111"
-identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111", private_key2)
-
 
 
 class TestOntId(unittest.TestCase):
-    def test_new_registry_ontid_transaction(self):
-        tx = sdk.native_vm().ont_id().new_registry_ontid_transaction(did, acc2.get_public_key(),
-                                                                     acc1.get_address_base58(), 20000, 500)
-        tx = sdk.sign_transaction(tx, acc2)
-        tx = sdk.add_sign_transaction(tx, acc1)
-        self.assertEqual(len(tx.hash256_hex()), 64)
-        self.assertEqual(len(tx.serialize(is_hex=True)), 806)
+    def test_new_registry_ont_id_transaction(self):
+        ont_id = sdk.native_vm().ont_id()
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        hex_public_key = acct.get_public_key_hex()
+        b58_address = acct.get_address_base58()
+        acct_did = "did:ont:" + b58_address
+        gas_limit = 20000
+        gas_price = 500
+        tx = ont_id.new_registry_ont_id_transaction(acct_did, hex_public_key, b58_address, gas_limit, gas_price)
+        tx = sdk.sign_transaction(tx, acct)
+        self.assertEqual(64, len(tx.hash256_hex()))
+        self.assertEqual(600, len(tx.serialize(is_hex=True)))
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
@@ -42,67 +41,159 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_send_registry(self):
-        identity = sdk.wallet_manager.create_identity("ss", "111111")
-        txhash = sdk.native_vm().ont_id().send_registry_ontid(identity,"111111",acc1,20000,0)
-        print(txhash)
-        time.sleep(3)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
+        ont_id = sdk.native_vm().ont_id()
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        label = 'label'
+        password = 'password'
+        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        gas_limit = 20000
+        gas_price = 500
+        try:
+            ont_id.send_registry_ont_id_transaction(identity, password, acct, gas_limit, gas_price)
+        except SDKException as e:
+            self.assertEqual(59000, e.args[0])
+            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] ' \
+                  'service execute error!: [Invoke] Native serivce function execute error!: ' \
+                  'register ONT ID error: already registered'
+            self.assertEqual(msg, e.args[1])
 
     def test_send_get_ddo(self):
-        print(sdk.native_vm().ont_id().send_get_ddo(identity.ont_id))
+        ont_id = sdk.native_vm().ont_id()
+        hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
+        acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        parsed_ddo = ont_id.send_get_ddo(acct_did)
+        self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', parsed_ddo['Owners'][0]['Curve'])
+        self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
 
     def test_new_get_ddo_transaction(self):
-        tx = sdk.native_vm().ont_id().new_get_ddo_transaction(did)
-        out_ddo = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        estimate_ddo = "26010000002102d3d048aca7bdee582a611d0b8acc45642950dc6167aee63abbdcd1a5781c6319"
-        self.assertEqual(estimate_ddo[2:], out_ddo[2:len(estimate_ddo)])
-        parsed_ddo = sdk.native_vm().ont_id().parse_ddo(did, out_ddo)
-        self.assertEqual(parsed_ddo['Owners'][0]['PubKeyId'][:len(did)], did)
+        ont_id = sdk.native_vm().ont_id()
+        hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
+        acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        tx = ont_id.new_get_ddo_transaction(acct_did)
+        ddo = sdk.rpc.send_raw_transaction_pre_exec(tx)
+        estimate_ddo = "4c0100000021035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da003" \
+                       "0000002103a8cf063f862c2edfc3c2ead8b5889db624b98430dcbefcff98400a2fdafce81b150374" \
+                       "727906737472696e670961747472696275746514a8fbb6da841e737486e791c10ee3a8053909c086"
+        self.assertEqual(estimate_ddo[2:], ddo[2:len(estimate_ddo)])
+        parsed_ddo = ont_id.parse_ddo(acct_did, ddo)
+        self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', parsed_ddo['Owners'][0]['Curve'])
+        self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
 
     def test_new_add_attribute_transaction(self):
-        attris = []
-        attri = {}
-        attri["key"] = "key1"
-        attri["type"] = "string"
-        attri["value"] = "value100"
-        attris.append(attri)
-        tx = sdk.native_vm().ont_id().new_add_attribute_transaction(did, acc2.get_public_key(), attris,
-                                                                    acc1.get_address_base58(), 20000,
-                                                                    500)
-        tx = sdk.sign_transaction(tx, acc2)
-        tx = sdk.add_sign_transaction(tx, acc1)
+        ont_id = sdk.native_vm().ont_id()
+        attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
+        attribute_list = [attribute]
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        hex_public_key = acct.get_public_key_hex()
+        b58_address = acct.get_address_base58()
+        acct_did = "did:ont:" + b58_address
+        gas_limit = 20000
+        gas_price = 500
+        tx = ont_id.new_add_attribute_transaction(acct_did, hex_public_key, attribute_list, b58_address, gas_limit,
+                                                  gas_price)
+        tx = sdk.sign_transaction(tx, acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(tx_hash, tx.hash256_explorer())
-
-    def test_send_add_attributes(self):
-        attris = []
-        attri = {}
-        attri["key"] = "key1"
-        attri["type"] = "string"
-        attri["value"] = "value100"
-        attris.append(attri)
-        txhash = sdk.native_vm().ont_id().send_add_attribute(identity, "111111", attris, acc1, 20000, 0)
-        time.sleep(3)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
-
-    def test_remove_attribute(self):
-        txhash = sdk.native_vm().ont_id().send_remove_attribute(identity,password,"key1",acc1,20000,0)
-        time.sleep(6)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
+        self.assertEqual(tx.hash256_explorer(), tx_hash)
 
     def test_new_remove_attribute_transaction(self):
-        tx = sdk.native_vm().ont_id().new_remove_attribute_transaction(did, acc2.get_public_key(), "key1",
-                                                                       acc1.get_address_base58(), 20000, 500)
-        tx = sdk.sign_transaction(tx, acc2)
-        tx = sdk.add_sign_transaction(tx, acc1)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(tx_hash, tx.hash256_explorer())
+        ont_id = sdk.native_vm().ont_id()
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        hex_public_key = acct.get_public_key_hex()
+        b58_address = acct.get_address_base58()
+        acct_did = "did:ont:" + b58_address
+        gas_limit = 20000
+        gas_price = 500
+        path = 'try'
+        tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, gas_limit, gas_price)
+        tx = sdk.sign_transaction(tx, acct)
+        try:
+            tx_hash = sdk.rpc.send_raw_transaction(tx)
+            self.assertEqual(tx.hash256_explorer(), tx_hash)
+            time.sleep(6)
+            notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+            self.assertEqual('Attribute', notify[0]['States'][0])
+            self.assertEqual('remove', notify[0]['States'][1])
+            self.assertEqual(acct_did, notify[0]['States'][2])
+            self.assertEqual('try', bytes.fromhex(notify[0]['States'][3]).decode())
+        except SDKException as e:
+            msg = 'Other Error, [NeoVmService] service system call error!: ' \
+                  '[SystemCall] service execute error!: [Invoke] Native serivce function execute error!: ' \
+                  'remove attribute failed: attribute not exist'
+            self.assertEqual(59000, e.args[0])
+            self.assertEqual(msg, e.args[1])
 
-    def test_new_add_pubkey_transaction(self):
-        tx = sdk.native_vm().ont_id().new_add_pubkey_transaction(did, acc1.get_public_key(), acc3.get_public_key(),
-                                                                 acc3.get_address_base58(), 20000, 500)
-        tx = sdk.sign_transaction(tx, acc1)
-        tx = sdk.add_sign_transaction(tx, acc3)
+    def test_send_add_attributes(self):
+        ont_id = sdk.native_vm().ont_id()
+        attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
+        attribute_list = [attribute]
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        password = 'password'
+        identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = ont_id.send_add_attribute_transaction(identity, password, attribute_list, acct, gas_limit, gas_price)
+        time.sleep(6)
+        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+        self.assertEqual('Attribute', notify[0]['States'][0])
+        self.assertEqual('add', notify[0]['States'][1])
+        self.assertEqual(identity.ont_id, notify[0]['States'][2])
+        self.assertEqual('try', bytes.fromhex(notify[0]['States'][3][0]).decode())
+
+    def test_remove_attribute(self):
+        ont_id = sdk.native_vm().ont_id()
+        label = 'label'
+        password = 'password'
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        gas_limit = 20000
+        gas_price = 500
+        path = 'try'
+        try:
+            tx_hash = ont_id.send_remove_attribute_transaction(identity, password, path, acct, gas_limit, gas_price)
+            time.sleep(6)
+            notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+            self.assertEqual('Attribute', notify[0]['States'][0])
+            self.assertEqual('remove', notify[0]['States'][1])
+            self.assertEqual(identity.ont_id, notify[0]['States'][2])
+            self.assertEqual('try', bytes.fromhex(notify[0]['States'][3]).decode())
+        except SDKException as e:
+            msg = 'Other Error, [NeoVmService] service system call error!: ' \
+                  '[SystemCall] service execute error!: [Invoke] Native serivce function execute error!: ' \
+                  'remove attribute failed: attribute not exist'
+            self.assertEqual(59000, e.args[0])
+            self.assertEqual(msg, e.args[1])
+
+    def test_new_add_remove_public_key_transaction(self):
+        ont_id = sdk.native_vm().ont_id()
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        hex_public_key = acct.get_public_key_hex()
+        rand_private_key = util.get_random_bytes(32).hex()
+        rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        hex_new_public_key = rand_acct.get_public_key_hex()
+        b58_address = acct.get_address_base58()
+        acct_did = "did:ont:" + b58_address
+        gas_limit = 20000
+        gas_price = 500
+        tx = ont_id.new_add_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address, gas_limit,
+                                                   gas_price)
+        tx = sdk.sign_transaction(tx, acct)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        time.sleep(6)
+        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+        self.assertEqual('PublicKey', notify[0]['States'][0])
+        self.assertEqual('add', notify[0]['States'][1])
+        self.assertEqual(acct_did, notify[0]['States'][2])
+        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
@@ -111,47 +202,87 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertEqual(msg, e.args[1])
 
-    def test_add_public_key(self):
-        txhash = sdk.native_vm().ont_id().send_add_pubkey(identity,password,acc1.serialize_public_key().hex(),acc1,20000,0)
+        tx = ont_id.new_remove_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address,
+                                                      gas_limit, gas_price)
+        tx = sdk.sign_transaction(tx, acct)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
         time.sleep(6)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
-
-    def test_add_recovery(self):
-        txhash = sdk.native_vm().ont_id().send_add_rcovery(identity, password, acc3.get_address_base58(), acc1, 20000, 0)
-        time.sleep(6)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
-
-    def test_add_public_key_by_recovery(self):
-        txhash = sdk.native_vm().ont_id().send_add_pubkey_by_recovery(identity.ont_id,acc3,acc3.serialize_public_key().hex(),acc1,20000,0)
-        time.sleep(6)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
-
-    def test_remove_public_key(self):
-        txhash = sdk.native_vm().ont_id().send_remove_pubkey(identity, password, acc1.serialize_public_key().hex(), acc1,
-                                                          20000, 0)
-        time.sleep(6)
-        print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
-
-    def test_new_remove_pubkey_transaction(self):
-        tx = sdk.native_vm().ont_id().new_remove_pubkey_transaction(did, acc1.get_public_key(), acc3.get_public_key(),
-                                                                    acc3.get_address_base58(), 20000, 500)
-        tx = sdk.sign_transaction(tx, acc1)
-        tx = sdk.add_sign_transaction(tx, acc3)
+        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+        self.assertEqual('PublicKey', notify[0]['States'][0])
+        self.assertEqual('remove', notify[0]['States'][1])
+        self.assertEqual(acct_did, notify[0]['States'][2])
+        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute error!:' \
-                  ' [Invoke] Native serivce function execute error!: remove key failed: public key has already' \
-                  ' been revoked'
+            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute ' \
+                  'error!: [Invoke] Native serivce function execute error!: remove key failed: ' \
+                  'public key has already been revoked'
+            self.assertEqual(59000, e.args[0])
+            self.assertEqual(msg, e.args[1])
+
+    def test_send_add_remove_public_key_transaction(self):
+        ont_id = sdk.native_vm().ont_id()
+        label = 'label'
+        password = 'password'
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        rand_private_key = util.get_random_bytes(32).hex()
+        rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        hex_new_public_key = rand_acct.get_public_key_hex()
+        password = 'password'
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
+                                                         gas_price)
+        time.sleep(6)
+        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+        self.assertEqual('PublicKey', notify[0]['States'][0])
+        self.assertEqual('add', notify[0]['States'][1])
+        self.assertEqual(identity.ont_id, notify[0]['States'][2])
+        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
+        try:
+            ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit, gas_price)
+        except SDKException as e:
+            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute' \
+                  ' error!: [Invoke] Native serivce function execute error!: add key failed: already exists'
+            self.assertEqual(59000, e.args[0])
+            self.assertEqual(msg, e.args[1])
+
+        tx_hash = ont_id.send_remove_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
+                                                            gas_price)
+        time.sleep(6)
+        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+        self.assertEqual('PublicKey', notify[0]['States'][0])
+        self.assertEqual('remove', notify[0]['States'][1])
+        self.assertEqual(identity.ont_id, notify[0]['States'][2])
+        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
+        try:
+            ont_id.send_remove_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
+                                                      gas_price)
+        except SDKException as e:
+            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute ' \
+                  'error!: [Invoke] Native serivce function execute error!: remove key failed: ' \
+                  'public key has already been revoked'
             self.assertEqual(59000, e.args[0])
             self.assertEqual(msg, e.args[1])
 
     def test_new_add_recovery_transaction(self):
-        tx = sdk.native_vm().ont_id().new_add_rcovery_transaction(did, acc1.get_public_key(), acc3.get_address_base58(),
-                                                                  acc2.get_address_base58(), 20000,
-                                                                  500)
-        tx = sdk.sign_transaction(tx, acc2)
-        tx = sdk.add_sign_transaction(tx, acc1)
+        ont_id = sdk.native_vm().ont_id()
+        gas_limit = 20000
+        gas_price = 500
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        b58_address = acct.get_address_base58()
+        acct_did = "did:ont:" + b58_address
+        hex_public_key = acct.get_public_key_hex()
+        rand_private_key = util.get_random_bytes(32).hex()
+        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_recovery_address = recovery.get_address_base58()
+        tx = ont_id.new_add_recovery_transaction(acct_did, hex_public_key, b58_recovery_address, b58_address, gas_limit,
+                                                 gas_price)
+        tx = sdk.sign_transaction(tx, acct)
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
@@ -160,6 +291,32 @@ class TestOntId(unittest.TestCase):
                   'set recovery'
             self.assertEqual(59000, e.args[0])
             self.assertEqual(msg, e.args[1])
+
+    def test_send_add_recovery_transaction(self):
+        ont_id = sdk.native_vm().ont_id()
+        label = 'label'
+        password = 'password'
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        rand_private_key = util.get_random_bytes(32).hex()
+        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_recovery_address = recovery.get_address_base58()
+        password = 'password'
+        gas_limit = 20000
+        gas_price = 500
+        try:
+            ont_id.send_add_recovery_transaction(identity, password, b58_recovery_address, acct, gas_limit, gas_price)
+        except SDKException as e:
+            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] ' \
+                  'service execute error!: [Invoke] Native serivce function execute error!: ' \
+                  'add recovery failed: already set recovery'
+            self.assertEqual(59000, e.args[0])
+            self.assertEqual(msg, e.args[1])
+
+    # TODO
+    # def test_send_add_public_key_by_recovery(self):
+    #     ont_id = sdk.native_vm().ont_id()
 
 
 if __name__ == '__main__':
