@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import binascii
+
 import base58
 from binascii import b2a_hex, a2b_hex
 
@@ -76,8 +78,21 @@ class Account(object):
         """
         return self.__address.to_reverse_hex_str()
 
-    def get_public_key(self):
+    def get_public_key_bytes(self) -> bytes:
+        """
+        This interface is used to get the account's public key in the form of bytes.
+
+        :return: the public key in the form of bytes.
+        """
         return self.__publicKey
+
+    def get_public_key_hex(self) -> str:
+        """
+        This interface is used to get the account's hexadecimal public key in the form of string.
+
+        :return: the hexadecimal public key in the form of string.
+        """
+        return binascii.b2a_hex(self.__publicKey).decode('ascii')
 
     def get_signature_scheme(self) -> SignatureScheme:
         """
@@ -87,13 +102,16 @@ class Account(object):
         """
         return self.__signature_scheme
 
-    def export_gcm_encrypted_private_key(self, password: str, salt: str, n: int):
+    def export_gcm_encrypted_private_key(self, password: str, salt: str, n: int) -> str:
         """
+        This interface is used to export an AES algorithm encrypted private key with the mode of GCM.
 
-        :param password:
-        :param salt:
-        :param n:
-        :return:
+        :param password: the secret pass phrase to generate the keys from.
+        :param salt: A string to use for better protection from dictionary attacks.
+                      This value does not need to be kept secret, but it should be randomly chosen for each derivation.
+                      It is recommended to be at least 8 bytes long.
+        :param n: CPU/memory cost parameter. It must be a power of 2 and less than 2**32
+        :return: an gcm encrypted private key in the form of string.
         """
         r = 8
         p = 8
@@ -114,14 +132,15 @@ class Account(object):
     def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, b58_address: str, salt: str, n: int,
                                     scheme: SignatureScheme) -> str:
         """
+        This interface is used to decrypt an private key which has been encrypted.
 
-        :param encrypted_key_str:
-        :param password:
-        :param b58_address:
-        :param salt:
-        :param n:
-        :param scheme:
-        :return:
+        :param encrypted_key_str: an gcm encrypted private key in the form of string.
+        :param password: the secret pass phrase to generate the keys from.
+        :param b58_address: a base58 encode address which should be correspond with the private key.
+        :param salt: a string to use for better protection from dictionary attacks.
+        :param n: CPU/memory cost parameter.
+        :param scheme: the signature scheme.
+        :return: a private key in the form of string.
         """
         r = 8
         p = 8
