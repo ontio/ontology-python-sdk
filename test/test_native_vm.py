@@ -6,6 +6,7 @@ import unittest
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
+from ontology.smart_contract.native_contract.asset import Asset
 
 rpc_address = 'http://polaris3.ont.io:20336'
 # rpc_address = "http://127.0.0.1:20336"
@@ -24,9 +25,10 @@ acct4 = Account(private_key4, SignatureScheme.SHA256withECDSA)
 class TestNativeVm(unittest.TestCase):
     def test_native_vm_transaction(self):
         sdk.set_rpc(rpc_address)
-        tx = sdk.native_vm().asset().new_transfer_transaction('ont', acct2.get_address_base58(),
-                                                              acct1.get_address_base58(), 120,
-                                                              acct1.get_address_base58(), 20000, 500)
+        asset = sdk.native_vm().asset()
+        amount = 1
+        tx = asset.new_transfer_transaction('ont', acct2.get_address_base58(), acct1.get_address_base58(), amount,
+                                            acct1.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx, acct1)
         sdk.add_sign_transaction(tx, acct2)
         res = sdk.rpc.send_raw_transaction(tx)
@@ -35,9 +37,10 @@ class TestNativeVm(unittest.TestCase):
     def test_native_vm_withdraw_ong(self):
         sdk.set_rpc(rpc_address)
         payer = acct2
-        b58_payer = payer.get_address_base58()
-        tx = sdk.native_vm().new_withdraw_ong_transaction(b58_payer, b58_payer, 1, b58_payer,
-                                                          20000, 500)
+        b58_payer_address = payer.get_address_base58()
+        amount = 1
+        asset = sdk.native_vm().asset()
+        tx = asset.new_withdraw_ong_transaction(b58_payer_address, b58_payer_address, amount, b58_payer_address, 20000, 500)
         sdk.sign_transaction(tx, payer)
         res = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(len(res), 64)

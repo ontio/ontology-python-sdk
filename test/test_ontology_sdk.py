@@ -24,9 +24,6 @@ acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
 acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
 acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 
-pub_keys = [acct1.get_public_key(), acct2.get_public_key(), acct3.get_public_key()]
-multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
-
 
 class TestOntologySdk(TestCase):
     def test_open_wallet(self):
@@ -36,24 +33,31 @@ class TestOntologySdk(TestCase):
         os.remove(path)
 
     def test_add_multi_sign_transaction(self):
-        self.assertEqual(multi_address.b58encode(), 'AcAR5ZhtxiS66ydXrKWTZMXo13LcsvgYnD')
-        tx = sdk.native_vm().asset().new_transfer_transaction("ong", acct1.get_address_base58(),
-                                                              multi_address.b58encode(),
-                                                              100000000,
-                                                              acct1.get_address_base58(), 20000, 500)
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        m = 2
+        multi_address = Address.address_from_multi_pub_keys(m, pub_keys)
+        b58_multi_address = multi_address.b58encode()
+        b58_acct1_address = acct1.get_address_base58()
+        b58_acct2_address = acct2.get_address_base58()
+        amount = 1
+        gas_price = 500
+        gas_limit = 20000
+        asset = sdk.native_vm().asset()
+        self.assertEqual('AcAR5ZhtxiS66ydXrKWTZMXo13LcsvgYnD', b58_multi_address)
+        tx = asset.new_transfer_transaction('ong', b58_acct1_address, b58_multi_address, amount, b58_acct1_address,
+                                            gas_limit, gas_price)
         sdk.add_sign_transaction(tx, acct1)
 
-        tx = sdk.native_vm().asset().new_transfer_transaction('ont', multi_address.b58encode(),
-                                                              acct2.get_address_base58(),
-                                                              1,
-                                                              acct1.get_address_base58(), 20000, 500)
+        tx = asset.new_transfer_transaction('ont', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
+                                            gas_limit, gas_price)
         sdk.sign_transaction(tx, acct1)
-        sdk.add_multi_sign_transaction(tx, 2, pub_keys, acct1)
-        sdk.add_multi_sign_transaction(tx, 2, pub_keys, acct2)
-        sdk.rpc.send_raw_transaction(tx)
+        sdk.add_multi_sign_transaction(tx, m, pub_keys, acct1)
+        sdk.add_multi_sign_transaction(tx, m, pub_keys, acct2)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(64,len(tx_hash))
 
     def test_sort_public_key(self):
-        pub_keys = [acct1.get_public_key(), acct2.get_public_key(), acct3.get_public_key()]
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         p = ProgramBuilder()
         a = p.sort_publickeys(pub_keys)
         self.assertEqual("03036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be889", a[0].hex())
