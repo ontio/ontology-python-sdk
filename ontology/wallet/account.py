@@ -54,7 +54,7 @@ class AccountData(object):
     def get_address(self):
         return self.address
 
-    def get_public_key(self):
+    def get_public_key_bytes(self):
         return self.public_key
 
     def get_key(self):
