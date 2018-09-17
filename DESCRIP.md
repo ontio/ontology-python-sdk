@@ -6,7 +6,6 @@ Ontology Python SDK function consists of four parts, RPC interface, wallet, asse
 
 ## Preparations
 
-
 Installation requires a Python 3.7 or later environment.
 
 ```bash
@@ -67,7 +66,6 @@ The wallet function includes three parts, digit account, digit identity, and mne
 The asset includes native digit asset and Nep-5 smart constract digit asset. Nep-5 smart constract will be supported in the future.
 
 ### Native digit asset
-
 
  |      | Main   Function                                                                                                                                |
  | :--- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
