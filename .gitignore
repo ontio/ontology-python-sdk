@@ -12,4 +12,4 @@ venv
 build
 dist
 
-ontology/ontology_python_sdk.egg-info
+ontology_python_sdk.egg-info
