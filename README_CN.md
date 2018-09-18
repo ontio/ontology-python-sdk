@@ -1,12 +1,12 @@
-<h1 align="center">Python SDK For Ontology</h1>
+<h1 align="center">本体 Python SDK</h1>
 
-<p align="center" class="version">Version 0.1.3</p>
+<p align="center" class="version">版本： v0.1.3</p>
 
 <!-- TOC -->
 
-- [Introduction](#introduction)
-- [Preparations](#preparations)
-- [Interface](#interface)
+- [简介](#%E7%AE%80%E4%BB%8B)
+- [准备](#%E5%87%86%E5%A4%87)
+- [接口](#%E6%8E%A5%E5%8F%A3)
   - [Network](#network)
   - [Wallet](#wallet)
   - [Account](#account)
@@ -17,38 +17,38 @@
   - [ABI](#abi)
   - [OEP4](#oep4)
   - [Utils](#utils)
-- [Contribution](#contribution)
-- [Naming](#naming)
-  - [Overview](#overview)
-  - [Names to Avoid](#names-to-avoid)
-  - [Naming Convention](#naming-convention)
-  - [Guidelines derived from Guido's Recommendations](#guidelines-derived-from-guidos-recommendations)
-- [Site](#site)
-- [License](#license)
+- [参与项目](#%E5%8F%82%E4%B8%8E%E9%A1%B9%E7%9B%AE)
+- [命名规范](#%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83)
+  - [概述](#%E6%A6%82%E8%BF%B0)
+  - [应该避免的名称](#%E5%BA%94%E8%AF%A5%E9%81%BF%E5%85%8D%E7%9A%84%E5%90%8D%E7%A7%B0)
+  - [命名约定](#%E5%91%BD%E5%90%8D%E7%BA%A6%E5%AE%9A)
+  - [Python之父Guido推荐的规范](#python%E4%B9%8B%E7%88%B6guido%E6%8E%A8%E8%8D%90%E7%9A%84%E8%A7%84%E8%8C%83)
+- [官网](#%E5%AE%98%E7%BD%91)
+- [许可证](#%E8%AE%B8%E5%8F%AF%E8%AF%81)
 
 <!-- /TOC -->
 
-English | [中文](README_CN.md)
+[English](README.md) | 中文
 
-## Introduction
+## 简介
 
-The Ontology official Python SDK is a comprehensive SDK which is based on `Python3.7`. Currently, it supports local wallet management, digital identity management, digital asset management, deployment and invoke for smart contract, the calling of OEP4, and communication with the Ontology blockchain. The future will also support more functions and applications.
+Ontology-Python-SDK是一个基于`Python3.7`实现的综合性SDK。目前，它支持本地钱包管理、数字身份管理、数字资产管理、智能合约的部署和调用、OEP4智能合约的调用以及与Ontology区块链的通信。并且，未来它还将支持更多功能和应用。
 
-## Preparations
+## 准备
 
-Installation requires a Python 3.7 or later environment.
+安装需要`Python 3.7`或更高版本的环境。
 
 ```bash
 pip install ontology-python-sdk
 ```
 
-## Interface
+## 接口
 
-Read more in the [ontology-python-sdk API document](https://apidoc.ont.io/pythonsdk/).
+更多信息可浏览[Ontology-Python-SDK API 文档](https://apidoc.ont.io/pythonsdk/).
 
 ### Network
 
-This is an API set that allows you to interact with an Ontology nodes.
+这是一个用于与Ontology节点进行交互的API集合。
 
 |       | Main Function                         |
 | :---: | :------------------------------------ |
@@ -70,17 +70,18 @@ This is an API set that allows you to interact with an Ontology nodes.
 
 ### Wallet
 
-This is an API set that allows you to handle with wallet account in the form of `AccountData`.
+这是一个用于操作钱包账户（以`AccountData`的形式）的API集合。
 
 |       | Main Function    |
 | :---: | :--------------- |
 | 1     | add_account()    |
 | 2     | remove_account() |
 
-**Note**: This package has **NOT** been audited and might potentially be unsafe. Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
+**注意**：该包**尚未**经过安全审计，可能存在潜在的安全隐患。在生产环境中使用之前，务必采取诸如正确清理内存、安全存储私钥、测试交易接发功能的正确性等预防措施！
 
 ### Account
 
+这是一个
 This is an API set that allows you to generate Ontology accounts and sign transactions and data.
 
 |       | Main Function                      |
@@ -99,7 +100,7 @@ This is an API set that allows you to generate Ontology accounts and sign transa
 | 12    | get_address_base58()               |
 | 13    | generate_signature()               |
 
-**Note**: This package has **NOT** been audited and might potentially be unsafe. Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
+**注意**：该包**尚未**经过安全审计，可能存在潜在的安全隐患。在生产环境中使用之前，务必采取诸如正确清理内存、安全存储私钥、测试交易接发功能的正确性等预防措施！
 
 ### Identity
 
@@ -131,7 +132,7 @@ This is an API set that allows you to generate **Ontology Digital Identity.**
 | 22    | send_raw_transaction()               |
 | 23    | send_raw_transaction_pre_exec()      |
 
-**Note**: This package has **NOT** been audited and might potentially be unsafe. Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
+**注意**：该包**尚未**经过安全审计，可能存在潜在的安全隐患。在生产环境中使用之前，务必采取诸如正确清理内存、安全存储私钥、测试交易接发功能的正确性等预防措施！
 
 ### AccountManager
 
@@ -149,7 +150,7 @@ This is an API set that allows you to manage your multiple account in an wallet 
 | 8     | set_default_account_by_index()    |
 | 9     | set_default_account_by_address()  |
 
-**Note**: This package has **NOT** been audited and might potentially be unsafe. Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
+**注意**：该包**尚未**经过安全审计，可能存在潜在的安全隐患。在生产环境中使用之前，务必采取诸如正确清理内存、安全存储私钥、测试交易接发功能的正确性等预防措施！
 
 ### IdentityManager
 
@@ -161,11 +162,11 @@ This is an API set that allows you to manage your multiple identity in an wallet
 | 2     | import_identity()                  |
 | 3     | create_identity_from_private_key() |
 
-**Note**: This package has **NOT** been audited and might potentially be unsafe. Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
+**注意**：该包**尚未**经过安全审计，可能存在潜在的安全隐患。在生产环境中使用之前，务必采取诸如正确清理内存、安全存储私钥、测试交易接发功能的正确性等预防措施！
 
 ### Asset
 
-The `Asset` package allows you to interact with Ontology Native Digital Asset(ONT, ONG) easily.
+`Asset`包使你能够容易地处理Ontology原生数字资产（ONT，ONG）。
 
 |       | Main Function                   |
 | :---: | :------------------------------ |
@@ -187,7 +188,7 @@ The `Asset` package allows you to interact with Ontology Native Digital Asset(ON
 
 ### ABI
 
-The `ABI` package allows you to interact with a deployed smart contract easily.
+`ABI`包使你能够轻松地与已经部署的智能合约进行交互。
 
 |       | Main Function      |
 | :---: | :----------------- |
@@ -197,7 +198,7 @@ The `ABI` package allows you to interact with a deployed smart contract easily.
 
 ### OEP4
 
-The `OEP4` package allows you to interact with an deployed Ontology OEP4 smart contract easily.
+`OEP4`包使你能够轻松地与已经部署的Ontology OEP4智能合约进行交互。
 
 |       | Main Function      |
 | :---: | :----------------- |
@@ -213,11 +214,11 @@ The `OEP4` package allows you to interact with an deployed Ontology OEP4 smart c
 | 10    | transfer_multi()   |
 | 11    | transfer_from()    |
 
-**Note**: This package has **NOT** been audited and might potentially be unsafe. Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
+**注意**：该包**尚未**经过安全审计，可能存在潜在的安全隐患。在生产环境中使用之前，务必采取诸如正确清理内存、安全存储私钥、测试交易接发功能的正确性等预防措施！
 
 ### Utils
 
-The `Utils` package provides utility functions for `Ontology Dapps` and other `Ontology-Python-Sdk` packages.
+`Utils`包为`Ontology Dapps`和其他`Ontology-Python-Sdk`包提供工具类方法。
 
 |       | Main Function       |
 | :---: | :------------------ |
@@ -225,35 +226,35 @@ The `Utils` package provides utility functions for `Ontology Dapps` and other `O
 | 2     | get_asset_address() |
 | 3     | get_random_bytes()  |
 
-## Contribution
+## 参与项目
 
-Can I contribute patches to Ontology project?
+我可以为Ontology项目做贡献吗？
 
-Yes! Please open a pull request with signed-off commits. We appreciate your help!
+当然可以！请发起一个带有打开带有签名提交的拉取请求。我们非常感谢你您的帮助！
 
-You can also send your patches as emails to the developer mailing list. Please join the Ontology mailing list or forum and talk to us about it.
+你还可以将补丁通过电子邮件的方式发送到开发人员邮件列表。请加入Ontology邮件列表或论坛，与我们讨论。
 
-Either way, if you don't sign off your patches, we will not accept them. This means adding a line that says "Signed-off-by: Name <email>" at the end of each commit, indicating that you wrote the code and have the right to pass it on as an open source patch.
+无论哪种方式，如果您不签署补丁，我们将不接受。这意味着在每次提交结束时添加一行`Signed-off-by：Name <email>`，表示你编写了代码并将其作为开源补丁传递。
 
-Also, please write good git commit messages.  A good commit message looks like this:
+另外，请写好git提交消息。一个好的提交消息如下所示：
 
-Header line: explain the commit in one line (use the imperative)
+标题行：在一行中解释提交（使用命令）
 
-Body of commit message is a few lines of text, explaining things in more detail, possibly giving some background about the issue being fixed, etc etc.
+提交消息的主体是几行文本，更详细地解释事情，可能提供有关修复问题的一些背景等。
 
-The body of the commit message can be several paragraphs, and please do proper word-wrap and keep columns shorter than about 74 characters or so. That way "git log" will show things nicely even when it's indented.
+提交消息的主体可以是几个段落，请做正确的自动换行并保持列短于约74个字符左右。这样`git log`即使缩进也能很好地显示出来。
 
-Make sure you explain your solution and why you're doing what you're doing, as opposed to describing what you're doing. Reviewers and your future self can read the patch, but might not understand why a particular solution was implemented.
+确保解释清楚你的解决方案以及为什么你正在做你正在做的事情，而不是描述你正在做的事情。审稿人和您未来的自己可以阅读补丁，但可能无法理解为什么要实施特定的解决方案。
 
-Reported-by: whoever-reported-it
+> Reported-by: whoever-reported-it
 
-Signed-off-by: Your Name <youremail@yourhost.com>
+> Signed-off-by: Your Name <youremail@yourhost.com>
 
-## Naming
+## 命名规范
 
-If you want to contribute, we strongly recommend you to read the [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md).
+如果您想贡献，我们强烈建议您阅读 [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md).
 
-### Overview
+### 概述
 
 `module_name`,
 `package_name`,
@@ -267,29 +268,27 @@ If you want to contribute, we strongly recommend you to read the [Google Python 
 `function_parameter_name`,
 `local_var_name`.
 
-Function names, variable names, and filenames should be descriptive; eschew abbreviation. In particular, do not use abbreviations that are ambiguous or unfamiliar to readers outside your project, and do not abbreviate by deleting letters within a word.
+函数名，变量名和文件名应该是描述性的，如`eschew`这样的命名就是缩写。特别地，**不要使用项目之外的读者不明确或不熟悉的缩写**，也**不要通过删除单词中的字母来缩写**。
 
-Always use a `.py` filename extension. Never use dashes.
+始终使用`.py`文件扩展名。
 
-### Names to Avoid
+切勿使用短划线。
 
-- single character names except for counters or iterators. You may use "e" as an exception identifier in try/except statements.
-- dashes (`-`) in any package/module name
-- `__double_leading_and_trailing_underscore__` names (reserved by Python)
+### 应该避免的名称
 
-### Naming Convention
+- 单字符名称, 除了计数器和迭代器。
+- 包/模块名中的连字符（-）。
+- 双下划线开头并结尾的名称（Python保留, 例如__init__）。
 
-- "Internal" means internal to a module or protected or private within a class.
+### 命名约定
 
-- Prepending a single underscore (`_`) has some support for protecting module variables and functions (not included with `from module import *`). While prepending a double underscore (`__` aka "dunder") to an instance variable or method effectively makes the variable or method private to its class (using name mangling) we discourage its use as it impacts readability and testability and isn't *really* private.
+- 所谓“`Internal`”表示仅模块内可用。或者, 在类内是保护或私有的.
+- 用单下划线(`_`)开头表示模块变量或函数是`protected`的（使用`import * from`时不会包含）.
+- 用双下划线(__)开头的实例变量或方法表示类内私有.
+- 将相关的类和顶级函数放在同一个模块里。不像`Java`, 没必要限制一个类一个模块。
+- 对类名使用大写字母开头的单词（如`CapWords`, 即`Pascal`风格）, 但是模块名应该用小写加下划线的方式(如`lower_with_under.py`)。尽管已经有很多现存的模块使用类似于`CapWords.py`这样的命名, 但现在已经不鼓励这样做, 因为如果模块名碰巧和类名一致, 这会让人困扰。
 
-- Place related classes and top-level functions together in a module. Unlike Java, there is no need to limit yourself to one class per module.
-
-- Use CapWords for class names, but lower\_with\_under.py for module names. **Although there are some old modules named CapWords.py, this is now discouraged because it's confusing when the module happens to be named after a class.** ("wait -- did I write `import StringIO` or `from StringIO import StringIO`?")
-
-- Underscores may appear in *unittest* method names starting with `test` to separate logical components of the name, even if those components use CapWords. One possible pattern is `test<MethodUnderTest>_<state>`; for example `testPop_EmptyStack` is okay. There is no One Correct Way to name test methods.
-
-### Guidelines derived from Guido's Recommendations
+### Python之父Guido推荐的规范
 
 | Type                       | Public               | Internal                          |
 | :------------------------: | :------------------: | :-------------------------------: |
@@ -305,10 +304,10 @@ Always use a `.py` filename extension. Never use dashes.
 | Function/Method Parameters | `lower_with_under`   |                                   |
 | Local Variables            | `lower_with_under`   |                                   |
 
-## Site
+## 官网
 
 * https://ont.io/
 
-## License
+## 许可证
 
-The Ontology library (i.e. all code outside of the cmd directory) is licensed under the GNU Lesser General Public License v3.0, also included in our repository in the License file.
+所有Ontology的库（即cmd目录之外的所有代码）遵循GNU Lesser General Public License v3.0许可，该许可证文件也包含在我们的存储库中。

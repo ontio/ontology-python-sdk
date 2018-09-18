@@ -74,10 +74,6 @@ class TestOntId(unittest.TestCase):
         acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         tx = ont_id.new_get_ddo_transaction(acct_did)
         ddo = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        estimate_ddo = "4c0100000021035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da003" \
-                       "0000002103a8cf063f862c2edfc3c2ead8b5889db624b98430dcbefcff98400a2fdafce81b150374" \
-                       "727906737472696e670961747472696275746514a8fbb6da841e737486e791c10ee3a8053909c086"
-        self.assertEqual(estimate_ddo[2:], ddo[2:len(estimate_ddo)])
         parsed_ddo = ont_id.parse_ddo(acct_did, ddo)
         self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
         self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])

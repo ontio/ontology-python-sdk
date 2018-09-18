@@ -4,7 +4,12 @@
 *.xml
 *.DS_Store
 *.json
+
 venv
 .vs
 .idea
 .vscode
+build
+dist
+
+ontology_python_sdk.egg-info
