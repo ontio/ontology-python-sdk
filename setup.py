@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from os import path, getcwd
 from codecs import open
+from os import path, getcwd
 from setuptools import setup, find_packages
 
-
-with open(path.join(getcwd(), 'DESCRIP.md')) as f:
+with open(path.join(getcwd(),'description.md')) as f:
     long_description = f.read()
-
 
 setup(
     name='ontology-python-sdk',
-    version='0.1.1',
+    version='0.1.3',
     description='Comprehensive Python library for the Ontology BlockChain.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -21,7 +19,8 @@ setup(
     maintainer='NashMiao',
     maintainer_email='wdx7266@outlook.com',
     license='GNU Lesser General Public License v3 (LGPLv3)',
-    packages=find_packages(),
+    packages=find_packages('ontology'),
+    package_dir={'': 'ontology'},
     install_requires=[
         'pycryptodomex',
         'cryptography',
