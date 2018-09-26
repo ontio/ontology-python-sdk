@@ -270,7 +270,7 @@ class WalletManager(object):
                     addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
                     key = self.wallet_in_mem.identities[index].controls[0].key
                     salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, Scrypt().get_n(),
+                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt["n"],
                                                                       self.scheme)
                     return Account(private_key, self.scheme)
         else:
@@ -279,7 +279,7 @@ class WalletManager(object):
                     key = self.wallet_in_mem.accounts[index].key
                     addr = self.wallet_in_mem.accounts[index].address
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, Scrypt().get_n(), self.scheme)
+                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt["n"], self.scheme)
                     return Account(private_key, self.scheme)
         return None
 
