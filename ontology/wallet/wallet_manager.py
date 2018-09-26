@@ -43,7 +43,10 @@ class WalletManager(object):
 
     def load(self):
         with open(self.wallet_path, "r") as f:
-            obj = json.load(f)
+            content = f.read()
+            if content.startswith(u'\ufeff'):
+                content = content.encode('utf8')[3:].decode('utf8')
+            obj = json.loads(content)
             try:
                 create_time = obj['createTime']
             except KeyError:
