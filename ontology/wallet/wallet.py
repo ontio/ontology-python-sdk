@@ -33,11 +33,15 @@ class WalletData(object):
             if isinstance(dict_identity, dict):
                 list_controls = list()
                 try:
+                    try:
+                        is_default = dict_identity['isDefault']
+                    except Exception as e:
+                        is_default = False
                     for control_data in dict_identity['controls']:
                         list_controls.append(Control.dict2obj(control_data))
                     identity = Identity(ont_id=dict_identity['ontid'], label=dict_identity['label'],
                                         lock=dict_identity['lock'], controls=list_controls,
-                                        is_default=dict_identity['isDefault'])
+                                        is_default=is_default)
                 except KeyError:
                     raise SDKException(ErrorCode.param_error)
                 self.identities.append(identity)
