@@ -21,11 +21,11 @@ class KeyType(Enum):
     def from_label(label: int):
         label = bytes([label])
         if KeyType.ECDSA.value == label:
-            return KeyType.ECDSA.name
+            return KeyType.ECDSA
         elif KeyType.SM2.value == label:
-            return KeyType.SM2.name
+            return KeyType.SM2
         elif KeyType.EDDSA.value == label:
-            return KeyType.EDDSA.name
+            return KeyType.EDDSA
 
     @staticmethod
     def from_pubkey(pubkey: []):

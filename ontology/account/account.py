@@ -7,6 +7,7 @@ import binascii
 import base58
 from binascii import b2a_hex, a2b_hex
 
+from ontology.common.error_code import ErrorCode
 from ontology.crypto.curve import Curve
 from ontology.crypto.digest import Digest
 from ontology.crypto.scrypt import Scrypt
@@ -46,6 +47,12 @@ class Account(object):
         else:
             raise TypeError
         return byte_signature
+
+    def verify_signature(self, msg: bytearray, signature: bytearray):
+        if msg is None or signature is None:
+            raise Exception(ErrorCode.param_err("param should not be None"))
+        handler = SignatureHandler(self.__keyType, self.__signature_scheme)
+        return handler.verify_signature(self.serialize_public_key(), msg, signature)
 
     def get_address(self):
         """
