@@ -278,12 +278,7 @@ class WalletManager(object):
                     key = self.wallet_in_mem.accounts[index].key
                     addr = self.wallet_in_mem.accounts[index].address
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-<<<<<<< HEAD
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, Scrypt().get_n(),
-                                                                      self.scheme)
-=======
                     private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt.get_n(), self.scheme)
->>>>>>> upstream/master
                     return Account(private_key, self.scheme)
         return None
 
