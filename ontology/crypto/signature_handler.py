@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from binascii import b2a_hex
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import utils
 from cryptography.hazmat.primitives import hashes
+import ecdsa
+from ecdsa.numbertheory import square_root_mod_prime
+from ecdsa.util import string_to_number, number_to_string
+from hashlib import sha256
+from ecdsa import ellipticcurve, VerifyingKey
+
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
@@ -37,6 +44,20 @@ class SignatureHandler(object):
         sign = SignatureHandler.dsa_der_to_plain(signature)
         return sign
 
+    def verify_signature(self, public_key: bytes, msg: bytes, signature: bytes):
+        if public_key.startswith(b'\x02') or public_key.startswith(b'\x03'):
+            public_key = SignatureHandler.uncompress_public_key(public_key)
+        elif public_key.startswith(b'\x04'):
+            pass
+        else:
+            raise ValueError('Invalid public key format')
+        vk = ecdsa.VerifyingKey.from_string(public_key, curve=ecdsa.NIST256p)
+        try:
+            return vk.verify(signature[1:], msg, hashfunc=sha256)
+        except Exception as e:
+            print(e)
+            return False
+
     @staticmethod
     def dsa_der_to_plain(signature):
         r, s = utils.decode_dss_signature(signature)
@@ -47,3 +68,25 @@ class SignatureHandler(object):
         if len(s) < 64:
             s = "".join(['0' for i in range(64-len(s))]) + s
         return r + s
+
+    @staticmethod
+    def uncompress_public_key(public_key):
+        """
+        Uncompress the compressed public key.
+        :param public_key: compressed public key
+        :return: uncompressed public key
+        """
+        is_even = public_key.startswith(b'\x02')
+        x = string_to_number(public_key[1:])
+
+        curve = ecdsa.NIST256p.curve
+        order = ecdsa.NIST256p.order
+        p = curve.p()
+        alpha = (pow(x, 3, p) + (curve.a() * x) + curve.b()) % p
+        beta = square_root_mod_prime(alpha, p)
+        if is_even == bool(beta & 1):
+            y = p - beta
+        else:
+            y = beta
+        point = ellipticcurve.Point(curve, x, y, order)
+        return b''.join([number_to_string(point.x(), order), number_to_string(point.y(), order)])

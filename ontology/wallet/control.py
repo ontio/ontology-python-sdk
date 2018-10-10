@@ -33,8 +33,16 @@ class Control(object):
 
     @staticmethod
     def dict2obj(control_data: dict):
+        try:
+            hash_value = control_data['hash']
+        except Exception as e:
+            hash_value = "sha256"
+        try:
+            public_key = control_data['publicKey']
+        except Exception as e:
+            public_key = ""
         obj = Control(id=control_data['id'], address=control_data['address'], enc_alg=control_data['enc-alg'],
                       key=control_data['key'], algorithm=control_data['algorithm'], salt=control_data['salt'],
-                      param=control_data['parameters'], hash_value=control_data['hash'],
-                      public_key=control_data['publicKey'])
+                      param=control_data['parameters'], hash_value=hash_value,
+                      public_key=public_key)
         return obj

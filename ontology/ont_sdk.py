@@ -3,7 +3,10 @@
 
 import threading
 
+from ontology.crypto.signature_handler import SignatureHandler
+
 from ontology.core.sig import Sig
+from ontology.crypto.key_type import KeyType
 from ontology.rpc.rpc import RpcClient
 from ontology.common import define as Common
 from ontology.account.account import Account
@@ -125,6 +128,24 @@ class OntologySdk(object):
         sig = Sig(pub_keys, m, [sig_data])
         tx.sigs.append(sig)
         return tx
+
+    def signature_data(self, acct: Account, data: bytearray or bytes):
+        return acct.generate_signature(data, acct.get_signature_scheme())
+
+    def verify_signature(self, public_key: bytearray, data: bytearray, signature: bytearray):
+        key_type = KeyType.ECDSA
+        if len(public_key) == 33:
+            key_type = KeyType.ECDSA
+        elif len(public_key) == 35:
+            key_type = KeyType.from_label(public_key[0])
+        handler = SignatureHandler(key_type, SignatureScheme.SHA256withECDSA)
+        if key_type == KeyType.ECDSA:
+            handler = SignatureHandler(key_type, SignatureScheme.SHA256withECDSA)
+        elif key_type == KeyType.SM2:
+            handler = SignatureHandler(key_type, SignatureScheme.SM3withSM2)
+        else:
+            raise Exception("unsupport key type")
+        return handler.verify_signature(public_key, data, signature)
 
     def open_wallet(self, wallet_file):
         return self.wallet_manager.open_wallet(wallet_file)
