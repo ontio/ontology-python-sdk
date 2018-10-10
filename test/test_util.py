@@ -27,25 +27,25 @@ class TestUtil(unittest.TestCase):
         length = 2048
         self.assertEqual(len(util.get_random_bytes(length)), length)
 
-    def test_get_random_str(self):
+    def test_get_random_hex_str(self):
         try:
             length = -1
-            util.get_random_str(length)
+            util.get_random_hex_str(length)
         except ValueError:
             raised = True
             self.assertTrue(raised, 'Exception raised')
         length = 0
-        self.assertEqual(len(util.get_random_str(length)), length)
+        self.assertEqual(len(util.get_random_hex_str(length)), length)
         length = 1
-        self.assertEqual(len(util.get_random_str(length)), length)
+        self.assertEqual(len(util.get_random_hex_str(length)), length)
         length = 64
-        self.assertEqual(len(util.get_random_str(length)), length)
+        self.assertEqual(len(util.get_random_hex_str(length)), length)
         length = 256
-        self.assertEqual(len(util.get_random_str(length)), length)
+        self.assertEqual(len(util.get_random_hex_str(length)), length)
         length = 1024
-        self.assertEqual(len(util.get_random_str(length)), length)
+        self.assertEqual(len(util.get_random_hex_str(length)), length)
         length = 2048
-        self.assertEqual(len(util.get_random_str(length)), length)
+        self.assertEqual(len(util.get_random_hex_str(length)), length)
 
     def test_bigint_to_neo_bytes(self):
         bs = util.bigint_to_neo_bytes(-9175052165852779861)

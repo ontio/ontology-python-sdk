@@ -18,7 +18,7 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = util.get_random_str(10)
+        password = util.get_random_hex_str(10)
         label = 'label'
         wm.create_account(label, password)
         default_account = wm.get_default_account()
@@ -85,14 +85,24 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
 
     def test_get_account(self):
-        wm = WalletManager()
+        wallet_manager = WalletManager()
         password = 'password'
-        acct = wm.create_account('', password)
-        self.assertTrue(isinstance(acct, AccountData))
-        b58_address = wm.wallet_in_mem.default_account_address
-        print(b58_address)
-        acct = wm.get_account(b58_address, password)
-        self.assertEqual(acct.get_address_base58(), b58_address)
+        acct0 = wallet_manager.create_account('', password)
+        self.assertTrue(isinstance(acct0, AccountData))
+        b58_address = wallet_manager.wallet_in_mem.default_account_address
+        acct0 = wallet_manager.get_account(b58_address, password)
+        self.assertEqual(acct0.get_address_base58(), b58_address)
+
+        b58_address1 = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
+        encrypted_pri_key = '8p2q0vLRqyfKmFHhnjUYVWOm12kPm78JWqzkTOi9rrFMBz624KjhHQJpyPmiSSOa'
+        password1 = '111111'
+        label = ''
+        base64_salt = 'KbiCUr53CZUfKG1M3Gojjw=='
+        acct1 = wallet_manager.import_account(label, encrypted_pri_key, password1, b58_address1, base64_salt)
+        self.assertEqual(b58_address1, acct1.address)
+        import_acct = wallet_manager.get_account(b58_address1, password1)
+        self.assertEqual(b58_address1, import_acct.get_address_base58())
+        self.assertEqual(base64_salt, acct1.salt)
 
     def test_get_accounts(self):
         wm = WalletManager()
@@ -113,7 +123,7 @@ class TestWalletManager(unittest.TestCase):
         wm.open_wallet(path)
         size = 3
         for i in range(size):
-            private_key = util.get_random_str(64)
+            private_key = util.get_random_hex_str(64)
             wm.create_identity_from_private_key("ide", str(i), private_key)
         identities = wm.get_wallet().get_identities()
         self.assertEqual(len(identities), size)
@@ -131,7 +141,7 @@ class TestWalletManager(unittest.TestCase):
         wm.open_wallet(path)
         size = 3
         for i in range(size):
-            private_key = util.get_random_str(64)
+            private_key = util.get_random_hex_str(64)
             wm.create_identity_from_private_key("ide", str(i), private_key)
         identities = wm.get_wallet().get_identities()
         self.assertEqual(len(identities), size)
@@ -204,10 +214,10 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        private_key = util.get_random_str(64)
+        private_key = util.get_random_hex_str(64)
         acct = Account(private_key)
-        password = util.get_random_str(10)
-        salt = util.get_random_str(16)
+        password = util.get_random_hex_str(10)
+        salt = util.get_random_hex_str(16)
         scrypt_n = 16384
         encrypted_private_key = acct.export_gcm_encrypted_private_key(password, salt, scrypt_n)
         label = 'label'
@@ -251,8 +261,9 @@ class TestWalletManager(unittest.TestCase):
         label = 'hello_account'
         password = 'password'
         account = wm.create_account_from_private_key(label, password, private_key)
+        b58_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         wm.save()
-        self.assertEqual(account.get_address(), 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
+        self.assertEqual(b58_address, account.get_address())
         os.remove(path)
 
 
