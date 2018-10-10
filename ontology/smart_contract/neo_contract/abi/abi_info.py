@@ -23,5 +23,5 @@ class AbiInfo(object):
         """
         for func in self.functions:
             if func['name'] == name:
-                return AbiFunction(func['name'], func['returntype'], func['parameters'])
+                return AbiFunction(func['name'], func.get('returntype', ''), func['parameters'])
         return None
