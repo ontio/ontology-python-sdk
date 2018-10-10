@@ -33,11 +33,11 @@ def get_random_bytes(length: int) -> bytes:
     return Random.get_random_bytes(length)
 
 
-def get_random_str(length: int) -> str:
+def get_random_hex_str(length: int) -> str:
     """
 
     :param length:
-    :return: a random string of the desired length.
+    :return: a random hexadecimal string of the desired length.
     """
     return Random.get_random_bytes(length).hex()[:length]
 
@@ -167,4 +167,3 @@ def int_to_bytearray(data: int):
     #     return bytearray(data.to_bytes(bit_length, "big", signed=True))
     # else:
     #     return bytearray(data.to_bytes(bit_length, "little"))
-

@@ -319,14 +319,14 @@ class Oep4(object):
             allowance = 0
         return allowance
 
-    def transfer_from(self, spender_acct: Account, from_acct: Account, b58_to_address: str, value: int,
+    def transfer_from(self, spender_acct: Account, b58_from_address: str, b58_to_address: str, value: int,
                       payer_acct: Account, gas_limit: int, gas_price: int):
         """
         This interface is used to call the Allowance method in ope4
         that allow spender to withdraw amount of oep4 token from from-account to to-account.
 
-        :param spender_acct: an Account class that spend the oep4 token.
-        :param from_acct: an Account class that actually pay oep4 token for the spender's spending.
+        :param spender_acct: an Account class that actually spend oep4 token.
+        :param b58_from_address: an base58 encode address that actually pay oep4 token for the spender's spending.
         :param b58_to_address: a base58 encode address that receive the oep4 token.
         :param value: the amount of ope4 token in this transaction.
         :param payer_acct: an Account class that used to pay for the transaction.
@@ -335,13 +335,12 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = self.__abi_info.get_function('TransferFrom')
+        Oep4.__b58_address_check(b58_from_address)
         Oep4.__b58_address_check(b58_to_address)
-        if not isinstance(from_acct, Account):
-            raise SDKException(ErrorCode.param_err('the data type of from_acct should be Account.'))
         if not isinstance(spender_acct, Account):
             raise SDKException(ErrorCode.param_err('the data type of spender_acct should be Account.'))
         spender_address_array = spender_acct.get_address().to_array()
-        from_address_array = from_acct.get_address().to_array()
+        from_address_array = Address.b58decode(b58_from_address).to_array()
         to_address_array = Address.b58decode(b58_to_address).to_array()
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
@@ -357,10 +356,8 @@ class Oep4(object):
         payer_address_array = payer_acct.get_address().to_array()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address_array, params,
                          bytearray(), [], bytearray())
-        self.__sdk.sign_transaction(tx, payer_acct)
+        self.__sdk.sign_transaction(tx, spender_acct)
         if spender_acct.get_address_base58() != payer_acct.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, spender_acct)
-        if from_acct.get_address_base58() != payer_acct.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer_acct)
         tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
         return tx_hash

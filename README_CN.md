@@ -222,7 +222,7 @@ This is an API set that allows you to manage your multiple identity in an wallet
 
 |       | Main Function       |
 | :---: | :------------------ |
-| 1     | get_random_str()    |
+| 1     | get_random_hex_str()    |
 | 2     | get_asset_address() |
 | 3     | get_random_bytes()  |
 

@@ -7,7 +7,7 @@ import unittest
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.utils.util import get_random_str
+from ontology.utils.util import get_random_hex_str
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 
@@ -159,7 +159,7 @@ class TestRpcClient(unittest.TestCase):
     def test_send_raw_transaction_pre_exec(self):
         pri_key_1 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(pri_key_1)
-        pri_key2 = get_random_str(64)
+        pri_key2 = get_random_hex_str(64)
         acct2 = Account(pri_key2)
         b58_address_1 = acct.get_address_base58()
         b58_address_2 = acct2.get_address_base58()

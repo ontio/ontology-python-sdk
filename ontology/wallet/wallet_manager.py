@@ -13,7 +13,7 @@ from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.util import is_file_exist
 from ontology.wallet.wallet import WalletData
-from ontology.utils.util import get_random_str
+from ontology.utils.util import get_random_hex_str
 from ontology.wallet.account import AccountData
 from ontology.common.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
@@ -120,8 +120,8 @@ class WalletManager(object):
         :param pwd: a password which will be used to encrypt and decrypt the private key.
         :return: if succeed, an Identity object will be returned.
         """
-        pri_key = get_random_str(64)
-        salt = get_random_str(16)
+        pri_key = get_random_hex_str(64)
+        salt = get_random_hex_str(16)
         return self.__create_identity(label, pwd, salt, pri_key)
 
     def __create_identity(self, label: str, pwd: str, salt: str, private_key: str):
@@ -144,7 +144,7 @@ class WalletManager(object):
         :param private_key: a private key in the form of string.
         :return: if succeed, an Identity object will be returned.
         """
-        salt = get_random_str(16)
+        salt = get_random_hex_str(16)
         identity = self.__create_identity(label, pwd, salt, private_key)
         return identity
 
@@ -156,8 +156,8 @@ class WalletManager(object):
         :param pwd: a password which will be used to encrypt and decrypt the private key
         :return: if succeed, return an data structure which contain the information of a wallet account.
         """
-        pri_key = get_random_str(64)
-        salt = get_random_str(16)
+        pri_key = get_random_hex_str(64)
+        salt = get_random_hex_str(16)
         account = self.__create_account(label, pwd, salt, pri_key, True)
         return self.wallet_in_mem.get_account_by_address(account.get_address_base58())
 
@@ -187,7 +187,7 @@ class WalletManager(object):
                 acct.is_default = True
                 self.wallet_in_mem.default_account_address = acct.address
             acct.label = label
-            acct.salt = base64.b64encode(salt.encode()).decode('ascii')
+            acct.salt = base64.b64encode(salt.encode('latin-1')).decode('ascii')
             acct.public_key = account.serialize_public_key().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
@@ -223,8 +223,7 @@ class WalletManager(object):
         """
         salt = base64.b64decode(base64_salt.encode('ascii')).decode('latin-1')
         private_key = Account.get_gcm_decoded_private_key(encrypted_pri_key, pwd, base58_address, salt,
-                                                          Scrypt().get_n(),
-                                                          self.scheme)
+                                                          Scrypt().get_n(), self.scheme)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
             if info.address_base58 == self.wallet_in_mem.accounts[index].address:
@@ -251,7 +250,7 @@ class WalletManager(object):
         :return: if succeed, return an AccountData object.
                   if failed, return a None object.
         """
-        salt = get_random_str(16)
+        salt = get_random_hex_str(16)
         info = self.create_account_info(label, password, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
             if info.address_base58 == self.wallet_in_mem.accounts[index].address:
@@ -279,7 +278,12 @@ class WalletManager(object):
                     key = self.wallet_in_mem.accounts[index].key
                     addr = self.wallet_in_mem.accounts[index].address
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
+<<<<<<< HEAD
+                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, Scrypt().get_n(),
+                                                                      self.scheme)
+=======
                     private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt.get_n(), self.scheme)
+>>>>>>> upstream/master
                     return Account(private_key, self.scheme)
         return None
 
