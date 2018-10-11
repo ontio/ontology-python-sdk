@@ -16,6 +16,8 @@ class WalletData(object):
                  default_address="", scrypt: Scrypt = None, identities: list = None, accounts: list = None):
         if scrypt is None:
             scrypt = Scrypt()
+        if not isinstance(scrypt, Scrypt):
+            raise SDKException(ErrorCode.other_error('Wallet Data init failed'))
         if identities is None:
             identities = list()
         if accounts is None:
