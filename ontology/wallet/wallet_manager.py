@@ -64,8 +64,11 @@ class WalletManager(object):
             except KeyError:
                 identities = list()
             try:
+                scrypt_dict = obj['scrypt']
+                scrypt_obj = Scrypt(scrypt_dict.get('n', 16384), scrypt_dict.get('r', 8), scrypt_dict.get('p', 8),
+                                    scrypt_dict.get('dk_len', 64))
                 wallet = WalletData(obj['name'], obj['version'], create_time, default_id, default_address,
-                                    obj['scrypt'], identities, obj['accounts'])
+                                    scrypt_obj, identities, obj['accounts'])
             except KeyError as e:
                 raise SDKException(ErrorCode.param_err('wallet file format error: %s.' % e))
         return wallet
@@ -269,8 +272,8 @@ class WalletManager(object):
                     addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
                     key = self.wallet_in_mem.identities[index].controls[0].key
                     salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt.get_n(),
-                                                                      self.scheme)
+                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
+                                                                      self.wallet_in_mem.scrypt.get_n(), self.scheme)
                     return Account(private_key, self.scheme)
         else:
             for index in range(len(self.wallet_in_mem.accounts)):
@@ -278,7 +281,8 @@ class WalletManager(object):
                     key = self.wallet_in_mem.accounts[index].key
                     addr = self.wallet_in_mem.accounts[index].address
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt.get_n(), self.scheme)
+                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
+                                                                      self.wallet_in_mem.scrypt.get_n(), self.scheme)
                     return Account(private_key, self.scheme)
         return None
 
