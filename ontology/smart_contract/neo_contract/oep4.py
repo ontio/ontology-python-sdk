@@ -17,44 +17,25 @@ class Oep4(object):
     def __init__(self, sdk):
         self.__sdk = sdk
         self.__contract_address = bytearray()
-        self.__oep4_abi = {"hash": "0x678259ca02f319d43095ceb243697e36c111e8ab", "entrypoint": "Main",
-                           "functions": [{"name": "Name", "parameters": [], "returntype": "String"},
-                                         {"name": "Symbol", "parameters": [], "returntype": "String"},
-                                         {"name": "Decimal", "parameters": [], "returntype": "Integer"},
-                                         {"name": "Main", "parameters": [{"name": "operation", "type": "String"},
-                                                                         {"name": "args", "type": "Array"}],
-                                          "returntype": "Any"},
-                                         {"name": "Init", "parameters": [], "returntype": "Boolean"},
-                                         {"name": "Transfer", "parameters": [{"name": "from", "type": "ByteArray"},
-                                                                             {"name": "to", "type": "ByteArray"},
-                                                                             {"name": "value", "type": "Integer"}],
-                                          "returntype": "Boolean"},
-                                         {"name": "TransferMulti", "parameters": [{"name": "args", "type": "Array"}],
-                                          "returntype": "Boolean"},
-                                         {"name": "BalanceOf", "parameters": [{"name": "address", "type": "ByteArray"}],
-                                          "returntype": "Integer"},
-                                         {"name": "TotalSupply", "parameters": [], "returntype": "Integer"},
-                                         {"name": "Approve", "parameters": [{"name": "owner", "type": "ByteArray"},
-                                                                            {"name": "spender", "type": "ByteArray"},
-                                                                            {"name": "amount", "type": "Integer"}],
-                                          "returntype": "Boolean"}, {"name": "TransferFrom", "parameters": [
-                                   {"name": "spender", "type": "ByteArray"}, {"name": "from", "type": "ByteArray"},
-                                   {"name": "to", "type": "ByteArray"}, {"name": "amount", "type": "Integer"}],
-                                                                     "returntype": "Boolean"}, {"name": "Allowance",
-                                                                                                "parameters": [
-                                                                                                    {"name": "owner",
-                                                                                                     "type": "ByteArray"},
-                                                                                                    {"name": "spender",
-                                                                                                     "type": "ByteArray"}],
-                                                                                                "returntype": "Integer"}],
-                           "events": [{"name": "transfer", "parameters": [{"name": "from", "type": "ByteArray"},
-                                                                          {"name": "to", "type": "ByteArray"},
-                                                                          {"name": "value", "type": "Integer"}],
-                                       "returntype": "Void"}, {"name": "approval",
-                                                               "parameters": [{"name": "onwer", "type": "ByteArray"},
-                                                                              {"name": "spender", "type": "ByteArray"},
-                                                                              {"name": "value", "type": "Integer"}],
-                                                               "returntype": "Void"}]}
+        self.__oep4_abi = {"contractHash": "85848b5ec3b15617e396bdd62cb49575738dd413", "abi": {"functions": [
+            {"name": "Main", "parameters": [{"name": "operation", "type": ""}, {"name": "args", "type": ""}],
+             "returntype": ""}, {"name": "init", "parameters": [{"name": "", "type": ""}], "returntype": ""},
+            {"name": "name", "parameters": [{"name": "", "type": ""}], "returntype": ""},
+            {"name": "symbol", "parameters": [{"name": "", "type": ""}], "returntype": ""},
+            {"name": "decimals", "parameters": [{"name": "", "type": ""}], "returntype": ""},
+            {"name": "totalSupply", "parameters": [{"name": "", "type": ""}], "returntype": ""},
+            {"name": "balanceOf", "parameters": [{"name": "account", "type": ""}], "returntype": ""},
+            {"name": "transfer", "parameters": [{"name": "from_acct", "type": ""}, {"name": "to_acct", "type": ""},
+                                                {"name": "amount", "type": ""}], "returntype": ""},
+            {"name": "transferMulti", "parameters": [{"name": "args", "type": ""}], "returntype": ""},
+            {"name": "approve", "parameters": [{"name": "owner", "type": ""}, {"name": "spender", "type": ""},
+                                               {"name": "amount", "type": ""}], "returntype": ""},
+            {"name": "transferFrom", "parameters": [{"name": "spender", "type": ""}, {"name": "from_acct", "type": ""},
+                                                    {"name": "to_acct", "type": ""}, {"name": "amount", "type": ""}],
+             "returntype": ""},
+            {"name": "allowance", "parameters": [{"name": "owner", "type": ""}, {"name": "spender", "type": ""}],
+             "returntype": ""}]}}
+
         self.__update_abi_info()
 
     def set_contract_address(self, contract_address: str or bytearray or bytes):
@@ -69,20 +50,15 @@ class Oep4(object):
                 raise SDKException(ErrorCode.param_err('the data type of the contract address unsupported.'))
         elif isinstance(contract_address, str) and len(contract_address) == 40:
             self.__contract_address = bytearray(binascii.a2b_hex(contract_address))
+            self.__contract_address.reverse()
             self.__update_abi_info()
         else:
             raise SDKException(ErrorCode.param_err('the length of contract address should be 20 bytes.'))
 
     def __update_abi_info(self):
-        try:
-            entry_point = self.__oep4_abi['entrypoint']
-        except KeyError:
-            entry_point = ''
-        functions = self.__oep4_abi['functions']
-        try:
-            events = self.__oep4_abi['events']
-        except KeyError:
-            events = list()
+        entry_point = self.__oep4_abi.get('entrypoint', '')
+        functions = self.__oep4_abi['abi']['functions']
+        events = self.__oep4_abi.get('events', list())
         self.__abi_info = AbiInfo(self.get_contract_address(is_hex=True), entry_point, functions, events)
 
     def __get_token_setting(self, func_name: str) -> str:
@@ -99,7 +75,7 @@ class Oep4(object):
 
     def get_contract_address(self, is_hex: bool = True) -> str or bytearray:
         if is_hex:
-            array_address = self.__contract_address
+            array_address = self.__contract_address.copy()
             array_address.reverse()
             return binascii.b2a_hex(array_address).decode('ascii')
         else:
@@ -115,7 +91,7 @@ class Oep4(object):
 
         :return: the string name of the oep4 token.
         """
-        name = self.__get_token_setting('Name')
+        name = self.__get_token_setting('name')
         return bytes.fromhex(name).decode()
 
     def get_symbol(self) -> str:
@@ -125,7 +101,7 @@ class Oep4(object):
 
         :return: a short string symbol of the oep4 token
         """
-        get_symbol = self.__get_token_setting('Symbol')
+        get_symbol = self.__get_token_setting('symbol')
         return bytes.fromhex(get_symbol).decode()
 
     def get_decimal(self) -> int:
@@ -135,7 +111,7 @@ class Oep4(object):
 
         :return: the number of decimals used by the oep4 token.
         """
-        decimals = self.__get_token_setting('Decimal')
+        decimals = self.__get_token_setting('decimals')
         return int(decimals[:2], 16)
 
     def init(self, acct: Account, payer_acct: Account, gas_limit: int, gas_price: int) -> str:
@@ -149,7 +125,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('Init')
+        func = self.__abi_info.get_function('init')
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, acct, payer_acct, gas_limit, gas_price,
                                                        func, False)
         return tx_hash
@@ -161,7 +137,7 @@ class Oep4(object):
 
         :return: the total supply of the oep4 token.
         """
-        total_supply = self.__get_token_setting('TotalSupply')
+        total_supply = self.__get_token_setting('totalSupply')
         array = bytearray(binascii.a2b_hex(total_supply.encode('ascii')))
         array.reverse()
         try:
@@ -178,7 +154,7 @@ class Oep4(object):
         :param b58_address: the base58 encode address.
         :return: the oep4 token balance of the base58 encode address.
         """
-        func = self.__abi_info.get_function('BalanceOf')
+        func = self.__abi_info.get_function('balanceOf')
         Oep4.__b58_address_check(b58_address)
         address = Address.b58decode(b58_address).to_array()
         func.set_params_value((address,))
@@ -205,7 +181,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('Transfer')
+        func = self.__abi_info.get_function('transfer')
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
         if value < 0:
@@ -236,7 +212,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('TransferMulti')
+        func = self.__abi_info.get_function('transferMulti')
         for index in range(len(args)):
             item = args[index]
             Oep4.__b58_address_check(item[0])
@@ -281,7 +257,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('Approve')
+        func = self.__abi_info.get_function('approve')
         if not isinstance(amount, int):
             raise SDKException(ErrorCode.param_err('the data type of amount should be int.'))
         if amount < 0:
@@ -304,7 +280,7 @@ class Oep4(object):
         :param b58_spender_address: a base58 encode address that represent spender's account.
         :return: the amount of oep4 token that owner allow spender to transfer from the owner account.
         """
-        func = self.__abi_info.get_function('Allowance')
+        func = self.__abi_info.get_function('allowance')
         Oep4.__b58_address_check(b58_owner_address)
         owner = Address.b58decode(b58_owner_address).to_array()
         Oep4.__b58_address_check(b58_spender_address)
@@ -334,7 +310,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('TransferFrom')
+        func = self.__abi_info.get_function('transferFrom')
         Oep4.__b58_address_check(b58_from_address)
         Oep4.__b58_address_check(b58_to_address)
         if not isinstance(spender_acct, Account):

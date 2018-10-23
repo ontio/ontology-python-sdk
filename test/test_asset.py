@@ -11,13 +11,12 @@ from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 
-rpc_address = 'http://polaris3.ont.io:20336'
-sdk = OntologySdk()
-sdk.rpc.set_address(rpc_address)
-
 
 class TestAsset(unittest.TestCase):
     def test_get_asset_address(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         ont_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
         ong_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
@@ -25,6 +24,9 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(ong_address, asset.get_asset_address('ong'))
 
     def test_query_name(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         token_name = asset.query_name('ont')
         self.assertEqual('ONT Token', token_name)
@@ -32,6 +34,9 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('ONG Token', token_name)
 
     def test_query_symbol(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         token_symbol = asset.query_symbol('ont')
         self.assertEqual('ONT', token_symbol)
@@ -39,6 +44,9 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('ONG', token_symbol)
 
     def test_query_decimals(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         decimals = asset.query_decimals('ong')
         self.assertEqual(9, decimals)
@@ -50,6 +58,9 @@ class TestAsset(unittest.TestCase):
         b58_address2 = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         b58_address3 = 'Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1'
         b58_address4 = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
         self.assertGreaterEqual(acct1_unbound_ong, 0)
@@ -61,6 +72,9 @@ class TestAsset(unittest.TestCase):
         self.assertGreaterEqual(acct4_unbound_ong, 0)
 
     def test_query_balance(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         private_key = util.get_random_hex_str(64)
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
@@ -73,6 +87,9 @@ class TestAsset(unittest.TestCase):
         self.assertGreaterEqual(balance, 0)
 
     def test_query_allowance(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
@@ -82,6 +99,9 @@ class TestAsset(unittest.TestCase):
         self.assertGreaterEqual(allowance, 0)
 
     def test_new_approve_transaction(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         sender = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_send_address = sender.get_address_base58()
@@ -97,6 +117,9 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
 
     def test_new_transfer_transaction(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -164,6 +187,9 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(int(old_ong_balance_2), int(new_ong_balance_2))
 
     def test_new_transfer_from_transaction(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         sender = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_sender_address = sender.get_address_base58()
@@ -195,6 +221,9 @@ class TestAsset(unittest.TestCase):
             self.assertIn(msg, e.args[1])
 
     def test_send_transfer(self):
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         from_acct = Account(private_key, SignatureScheme.SHA256withECDSA)
@@ -227,6 +256,9 @@ class TestAsset(unittest.TestCase):
         gas_limit = 20000
         tx = Asset.new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount, b58_payer_address,
                                                 gas_limit, gas_price)
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         sdk.add_sign_transaction(tx, claimer)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
@@ -236,6 +268,9 @@ class TestAsset(unittest.TestCase):
         private_key2 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
         claimer = Account(private_key1, SignatureScheme.SHA256withECDSA)
         payer = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         gas_limit = 20000
@@ -253,6 +288,9 @@ class TestAsset(unittest.TestCase):
         private_key2 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
         sender = Account(private_key1, SignatureScheme.SHA256withECDSA)
         payer = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         amount = 1
@@ -277,6 +315,9 @@ class TestAsset(unittest.TestCase):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         sender = Account(private_key, SignatureScheme.SHA256withECDSA)
         payer = sender
+        rpc_address = 'http://polaris3.ont.io:20336'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         b58_recv_address = sender.get_address_base58()
