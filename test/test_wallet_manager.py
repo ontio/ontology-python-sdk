@@ -92,7 +92,7 @@ class TestWalletManager(unittest.TestCase):
         b58_address = wallet_manager.wallet_in_mem.default_account_address
         acct0 = wallet_manager.get_account(b58_address, password)
         self.assertEqual(acct0.get_address_base58(), b58_address)
-
+        self.assertRaises(SDKException, wallet_manager.get_account, b58_address, 'wrong_password')
         b58_address1 = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
         encrypted_pri_key = '8p2q0vLRqyfKmFHhnjUYVWOm12kPm78JWqzkTOi9rrFMBz624KjhHQJpyPmiSSOa'
         password1 = '111111'

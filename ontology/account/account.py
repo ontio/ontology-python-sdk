@@ -15,6 +15,7 @@ from ontology.common.address import Address
 from ontology.crypto.key_type import KeyType
 from ontology.crypto.signature import Signature
 from ontology.crypto.aes_handler import AESHandler
+from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler
 
@@ -159,12 +160,14 @@ class Account(object):
         encrypted_key = base64.b64decode(encrypted_key_str).hex()
         mac_tag = a2b_hex(encrypted_key[64:96])
         cipher_text = a2b_hex(encrypted_key[0:64])
-        pri_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, b58_address.encode(), mac_tag, derivedhalf2, iv)
-        pri_key = b2a_hex(pri_key).decode('ascii')
-        acct = Account(pri_key, scheme)
+        private_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, b58_address.encode(), mac_tag, derivedhalf2, iv)
+        if len(private_key) == 0:
+            raise SDKException(ErrorCode.decrypt_encrypted_private_key_error)
+        private_key = b2a_hex(private_key).decode('ascii')
+        acct = Account(private_key, scheme)
         if acct.get_address().b58encode() != b58_address:
             raise RuntimeError
-        return pri_key
+        return private_key
 
     def serialize_private_key(self):
         """
