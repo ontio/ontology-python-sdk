@@ -30,6 +30,8 @@ class ErrorCode:
     encrypted_pri_key_address_password_err = get_error.__func__(51015,
                                                                 "Account Error, encrypted private key address password not match.")
     encrypt_private_key_error = get_error.__func__(51016, "Account Error, encrypt private key error,")
+    decrypt_encrypted_private_key_error = get_error.__func__(51017,
+                                                             "Account Error, decrypt encrypted private key error.")
 
     param_length_err = get_error.__func__(52001, "Uint256 Error,param length error")
     checksum_not_validate = get_error.__func__(52002, "Base58 Error,Checksum does not validate")
