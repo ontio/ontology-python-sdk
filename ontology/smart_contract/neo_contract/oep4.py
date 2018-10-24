@@ -73,6 +73,16 @@ class Oep4(object):
         if len(b58_address) != 34:
             raise SDKException(ErrorCode.param_err('the length of base58 encode address should be 34 bytes.'))
 
+    def __to_float_according_to_decimal(self, value) -> float:
+        decimal = self.get_decimal()
+        value /= (10 ** decimal)
+        return value
+
+    def __to_int_according_to_decimal(self, value) -> int:
+        decimal = self.get_decimal()
+        value *= (10 ** decimal)
+        return int(value)
+
     def get_contract_address(self, is_hex: bool = True) -> str or bytearray:
         if is_hex:
             array_address = self.__contract_address.copy()
@@ -130,7 +140,7 @@ class Oep4(object):
                                                        func, False)
         return tx_hash
 
-    def get_total_supply(self) -> int:
+    def get_total_supply(self) -> float:
         """
         This interface is used to call the TotalSupply method in ope4
         that return the total supply of the oep4 token.
@@ -144,9 +154,10 @@ class Oep4(object):
             supply = int(binascii.b2a_hex(array).decode('ascii'), 16)
         except ValueError:
             supply = 0
+        supply = self.__to_float_according_to_decimal(supply)
         return supply
 
-    def balance_of(self, b58_address: str) -> int:
+    def balance_of(self, b58_address: str) -> float:
         """
         This interface is used to call the BalanceOf method in ope4
         that query the ope4 token balance of the given base58 encode address.
@@ -165,6 +176,7 @@ class Oep4(object):
             balance = int(binascii.b2a_hex(array).decode('ascii'), 16)
         except ValueError:
             balance = 0
+        balance = self.__to_float_according_to_decimal(balance)
         return balance
 
     def transfer(self, from_acct: Account, b58_to_address: str, value: int, payer_acct: Account, gas_limit: int,
@@ -182,8 +194,8 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = self.__abi_info.get_function('transfer')
-        if not isinstance(value, int):
-            raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
+        if not isinstance(value, int) or isinstance(value, float):
+            raise SDKException(ErrorCode.param_err('the data type of value should be number.'))
         if value < 0:
             raise SDKException(ErrorCode.param_err('the value should be equal or great than 0.'))
         if not isinstance(from_acct, Account):
@@ -191,6 +203,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_to_address)
         from_address = from_acct.get_address().to_array()
         to_address = Address.b58decode(b58_to_address).to_array()
+        value = self.__to_int_according_to_decimal(value)
         params = (from_address, to_address, value)
         func.set_params_value(params)
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, from_acct, payer_acct, gas_limit,
@@ -217,13 +230,13 @@ class Oep4(object):
             item = args[index]
             Oep4.__b58_address_check(item[0])
             Oep4.__b58_address_check(item[1])
-            if not isinstance(item[2], int):
-                raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
+            if not isinstance(item[2], float) or isinstance(item[2], int):
+                raise SDKException(ErrorCode.param_err('the data type of value should be number.'))
             if item[2] < 0:
                 raise SDKException(ErrorCode.param_err('the value should be equal or great than 0.'))
             from_address_array = Address.b58decode(item[0]).to_array()
             to_address_array = Address.b58decode(item[1]).to_array()
-            args[index] = [from_address_array, to_address_array, item[2]]
+            args[index] = [from_address_array, to_address_array, self.__to_int_according_to_decimal(item[2])]
         func.set_params_value((args,))
         params = BuildParams.serialize_abi_function(func)
         unix_time_now = int(time.time())
@@ -265,13 +278,14 @@ class Oep4(object):
         owner_address = owner_acct.get_address().to_array()
         Oep4.__b58_address_check(b58_spender_address)
         spender_address = Address.b58decode(b58_spender_address).to_array()
+        amount = self.__to_int_according_to_decimal(amount)
         params = (owner_address, spender_address, amount)
         func.set_params_value(params)
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, owner_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
 
-    def allowance(self, b58_owner_address: str, b58_spender_address: str):
+    def allowance(self, b58_owner_address: str, b58_spender_address: str) -> float:
         """
         This interface is used to call the Allowance method in ope4
         that query the amount of spender still allowed to withdraw from owner account.
@@ -293,6 +307,7 @@ class Oep4(object):
             allowance = int(binascii.b2a_hex(array).decode('ascii'), 16)
         except ValueError:
             allowance = 0
+        allowance = self.__to_float_according_to_decimal(allowance)
         return allowance
 
     def transfer_from(self, spender_acct: Account, b58_from_address: str, b58_to_address: str, value: int,
@@ -318,8 +333,9 @@ class Oep4(object):
         spender_address_array = spender_acct.get_address().to_array()
         from_address_array = Address.b58decode(b58_from_address).to_array()
         to_address_array = Address.b58decode(b58_to_address).to_array()
-        if not isinstance(value, int):
-            raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
+        if not isinstance(value, int) or isinstance(value, float):
+            raise SDKException(ErrorCode.param_err('the data type of value should be number.'))
+        value = self.__to_int_according_to_decimal(value)
         params = (spender_address_array, from_address_array, to_address_array, value)
         func.set_params_value(params)
         params = BuildParams.serialize_abi_function(func)
