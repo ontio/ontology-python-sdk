@@ -4,6 +4,7 @@
 import json
 import uuid
 import base64
+import codecs
 from datetime import datetime
 
 from ontology.common.define import DID_ONT
@@ -42,10 +43,10 @@ class WalletManager(object):
         return self.wallet_file
 
     def load(self):
-        with open(self.wallet_path, "r") as f:
+        with open(self.wallet_path, "rb") as f:
             content = f.read()
-            if content.startswith(u'\ufeff'):
-                content = content.encode('utf8')[3:].decode('utf8')
+            if content.startswith(codecs.BOM_UTF8):
+                content = content[len(codecs.BOM_UTF8):]
             obj = json.loads(content)
             try:
                 create_time = obj['createTime']
@@ -281,7 +282,8 @@ class WalletManager(object):
                     key = self.wallet_in_mem.accounts[index].key
                     addr = self.wallet_in_mem.accounts[index].address
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, self.wallet_in_mem.scrypt.get_n(), self.scheme)
+                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
+                                                                      self.wallet_in_mem.scrypt.get_n(), self.scheme)
                     return Account(private_key, self.scheme)
         return None
 
