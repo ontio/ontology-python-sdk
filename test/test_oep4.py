@@ -32,7 +32,7 @@ class TestOep4(unittest.TestCase):
     def test_get_name(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = '9276ccc51535ff23d4204117745c0ab07956c523'
+        contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         self.assertEqual('DXToken', oep4.get_name())
@@ -40,7 +40,7 @@ class TestOep4(unittest.TestCase):
     def test_get_symbol(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = '9276ccc51535ff23d4204117745c0ab07956c523'
+        contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         self.assertEqual('DX', oep4.get_symbol())
@@ -48,10 +48,10 @@ class TestOep4(unittest.TestCase):
     def test_get_decimal(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address1 = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address1 = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address1)
-        self.assertEqual(8, oep4.get_decimal())
+        self.assertEqual(10, oep4.get_decimal())
         contract_address2 = '165b1227311d47c22cd073ef8f285d3bddc858ca'
         oep4.set_contract_address(contract_address2)
         self.assertEqual(32, oep4.get_decimal())
@@ -62,7 +62,7 @@ class TestOep4(unittest.TestCase):
     def test_init(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -78,15 +78,15 @@ class TestOep4(unittest.TestCase):
     def test_get_total_supply(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        self.assertEqual(100000000000000000, oep4.get_total_supply())
+        self.assertEqual(1000000000, oep4.get_total_supply())
 
     def test_transfer(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -101,7 +101,7 @@ class TestOep4(unittest.TestCase):
     def test_balance_of(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         b58_address1 = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
@@ -114,7 +114,7 @@ class TestOep4(unittest.TestCase):
     def test_transfer_multi(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -137,7 +137,7 @@ class TestOep4(unittest.TestCase):
         hex_to_address2 = acct3.get_address_hex()
         to_address_list = [hex_to_address1, hex_to_address2]
 
-        value_list = [1, 2]
+        value_list = [1.1, 2.2]
 
         transfer1 = [b58_from_address1, b58_to_address1, value_list[0]]
         transfer2 = [b58_from_address2, b58_to_address2, value_list[1]]
@@ -155,6 +155,7 @@ class TestOep4(unittest.TestCase):
         sdk.set_rpc(remote_rpc_address)
         time.sleep(6)
         try:
+            decimal = oep4.get_decimal()
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][:-1]
             self.assertEqual(len(args), len(notify))
@@ -162,7 +163,10 @@ class TestOep4(unittest.TestCase):
                 self.assertEqual('transfer', bytes.fromhex(notify[index]['States'][0]).decode())
                 self.assertEqual(from_address_list[index], notify[index]['States'][1])
                 self.assertEqual(to_address_list[index], notify[index]['States'][2])
-                self.assertEqual(value_list[index], int(notify[index]['States'][3]))
+                array = bytearray(binascii.a2b_hex(notify[index]['States'][3].encode('ascii')))
+                array.reverse()
+                notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+                self.assertEqual((10 ** decimal) * value_list[index], notify_value)
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
@@ -170,7 +174,7 @@ class TestOep4(unittest.TestCase):
     def test_approve(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -189,13 +193,17 @@ class TestOep4(unittest.TestCase):
         sdk.set_rpc(remote_rpc_address)
         time.sleep(6)
         try:
+            decimal = oep4.get_decimal()
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
             states = notify['States']
             self.assertEqual('approval', bytes.fromhex(states[0]).decode())
             self.assertEqual(hex_owner_address, states[1])
             self.assertEqual(hex_spender_address, states[2])
-            self.assertEqual(amount, int(states[3], 16))
+            array = bytearray(binascii.a2b_hex(states[3].encode('ascii')))
+            array.reverse()
+            notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+            self.assertEqual((10 ** decimal) * amount, notify_value)
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
@@ -203,7 +211,7 @@ class TestOep4(unittest.TestCase):
     def test_allowance(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -218,7 +226,7 @@ class TestOep4(unittest.TestCase):
     def test_transfer_from(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
-        contract_address = 'db425199361c3c68da4b1142817c1dc57bfa820c'
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -244,13 +252,17 @@ class TestOep4(unittest.TestCase):
         sdk.set_rpc(remote_rpc_address)
         time.sleep(6)
         try:
+            decimal = oep4.get_decimal()
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
             self.assertEqual(2, len(notify))
             self.assertEqual('transfer', bytes.fromhex(notify['States'][0]).decode())
             self.assertEqual(hex_from_address, notify['States'][1])
             self.assertEqual(hex_to_address, notify['States'][2])
-            self.assertEqual('01', notify['States'][3])
+            array = bytearray(binascii.a2b_hex(notify['States'][3].encode('ascii')))
+            array.reverse()
+            notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+            self.assertEqual((10 ** decimal) * value, notify_value)
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
