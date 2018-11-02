@@ -37,6 +37,14 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    def test_open_cyano_wallet(self):
+        wm = WalletManager()
+        path = os.path.join(os.getcwd(), 'cyano_wallet.json')
+        wm.open_wallet(path)
+        self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
+        account = wm.get_account('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', '1234567890')
+        self.assertTrue(isinstance(account, Account))
+
     def test_wallet_data(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'wallet.dat')

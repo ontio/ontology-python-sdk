@@ -4,27 +4,27 @@
 
 <!-- TOC -->
 
-- [简介](#%E7%AE%80%E4%BB%8B)
-- [准备](#%E5%87%86%E5%A4%87)
-- [接口](#%E6%8E%A5%E5%8F%A3)
-  - [Network](#network)
-  - [Wallet](#wallet)
-  - [Account](#account)
-  - [Identity](#identity)
-  - [AccountManager](#accountmanager)
-  - [IdentityManager](#identitymanager)
-  - [Asset](#asset)
-  - [ABI](#abi)
-  - [OEP4](#oep4)
-  - [Utils](#utils)
-- [参与项目](#%E5%8F%82%E4%B8%8E%E9%A1%B9%E7%9B%AE)
-- [命名规范](#%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83)
-  - [概述](#%E6%A6%82%E8%BF%B0)
-  - [应该避免的名称](#%E5%BA%94%E8%AF%A5%E9%81%BF%E5%85%8D%E7%9A%84%E5%90%8D%E7%A7%B0)
-  - [命名约定](#%E5%91%BD%E5%90%8D%E7%BA%A6%E5%AE%9A)
-  - [Python之父Guido推荐的规范](#python%E4%B9%8B%E7%88%B6guido%E6%8E%A8%E8%8D%90%E7%9A%84%E8%A7%84%E8%8C%83)
-- [官网](#%E5%AE%98%E7%BD%91)
-- [许可证](#%E8%AE%B8%E5%8F%AF%E8%AF%81)
+- [简介](#简介)
+- [准备](#准备)
+- [接口](#接口)
+    - [Network](#network)
+    - [Wallet](#wallet)
+    - [Account](#account)
+    - [Identity](#identity)
+    - [AccountManager](#accountmanager)
+    - [IdentityManager](#identitymanager)
+    - [Asset](#asset)
+    - [ABI](#abi)
+    - [OEP4](#oep4)
+    - [Utils](#utils)
+- [参与项目](#参与项目)
+- [命名规范](#命名规范)
+    - [概述](#概述)
+    - [应该避免的名称](#应该避免的名称)
+    - [命名约定](#命名约定)
+    - [Python之父Guido推荐的规范](#python之父guido推荐的规范)
+- [官网](#官网)
+- [许可证](#许可证)
 
 <!-- /TOC -->
 
@@ -32,11 +32,11 @@
 
 ## 简介
 
-Ontology-Python-SDK是一个基于`Python3.7`实现的综合性SDK。目前，它支持本地钱包管理、数字身份管理、数字资产管理、智能合约的部署和调用、OEP4智能合约的调用以及与Ontology区块链的通信。并且，未来它还将支持更多功能和应用。
+Ontology-Python-SDK是一个基于`Python3.6`实现的综合性SDK。目前，它支持本地钱包管理、数字身份管理、数字资产管理、智能合约的部署和调用、OEP4智能合约的调用以及与Ontology区块链的通信。并且，未来它还将支持更多功能和应用。
 
 ## 准备
 
-安装需要`Python 3.7`或更高版本的环境。
+安装需要`Python 3.6`或更高版本的环境。
 
 ```bash
 pip install ontology-python-sdk

@@ -10,7 +10,7 @@ with open(path.join(getcwd(), 'description.md')) as f:
 
 setup(
     name='ontology-python-sdk',
-    version='0.1.10',
+    version='0.1.11',
     description='Comprehensive Python library for the Ontology BlockChain.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -27,7 +27,7 @@ setup(
         'base58',
         'requests'
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     platforms=["all"],
     url='https://github.com/ontio/ontology-python-sdk',
     classifiers=[
@@ -35,6 +35,7 @@ setup(
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
 )
