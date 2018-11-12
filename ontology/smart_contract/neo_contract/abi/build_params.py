@@ -22,13 +22,20 @@ class BuildParams(object):
         for param in abi_func.parameters:
             try:
                 if isinstance(param.value, list):
+                    temp_param_list = []
                     for item in param.value:
-                        temp_list.append(item)
+                        if isinstance(item, list):
+                            temp_list.append(item)
+                        else:
+                            temp_param_list.append(item)
+                    if len(temp_param_list) != 0:
+                        temp_list.append(temp_param_list)
                 else:
                     temp_list.append(param.value)
             except AttributeError:
                 pass
         param_list.append(temp_list)
+        print('param_list:', param_list)
         return BuildParams.create_code_params_script(param_list)
 
     @staticmethod
