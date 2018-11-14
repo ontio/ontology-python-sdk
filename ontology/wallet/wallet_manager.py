@@ -47,6 +47,7 @@ class WalletManager(object):
             content = f.read()
             if content.startswith(codecs.BOM_UTF8):
                 content = content[len(codecs.BOM_UTF8):]
+            content = content.decode('utf-8')
             obj = json.loads(content)
             try:
                 create_time = obj['createTime']
