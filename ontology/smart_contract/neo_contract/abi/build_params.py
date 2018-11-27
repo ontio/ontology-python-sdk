@@ -1,7 +1,7 @@
 from enum import Enum
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.utils import util
-from ontology.vm.op_code import PACK
+from ontology.vm.op_code import PACK, NEWMAP, TOALTSTACK, DUPFROMALTSTACK, SETITEM, FROMALTSTACK
 from ontology.vm.params_builder import ParamsBuilder
 
 
@@ -48,12 +48,13 @@ class BuildParams(object):
                 builder.emit_push_byte_array(param_list[i])
             elif isinstance(param_list[i], str):
                 builder.emit_push_byte_array(str.encode(param_list[i]))
-            elif isinstance(param_list[i], int):
-                builder.emit_push_integer(param_list[i])
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
+            elif isinstance(param_list[i], int):
+                builder.emit_push_integer(param_list[i])
             elif isinstance(param_list[i], dict):
-                builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
+                # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
+                BuildParams.push_map(param_list[i], builder)
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
                 builder.emit_push_integer(len(param_list[i]))
@@ -74,12 +75,43 @@ class BuildParams(object):
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
             elif isinstance(param_list[i], dict):
-                builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
+                # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
+                BuildParams.push_map(param_list[i], builder)
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
                 builder.emit_push_integer(len(param_list[i]))
                 builder.emit(PACK)
         return builder.to_array()
+
+    @staticmethod
+    def push_param(param, builder: ParamsBuilder):
+        if isinstance(param, bytearray) or isinstance(param, bytes):
+            builder.emit_push_byte_array(param)
+        elif isinstance(param, str):
+            builder.emit_push_byte_array(bytes(param.encode()))
+        elif isinstance(param, bool):
+            builder.emit_push_bool(param)
+        elif isinstance(param, int):
+            builder.emit_push_integer(param)
+        elif isinstance(param, dict):
+            # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param)))
+            BuildParams.push_map(param, builder)
+        elif isinstance(param, list):
+            BuildParams.create_code_params_script_builder(param, builder)
+            builder.emit_push_integer(len(param))
+            builder.emit(PACK)
+
+    @staticmethod
+    def push_map(dict_param: dict, builder: ParamsBuilder):
+        builder.emit(NEWMAP)
+        builder.emit(TOALTSTACK)
+        for key, value in dict_param.items():
+            builder.emit(DUPFROMALTSTACK)
+            BuildParams.push_param(key, builder)
+            BuildParams.push_param(value, builder)
+            builder.emit(SETITEM)
+        builder.emit(FROMALTSTACK)
+
 
     @staticmethod
     def get_map_bytes(param_dict: dict):
