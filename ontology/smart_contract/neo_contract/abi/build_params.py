@@ -95,6 +95,9 @@ class BuildParams(object):
             elif isinstance(value, str):
                 builder.emit(BuildParams.Type.bytearraytype.value)
                 builder.emit_push_byte_array(value.encode())
+            elif isinstance(value, bool):
+                builder.emit(BuildParams.Type.booltype.value)
+                builder.emit_push_bool(value)
             elif isinstance(value, int):
                 builder.emit(BuildParams.Type.integertype.value)
                 builder.emit_push_integer(int(value))
