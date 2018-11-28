@@ -35,7 +35,6 @@ class BuildParams(object):
             except AttributeError:
                 pass
         param_list.append(temp_list)
-        print('param_list:', param_list)
         return BuildParams.create_code_params_script(param_list)
 
     @staticmethod
