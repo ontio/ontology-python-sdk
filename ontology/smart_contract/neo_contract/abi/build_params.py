@@ -74,8 +74,7 @@ class BuildParams(object):
             elif isinstance(param_list[i], bool):
                 builder.emit_push_bool(param_list[i])
             elif isinstance(param_list[i], dict):
-                # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
-                BuildParams.push_map(param_list[i], builder)
+                builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
             elif isinstance(param_list[i], list):
                 BuildParams.create_code_params_script_builder(param_list[i], builder)
                 builder.emit_push_integer(len(param_list[i]))
