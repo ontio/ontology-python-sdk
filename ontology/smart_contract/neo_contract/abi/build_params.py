@@ -1,7 +1,12 @@
 from enum import Enum
+
+from ontology.common.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.smart_contract.neo_contract.abi.struct_type import Struct
 from ontology.utils import util
-from ontology.vm.op_code import PACK, NEWMAP, TOALTSTACK, DUPFROMALTSTACK, SETITEM, FROMALTSTACK
+from ontology.vm.op_code import PACK, NEWMAP, TOALTSTACK, DUPFROMALTSTACK, SETITEM, FROMALTSTACK, NEWSTRUCT, SWAP, \
+    APPEND
 from ontology.vm.params_builder import ParamsBuilder
 
 
@@ -44,21 +49,7 @@ class BuildParams(object):
         length = len(param_list)
         for j in range(length):
             i = length - 1 - j
-            if isinstance(param_list[i], bytearray) or isinstance(param_list[i], bytes):
-                builder.emit_push_byte_array(param_list[i])
-            elif isinstance(param_list[i], str):
-                builder.emit_push_byte_array(str.encode(param_list[i]))
-            elif isinstance(param_list[i], bool):
-                builder.emit_push_bool(param_list[i])
-            elif isinstance(param_list[i], int):
-                builder.emit_push_integer(param_list[i])
-            elif isinstance(param_list[i], dict):
-                # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
-                BuildParams.push_map(param_list[i], builder)
-            elif isinstance(param_list[i], list):
-                BuildParams.create_code_params_script_builder(param_list[i], builder)
-                builder.emit_push_integer(len(param_list[i]))
-                builder.emit(PACK)
+            BuildParams.push_param(param_list[i], builder)
         return bytearray(builder.to_array())
 
     @staticmethod
@@ -66,21 +57,7 @@ class BuildParams(object):
         length = len(param_list)
         for j in range(length):
             i = length - 1 - j
-            if isinstance(param_list[i], bytearray) or isinstance(param_list[i], bytes):
-                builder.emit_push_byte_array(param_list[i])
-            elif isinstance(param_list[i], str):
-                builder.emit_push_byte_array(bytes(param_list[i].encode()))
-            elif isinstance(param_list[i], int):
-                builder.emit_push_integer(param_list[i])
-            elif isinstance(param_list[i], bool):
-                builder.emit_push_bool(param_list[i])
-            elif isinstance(param_list[i], dict):
-                # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param_list[i])))
-                BuildParams.push_map(param_list[i], builder)
-            elif isinstance(param_list[i], list):
-                BuildParams.create_code_params_script_builder(param_list[i], builder)
-                builder.emit_push_integer(len(param_list[i]))
-                builder.emit(PACK)
+            BuildParams.push_param(param_list[i], builder)
         return builder.to_array()
 
     @staticmethod
@@ -100,6 +77,10 @@ class BuildParams(object):
             BuildParams.create_code_params_script_builder(param, builder)
             builder.emit_push_integer(len(param))
             builder.emit(PACK)
+        elif isinstance(param, Struct):
+            BuildParams.push_struct(param, builder)
+        else:
+            raise SDKException(ErrorCode.other_error('parameter type is error'))
 
     @staticmethod
     def push_map(dict_param: dict, builder: ParamsBuilder):
@@ -112,6 +93,17 @@ class BuildParams(object):
             builder.emit(SETITEM)
         builder.emit(FROMALTSTACK)
 
+    @staticmethod
+    def push_struct(struct_param: Struct, builder: ParamsBuilder):
+        builder.emit_push_integer(0)
+        builder.emit(NEWSTRUCT)
+        builder.emit(TOALTSTACK)
+        for item in struct_param.param_list:
+            BuildParams.push_param(item, builder)
+            builder.emit(DUPFROMALTSTACK)
+            builder.emit(SWAP)
+            builder.emit(APPEND)
+        builder.emit(FROMALTSTACK)
 
     @staticmethod
     def get_map_bytes(param_dict: dict):

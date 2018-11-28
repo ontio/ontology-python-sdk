@@ -5,6 +5,12 @@ import os.path
 from Cryptodome import Random
 
 from ontology.common.define import *
+from ontology.common.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+from ontology.io.binary_reader import BinaryReader
+from ontology.io.memory_stream import StreamManager
+from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
+from ontology.smart_contract.neo_contract.abi.struct_type import Struct
 
 
 def get_asset_address(asset: str) -> bytearray:
@@ -132,6 +138,54 @@ def bytes_reader(b):
     for i in range(len(b) // 2):
         res += bytearray.fromhex(b[2 * i:2 * i + 2].decode())
     return res
+
+
+def deserialize_hex(item_serialize: str):
+    stream = StreamManager.GetStream(bytearray.fromhex(item_serialize))
+    reader = BinaryReader(stream)
+    return deserialize_stack_item(reader)
+
+
+def deserialize_stack_item(reader: BinaryReader) -> dict:
+    t = reader.read_byte()
+    if t == BuildParams.Type.bytearraytype.value:
+        b = reader.read_var_bytes()
+        return b
+    elif t == BuildParams.Type.booltype.value:
+        return reader.read_bool()
+    elif t == BuildParams.Type.integertype.value:
+        b = reader.read_var_bytes()
+        return bigint_from_bytes(b)
+    elif t == BuildParams.Type.structtype.value or t == BuildParams.Type.arraytype.value:
+        count = reader.read_var_int()
+        item_list = list()
+        for i in range(count):
+            item = deserialize_stack_item(reader)
+            item_list.append(item)
+        if t == t == BuildParams.Type.structtype.value:
+            return Struct(item_list)
+        return item_list
+    elif t == BuildParams.Type.maptype.value:
+        count = reader.read_var_int()
+        item_dict = dict()
+        for i in range(count):
+            key = deserialize_stack_item(reader)
+            value = deserialize_stack_item(reader)
+            item_dict[key] = value
+        return item_dict
+    else:
+        raise SDKException(ErrorCode.other_error('type error'))
+
+
+def bigint_from_bytes(ba: bytearray):
+    if len(ba) == 0:
+        return 0
+    ba_temp = ba[:]
+    ba_temp.reverse()
+    if ba_temp[0] >> 7 == 1:
+        res = int.from_bytes(ba_temp, 'big', signed=True)
+        return res
+    return int.from_bytes(ba_temp, 'big', signed=True)
 
 
 def bigint_to_neo_bytes(data: int):
