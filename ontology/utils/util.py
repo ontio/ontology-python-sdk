@@ -158,6 +158,7 @@ def deserialize_stack_item(reader: BinaryReader) -> dict:
         return bigint_from_bytes(b)
     elif t == BuildParams.Type.structtype.value or t == BuildParams.Type.arraytype.value:
         count = reader.read_var_int()
+        # TODO
         item_list = list()
         for i in range(count):
             item = deserialize_stack_item(reader)
