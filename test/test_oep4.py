@@ -5,7 +5,6 @@ import json
 import time
 import unittest
 
-from ontology.common.address import Address
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
