@@ -5,7 +5,7 @@ import os
 import random
 import unittest
 
-from ontology.utils import util
+from ontology.utils import utils
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.wallet.account import AccountData
@@ -18,7 +18,7 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        password = util.get_random_hex_str(10)
+        password = utils.get_random_hex_str(10)
         label = 'label'
         wm.create_account(label, password)
         default_account = wm.get_default_account()
@@ -131,7 +131,7 @@ class TestWalletManager(unittest.TestCase):
         wm.open_wallet(path)
         size = 3
         for i in range(size):
-            private_key = util.get_random_hex_str(64)
+            private_key = utils.get_random_hex_str(64)
             wm.create_identity_from_private_key("ide", str(i), private_key)
         identities = wm.get_wallet().get_identities()
         self.assertEqual(len(identities), size)
@@ -149,7 +149,7 @@ class TestWalletManager(unittest.TestCase):
         wm.open_wallet(path)
         size = 3
         for i in range(size):
-            private_key = util.get_random_hex_str(64)
+            private_key = utils.get_random_hex_str(64)
             wm.create_identity_from_private_key("ide", str(i), private_key)
         identities = wm.get_wallet().get_identities()
         self.assertEqual(len(identities), size)
@@ -222,10 +222,10 @@ class TestWalletManager(unittest.TestCase):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
         wm.open_wallet(path)
-        private_key = util.get_random_hex_str(64)
+        private_key = utils.get_random_hex_str(64)
         acct = Account(private_key)
-        password = util.get_random_hex_str(10)
-        salt = util.get_random_hex_str(16)
+        password = utils.get_random_hex_str(10)
+        salt = utils.get_random_hex_str(16)
         scrypt_n = 16384
         encrypted_private_key = acct.export_gcm_encrypted_private_key(password, salt, scrypt_n)
         label = 'label'

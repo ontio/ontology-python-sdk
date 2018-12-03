@@ -4,7 +4,7 @@
 import unittest
 
 from ontology.core.transaction import Transaction
-from ontology.utils import util
+from ontology.utils import utils
 
 
 class TestTransaction(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestTransaction(unittest.TestCase):
                  "12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be88921020f9ce29ede5f0e271b67e61b2480dccc98c3" \
                  "aabad095c604ef9ab1d92a475c0a21035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da053ae"
 
-        tx = Transaction.deserialize_from(util.hex_to_bytes(tx_hex))
+        tx = Transaction.deserialize_from(utils.hex_to_bytes(tx_hex))
         self.assertGreaterEqual(tx.gas_limit, 0)
         self.assertGreaterEqual(tx.gas_price, 0)
         self.assertGreaterEqual(tx.nonce, 0)

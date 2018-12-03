@@ -5,7 +5,7 @@ import time
 import unittest
 
 from ontology.exception.exception import SDKException
-from ontology.utils import util
+from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
@@ -76,7 +76,7 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.set_address(rpc_address)
         asset = sdk.native_vm().asset()
-        private_key = util.get_random_hex_str(64)
+        private_key = utils.get_random_hex_str(64)
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_address = acct.get_address_base58()
         balance = asset.query_balance('ont', b58_address)

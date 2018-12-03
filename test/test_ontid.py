@@ -4,7 +4,7 @@ import binascii
 import time
 import unittest
 
-from ontology.utils import util
+from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
@@ -173,7 +173,7 @@ class TestOntId(unittest.TestCase):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         hex_public_key = acct.get_public_key_hex()
-        rand_private_key = util.get_random_bytes(32).hex()
+        rand_private_key = utils.get_random_bytes(32).hex()
         rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         hex_new_public_key = rand_acct.get_public_key_hex()
         b58_address = acct.get_address_base58()
@@ -224,7 +224,7 @@ class TestOntId(unittest.TestCase):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
-        rand_private_key = util.get_random_bytes(32).hex()
+        rand_private_key = utils.get_random_bytes(32).hex()
         rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         hex_new_public_key = rand_acct.get_public_key_hex()
         password = 'password'
@@ -273,7 +273,7 @@ class TestOntId(unittest.TestCase):
         b58_address = acct.get_address_base58()
         acct_did = "did:ont:" + b58_address
         hex_public_key = acct.get_public_key_hex()
-        rand_private_key = util.get_random_bytes(32).hex()
+        rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
         tx = ont_id.new_add_recovery_transaction(acct_did, hex_public_key, b58_recovery_address, b58_address, gas_limit,
@@ -295,7 +295,7 @@ class TestOntId(unittest.TestCase):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
-        rand_private_key = util.get_random_bytes(32).hex()
+        rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
         password = 'password'
