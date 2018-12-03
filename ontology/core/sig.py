@@ -4,7 +4,7 @@
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
-from ontology.utils.util import bytes_reader
+from ontology.utils.utils import bytes_reader
 from ontology.core.program import ProgramBuilder
 
 

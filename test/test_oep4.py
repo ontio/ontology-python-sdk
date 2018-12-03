@@ -136,7 +136,7 @@ class TestOep4(unittest.TestCase):
         hex_to_address2 = acct3.get_address_hex()
         to_address_list = [hex_to_address1, hex_to_address2]
 
-        value_list = [1.1, 2.2]
+        value_list = [1, 2]
 
         transfer1 = [b58_from_address1, b58_to_address1, value_list[0]]
         transfer2 = [b58_from_address2, b58_to_address2, value_list[1]]
@@ -165,7 +165,7 @@ class TestOep4(unittest.TestCase):
                 array = bytearray(binascii.a2b_hex(notify[index]['States'][3].encode('ascii')))
                 array.reverse()
                 notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
-                self.assertEqual((10 ** decimal) * value_list[index], notify_value)
+                self.assertEqual(value_list[index], notify_value)
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)

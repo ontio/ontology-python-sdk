@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import binascii
 import json
+import time
 import unittest
 
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
+from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
+from ontology.smart_contract.neo_contract.abi.parameter import Parameter
 
 rpc_address = 'http://polaris3.ont.io:20336'
 # rpc_address = 'http://127.0.0.1:20336'
 sdk = OntologySdk()
+sdk.set_rpc(rpc_address)
 
 private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
 private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -36,7 +41,6 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual(num_hex_str_big, num_dec.to_bytes(8, 'big').hex())
 
     def test_get_balance(self):
-        sdk.set_rpc(rpc_address)
         acct_balance = sdk.rpc.get_balance(acct1.get_address_base58())
         try:
             acct_balance['ont']
@@ -86,7 +90,6 @@ class TestNeoVm(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
 
     def test_unbound_ong(self):
-        sdk.set_rpc(rpc_address)
         acct1_unbound_ong = sdk.native_vm().asset().query_unbound_ong(acct1.get_address_base58())
         self.assertGreaterEqual(int(acct1_unbound_ong), 0)
         acct2_unbound_ong = sdk.native_vm().asset().query_unbound_ong(acct4.get_address_base58())
@@ -97,7 +100,6 @@ class TestNeoVm(unittest.TestCase):
         self.assertGreaterEqual(int(acct4_unbound_ong), 0)
 
     def test_address_from_vm_code(self):
-        sdk.set_rpc(rpc_address)
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
                '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
@@ -106,7 +108,6 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual(code_address.to_reverse_hex_str(), code_hex_address)
 
     def test_make_deploy_transaction(self):
-        sdk.set_rpc(rpc_address)
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
                '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
@@ -121,7 +122,6 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual(len(res), 64)
 
     def test_invoke_transaction(self):
-        sdk.set_rpc(rpc_address)
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
                '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
@@ -132,14 +132,51 @@ class TestNeoVm(unittest.TestCase):
         abi = json.loads(abi_str)
         abi_info = AbiInfo(abi['hash'], abi['entrypoint'], abi['functions'], abi['events'])
         func = abi_info.get_function("Main")
-        func.set_params_value(("Hello", "args"))
-        contract_address = Address.address_from_vm_code(code).to_array()
+        func.set_params_value("Hello", "args")
+        contract_address = Address.address_from_vm_code(code).to_bytes()
         res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
         self.assertEqual(res, '00')
         func = abi_info.get_function("Hello")
-        func.set_params_value(("value",))
+        func.set_params_value("value")
         res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
         self.assertEqual(res, '01')
+
+    def test_transfer_multi_args_0(self):
+        transfer_1 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 10]
+        transfer_2 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 100]
+        transfer_list = [[transfer_1, transfer_2]]
+        contract_address_hex = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
+        contract_address_bytearray = bytearray(binascii.a2b_hex(contract_address_hex))
+        contract_address_bytearray.reverse()
+        parameter_list = [{"name": "transfer_list"}]
+        func = AbiFunction('transfer_multi', parameter_list)
+        func.set_params_value(transfer_list)
+        gas_limit = 20000000
+        gas_price = 500
+        tx_hash = sdk.neo_vm().send_transaction(contract_address_bytearray, acct1, acct2, gas_limit, gas_price, func,
+                                                False)
+        time.sleep(6)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        print(event)
+
+    def test_transfer_multi_args(self):
+        transfer_1 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 10]
+        transfer_2 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 100]
+        transfer_list = [transfer_1, transfer_2]
+        contract_address_hex = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
+        contract_address_bytearray = bytearray(binascii.a2b_hex(contract_address_hex))
+        contract_address_bytearray.reverse()
+        parameter_list = [{"name": "args"}]
+        param = Parameter('transfer_multi_args', '', transfer_list)
+        func = AbiFunction('transfer_multi', ['args1','args2'])
+        func.set_params_value(transfer_1, transfer_2)
+        gas_limit = 20000000
+        gas_price = 500
+        tx_hash = sdk.neo_vm().send_transaction(contract_address_bytearray, acct1, acct2, gas_limit, gas_price, func,
+                                                False)
+        time.sleep(6)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        print(event)
 
 
 if __name__ == '__main__':

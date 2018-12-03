@@ -34,7 +34,7 @@ class Auth(object):
         param = {"contract_address": a2b_hex(contract_address.encode()), 'new_admin_ont_id': new_admin_ont_id.encode('utf-8'), 'key_no': key_no}
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "transfer", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code,
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [], bytearray())
         return tx
 
@@ -43,7 +43,7 @@ class Auth(object):
         param = {"contract_address": contract_address, "ontid": identity.ont_id.encode('utf-8'), "function_name": function_name.encode('utf-8'), "key_no": key_no}
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "verifyToken", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, Address(ZERO_ADDRESS).to_array(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, Address(ZERO_ADDRESS).to_bytes(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
@@ -59,7 +59,7 @@ class Auth(object):
         param['key_no'] = key_no
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "assignFuncsToRole", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(admin_identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
@@ -76,7 +76,7 @@ class Auth(object):
         param['key_no'] = key_no
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "assignOntIDsToRole", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(admin_identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
@@ -90,7 +90,7 @@ class Auth(object):
                  "role": role.encode('utf-8'), "period": period, "level": level, "key_no": key_no}
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "delegate", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
@@ -104,7 +104,7 @@ class Auth(object):
                  "role": role.encode('utf-8'), "key_no": key_no}
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "withdraw", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_array(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
         account = self.__sdk.wallet_manager.get_account(initiator_identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)

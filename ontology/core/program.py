@@ -7,7 +7,7 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG, PUSH1
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
-from ontology.utils.util import bytes_reader
+from ontology.utils.utils import bytes_reader
 from ontology.vm.params_builder import ParamsBuilder
 from ecdsa import util
 from ontology.common import define

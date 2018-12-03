@@ -156,8 +156,8 @@ class Oep4(object):
         """
         func = self.__abi_info.get_function('balanceOf')
         Oep4.__b58_address_check(b58_address)
-        address = Address.b58decode(b58_address).to_array()
-        func.set_params_value((address,))
+        address = Address.b58decode(b58_address).to_bytes()
+        func.set_params_value(address)
         balance = self.__sdk.neo_vm().send_transaction(self.__contract_address, None, None, 0, 0, func, True)
         array = bytearray(binascii.a2b_hex(balance.encode('ascii')))
         array.reverse()
@@ -189,10 +189,9 @@ class Oep4(object):
         if not isinstance(from_acct, Account):
             raise SDKException(ErrorCode.param_err('the data type of from_acct should be Account.'))
         Oep4.__b58_address_check(b58_to_address)
-        from_address = from_acct.get_address().to_array()
-        to_address = Address.b58decode(b58_to_address).to_array()
-        params = (from_address, to_address, value)
-        func.set_params_value(params)
+        from_address = from_acct.get_address().to_bytes()
+        to_address = Address.b58decode(b58_to_address).to_bytes()
+        func.set_params_value(from_address, to_address, value)
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, from_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
@@ -221,10 +220,10 @@ class Oep4(object):
                 raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
             if item[2] < 0:
                 raise SDKException(ErrorCode.param_err('the value should be equal or great than 0.'))
-            from_address_array = Address.b58decode(item[0]).to_array()
-            to_address_array = Address.b58decode(item[1]).to_array()
+            from_address_array = Address.b58decode(item[0]).to_bytes()
+            to_address_array = Address.b58decode(item[1]).to_bytes()
             args[index] = [from_address_array, to_address_array, item[2]]
-        func.set_params_value((args,))
+        func.set_params_value(args)
         params = BuildParams.serialize_abi_function(func)
         unix_time_now = int(time.time())
         params.append(0x67)
@@ -233,7 +232,7 @@ class Oep4(object):
         signers_len = len(signers)
         if signers_len == 0:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
-        payer_address = payer_acct.get_address().to_array()
+        payer_address = payer_acct.get_address().to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, params,
                          bytearray(), [], bytearray())
         for index in range(signers_len):
@@ -262,9 +261,9 @@ class Oep4(object):
             raise SDKException(ErrorCode.param_err('the data type of amount should be int.'))
         if amount < 0:
             raise SDKException(ErrorCode.param_err('the amount should be equal or great than 0.'))
-        owner_address = owner_acct.get_address().to_array()
+        owner_address = owner_acct.get_address().to_bytes()
         Oep4.__b58_address_check(b58_spender_address)
-        spender_address = Address.b58decode(b58_spender_address).to_array()
+        spender_address = Address.b58decode(b58_spender_address).to_bytes()
         params = (owner_address, spender_address, amount)
         func.set_params_value(params)
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, owner_acct, payer_acct, gas_limit,
@@ -282,10 +281,10 @@ class Oep4(object):
         """
         func = self.__abi_info.get_function('allowance')
         Oep4.__b58_address_check(b58_owner_address)
-        owner = Address.b58decode(b58_owner_address).to_array()
+        owner = Address.b58decode(b58_owner_address).to_bytes()
         Oep4.__b58_address_check(b58_spender_address)
-        spender = Address.b58decode(b58_spender_address).to_array()
-        func.set_params_value((owner, spender))
+        spender = Address.b58decode(b58_spender_address).to_bytes()
+        func.set_params_value(owner, spender)
         allowance = self.__sdk.neo_vm().send_transaction(self.__contract_address, None, None, 0, 0, func, True)
         array = bytearray(binascii.a2b_hex(allowance.encode('ascii')))
         array.reverse()
@@ -315,13 +314,12 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_to_address)
         if not isinstance(spender_acct, Account):
             raise SDKException(ErrorCode.param_err('the data type of spender_acct should be Account.'))
-        spender_address_array = spender_acct.get_address().to_array()
-        from_address_array = Address.b58decode(b58_from_address).to_array()
-        to_address_array = Address.b58decode(b58_to_address).to_array()
+        spender_address_array = spender_acct.get_address().to_bytes()
+        from_address_array = Address.b58decode(b58_from_address).to_bytes()
+        to_address_array = Address.b58decode(b58_to_address).to_bytes()
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
-        params = (spender_address_array, from_address_array, to_address_array, value)
-        func.set_params_value(params)
+        func.set_params_value(spender_address_array, from_address_array, to_address_array, value)
         params = BuildParams.serialize_abi_function(func)
         unix_time_now = int(time.time())
         params.append(0x67)
@@ -329,7 +327,7 @@ class Oep4(object):
             params.append(i)
         if payer_acct is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
-        payer_address_array = payer_acct.get_address().to_array()
+        payer_address_array = payer_acct.get_address().to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address_array, params,
                          bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, spender_acct)

@@ -7,7 +7,7 @@ import requests
 from ontology.rpc.define import *
 from ontology.common.address import Address
 from ontology.common.error_code import ErrorCode
-from ontology.utils.util import get_asset_address
+from ontology.utils.utils import get_asset_address
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 

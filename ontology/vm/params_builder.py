@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from binascii import a2b_hex
-from ontology.utils import util
+from ontology.utils import utils
 from ontology.common.error_code import ErrorCode
 from ontology.io.memory_stream import MemoryStream
 from ontology.exception.exception import SDKException
@@ -39,7 +39,7 @@ class ParamsBuilder:
         #     return self.emit_push_byte_array(num.to_bytes(7, "little"))
         # else:
         #     return self.emit_push_byte_array(num.to_bytes(8, "little"))
-        bs = util.bigint_to_neo_bytes(num)
+        bs = utils.bigint_to_neo_bytes(num)
         return self.emit_push_byte_array(bs)
 
     def emit_push_byte_array(self, data):

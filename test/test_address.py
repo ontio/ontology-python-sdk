@@ -3,7 +3,7 @@
 
 import unittest
 
-from ontology.utils import util
+from ontology.utils import utils
 from ontology.common.address import Address
 
 
@@ -18,12 +18,12 @@ class TestAddress(unittest.TestCase):
 
     def test_b58decode(self):
         length = 20
-        rand_code = util.get_random_bytes(length)
+        rand_code = utils.get_random_bytes(length)
         address = Address(rand_code)
         b58_address = address.b58encode()
-        zero = Address.b58decode(b58_address).to_array()
+        zero = Address.b58decode(b58_address).to_bytes()
         self.assertEqual(rand_code, zero)
-        decode_address = Address.b58decode(b58_address).to_array()
+        decode_address = Address.b58decode(b58_address).to_bytes()
         self.assertEqual(rand_code, decode_address)
 
 

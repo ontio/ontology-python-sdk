@@ -7,7 +7,7 @@ import unittest
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.utils.util import get_random_hex_str
+from ontology.utils.utils import get_random_hex_str
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 
