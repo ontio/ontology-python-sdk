@@ -49,7 +49,7 @@ class Address(object):
         out_byte_array = script_builder + bytearray(c256)
         return base58.b58encode(bytes(out_byte_array)).decode('utf-8')
 
-    def to_array(self):
+    def to_bytes(self):
         return self.ZERO
 
     def to_hex_str(self):
