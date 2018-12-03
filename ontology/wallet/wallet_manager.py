@@ -12,9 +12,9 @@ from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.control import Control
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.utils.util import is_file_exist
+from ontology.utils.utils import is_file_exist
 from ontology.wallet.wallet import WalletData
-from ontology.utils.util import get_random_hex_str
+from ontology.utils.utils import get_random_hex_str
 from ontology.wallet.account import AccountData
 from ontology.common.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
@@ -137,7 +137,7 @@ class WalletManager(object):
         info.private_key = acct.serialize_private_key().hex()
         info.pri_key_wif = acct.export_wif().encode('ascii')
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
-        info.address_u160 = acct.get_address().to_array().hex()
+        info.address_u160 = acct.get_address().to_bytes().hex()
         return self.wallet_in_mem.get_identity_by_ont_id(info.ont_id)
 
     def create_identity_from_private_key(self, label: str, pwd: str, private_key: str) -> Identity:
@@ -241,7 +241,7 @@ class WalletManager(object):
         info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).b58encode()
         info.public_key = acct.serialize_public_key().hex()
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
-        info.address_u160 = acct.get_address().to_array().hex()
+        info.address_u160 = acct.get_address().to_bytes().hex()
         info.salt = salt
         return info
 
