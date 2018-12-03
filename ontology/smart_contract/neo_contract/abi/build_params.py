@@ -4,7 +4,7 @@ from ontology.common.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.struct_type import Struct
-from ontology.utils import util
+from ontology.utils import utils
 from ontology.vm.op_code import PACK, NEWMAP, TOALTSTACK, DUPFROMALTSTACK, SETITEM, FROMALTSTACK, NEWSTRUCT, SWAP, \
     APPEND
 from ontology.vm.params_builder import ParamsBuilder
@@ -22,7 +22,7 @@ class BuildParams(object):
     @staticmethod
     def serialize_abi_function(abi_func: AbiFunction):
         param_list = list()
-        param_list.append(bytes(abi_func.name.encode()))
+        param_list.append(bytes(abi_func.name.encode('utf-8')))
         temp_list = list()
         for param in abi_func.parameters:
             try:
@@ -108,7 +108,7 @@ class BuildParams(object):
     def get_map_bytes(param_dict: dict):
         builder = ParamsBuilder()
         builder.emit(BuildParams.Type.maptype.value)
-        builder.emit(util.bigint_to_neo_bytes(len(param_dict)))
+        builder.emit(utils.bigint_to_neo_bytes(len(param_dict)))
         for key, value in param_dict.items():
             builder.emit(BuildParams.Type.bytearraytype.value)
             builder.emit_push_byte_array(str(key).encode())
