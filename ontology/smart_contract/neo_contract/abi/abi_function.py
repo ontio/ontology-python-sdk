@@ -4,17 +4,14 @@ from ontology.smart_contract.neo_contract.abi.parameter import Parameter
 
 
 class AbiFunction(object):
-
-    def __init__(self, name: str, return_type: str, parameters: list):
+    def __init__(self, name: str, parameters: list, return_type: str = ''):
         self.name = name
         self.return_type = return_type
         self.parameters = parameters
 
-    def set_params_value(self, params: tuple):
+    def set_params_value(self, *params):
         """
         This interface is used to set parameter value for an function in abi file.
-
-        :param params:
         """
         if len(params) != len(self.parameters):
             raise Exception("parameter error")
