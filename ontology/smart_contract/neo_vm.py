@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import binascii
 from time import time
 
 from ontology.common.address import Address
@@ -9,6 +9,7 @@ from ontology.common.define import ZERO_ADDRESS
 from ontology.common.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
@@ -27,12 +28,17 @@ class NeoVm(object):
     def claim_record(self):
         return ClaimRecord(self.__sdk)
 
-    def send_transaction(self, contract_address: bytes or bytearray, acct: Account, payer_acct: Account, gas_limit: int,
-                         gas_price: int, func: AbiFunction, pre_exec: bool):
-        if func is not None:
+    def send_transaction(self, contract_address: str or bytes or bytearray, acct: Account, payer_acct: Account,
+                         gas_limit: int, gas_price: int, func: AbiFunction or InvokeFunction, pre_exec: bool):
+        if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
+        elif isinstance(func, InvokeFunction):
+            params = func.create_invoke_code()
         else:
-            params = bytearray()
+            raise SDKException(ErrorCode.other_error('the type of func is error.'))
+        if isinstance(contract_address, str) and len(contract_address) == 40:
+            contract_address = bytearray(binascii.a2b_hex(contract_address))
+            contract_address.reverse()
         if pre_exec:
             if isinstance(contract_address, bytes):
                 tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
@@ -50,7 +56,7 @@ class NeoVm(object):
                 params.append(i)
             if payer_acct is None:
                 raise SDKException(ErrorCode.param_err('payer account is None.'))
-            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_array(),
+            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_bytes(),
                              params, bytearray(), [], bytearray())
             self.__sdk.sign_transaction(tx, acct)
             if acct.get_address_base58() != payer_acct.get_address_base58():
@@ -62,7 +68,7 @@ class NeoVm(object):
                                 email: str, desp: str, payer: str, gas_limit: int, gas_price: int):
         unix_time_now = int(time())
         deploy_tx = DeployTransaction()
-        deploy_tx.payer = Address.b58decode(payer).to_array()
+        deploy_tx.payer = Address.b58decode(payer).to_bytes()
         deploy_tx.attributes = bytearray()
         deploy_tx.nonce = unix_time_now
         deploy_tx.code = bytearray.fromhex(code_str)
@@ -94,5 +100,5 @@ class NeoVm(object):
         if isinstance(payer, bytes) and payer != b'':
             invoke_tx.payer = payer
         else:
-            invoke_tx.payer = Address(ZERO_ADDRESS).to_array()
+            invoke_tx.payer = Address(ZERO_ADDRESS).to_bytes()
         return invoke_tx
