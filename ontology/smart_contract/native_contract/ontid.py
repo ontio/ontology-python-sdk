@@ -35,7 +35,7 @@ class OntId(object):
         args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(hex_public_key)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_array(),
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
                          invoke_code, bytearray(), [], bytearray())
         return tx
 
@@ -80,7 +80,7 @@ class OntId(object):
         args["pubkey"] = bytearray.fromhex(hex_public_key)
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addAttributes", args)
         unix_time_now = int(time())
-        array_payer_address = Address.b58decode(b58_payer_address).to_array()
+        array_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, array_payer_address, invoke_code, bytearray(),
                          [], bytearray())
         return tx
@@ -124,7 +124,7 @@ class OntId(object):
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": bytearray.fromhex(hex_public_key)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_array(),
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
                          invoke_code, bytearray(), [], bytearray())
         return tx
 
@@ -167,7 +167,7 @@ class OntId(object):
                 "pubkey_or_recovery": bytearray.fromhex(hex_public_key_or_recovery)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addKey", args)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_array(),
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_bytes(),
                          invoke_code, bytearray(), [], bytearray())
         return tx
 
@@ -236,7 +236,7 @@ class OntId(object):
                 "pubkey_or_recovery": bytes_public_key_or_recovery}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeKey", args)
         unix_time_now = int(time())
-        bytes_payer_address = Address.b58decode(b58_payer_address).to_array()
+        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
                          [], bytearray())
         return tx
@@ -265,7 +265,7 @@ class OntId(object):
     def send_remove_public_key_transaction_by_recovery(self, ont_id: str, recovery: Account, hex_remove_public_key: str,
                                                        payer: Account,
                                                        gas_limit: int, gas_price: int):
-        bytes_recovery_address = recovery.get_address().to_array()
+        bytes_recovery_address = recovery.get_address().to_bytes()
         b58_payer_address = payer.get_address_base58()
         tx = OntId.new_remove_public_key_transaction(ont_id, bytes_recovery_address, hex_remove_public_key,
                                                      b58_payer_address, gas_limit, gas_price)
@@ -289,12 +289,12 @@ class OntId(object):
         :return:
         """
         contract_address = ONTID_CONTRACT_ADDRESS
-        bytes_recovery_address = Address.b58decode(b58_recovery_address).to_array()
+        bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
         bytearray_public_key = bytearray.fromhex(hex_public_key)
         args = {"ontid": ont_id.encode(), "recovery": bytes_recovery_address, "pubkey": bytearray_public_key}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addRecovery", args)
         unix_time_now = int(time())
-        bytes_payer_address = Address.b58decode(b58_payer_address).to_array()
+        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
                          [], bytearray())
         return tx
@@ -334,7 +334,7 @@ class OntId(object):
         args = {"ontid": ont_id.encode()}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
         unix_time_now = int(time())
-        payer = Address(a2b_hex("0000000000000000000000000000000000000000".encode())).to_array()
+        payer = Address(a2b_hex("0000000000000000000000000000000000000000".encode())).to_bytes()
         return Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(),
                            [], bytearray())
 
