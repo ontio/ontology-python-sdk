@@ -37,10 +37,8 @@ class TestAbiInfo(unittest.TestCase):
         abi_info = AbiInfo(dict_abi['hash'], dict_abi['entrypoint'], dict_abi['functions'], dict_abi['events'])
         func_name = 'Hello'
         func = abi_info.get_function(func_name)
-        param = ('Value',)
-        func.set_params_value(param)
-        self.assertEqual(len(param), len(func.parameters))
-        self.assertEqual(param[0], func.parameters[0].value)
+        func.set_params_value('Value')
+        self.assertEqual('Value', func.parameters[0].value)
 
     def test_get_parameter(self):
         str_abi = '{"hash":"0x362cb5608b3eca61d4846591ebb49688900fedd0","entrypoint":"Main","functions":' \
@@ -51,13 +49,12 @@ class TestAbiInfo(unittest.TestCase):
         abi_info = AbiInfo(dict_abi['hash'], dict_abi['entrypoint'], dict_abi['functions'], dict_abi['events'])
         func_name = 'Hello'
         func = abi_info.get_function(func_name)
-        param = ('Value',)
-        func.set_params_value(param)
+        func.set_params_value('Value')
         param_name = 'msg'
         parameter = func.get_parameter(param_name)
         self.assertEqual(param_name, parameter.name)
         self.assertEqual('String', parameter.type)
-        self.assertEqual(param[0], parameter.value)
+        self.assertEqual('Value', parameter.value)
 
 
 if __name__ == '__main__':
