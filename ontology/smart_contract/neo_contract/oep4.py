@@ -96,7 +96,8 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('init')
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, acct, payer_acct, gas_limit, gas_price,
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, acct, payer_acct, gas_limit,
+                                                       gas_price,
                                                        func, False)
         return tx_hash
 
@@ -164,12 +165,12 @@ class Oep4(object):
                                                        gas_price, func, False)
         return tx_hash
 
-    def transfer_multi(self, args: list, payer_acct: Account, signers: list, gas_limit: int, gas_price: int):
+    def transfer_multi(self, transfer_list: list, payer_acct: Account, signers: list, gas_limit: int, gas_price: int):
         """
         This interface is used to call the TransferMulti method in ope4
         that allow transfer amount of token from multiple from-account to multiple to-account multiple times.
 
-        :param args: a parameter list with each item contains three sub-items:
+        :param transfer_list: a parameter list with each item contains three sub-items:
                 base58 encode transaction sender address,
                 base58 encode transaction receiver address,
                 amount of token in transaction.
@@ -180,8 +181,8 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('transferMulti')
-        for index in range(len(args)):
-            item = args[index]
+        for index in range(len(transfer_list)):
+            item = transfer_list[index]
             Oep4.__b58_address_check(item[0])
             Oep4.__b58_address_check(item[1])
             if not isinstance(item[2], int):
@@ -190,8 +191,9 @@ class Oep4(object):
                 raise SDKException(ErrorCode.param_err('the value should be equal or great than 0.'))
             from_address_array = Address.b58decode(item[0]).to_bytes()
             to_address_array = Address.b58decode(item[1]).to_bytes()
-            args[index] = [from_address_array, to_address_array, item[2]]
-        func.set_params_value(args)
+            transfer_list[index] = [from_address_array, to_address_array, item[2]]
+        for item in transfer_list:
+            func.add_params_value(item)
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
