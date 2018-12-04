@@ -141,43 +141,6 @@ class TestNeoVm(unittest.TestCase):
         res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
         self.assertEqual(res, '01')
 
-    def test_transfer_multi_args_0(self):
-        transfer_1 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 10]
-        transfer_2 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 100]
-        transfer_list = [[transfer_1, transfer_2]]
-        contract_address_hex = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
-        contract_address_bytearray = bytearray(binascii.a2b_hex(contract_address_hex))
-        contract_address_bytearray.reverse()
-        parameter_list = [{"name": "transfer_list"}]
-        func = AbiFunction('transfer_multi', parameter_list)
-        func.set_params_value(transfer_list)
-        gas_limit = 20000000
-        gas_price = 500
-        tx_hash = sdk.neo_vm().send_transaction(contract_address_bytearray, acct1, acct2, gas_limit, gas_price, func,
-                                                False)
-        time.sleep(6)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        print(event)
-
-    def test_transfer_multi_args(self):
-        transfer_1 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 10]
-        transfer_2 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 100]
-        transfer_list = [transfer_1, transfer_2]
-        contract_address_hex = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
-        contract_address_bytearray = bytearray(binascii.a2b_hex(contract_address_hex))
-        contract_address_bytearray.reverse()
-        parameter_list = [{"name": "args"}]
-        param = Parameter('transfer_multi_args', '', transfer_list)
-        func = AbiFunction('transfer_multi', ['args1','args2'])
-        func.set_params_value(transfer_1, transfer_2)
-        gas_limit = 20000000
-        gas_price = 500
-        tx_hash = sdk.neo_vm().send_transaction(contract_address_bytearray, acct1, acct2, gas_limit, gas_price, func,
-                                                False)
-        time.sleep(6)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        print(event)
-
 
 if __name__ == '__main__':
     unittest.main()
