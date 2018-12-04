@@ -59,7 +59,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(len(dict_wallet_in_mem['accounts']), size)
 
         dict_accounts = wm.wallet_in_mem.accounts[0].__dict__
-        self.assertEqual(dict_accounts['address'], 'Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT')
+        self.assertEqual(dict_accounts['b58_address'], 'Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT')
         self.assertEqual(dict_accounts['algorithm'], 'ECDSA')
         self.assertEqual(dict_accounts['enc_alg'], 'aes-256-gcm')
         self.assertEqual(dict_accounts['is_default'], True)
@@ -71,7 +71,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
 
         dict_accounts = wm.wallet_in_mem.accounts[15].__dict__
-        self.assertEqual(dict_accounts['address'], 'AZy1ApV47jLM4m4a2MSx92hzwpDcMtn96z')
+        self.assertEqual(dict_accounts['b58_address'], 'AZy1ApV47jLM4m4a2MSx92hzwpDcMtn96z')
         self.assertEqual(dict_accounts['enc_alg'], 'aes-256-gcm')
         self.assertEqual(dict_accounts['is_default'], False)
         self.assertEqual(dict_accounts['key'], 'ATqEeReytF1Ma16KJKWlvnSmHeH7p8l5Es3Ngp/62l/1Pp4K4fhAaXOfahZ6g8Wd')
@@ -82,7 +82,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
 
         dict_accounts = wm.wallet_in_mem.accounts[31].__dict__
-        self.assertEqual(dict_accounts['address'], 'Aa4diLddFtHg5fU7Nf71q3KwBmu21D4ZyM')
+        self.assertEqual(dict_accounts['b58_address'], 'Aa4diLddFtHg5fU7Nf71q3KwBmu21D4ZyM')
         self.assertEqual(dict_accounts['enc_alg'], 'aes-256-gcm')
         self.assertEqual(dict_accounts['is_default'], False)
         self.assertEqual(dict_accounts['key'], 'epWSyUe9VUI81WIe30ul2B/ahjHhc1sXRg7IJjV2jk39BPzkrMbIa5p9UOOrAZ3e')
@@ -107,7 +107,7 @@ class TestWalletManager(unittest.TestCase):
         label = ''
         base64_salt = 'KbiCUr53CZUfKG1M3Gojjw=='
         acct1 = wallet_manager.import_account(label, encrypted_pri_key, password1, b58_address1, base64_salt)
-        self.assertEqual(b58_address1, acct1.address)
+        self.assertEqual(b58_address1, acct1.get_b58_address())
         import_acct = wallet_manager.get_account(b58_address1, password1)
         self.assertEqual(b58_address1, import_acct.get_address_base58())
         self.assertEqual(base64_salt, acct1.salt)
@@ -179,7 +179,7 @@ class TestWalletManager(unittest.TestCase):
         for index in range(size):
             wm.get_wallet().set_default_account_by_index(index)
             default_address = wm.get_wallet().get_default_account_address()
-            self.assertEqual(accounts[index].address, default_address)
+            self.assertEqual(accounts[index].get_b58_address(), default_address)
         wm.write_wallet()
         os.remove(path)
 
@@ -195,9 +195,9 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(len(accounts), size)
         self.assertRaises(SDKException, wm.get_wallet().set_default_account_by_address, '1')
         for acct in accounts:
-            wm.get_wallet().set_default_account_by_address(acct.address)
+            wm.get_wallet().set_default_account_by_address(acct.get_b58_address())
             default_address = wm.get_wallet().get_default_account_address()
-            self.assertEqual(default_address, acct.address)
+            self.assertEqual(default_address, acct.get_b58_address())
         wm.write_wallet()
         os.remove(path)
 
@@ -212,9 +212,9 @@ class TestWalletManager(unittest.TestCase):
         accounts = wm.get_wallet().get_accounts()
         self.assertEqual(len(accounts), size)
         for acct in accounts:
-            wm.get_wallet().set_default_account_by_address(acct.address)
+            wm.get_wallet().set_default_account_by_address(acct.get_b58_address())
             default_account = wm.get_default_account()
-            self.assertEqual(default_account.address, acct.address)
+            self.assertEqual(default_account.b58_address, acct.get_b58_address())
         wm.write_wallet()
         os.remove(path)
 
@@ -271,7 +271,7 @@ class TestWalletManager(unittest.TestCase):
         account = wm.create_account_from_private_key(label, password, private_key)
         b58_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         wm.save()
-        self.assertEqual(b58_address, account.get_address())
+        self.assertEqual(b58_address, account.get_b58_address())
         os.remove(path)
 
 
