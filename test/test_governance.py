@@ -1,3 +1,4 @@
+import os
 import time
 import unittest
 
@@ -5,7 +6,8 @@ from ontology.account.account import Account
 from ontology.ont_sdk import OntologySdk
 
 sdk = OntologySdk()
-sdk.rpc.set_address("http://139.219.128.220:20336")
+rpc_address = 'http://139.219.128.220:20336'
+sdk.rpc.set_address(rpc_address)
 password = "111111"
 
 account1 = Account('b2a7b886e69fd7fd9f12d746524d7f4ac00fce349f028900328dbbe09ba2ec23')
@@ -15,13 +17,15 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 class TestGovernance(unittest.TestCase):
 
     def test_prepare(self):
-        sdk.wallet_manager.open_wallet("./TestGovernance.json")
+        path = os.path.join(__file__, 'testGovernance.json')
+        sdk.wallet_manager.open_wallet(path)
         identities = sdk.wallet_manager.get_wallet().identities
         if identities is None or len(identities) == 0:
             identity = sdk.wallet_manager.create_identity("sss", password)
             account = sdk.wallet_manager.get_account(identity.ont_id, password)
-            tx = sdk.native_vm().ont_id().new_registry_ont_id_transaction(identity.ont_id, account.serialize_public_key().hex(),
-                                                                    account.get_address_base58(), 20000, 0)
+            tx = sdk.native_vm().ont_id().new_registry_ont_id_transaction(identity.ont_id,
+                                                                          account.serialize_public_key().hex(),
+                                                                          account.get_address_base58(), 20000, 0)
             sdk.sign_transaction(tx, account)
             res = sdk.rpc.send_raw_transaction(tx)
             print("res:", res)
@@ -37,6 +41,7 @@ class TestGovernance(unittest.TestCase):
             res2 = sdk.rpc.send_raw_transaction_pre_exec(tx2)
             d = sdk.native_vm().ont_id().parse_ddo(identities[0].ont_id, res2)
             print(d)
+        os.remove(path)
 
     def test_getbalance(self):
         print(sdk.native_vm().asset().query_balance('ont', account1.get_address_base58()))
@@ -46,7 +51,8 @@ class TestGovernance(unittest.TestCase):
         sdk.wallet_manager.open_wallet("./TestGovernance.json")
         identities = sdk.wallet_manager.get_wallet().identities
         identity = identities[0]
-        res = sdk.native_vm().governance().register_candidate(account1, peer_publickey, 10000, identity, password, 1, account1, 20000, 0)
+        res = sdk.native_vm().governance().register_candidate(account1, peer_publickey, 10000, identity, password, 1,
+                                                              account1, 20000, 0)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 
@@ -60,7 +66,8 @@ class TestGovernance(unittest.TestCase):
         peer_publickeys.append(peer_publickey)
         withdraw_lists = list()
         withdraw_lists.append(500)
-        res = sdk.native_vm().governance().authorize_for_peer(account1, peer_publickeys, withdraw_lists, account1, 20000, 0)
+        res = sdk.native_vm().governance().authorize_for_peer(account1, peer_publickeys, withdraw_lists, account1,
+                                                              20000, 0)
         print("res:", res)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
@@ -80,7 +87,8 @@ class TestGovernance(unittest.TestCase):
         peer_publickeys.append(peer_publickey)
         withdraw_lists = list()
         withdraw_lists.append(500)
-        res = sdk.native_vm().governance().unauthorize_for_peer(account1, peer_publickeys, withdraw_lists, account1, 20000, 0)
+        res = sdk.native_vm().governance().unauthorize_for_peer(account1, peer_publickeys, withdraw_lists, account1,
+                                                                20000, 0)
         print("res:", res)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
@@ -151,10 +159,6 @@ class TestGovernance(unittest.TestCase):
 
     def test_unbound_deadline(self):
         print(sdk.native_vm().governance().unbound_deadline())
-
-    def test_get_peer_unbind_ong(self):
-        ss = sdk.native_vm().governance().get_peer_unbind_ong(account1.get_address_base58())
-        print("ss:", ss)
 
     def test_get_total_stake(self):
         total_stake = sdk.native_vm().governance().get_total_stake(account1.get_address_base58())

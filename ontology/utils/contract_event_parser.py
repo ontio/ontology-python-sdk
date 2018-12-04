@@ -53,7 +53,7 @@ class ContractEventParser(object):
         return dict()
 
     @staticmethod
-    def get_notify_by_contract_address(event: dict, hex_contract_address: str) -> list:
+    def __get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
         ContractEventParser.__check_event(event)
         notify_list = ContractEventParser.get_notify_list(event)
         specify_notify_list = list()
@@ -63,10 +63,25 @@ class ContractEventParser(object):
         return specify_notify_list
 
     @staticmethod
+    def get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
+        ContractEventParser.__check_event(event)
+        notify_list = ContractEventParser.get_notify_list(event)
+        specify_notify_list = list()
+        for notify in notify_list:
+            if notify['ContractAddress'] == hex_contract_address:
+                specify_notify_list.append(notify)
+        if len(specify_notify_list) == 1:
+            specify_notify_list = notify_list[0]
+        return specify_notify_list
+
+    @staticmethod
     def get_states_by_contract_address(event: dict, hex_contract_address: str):
-        notify_list = ContractEventParser.get_notify_by_contract_address(event, hex_contract_address)
+        notify_list = ContractEventParser.__get_notify_list_by_contract_address(event, hex_contract_address)
         states_list = list()
         for notify in notify_list:
             states = notify.get('States', list())
             states_list.append(states)
+        states_list.count(list)
+        if len(states_list) == 1:
+            states_list = states_list[0]
         return states_list

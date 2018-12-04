@@ -164,7 +164,7 @@ class WalletManager(object):
         pri_key = get_random_hex_str(64)
         salt = get_random_hex_str(16)
         account = self.__create_account(label, pwd, salt, pri_key, True)
-        return self.wallet_in_mem.get_account_by_address(account.get_address_base58())
+        return self.wallet_in_mem.get_account_by_b58_address(account.get_address_base58())
 
     def __create_account(self, label: str, pwd: str, salt: str, private_key: str, account_flag: bool):
         account = Account(private_key, self.scheme)
@@ -179,34 +179,34 @@ class WalletManager(object):
         else:
             acct.key = account.serialize_private_key().hex()
 
-        acct.address = account.get_address_base58()
+        acct.b58_address = account.get_address_base58()
         # set label
         if label is None or label == "":
             label = str(uuid.uuid4())[0:8]
         if account_flag:
             for index in range(len(self.wallet_in_mem.accounts)):
-                if acct.address == self.wallet_in_mem.accounts[index].address:
+                if acct.b58_address == self.wallet_in_mem.accounts[index].get_b58_address():
                     raise ValueError("wallet account exists")
 
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.is_default = True
-                self.wallet_in_mem.default_account_address = acct.address
+                self.wallet_in_mem.default_account_address = acct.b58_address
             acct.label = label
             acct.salt = base64.b64encode(salt.encode('latin-1')).decode('ascii')
             acct.public_key = account.serialize_public_key().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
             for index in range(len(self.wallet_in_mem.identities)):
-                if self.wallet_in_mem.identities[index].ont_id == did_ont + acct.address:
+                if self.wallet_in_mem.identities[index].ont_id == did_ont + acct.b58_address:
                     raise ValueError("wallet identity exists")
             idt = Identity()
-            idt.ont_id = did_ont + acct.address
+            idt.ont_id = did_ont + acct.b58_address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
                 idt.is_default = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
-                          address=acct.address,
+                          address=acct.b58_address,
                           public_key=account.serialize_public_key().hex())
             idt.controls.append(ctl)
             self.wallet_in_mem.identities.append(idt)
@@ -231,7 +231,7 @@ class WalletManager(object):
                                                           Scrypt().get_n(), self.scheme)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].address:
+            if info.address_base58 == self.wallet_in_mem.accounts[index].get_b58_address():
                 return self.wallet_in_mem.accounts[index]
         return None
 
@@ -258,7 +258,7 @@ class WalletManager(object):
         salt = get_random_hex_str(16)
         info = self.create_account_info(label, password, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].address:
+            if info.address_base58 == self.wallet_in_mem.accounts[index].get_b58_address():
                 return self.wallet_in_mem.accounts[index]
         return None
 
@@ -279,9 +279,9 @@ class WalletManager(object):
                     return Account(private_key, self.scheme)
         else:
             for index in range(len(self.wallet_in_mem.accounts)):
-                if self.wallet_in_mem.accounts[index].address == b58_address_or_ontid:
+                if self.wallet_in_mem.accounts[index].get_b58_address() == b58_address_or_ontid:
                     key = self.wallet_in_mem.accounts[index].key
-                    addr = self.wallet_in_mem.accounts[index].address
+                    addr = self.wallet_in_mem.accounts[index].get_b58_address()
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
                     private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
                                                                       self.wallet_in_mem.scrypt.get_n(), self.scheme)

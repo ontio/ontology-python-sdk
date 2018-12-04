@@ -148,25 +148,25 @@ def deserialize_hex(item_serialize: str):
 
 def deserialize_stack_item(reader: BinaryReader) -> dict:
     t = reader.read_byte()
-    if t == BuildParams.Type.bytearraytype.value:
+    if t == BuildParams.Type.bytearray_type.value:
         b = reader.read_var_bytes()
         return b
-    elif t == BuildParams.Type.booltype.value:
+    elif t == BuildParams.Type.bool_type.value:
         return reader.read_bool()
-    elif t == BuildParams.Type.integertype.value:
+    elif t == BuildParams.Type.int_type.value:
         b = reader.read_var_bytes()
         return bigint_from_bytes(b)
-    elif t == BuildParams.Type.structtype.value or t == BuildParams.Type.arraytype.value:
+    elif t == BuildParams.Type.struct_type.value or t == BuildParams.Type.array_type.value:
         count = reader.read_var_int()
         # TODO
         item_list = list()
         for i in range(count):
             item = deserialize_stack_item(reader)
             item_list.append(item)
-        if t == t == BuildParams.Type.structtype.value:
+        if t == t == BuildParams.Type.struct_type.value:
             return Struct(item_list)
         return item_list
-    elif t == BuildParams.Type.maptype.value:
+    elif t == BuildParams.Type.dict_type.value:
         count = reader.read_var_int()
         item_dict = dict()
         for i in range(count):

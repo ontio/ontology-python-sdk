@@ -452,9 +452,9 @@ class RpcClient(object):
         if err > 0:
             try:
                 result = res['result']
-                raise RuntimeError(result)
+                raise SDKException(ErrorCode.other_error(result))
             except KeyError:
-                raise RuntimeError('send raw transaction pre-execute error')
+                raise SDKException(ErrorCode.other_error('Send raw transaction pre-execute error.'))
         if res["result"]["State"] == 0:
-            raise RuntimeError("State = 0")
+            raise SDKException(ErrorCode.other_error('State is equal to 0'))
         return res["result"]["Result"]

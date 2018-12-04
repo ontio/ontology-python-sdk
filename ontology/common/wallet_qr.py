@@ -39,7 +39,7 @@ class WalletQR(object):
             d["scrypt"] = json.dumps(wallet_file_or_scrypt.scrypt, default=lambda obj: obj.__dict__, sort_keys=True,indent=4)
         else:
             d["scrypt"] = json.dumps(wallet_file_or_scrypt, default=lambda obj: obj.__dict__, sort_keys=True,indent=4)
-        d["address"] = account.address
+        d["address"] = account.b58_address
         d["salt"] = account.salt
         return d
 

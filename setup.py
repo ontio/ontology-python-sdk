@@ -10,7 +10,7 @@ with open(path.join(getcwd(), 'description.md')) as f:
 
 setup(
     name='ontology-python-sdk',
-    version='0.1.17',
+    version='0.1.18',
     description='Comprehensive Python library for the Ontology BlockChain.',
     long_description=long_description,
     long_description_content_type="text/markdown",

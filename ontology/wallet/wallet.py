@@ -3,6 +3,8 @@
 
 import json
 
+from typing import List
+
 from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.control import Control
 from ontology.wallet.identity import Identity
@@ -110,12 +112,12 @@ class WalletData(object):
 
         :param address: a string address.
         """
-        account = self.get_account_by_address(address)
+        account = self.get_account_by_b58_address(address)
         if account is None:
             raise SDKException(ErrorCode.get_account_by_address_err)
         self.accounts.remove(account)
 
-    def get_accounts(self) -> list:
+    def get_accounts(self) -> List[AccountData]:
         """
         This interface is used to get all the account information in WalletManager.
 
@@ -134,7 +136,7 @@ class WalletData(object):
         for acct in self.accounts:
             acct.is_default = False
         self.accounts[index].is_default = True
-        self.default_account_address = self.accounts[index].address
+        self.default_account_address = self.accounts[index].get_b58_address()
 
     def set_default_account_by_address(self, b58_address: str):
         """
@@ -146,7 +148,7 @@ class WalletData(object):
         index = -1
         for acct in self.accounts:
             index += 1
-            if acct.address == b58_address:
+            if acct.get_b58_address() == b58_address:
                 flag = False
                 break
         if flag:
@@ -169,9 +171,9 @@ class WalletData(object):
             raise SDKException(ErrorCode.get_account_by_index_err)
         return self.accounts[index]
 
-    def get_account_by_address(self, address: str):
+    def get_account_by_b58_address(self, b58_address: str):
         for index in range(len(self.accounts)):
-            if self.accounts[index].address == address:
+            if self.accounts[index].get_b58_address() == b58_address:
                 return self.accounts[index]
         return None
 

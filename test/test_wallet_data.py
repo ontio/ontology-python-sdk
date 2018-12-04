@@ -56,7 +56,7 @@ class TestWalletData(unittest.TestCase):
         for i in range(size * 2):
             index = random.choice(range(size))
             acct = wallet.get_account_by_index(index)
-            self.assertEqual(address_list[index], acct.address)
+            self.assertEqual(address_list[index], acct.get_b58_address())
 
     def test_get_account_by_address(self):
         test_id = "test_ont_id"
@@ -72,8 +72,8 @@ class TestWalletData(unittest.TestCase):
 
         for i in range(size * 2):
             rand_address = random.choice(address_list)
-            acct = wallet.get_account_by_address(rand_address)
-            self.assertEqual(rand_address, acct.address)
+            acct = wallet.get_account_by_b58_address(rand_address)
+            self.assertEqual(rand_address, acct.get_b58_address())
 
     def test_add_identity(self):
         test_id = "test_ont_id"
