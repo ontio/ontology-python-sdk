@@ -264,8 +264,7 @@ class Oep4(object):
         owner_address = owner_acct.get_address().to_bytes()
         Oep4.__b58_address_check(b58_spender_address)
         spender_address = Address.b58decode(b58_spender_address).to_bytes()
-        params = (owner_address, spender_address, amount)
-        func.set_params_value(params)
+        func.set_params_value(owner_address, spender_address, amount)
         tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, owner_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
