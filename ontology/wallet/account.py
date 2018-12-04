@@ -8,7 +8,7 @@ class AccountData(object):
                  is_default: bool = True, lock: bool = False):
         if param is None:
             param = {"curve": "P-256"}
-        self.address = address
+        self.b58_address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.is_default = is_default
@@ -22,7 +22,7 @@ class AccountData(object):
 
     def __iter__(self):
         data = dict()
-        data['address'] = self.address
+        data['address'] = self.b58_address
         data['algorithm'] = self.algorithm
         data['enc-alg'] = self.enc_alg
         data['isDefault'] = self.is_default
@@ -39,8 +39,8 @@ class AccountData(object):
     def set_label(self, label: str):
         self.label = label
 
-    def set_address(self, address):
-        self.address = address
+    def set_b58_address(self, b58_address):
+        self.b58_address = b58_address
 
     def set_public_key(self, public_key):
         self.public_key = public_key
@@ -51,8 +51,8 @@ class AccountData(object):
     def get_label(self):
         return self.label
 
-    def get_address(self):
-        return self.address
+    def get_b58_address(self):
+        return self.b58_address
 
     def get_public_key_bytes(self):
         return self.public_key
