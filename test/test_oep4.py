@@ -15,11 +15,6 @@ local_rpc_address = 'http://localhost:20336'
 
 
 class TestOep4(unittest.TestCase):
-    def test_get_abi(self):
-        oep4_abi = '{"contractHash":"85848b5ec3b15617e396bdd62cb49575738dd413","abi":{"functions":[{"name":"Main","parameters":[{"name":"operation","type":""},{"name":"args","type":""}],"returntype":""},{"name":"init","parameters":[{"name":"","type":""}],"returntype":""},{"name":"name","parameters":[{"name":"","type":""}],"returntype":""},{"name":"symbol","parameters":[{"name":"","type":""}],"returntype":""},{"name":"decimals","parameters":[{"name":"","type":""}],"returntype":""},{"name":"totalSupply","parameters":[{"name":"","type":""}],"returntype":""},{"name":"balanceOf","parameters":[{"name":"account","type":""}],"returntype":""},{"name":"transfer","parameters":[{"name":"from_acct","type":""},{"name":"to_acct","type":""},{"name":"amount","type":""}],"returntype":""},{"name":"transferMulti","parameters":[{"name":"args","type":""}],"returntype":""},{"name":"approve","parameters":[{"name":"owner","type":""},{"name":"spender","type":""},{"name":"amount","type":""}],"returntype":""},{"name":"transferFrom","parameters":[{"name":"spender","type":""},{"name":"from_acct","type":""},{"name":"to_acct","type":""},{"name":"amount","type":""}],"returntype":""},{"name":"allowance","parameters":[{"name":"owner","type":""},{"name":"spender","type":""}],"returntype":""}]}}'
-        sdk = OntologySdk()
-        self.assertEqual(json.loads(oep4_abi), sdk.neo_vm().oep4().get_abi())
-
     def test_set_contract_address(self):
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
@@ -122,7 +117,7 @@ class TestOep4(unittest.TestCase):
         acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
         acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
         acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-        args = list()
+        transfer_list = list()
 
         b58_from_address1 = acct1.get_address_base58()
         b58_from_address2 = acct2.get_address_base58()
@@ -142,22 +137,21 @@ class TestOep4(unittest.TestCase):
         transfer2 = [b58_from_address2, b58_to_address2, value_list[1]]
 
         signers = [acct1, acct2, acct3]
-        args.append(transfer1)
-        args.append(transfer2)
+        transfer_list.append(transfer1)
+        transfer_list.append(transfer2)
 
         gas_limit = 20000000
         gas_price = 500
 
-        tx_hash = oep4.transfer_multi(args, signers[0], signers, gas_limit, gas_price)
+        tx_hash = oep4.transfer_multi(transfer_list, signers[0], signers, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         sdk = OntologySdk()
         sdk.set_rpc(remote_rpc_address)
         time.sleep(6)
         try:
-            decimal = oep4.get_decimal()
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][:-1]
-            self.assertEqual(len(args), len(notify))
+            self.assertEqual(len(transfer_list), len(notify))
             for index in range(len(notify)):
                 self.assertEqual('transfer', bytes.fromhex(notify[index]['States'][0]).decode())
                 self.assertEqual(from_address_list[index], notify[index]['States'][1])
