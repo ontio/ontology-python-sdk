@@ -25,10 +25,13 @@ class ContractDataParser(object):
     def to_int(hex_str: str) -> int:
         try:
             array = bytearray(binascii.a2b_hex(hex_str.encode('ascii')))
-        except binascii.Error as e:
+        except (binascii.Error, ValueError) as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         array.reverse()
-        num = int(binascii.b2a_hex(array).decode('ascii'), 16)
+        try:
+            num = int(binascii.b2a_hex(array).decode('ascii'), 16)
+        except (binascii.Error, ValueError) as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         return num
 
     @staticmethod
