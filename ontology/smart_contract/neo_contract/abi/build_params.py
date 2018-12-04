@@ -12,12 +12,12 @@ from ontology.vm.params_builder import ParamsBuilder
 
 class BuildParams(object):
     class Type(Enum):
-        bytearraytype = 0x00
-        booltype = 0x01
-        integertype = 0x02
-        arraytype = 0x80
-        structtype = 0x81
-        maptype = 0x82
+        bytearray_type = 0x00
+        bool_type = 0x01
+        int_type = 0x02
+        array_type = 0x80
+        struct_type = 0x81
+        dict_type = 0x82
 
     @staticmethod
     def serialize_abi_function(abi_func: AbiFunction):
@@ -107,22 +107,22 @@ class BuildParams(object):
     @staticmethod
     def get_map_bytes(param_dict: dict):
         builder = ParamsBuilder()
-        builder.emit(BuildParams.Type.maptype.value)
+        builder.emit(BuildParams.Type.dict_type.value)
         builder.emit(utils.bigint_to_neo_bytes(len(param_dict)))
         for key, value in param_dict.items():
-            builder.emit(BuildParams.Type.bytearraytype.value)
+            builder.emit(BuildParams.Type.bytearray_type.value)
             builder.emit_push_byte_array(str(key).encode())
             if isinstance(value, bytearray) or isinstance(value, bytes):
-                builder.emit(BuildParams.Type.bytearraytype.value)
+                builder.emit(BuildParams.Type.bytearray_type.value)
                 builder.emit_push_byte_array(bytearray(value))
             elif isinstance(value, str):
-                builder.emit(BuildParams.Type.bytearraytype.value)
+                builder.emit(BuildParams.Type.bytearray_type.value)
                 builder.emit_push_byte_array(value.encode())
             elif isinstance(value, bool):
-                builder.emit(BuildParams.Type.booltype.value)
+                builder.emit(BuildParams.Type.bool_type.value)
                 builder.emit_push_bool(value)
             elif isinstance(value, int):
-                builder.emit(BuildParams.Type.integertype.value)
+                builder.emit(BuildParams.Type.int_type.value)
                 builder.emit_push_integer(int(value))
             else:
                 raise Exception("param error")
