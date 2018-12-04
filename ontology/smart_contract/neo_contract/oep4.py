@@ -11,59 +11,32 @@ from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.utils.contract_data_parser import ContractDataParser
 
 
 class Oep4(object):
     def __init__(self, sdk):
         self.__sdk = sdk
-        self.__contract_address = bytearray()
-        self.__oep4_abi = {"contractHash": "85848b5ec3b15617e396bdd62cb49575738dd413", "abi": {"functions": [
-            {"name": "Main", "parameters": [{"name": "operation", "type": ""}, {"name": "args", "type": ""}],
-             "returntype": ""}, {"name": "init", "parameters": [{"name": "", "type": ""}], "returntype": ""},
-            {"name": "name", "parameters": [{"name": "", "type": ""}], "returntype": ""},
-            {"name": "symbol", "parameters": [{"name": "", "type": ""}], "returntype": ""},
-            {"name": "decimals", "parameters": [{"name": "", "type": ""}], "returntype": ""},
-            {"name": "totalSupply", "parameters": [{"name": "", "type": ""}], "returntype": ""},
-            {"name": "balanceOf", "parameters": [{"name": "account", "type": ""}], "returntype": ""},
-            {"name": "transfer", "parameters": [{"name": "from_acct", "type": ""}, {"name": "to_acct", "type": ""},
-                                                {"name": "amount", "type": ""}], "returntype": ""},
-            {"name": "transferMulti", "parameters": [{"name": "args", "type": ""}], "returntype": ""},
-            {"name": "approve", "parameters": [{"name": "owner", "type": ""}, {"name": "spender", "type": ""},
-                                               {"name": "amount", "type": ""}], "returntype": ""},
-            {"name": "transferFrom", "parameters": [{"name": "spender", "type": ""}, {"name": "from_acct", "type": ""},
-                                                    {"name": "to_acct", "type": ""}, {"name": "amount", "type": ""}],
-             "returntype": ""},
-            {"name": "allowance", "parameters": [{"name": "owner", "type": ""}, {"name": "spender", "type": ""}],
-             "returntype": ""}]}}
-
-        self.__update_abi_info()
+        self.__bytes_contract_address = bytearray()
 
     def set_contract_address(self, contract_address: str or bytearray or bytes):
         if len(contract_address) == 20:
             if isinstance(contract_address, bytes):
-                self.__contract_address = bytearray(contract_address)
-                self.__update_abi_info()
+                self.__bytes_contract_address = bytearray(contract_address)
             elif isinstance(contract_address, bytearray):
-                self.__contract_address = contract_address
-                self.__update_abi_info()
+                self.__bytes_contract_address = contract_address
             else:
                 raise SDKException(ErrorCode.param_err('the data type of the contract address unsupported.'))
         elif isinstance(contract_address, str) and len(contract_address) == 40:
-            self.__contract_address = bytearray(binascii.a2b_hex(contract_address))
-            self.__contract_address.reverse()
-            self.__update_abi_info()
+            self.__bytes_contract_address = bytearray(binascii.a2b_hex(contract_address))
+            self.__bytes_contract_address.reverse()
         else:
             raise SDKException(ErrorCode.param_err('the length of contract address should be 20 bytes.'))
 
-    def __update_abi_info(self):
-        entry_point = self.__oep4_abi.get('entrypoint', '')
-        functions = self.__oep4_abi['abi']['functions']
-        events = self.__oep4_abi.get('events', list())
-        self.__abi_info = AbiInfo(self.get_contract_address(is_hex=True), entry_point, functions, events)
-
     def __get_token_setting(self, func_name: str) -> str:
-        func = self.__abi_info.get_function(func_name)
-        res = self.__sdk.neo_vm().send_transaction(self.__contract_address, None, None, 0, 0, func, True)
+        func = InvokeFunction(func_name)
+        res = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0, 0, func, True)
         return res
 
     @staticmethod
@@ -75,14 +48,11 @@ class Oep4(object):
 
     def get_contract_address(self, is_hex: bool = True) -> str or bytearray:
         if is_hex:
-            array_address = self.__contract_address.copy()
+            array_address = self.__bytes_contract_address.copy()
             array_address.reverse()
             return binascii.b2a_hex(array_address).decode('ascii')
         else:
-            return self.__contract_address
-
-    def get_abi(self) -> dict:
-        return self.__oep4_abi
+            return self.__bytes_contract_address
 
     def get_name(self) -> str:
         """
@@ -92,7 +62,7 @@ class Oep4(object):
         :return: the string name of the oep4 token.
         """
         name = self.__get_token_setting('name')
-        return bytes.fromhex(name).decode()
+        return ContractDataParser.to_utf8_str(name)
 
     def get_symbol(self) -> str:
         """
@@ -101,8 +71,8 @@ class Oep4(object):
 
         :return: a short string symbol of the oep4 token
         """
-        get_symbol = self.__get_token_setting('symbol')
-        return bytes.fromhex(get_symbol).decode()
+        symbol = self.__get_token_setting('symbol')
+        return ContractDataParser.to_utf8_str(symbol)
 
     def get_decimal(self) -> int:
         """
@@ -112,7 +82,7 @@ class Oep4(object):
         :return: the number of decimals used by the oep4 token.
         """
         decimals = self.__get_token_setting('decimals')
-        return int(decimals[:2], 16)
+        return ContractDataParser.to_int(decimals)
 
     def init(self, acct: Account, payer_acct: Account, gas_limit: int, gas_price: int) -> str:
         """
@@ -125,8 +95,8 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('init')
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, acct, payer_acct, gas_limit, gas_price,
+        func = InvokeFunction('init')
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, acct, payer_acct, gas_limit, gas_price,
                                                        func, False)
         return tx_hash
 
@@ -137,14 +107,14 @@ class Oep4(object):
 
         :return: the total supply of the oep4 token.
         """
-        total_supply = self.__get_token_setting('totalSupply')
-        array = bytearray(binascii.a2b_hex(total_supply.encode('ascii')))
-        array.reverse()
+        func = InvokeFunction('totalSupply')
+        total_supply = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0,
+                                                            0, func, True)
         try:
-            supply = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except ValueError:
-            supply = 0
-        return supply
+            total_supply = ContractDataParser.to_int(total_supply)
+        except SDKException:
+            total_supply = 0
+        return total_supply
 
     def balance_of(self, b58_address: str) -> int:
         """
@@ -154,16 +124,14 @@ class Oep4(object):
         :param b58_address: the base58 encode address.
         :return: the oep4 token balance of the base58 encode address.
         """
-        func = self.__abi_info.get_function('balanceOf')
+        func = InvokeFunction('balanceOf')
         Oep4.__b58_address_check(b58_address)
         address = Address.b58decode(b58_address).to_bytes()
         func.set_params_value(address)
-        balance = self.__sdk.neo_vm().send_transaction(self.__contract_address, None, None, 0, 0, func, True)
-        array = bytearray(binascii.a2b_hex(balance.encode('ascii')))
-        array.reverse()
+        balance = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0, 0, func, True)
         try:
-            balance = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except ValueError:
+            balance = ContractDataParser.to_int(balance)
+        except SDKException:
             balance = 0
         return balance
 
@@ -181,7 +149,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('transfer')
+        func = InvokeFunction('transfer')
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
         if value < 0:
@@ -192,7 +160,7 @@ class Oep4(object):
         from_address = from_acct.get_address().to_bytes()
         to_address = Address.b58decode(b58_to_address).to_bytes()
         func.set_params_value(from_address, to_address, value)
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, from_acct, payer_acct, gas_limit,
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, from_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
 
@@ -211,7 +179,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('transferMulti')
+        func = InvokeFunction('transferMulti')
         for index in range(len(args)):
             item = args[index]
             Oep4.__b58_address_check(item[0])
@@ -224,10 +192,10 @@ class Oep4(object):
             to_address_array = Address.b58decode(item[1]).to_bytes()
             args[index] = [from_address_array, to_address_array, item[2]]
         func.set_params_value(args)
-        params = BuildParams.serialize_abi_function(func)
+        params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in self.__contract_address:
+        for i in self.__bytes_contract_address:
             params.append(i)
         signers_len = len(signers)
         if signers_len == 0:
@@ -256,7 +224,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('approve')
+        func = InvokeFunction('approve')
         if not isinstance(amount, int):
             raise SDKException(ErrorCode.param_err('the data type of amount should be int.'))
         if amount < 0:
@@ -265,7 +233,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_spender_address)
         spender_address = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner_address, spender_address, amount)
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__contract_address, owner_acct, payer_acct, gas_limit,
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, owner_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
 
@@ -278,13 +246,13 @@ class Oep4(object):
         :param b58_spender_address: a base58 encode address that represent spender's account.
         :return: the amount of oep4 token that owner allow spender to transfer from the owner account.
         """
-        func = self.__abi_info.get_function('allowance')
+        func = InvokeFunction('allowance')
         Oep4.__b58_address_check(b58_owner_address)
         owner = Address.b58decode(b58_owner_address).to_bytes()
         Oep4.__b58_address_check(b58_spender_address)
         spender = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner, spender)
-        allowance = self.__sdk.neo_vm().send_transaction(self.__contract_address, None, None, 0, 0, func, True)
+        allowance = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0, 0, func, True)
         array = bytearray(binascii.a2b_hex(allowance.encode('ascii')))
         array.reverse()
         try:
@@ -308,7 +276,7 @@ class Oep4(object):
         :param gas_price: an int value that indicate the gas price.
         :return: the hexadecimal transaction hash value.
         """
-        func = self.__abi_info.get_function('transferFrom')
+        func = InvokeFunction('transferFrom')
         Oep4.__b58_address_check(b58_from_address)
         Oep4.__b58_address_check(b58_to_address)
         if not isinstance(spender_acct, Account):
@@ -319,10 +287,10 @@ class Oep4(object):
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
         func.set_params_value(spender_address_array, from_address_array, to_address_array, value)
-        params = BuildParams.serialize_abi_function(func)
+        params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in self.__contract_address:
+        for i in self.__bytes_contract_address:
             params.append(i)
         if payer_acct is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
