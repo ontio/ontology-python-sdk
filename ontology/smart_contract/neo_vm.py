@@ -58,9 +58,9 @@ class NeoVm(object):
                 raise SDKException(ErrorCode.param_err('payer account is None.'))
             tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_bytes(),
                              params, bytearray(), [], bytearray())
-            self.__sdk.sign_transaction(tx, acct)
-            if acct.get_address_base58() != payer_acct.get_address_base58():
-                self.__sdk.add_sign_transaction(tx, payer_acct)
+            self.__sdk.sign_transaction(tx, payer_acct)
+            if isinstance(acct, Account) and acct.get_address_base58() != payer_acct.get_address_base58():
+                self.__sdk.add_sign_transaction(tx, acct)
             return self.__sdk.rpc.send_raw_transaction(tx)
 
     @staticmethod
