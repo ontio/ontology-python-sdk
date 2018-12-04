@@ -6,8 +6,7 @@ from ontology.utils import utils
 from ontology.common.error_code import ErrorCode
 from ontology.io.memory_stream import MemoryStream
 from ontology.exception.exception import SDKException
-from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSHF, PUSHT, PUSH0, PUSH1, PUSHM1, \
-    PUSHBYTES75, APPCALL
+from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSH0, PUSH1, PUSHM1, PUSHBYTES75, APPCALL
 
 
 class ParamsBuilder:
@@ -18,7 +17,10 @@ class ParamsBuilder:
         self.write_byte(op)
 
     def emit_push_bool(self, data: bool):
-        return self.emit(PUSHT) if data else self.emit(PUSHF)
+        if data:
+            return self.emit(PUSH1)
+        else:
+            return self.emit(PUSH0)
 
     def emit_push_integer(self, num: int):
         if num == -1:
