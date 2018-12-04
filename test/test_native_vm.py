@@ -33,6 +33,12 @@ class TestNativeVm(unittest.TestCase):
         sdk.add_sign_transaction(tx, acct2)
         res = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(len(res), 64)
+        tx = asset.new_transfer_transaction('ont', acct1.get_address_base58(), acct2.get_address_base58(), amount,
+                                            acct1.get_address_base58(), 20000, 500)
+        sdk.sign_transaction(tx, acct2)
+        sdk.add_sign_transaction(tx, acct1)
+        res = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(len(res), 64)
 
     def test_native_vm_withdraw_ong(self):
         sdk.set_rpc(rpc_address)
@@ -40,7 +46,8 @@ class TestNativeVm(unittest.TestCase):
         b58_payer_address = payer.get_address_base58()
         amount = 1
         asset = sdk.native_vm().asset()
-        tx = asset.new_withdraw_ong_transaction(b58_payer_address, b58_payer_address, amount, b58_payer_address, 20000, 500)
+        tx = asset.new_withdraw_ong_transaction(b58_payer_address, b58_payer_address, amount, b58_payer_address, 20000,
+                                                500)
         sdk.sign_transaction(tx, payer)
         res = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(len(res), 64)
