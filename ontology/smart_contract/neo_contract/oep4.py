@@ -18,25 +18,25 @@ from ontology.utils.contract_data_parser import ContractDataParser
 class Oep4(object):
     def __init__(self, sdk):
         self.__sdk = sdk
-        self.__bytes_contract_address = bytearray()
+        self.__bytearry_contract_address = bytearray()
 
     def set_contract_address(self, contract_address: str or bytearray or bytes):
         if len(contract_address) == 20:
             if isinstance(contract_address, bytes):
-                self.__bytes_contract_address = bytearray(contract_address)
+                self.__bytearry_contract_address = bytearray(contract_address)
             elif isinstance(contract_address, bytearray):
-                self.__bytes_contract_address = contract_address
+                self.__bytearry_contract_address = contract_address
             else:
                 raise SDKException(ErrorCode.param_err('the data type of the contract address unsupported.'))
         elif isinstance(contract_address, str) and len(contract_address) == 40:
-            self.__bytes_contract_address = bytearray(binascii.a2b_hex(contract_address))
-            self.__bytes_contract_address.reverse()
+            self.__bytearry_contract_address = bytearray(binascii.a2b_hex(contract_address))
+            self.__bytearry_contract_address.reverse()
         else:
             raise SDKException(ErrorCode.param_err('the length of contract address should be 20 bytes.'))
 
     def __get_token_setting(self, func_name: str) -> str:
         func = InvokeFunction(func_name)
-        res = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0, 0, func, True)
+        res = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
         return res
 
     @staticmethod
@@ -48,11 +48,11 @@ class Oep4(object):
 
     def get_contract_address(self, is_hex: bool = True) -> str or bytearray:
         if is_hex:
-            array_address = self.__bytes_contract_address.copy()
+            array_address = self.__bytearry_contract_address.copy()
             array_address.reverse()
             return binascii.b2a_hex(array_address).decode('ascii')
         else:
-            return self.__bytes_contract_address
+            return self.__bytearry_contract_address
 
     def get_name(self) -> str:
         """
@@ -96,7 +96,8 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('init')
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, acct, payer_acct, gas_limit, gas_price,
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, acct, payer_acct, gas_limit,
+                                                       gas_price,
                                                        func, False)
         return tx_hash
 
@@ -108,7 +109,7 @@ class Oep4(object):
         :return: the total supply of the oep4 token.
         """
         func = InvokeFunction('totalSupply')
-        total_supply = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0,
+        total_supply = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0,
                                                             0, func, True)
         try:
             total_supply = ContractDataParser.to_int(total_supply)
@@ -128,7 +129,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_address)
         address = Address.b58decode(b58_address).to_bytes()
         func.set_params_value(address)
-        balance = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0, 0, func, True)
+        balance = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
         try:
             balance = ContractDataParser.to_int(balance)
         except SDKException:
@@ -160,16 +161,16 @@ class Oep4(object):
         from_address = from_acct.get_address().to_bytes()
         to_address = Address.b58decode(b58_to_address).to_bytes()
         func.set_params_value(from_address, to_address, value)
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, from_acct, payer_acct, gas_limit,
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, from_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
 
-    def transfer_multi(self, args: list, payer_acct: Account, signers: list, gas_limit: int, gas_price: int):
+    def transfer_multi(self, transfer_list: list, payer_acct: Account, signers: list, gas_limit: int, gas_price: int):
         """
         This interface is used to call the TransferMulti method in ope4
         that allow transfer amount of token from multiple from-account to multiple to-account multiple times.
 
-        :param args: a parameter list with each item contains three sub-items:
+        :param transfer_list: a parameter list with each item contains three sub-items:
                 base58 encode transaction sender address,
                 base58 encode transaction receiver address,
                 amount of token in transaction.
@@ -180,8 +181,8 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('transferMulti')
-        for index in range(len(args)):
-            item = args[index]
+        for index in range(len(transfer_list)):
+            item = transfer_list[index]
             Oep4.__b58_address_check(item[0])
             Oep4.__b58_address_check(item[1])
             if not isinstance(item[2], int):
@@ -190,12 +191,13 @@ class Oep4(object):
                 raise SDKException(ErrorCode.param_err('the value should be equal or great than 0.'))
             from_address_array = Address.b58decode(item[0]).to_bytes()
             to_address_array = Address.b58decode(item[1]).to_bytes()
-            args[index] = [from_address_array, to_address_array, item[2]]
-        func.set_params_value(args)
+            transfer_list[index] = [from_address_array, to_address_array, item[2]]
+        for item in transfer_list:
+            func.add_params_value(item)
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in self.__bytes_contract_address:
+        for i in self.__bytearry_contract_address:
             params.append(i)
         signers_len = len(signers)
         if signers_len == 0:
@@ -233,7 +235,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_spender_address)
         spender_address = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner_address, spender_address, amount)
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, owner_acct, payer_acct, gas_limit,
+        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, owner_acct, payer_acct, gas_limit,
                                                        gas_price, func, False)
         return tx_hash
 
@@ -252,7 +254,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_spender_address)
         spender = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner, spender)
-        allowance = self.__sdk.neo_vm().send_transaction(self.__bytes_contract_address, None, None, 0, 0, func, True)
+        allowance = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
         array = bytearray(binascii.a2b_hex(allowance.encode('ascii')))
         array.reverse()
         try:
@@ -290,7 +292,7 @@ class Oep4(object):
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in self.__bytes_contract_address:
+        for i in self.__bytearry_contract_address:
             params.append(i)
         if payer_acct is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))

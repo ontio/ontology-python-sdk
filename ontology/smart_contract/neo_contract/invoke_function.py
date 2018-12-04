@@ -17,6 +17,11 @@ class InvokeFunction(object):
         for param in params:
             self.__parameters.append(param)
 
+    def add_params_value(self, param):
+        if self.__parameters is None:
+            self.__parameters = list()
+        self.__parameters.append(param)
+
     def create_invoke_code(self):
         param_list = list()
         param_list.append(self.__func_name.encode('utf-8'))
