@@ -80,7 +80,7 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
-        self.assertEqual(1000000000, oep4.get_total_supply())
+        self.assertEqual(10000000000000000000, oep4.get_total_supply())
 
     def test_transfer(self):
         sdk = OntologySdk()
@@ -202,7 +202,7 @@ class TestOep4(unittest.TestCase):
             array = bytearray(binascii.a2b_hex(states[3].encode('ascii')))
             array.reverse()
             notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
-            self.assertEqual((10 ** decimal) * amount, notify_value)
+            self.assertEqual(amount, notify_value)
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
@@ -220,7 +220,7 @@ class TestOep4(unittest.TestCase):
         b58_owner_address = acct1.get_address_base58()
         b58_spender_address = acct2.get_address_base58()
         allowance = oep4.allowance(b58_owner_address, b58_spender_address)
-        self.assertGreaterEqual(allowance, 50)
+        self.assertGreaterEqual(allowance, 1)
 
     def test_transfer_from(self):
         sdk = OntologySdk()
@@ -261,7 +261,7 @@ class TestOep4(unittest.TestCase):
             array = bytearray(binascii.a2b_hex(notify['States'][3].encode('ascii')))
             array.reverse()
             notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
-            self.assertEqual((10 ** decimal) * value, notify_value)
+            self.assertEqual(value, notify_value)
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
