@@ -23,7 +23,10 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_int(hex_str: str) -> int:
-        array = bytearray(binascii.a2b_hex(hex_str.encode('ascii')))
+        try:
+            array = bytearray(binascii.a2b_hex(hex_str.encode('ascii')))
+        except binascii.Error as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         array.reverse()
         num = int(binascii.b2a_hex(array).decode('ascii'), 16)
         return num
@@ -42,7 +45,10 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_bytes(hex_str: str) -> bytes:
-        bytes_str = binascii.a2b_hex(hex_str)
+        try:
+            bytes_str = binascii.a2b_hex(hex_str)
+        except binascii.Error as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         return bytes_str
 
     @staticmethod
@@ -60,9 +66,10 @@ class ContractDataParser(object):
     @staticmethod
     def to_utf8_str(hex_str: str) -> str:
         try:
-            utf8_str = binascii.a2b_hex(hex_str).decode('utf-8')
-        except ValueError:
-            raise SDKException(ErrorCode.other_error('Non-hexadecimal number found.'))
+            utf8_str = binascii.a2b_hex(hex_str)
+            utf8_str = utf8_str.decode('utf-8')
+        except (ValueError, binascii.Error)as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         return utf8_str
 
     @staticmethod
@@ -123,10 +130,10 @@ class ContractDataParser(object):
     def to_dict(item_serialize: str):
         stream = StreamManager.GetStream(bytearray.fromhex(item_serialize))
         reader = BinaryReader(stream)
-        return ContractDataParser.deserialize_stack_item(reader)
+        return ContractDataParser.__deserialize_stack_item(reader)
 
     @staticmethod
-    def deserialize_stack_item(reader: BinaryReader):
+    def __deserialize_stack_item(reader: BinaryReader):
         t = reader.read_byte()
         if t == BuildParams.Type.bytearray_type.value:
             b = reader.read_var_bytes()
@@ -135,30 +142,29 @@ class ContractDataParser(object):
             return reader.read_bool()
         elif t == BuildParams.Type.int_type.value:
             b = reader.read_var_bytes()
-            return ContractDataParser.bigint_from_bytes(bytearray(b))
+            return ContractDataParser.__big_int_from_bytes(bytearray(b))
         elif t == BuildParams.Type.struct_type.value or t == BuildParams.Type.array_type.value:
             count = reader.read_var_int()
-            # TODO
             item_list = list()
             for i in range(count):
-                item = ContractDataParser.deserialize_stack_item(reader)
+                item = ContractDataParser.__deserialize_stack_item(reader)
                 item_list.append(item)
-            if t == t == BuildParams.Type.struct_type.value:
+            if t == BuildParams.Type.struct_type.value:
                 return Struct(item_list)
             return item_list
         elif t == BuildParams.Type.dict_type.value:
             count = reader.read_var_int()
             item_dict = dict()
             for i in range(count):
-                key = ContractDataParser.deserialize_stack_item(reader)
-                value = ContractDataParser.deserialize_stack_item(reader)
+                key = ContractDataParser.__deserialize_stack_item(reader)
+                value = ContractDataParser.__deserialize_stack_item(reader)
                 item_dict[key] = value
             return item_dict
         else:
             raise SDKException(ErrorCode.other_error('type error'))
 
     @staticmethod
-    def bigint_from_bytes(ba: bytearray):
+    def __big_int_from_bytes(ba: bytearray):
         if len(ba) == 0:
             return 0
         ba_temp = ba[:]
