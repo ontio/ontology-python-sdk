@@ -3,10 +3,10 @@
 
 import unittest
 
-from ontology.account.account import Account
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.ont_sdk import OntologySdk
-from ontology.smart_contract.native_contract.asset import Asset
+from ontology.account.account import Account
+from ontology.exception.exception import SDKException
+from ontology.crypto.signature_scheme import SignatureScheme
 
 rpc_address = 'http://polaris3.ont.io:20336'
 # rpc_address = "http://127.0.0.1:20336"
@@ -31,14 +31,20 @@ class TestNativeVm(unittest.TestCase):
                                             acct1.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx, acct1)
         sdk.add_sign_transaction(tx, acct2)
-        res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(len(res), 64)
+        try:
+            tx_hash = sdk.rpc.send_raw_transaction(tx)
+            self.assertEqual(64, len(tx_hash))
+        except SDKException as e:
+            self.assertIn('[Transfer] balance insufficient', e.args[1])
         tx = asset.new_transfer_transaction('ont', acct1.get_address_base58(), acct2.get_address_base58(), amount,
                                             acct1.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx, acct2)
         sdk.add_sign_transaction(tx, acct1)
-        res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(len(res), 64)
+        try:
+            tx_hash = sdk.rpc.send_raw_transaction(tx)
+            self.assertEqual(64, len(tx_hash))
+        except SDKException as e:
+            self.assertIn('[Transfer] balance insufficient', e.args[1])
 
     def test_native_vm_withdraw_ong(self):
         sdk.set_rpc(rpc_address)
@@ -49,8 +55,8 @@ class TestNativeVm(unittest.TestCase):
         tx = asset.new_withdraw_ong_transaction(b58_payer_address, b58_payer_address, amount, b58_payer_address, 20000,
                                                 500)
         sdk.sign_transaction(tx, payer)
-        res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(len(res), 64)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(64, len(tx_hash))
 
 
 if __name__ == '__main__':
