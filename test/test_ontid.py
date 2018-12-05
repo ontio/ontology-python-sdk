@@ -46,7 +46,11 @@ class TestOntId(unittest.TestCase):
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         label = 'label'
         password = 'password'
-        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        try:
+            identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        except SDKException as e:
+            self.assertIn('Wallet identity exists', e.args[1])
+            return
         gas_limit = 20000
         gas_price = 500
         try:
@@ -132,10 +136,15 @@ class TestOntId(unittest.TestCase):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         password = 'password'
-        identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
+        try:
+            identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
+        except SDKException as e:
+            self.assertIn('Wallet identity exists', e.args[1])
+            return
         gas_limit = 20000
         gas_price = 500
-        tx_hash = ont_id.send_add_attribute_transaction(identity, password, attribute_list, acct, gas_limit, gas_price)
+        tx_hash = ont_id.send_add_attribute_transaction(identity, password, attribute_list, acct, gas_limit,
+                                                        gas_price)
         time.sleep(6)
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
         self.assertEqual('Attribute', notify[0]['States'][0])
@@ -223,7 +232,11 @@ class TestOntId(unittest.TestCase):
         password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        try:
+            identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        except SDKException as e:
+            self.assertIn('Wallet identity exists', e.args[1])
+            return
         rand_private_key = utils.get_random_bytes(32).hex()
         rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         hex_new_public_key = rand_acct.get_public_key_hex()
@@ -294,7 +307,11 @@ class TestOntId(unittest.TestCase):
         password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        try:
+            identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        except SDKException as e:
+            self.assertIn('Wallet identity exists', e.args[1])
+            return
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()

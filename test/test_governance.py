@@ -15,9 +15,8 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 
 
 class TestGovernance(unittest.TestCase):
-
     def test_prepare(self):
-        path = os.path.join(__file__, 'testGovernance.json')
+        path = os.path.join(os.path.dirname(__file__), 'TestGovernance.json')
         sdk.wallet_manager.open_wallet(path)
         identities = sdk.wallet_manager.get_wallet().identities
         if identities is None or len(identities) == 0:
@@ -162,6 +161,8 @@ class TestGovernance(unittest.TestCase):
 
     def test_get_total_stake(self):
         total_stake = sdk.native_vm().governance().get_total_stake(account1.get_address_base58())
+        if total_stake is None:
+            return
         print(total_stake.time_offset)
         print(total_stake.stake)
         print(total_stake.address)
