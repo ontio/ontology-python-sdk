@@ -27,7 +27,7 @@ multi_addr = Address.address_from_multi_pub_keys(2, pubkeys)
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
         version = sdk.rpc.get_version()
-        self.assertEqual("v1.0.3-rc", version)
+        self.assertIn('v', version)
 
     def test_get_node_count(self):
         count = sdk.rpc.get_node_count()

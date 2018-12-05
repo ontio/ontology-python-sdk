@@ -326,9 +326,13 @@ class TestAsset(unittest.TestCase):
         amount = 1
         gas_limit = 20000
         gas_price = 500
-        tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer, gas_limit,
-                                           gas_price)
-        self.assertEqual(64, len(tx_hash))
+        try:
+            tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
+                                               gas_limit, gas_price)
+            self.assertEqual(64, len(tx_hash))
+        except SDKException as e:
+            self.assertIn('[Transfer] balance insufficient', e.args[1])
+            return
         time.sleep(6)
         new_from_balance = sdk.rpc.get_balance(b58_from_address)
         new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
