@@ -172,7 +172,7 @@ class WalletManager(object):
         if self.scheme == SignatureScheme.SHA256withECDSA:
             acct = AccountData()
         else:
-            raise ValueError("scheme type is error")
+            raise SDKException(ErrorCode.other_error('Scheme type is error.'))
         # set key
         if pwd is not None:
             acct.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
@@ -186,8 +186,7 @@ class WalletManager(object):
         if account_flag:
             for index in range(len(self.wallet_in_mem.accounts)):
                 if acct.b58_address == self.wallet_in_mem.accounts[index].get_b58_address():
-                    raise ValueError("wallet account exists")
-
+                    raise SDKException(ErrorCode.other_error('Wallet account exists.'))
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.is_default = True
                 self.wallet_in_mem.default_account_address = acct.b58_address
@@ -198,7 +197,7 @@ class WalletManager(object):
         else:
             for index in range(len(self.wallet_in_mem.identities)):
                 if self.wallet_in_mem.identities[index].ont_id == did_ont + acct.b58_address:
-                    raise ValueError("wallet identity exists")
+                    raise SDKException(ErrorCode.other_error('Wallet identity exists.'))
             idt = Identity()
             idt.ont_id = did_ont + acct.b58_address
             idt.label = label
