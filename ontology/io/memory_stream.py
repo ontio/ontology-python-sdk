@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Description:
-    MemoryStream
-Usage:
-    from ontology.io.memory_stream import MemoryStream
+Ontology MemoryStream
 """
 
 from io import BytesIO
@@ -69,7 +66,13 @@ class StreamManager:
 
 
 class MemoryStream(BytesIO):
-    """docstring for MemoryStream"""
+    """
+    Description:
+        MemoryStream
+
+    Usage:
+    from ontology.io.memory_stream import MemoryStream
+    """
 
     def __init__(self, *args, **kwargs):
         """
