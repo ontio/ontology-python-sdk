@@ -2,11 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Description:
-    Binary Writer
-
-Usage:
-    from neocore.IO.BinaryWriter import BinaryWriter
+Ontology Binary Writer
 """
 
 import struct
@@ -29,7 +25,13 @@ def swap32(i):
 
 
 class BinaryWriter(object):
-    """docstring for BinaryWriter"""
+    """
+    Description:
+    Binary Writer
+
+    Usage:
+        from ontology.io.binary_writer import BinaryWriter
+    """
 
     def __init__(self, stream):
         """

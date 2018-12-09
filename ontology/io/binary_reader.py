@@ -2,11 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Description:
-    Binary Reader
-
-Usage:
-    from ontology.io.binary_reader import BinaryReader
+Ontology Binary Reader
 """
 
 import sys
@@ -19,7 +15,13 @@ from ontology.exception.exception import SDKException
 
 
 class BinaryReader(object):
-    """docstring for BinaryReader"""
+    """
+    Description:
+    Binary Reader
+
+    Usage:
+        from ontology.io.binary_reader import BinaryReader
+    """
 
     def __init__(self, stream):
         """
