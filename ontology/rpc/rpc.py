@@ -73,16 +73,16 @@ class RpcClient(object):
             self.__qid = randint(0, maxsize)
         return self.__qid
 
-    def set_json_rpc_version(self, method, param=None):
+    def generate_json_rpc_payload(self, method, param=None):
         if param is None:
             param = list()
-        json_rpc_request = dict(jsonrpc=JSON_RPC_VERSION, id=self.__qid, method=method, params=param)
-        return json_rpc_request
+        json_rpc_payload = dict(jsonrpc=JSON_RPC_VERSION, id=self.__qid, method=method, params=param)
+        return json_rpc_payload
 
     def __post(self, method: str, msg: list = None) -> dict or str:
         if msg is None:
             msg = list()
-        payload = self.set_json_rpc_version(method, msg)
+        payload = self.generate_json_rpc_payload(method, msg)
         try:
             response = HttpRequest.request("post", self.__url, payload)
         except requests.exceptions.ConnectTimeout:
