@@ -62,6 +62,9 @@ class Account(object):
         """
         return self.__address  # __address is a class not a string or bytes
 
+    def get_address_bytes(self):
+        return self.__address.to_bytes()
+
     def get_address_base58(self) -> str:
         """
         This interface is used to get the base58 encode account address.

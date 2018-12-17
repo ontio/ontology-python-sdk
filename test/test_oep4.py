@@ -186,7 +186,6 @@ class TestOep4(unittest.TestCase):
         sdk.set_rpc(remote_rpc_address)
         time.sleep(6)
         try:
-            decimal = oep4.get_decimal()
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
             states = notify['States']
