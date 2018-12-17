@@ -1,15 +1,38 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import binascii
 import json
 import requests
 
-from ontology.rpc.define import *
-from ontology.common.address import Address
+from sys import maxsize
+from Cryptodome.Random.random import randint
+
 from ontology.common.error_code import ErrorCode
-from ontology.utils.utils import get_asset_address
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data_parser import ContractDataParser
+
+RPC_GET_VERSION = "getversion"
+RPC_GET_NODE_COUNT = "getconnectioncount"
+RPC_GET_GAS_PRICE = "getgasprice"
+RPC_GET_NETWORK_ID = "getnetworkid"
+RPC_GET_TRANSACTION = "getrawtransaction"
+RPC_SEND_TRANSACTION = "sendrawtransaction"
+RPC_GET_BLOCK = "getblock"
+RPC_GET_BLOCK_COUNT = "getblockcount"
+RPC_GET_BLOCK_HASH = "getblockhash"
+RPC_GET_CURRENT_BLOCK_HASH = "getbestblockhash"
+RPC_GET_BALANCE = "getbalance"
+RPC_GET_ALLOWANCE = "getallowance"
+RPC_GET_SMART_CONTRACT_EVENT = "getsmartcodeevent"
+RPC_GET_STORAGE = "getstorage"
+RPC_GET_SMART_CONTRACT = "getcontractstate"
+RPC_GET_GENERATE_BLOCK_TIME = "getgenerateblocktime"
+RPC_GET_MERKLE_PROOF = "getmerkleproof"
+SEND_EMERGENCY_GOV_REQ = "sendemergencygovreq"
+GET_BLOCK_ROOT_WITH_NEW_TX_ROOT = "getblockrootwithnewtxroot"
+
+JSON_RPC_VERSION = "2.0"
 
 
 class HttpRequest(object):
@@ -34,28 +57,32 @@ class HttpRequest(object):
 
 
 class RpcClient(object):
-    def __init__(self, url: str = '', qid=0):
+    def __init__(self, url: str = '', qid: int = 0):
         self.__url = url
-        self.qid = qid
+        self.__qid = qid
+        self.__generate_qid()
 
     def set_address(self, url: str):
         self.__url = url
 
-    @staticmethod
-    def set_json_rpc_version(method, param=None):
-        JsonRpcRequest["jsonrpc"] = JSON_RPC_VERSION
-        JsonRpcRequest["id"] = "1"
-        JsonRpcRequest["method"] = method
+    def get_address(self):
+        return self.__url
+
+    def __generate_qid(self):
+        if self.__qid == 0:
+            self.__qid = randint(0, maxsize)
+        return self.__qid
+
+    def set_json_rpc_version(self, method, param=None):
         if param is None:
-            JsonRpcRequest["params"] = list()
-        else:
-            JsonRpcRequest["params"] = param
-        return JsonRpcRequest
+            param = list()
+        json_rpc_request = dict(jsonrpc=JSON_RPC_VERSION, id=self.__qid, method=method, params=param)
+        return json_rpc_request
 
     def __post(self, method: str, msg: list = None) -> dict or str:
         if msg is None:
             msg = list()
-        payload = RpcClient.set_json_rpc_version(method, msg)
+        payload = self.set_json_rpc_version(method, msg)
         try:
             response = HttpRequest.request("post", self.__url, payload)
         except requests.exceptions.ConnectTimeout:
@@ -204,7 +231,7 @@ class RpcClient(object):
         allowance = self.__post(RPC_GET_ALLOWANCE, [asset_name, from_address, to_address])
         return allowance
 
-    def get_storage(self, contract_address: str, key: str) -> int:
+    def get_storage(self, contract_address: str, key: str) -> str:
         """
         This interface is used to get the corresponding stored value
         based on hexadecimal contract address and stored key.
@@ -216,11 +243,11 @@ class RpcClient(object):
             a hexadecimal stored key
 
         Return:
-            the information of smart contract event in dictionary form.
+            the information of contract storage.
         """
 
-        storage = self.__post(RPC_GET_STORAGE, [contract_address, key, 1])
-        return storage
+        storage_value = self.__post(RPC_GET_STORAGE, [contract_address, key, 1])
+        return storage_value
 
     def get_smart_contract_event_by_tx_hash(self, tx_hash: str) -> dict:
         """
