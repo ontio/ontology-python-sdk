@@ -89,7 +89,7 @@ class RpcClient(object):
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.__url])))
         except requests.exceptions.ConnectionError:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.__url])))
-        response = json.loads(response.content.decode())['result']
+        response = json.loads(response.content.decode('utf-8'))['result']
         return response
 
     def get_version(self) -> str:
@@ -102,7 +102,7 @@ class RpcClient(object):
         response = self.__post(RPC_GET_VERSION)
         return response
 
-    def get_node_count(self) -> int:
+    def get_connection_count(self) -> int:
         """
         This interface is used to get the current number of connections for the node in current network.
 

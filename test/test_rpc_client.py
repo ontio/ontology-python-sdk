@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 import unittest
 
-from ontology.rpc.rpc import RpcClient
+from random import choice
+
+from ontology.network.rpc import RpcClient
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.utils import get_random_hex_str
 from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.network.connect_manager import TEST_RPC_ADDRESS
 from ontology.smart_contract.native_contract.asset import Asset
+from ontology.utils.contract_data_parser import ContractDataParser
 
-rpc_address = 'http://polaris3.ont.io:20336'
+rpc_address = choice(TEST_RPC_ADDRESS)
 rpc_client = RpcClient(rpc_address)
 
 private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -31,8 +33,8 @@ class TestRpcClient(unittest.TestCase):
         version = rpc_client.get_version()
         self.assertIn('v', version)
 
-    def test_get_node_count(self):
-        count = rpc_client.get_node_count()
+    def test_get_connection_count(self):
+        count = rpc_client.get_connection_count()
         self.assertGreaterEqual(count, 0)
 
     def test_get_gas_price(self):
@@ -168,7 +170,9 @@ class TestRpcClient(unittest.TestCase):
         tx = Asset.new_transfer_transaction('ont', b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         result = rpc_client.send_raw_transaction_pre_exec(tx)
-        self.assertEqual(result, '01')
+        self.assertEqual(result['Result'], '01')
+        self.assertEqual(result['Gas'], 20000)
+        self.assertEqual(result['State'], 1)
 
 
 if __name__ == '__main__':
