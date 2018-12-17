@@ -80,12 +80,12 @@ class Transaction(object):
         for sig in self.sigs:
             writer.write_bytes(sig.serialize())
         ms.flush()
-        temp = ms.ToArray()
+        bytes_tx = ms.ToArray()
         StreamManager.ReleaseStream(ms)
         if is_hex:
-            return temp
+            return bytes_tx
         else:
-            return a2b_hex(temp)
+            return a2b_hex(bytes_tx)
 
     @staticmethod
     def deserialize_from(txbytes: bytes):
