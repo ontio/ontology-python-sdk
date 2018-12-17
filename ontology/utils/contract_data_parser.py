@@ -67,6 +67,11 @@ class ContractDataParser(object):
         return hex_str_list
 
     @staticmethod
+    def to_reserve_hex_str(hex_str: str) -> str:
+        hex_str = ''.join(reversed([hex_str[i:i + 2] for i in range(0, len(hex_str), 2)]))
+        return hex_str
+
+    @staticmethod
     def to_utf8_str(hex_str: str) -> str:
         try:
             utf8_str = binascii.a2b_hex(hex_str)

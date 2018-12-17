@@ -23,8 +23,11 @@ class WebsocketClient(object):
             self.__id = randint(0, maxsize)
         return self.__id
 
-    def set_address(self, address):
-        self.__url = address
+    def set_address(self, url: str):
+        self.__url = url
+
+    def get_address(self):
+        return self.__url
 
     async def connect(self):
         self.__ws_client = await client.connect(self.__url)

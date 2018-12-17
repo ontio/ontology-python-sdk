@@ -1,3 +1,4 @@
+websockets
 pycryptodomex>=3.6.6
 cryptography>=2.3.1
 ecdsa>=0.13
