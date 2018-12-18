@@ -58,7 +58,7 @@ This is an API set that allows you to interact with an Ontology nodes.
 | 4     | get_gas_price()                       |
 | 5     | get_network_id()                      |
 | 6     | get_node_count()                      |
-| 7     | get_block_count()                     |
+| 7     | test_get_block_height()                     |
 | 8     | get_block_by_hash()                   |
 | 9     | get_block_by_height()                 |
 | 10    | get_current_block_hash()              |
@@ -127,7 +127,7 @@ This is an API set that allows you to generate **Ontology Digital Identity.**
 | 18    | add_sign_transaction()               |
 | 19    | add_multi_sign_transaction()         |
 | 20    | get_merkle_proof()                   |
-| 21    | get_raw_transaction()                |
+| 21    | get_transaction_by_tx_hash()                |
 | 22    | send_raw_transaction()               |
 | 23    | send_raw_transaction_pre_exec()      |
 
