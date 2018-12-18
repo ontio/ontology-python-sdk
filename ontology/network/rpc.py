@@ -171,7 +171,7 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_block_count(self, is_full: bool = False) -> int:
+    def get_block_height(self, is_full: bool = False) -> int:
         """
         This interface is used to get the decimal block number in current network.
 
@@ -286,7 +286,7 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_raw_transaction(self, tx_hash: str, is_full: bool = False) -> dict:
+    def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
         This interface is used to get the corresponding transaction information based on the specified hash value.
 
