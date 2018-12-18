@@ -55,8 +55,8 @@ class TestRpcClient(unittest.TestCase):
         block = rpc_client.get_block_by_height(height)
         self.assertEqual(block['Header']['Height'], height)
 
-    def test_get_block_count(self):
-        count = rpc_client.get_block_count()
+    def test_test_get_block_height(self):
+        count = rpc_client.get_block_height()
         self.assertGreater(count, 103712)
 
     def test_get_current_block_hash(self):
@@ -81,8 +81,6 @@ class TestRpcClient(unittest.TestCase):
         except KeyError:
             raised = True
             self.assertFalse(raised, 'Exception raised')
-
-    def test_get_balance_by_acc(self):
         address_balance = rpc_client.get_balance(acc.get_address_base58())
         try:
             address_balance['ont']
@@ -109,7 +107,7 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_allowance(self):
         base58_address = "AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA"
-        allowance = rpc_client.get_allowance("ong", base58_address, base58_address)
+        allowance = rpc_client.get_allowance('ong', base58_address, base58_address)
         self.assertEqual(allowance, '0')
 
     def test_get_storage(self):
@@ -129,9 +127,9 @@ class TestRpcClient(unittest.TestCase):
         event = rpc_client.get_smart_contract_event_by_height(height)
         self.assertEqual(event[0]['State'], 1)
 
-    def test_get_raw_transaction(self):
+    def test_get_transaction_by_tx_hash(self):
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
-        tx = rpc_client.get_raw_transaction(tx_hash)
+        tx = rpc_client.get_transaction_by_tx_hash(tx_hash)
         self.assertEqual(tx['Hash'], tx_hash)
 
     def test_get_smart_contract(self):
