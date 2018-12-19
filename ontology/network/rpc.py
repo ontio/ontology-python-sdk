@@ -14,26 +14,29 @@ from ontology.exception.exception import SDKException
 
 
 class RpcMethod(object):
-    GET_VERSION = "getversion"
-    GET_NODE_COUNT = "getconnectioncount"
-    GET_GAS_PRICE = "getgasprice"
-    GET_NETWORK_ID = "getnetworkid"
-    GET_TRANSACTION = "getrawtransaction"
-    SEND_TRANSACTION = "sendrawtransaction"
-    GET_BLOCK = "getblock"
-    GET_BLOCK_COUNT = "getblockcount"
-    GET_BLOCK_HASH = "getblockhash"
-    GET_CURRENT_BLOCK_HASH = "getbestblockhash"
-    GET_BLOCK_HEIGHT_BY_HASH = "getblockheightbytxhash"
-    GET_BALANCE = "getbalance"
-    GET_ALLOWANCE = "getallowance"
-    GET_SMART_CONTRACT_EVENT = "getsmartcodeevent"
-    GET_STORAGE = "getstorage"
-    GET_SMART_CONTRACT = "getcontractstate"
-    GET_GENERATE_BLOCK_TIME = "getgenerateblocktime"
-    GET_MERKLE_PROOF = "getmerkleproof"
-    SEND_EMERGENCY_GOV_REQ = "sendemergencygovreq"
-    GET_BLOCK_ROOT_WITH_NEW_TX_ROOT = "getblockrootwithnewtxroot"
+    GET_VERSION = 'getversion'
+    GET_NODE_COUNT = 'getconnectioncount'
+    GET_GAS_PRICE = 'getgasprice'
+    GET_NETWORK_ID = 'getnetworkid'
+    GET_TRANSACTION = 'getrawtransaction'
+    SEND_TRANSACTION = 'sendrawtransaction'
+    GET_BLOCK = 'getblock'
+    GET_BLOCK_COUNT = 'getblockcount'
+    GET_BLOCK_HASH = 'getblockhash'
+    GET_CURRENT_BLOCK_HASH = 'getbestblockhash'
+    GET_BLOCK_HEIGHT_BY_HASH = 'getblockheightbytxhash'
+    GET_BALANCE = 'getbalance'
+    GET_GRANT_ONG = 'getgrantong'
+    GET_ALLOWANCE = 'getallowance'
+    GET_SMART_CONTRACT_EVENT = 'getsmartcodeevent'
+    GET_STORAGE = 'getstorage'
+    GET_SMART_CONTRACT = 'getcontractstate'
+    GET_GENERATE_BLOCK_TIME = 'getgenerateblocktime'
+    GET_MERKLE_PROOF = 'getmerkleproof'
+    SEND_EMERGENCY_GOV_REQ = 'sendemergencygovreq'
+    GET_BLOCK_ROOT_WITH_NEW_TX_ROOT = 'getblockrootwithnewtxroot'
+    GET_MEM_POOL_TX_COUNT = 'getmempooltxcount'
+    GET_MEM_POOL_TX_STATE = 'getmempooltxstate'
 
     RPC_VERSION = "2.0"
 
@@ -264,19 +267,26 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_balance(self, base58_address: str, is_full: bool = False) -> dict:
+    def get_balance(self, b58_address: str, is_full: bool = False) -> dict:
         """
         This interface is used to get the account balance of specified base58 encoded address in current network.
 
-        :param base58_address: a base58 encoded account address.
+        :param b58_address: a base58 encoded account address.
         :param is_full:
         :return: the value of account balance in dictionary form.
         """
-        payload = self.generate_json_rpc_payload(RpcMethod.GET_BALANCE, [base58_address, 1])
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_BALANCE, [b58_address, 1])
         response = self.__post(self.__url, payload)
         if is_full:
             return response
         return response['result']
+
+    def get_grant_ong(self, b58_address: str, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_GRANT_ONG, [b58_address])
+        response = self.__post(self.__url, payload)
+        if is_full:
+            return response
+        return int(response['result'])
 
     def get_allowance(self, asset_name: str, from_address: str, to_address: str, is_full: bool = False) -> str:
         """
@@ -295,17 +305,17 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_storage(self, contract_address: str, key: str, is_full: bool = False) -> str:
+    def get_storage(self, hex_contract_address: str, hex_key: str, is_full: bool = False) -> str:
         """
         This interface is used to get the corresponding stored value
         based on hexadecimal contract address and stored key.
 
-        :param contract_address: hexadecimal contract address.
-        :param key: a hexadecimal stored key.
+        :param hex_contract_address: hexadecimal contract address.
+        :param hex_key: a hexadecimal stored key.
         :param is_full:
         :return: the information of contract storage.
         """
-        payload = self.generate_json_rpc_payload(RpcMethod.GET_STORAGE, [contract_address, key, 1])
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_STORAGE, [hex_contract_address, hex_key, 1])
         response = self.__post(self.__url, payload)
         if is_full:
             return response
@@ -419,3 +429,17 @@ class RpcClient(object):
         if is_full:
             return response
         return response['result']
+
+    def get_memory_pool_tx_count(self, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_COUNT)
+        response = self.__post(self.__url, payload)
+        if is_full:
+            return response
+        return response['result']
+
+    def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
+        response = self.__post(self.__url, payload)
+        if is_full:
+            return response
+        return response['result']['State']
