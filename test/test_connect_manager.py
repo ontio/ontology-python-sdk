@@ -21,7 +21,7 @@ rpc_connector = sdk.rpc_connector
 
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
-        version = sdk.rpc_connector.get_version()
+        version = rpc_connector.get_version()
         self.assertIn('v', version)
 
     def test_get_connection_count(self):
