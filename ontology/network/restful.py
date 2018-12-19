@@ -81,12 +81,25 @@ class RestfulMethod(object):
     def get_block_height_by_tx_hash(url: str, tx_hash: str):
         return f'{url}/api/v1/block/height/txhash/{tx_hash}'
 
+    @staticmethod
+    def get_storage(url: str, hex_contract_address: str, hex_key: str):
+        return f'{url}/api/v1/storage/{hex_contract_address}/{hex_key}'
 
-GET_STORAGE = '/api/v1/storage/'
-GET_MERKLE_PROOF = '/api/v1/merkleproof/'
-GET_MEM_POOL_TX_COUNT = '/api/v1/mempool/txcount'
-GET_MEM_POOL_TX_STATE = '/api/v1/mempool/txstate/'
-GET_GRANT_ONG = '/api/v1/grantong'
+    @staticmethod
+    def get_merkle_proof(url: str, tx_hash: str):
+        return f'{url}/api/v1/merkleproof/{tx_hash}'
+
+    @staticmethod
+    def get_mem_pool_tx_count(url: str):
+        return f'{url}/api/v1/mempool/txcount'
+
+    @staticmethod
+    def get_mem_pool_tx_state(url: str, tx_hash: str):
+        return f'{url}/api/v1/mempool/txstate/{tx_hash}'
+
+    @staticmethod
+    def get_grant_ong(url: str, b58_address: str):
+        return f'{url}/api/v1/grantong/{b58_address}'
 
 
 class RestfulClient(object):
@@ -217,6 +230,13 @@ class RestfulClient(object):
             return response
         return response['Result']
 
+    def get_grant_ong(self, b58_address: str, is_full: bool = False):
+        url = RestfulMethod.get_grant_ong(self.__url, b58_address)
+        response = self.__get(url)
+        if is_full:
+            return response
+        return int(response['Result'])
+
     def get_allowance(self, asset: str, b58_from_address: str, b58_to_address: str, is_full: bool = False):
         url = RestfulMethod.get_allowance(self.__url, asset, b58_from_address, b58_to_address)
         response = self.__get(url)
@@ -251,6 +271,13 @@ class RestfulClient(object):
             return response
         return response['Result']
 
+    def get_storage(self, hex_contract_address: str, hex_key: str, is_full: bool = False) -> str or dict:
+        url = RestfulMethod.get_storage(self.__url, hex_contract_address, hex_key)
+        response = self.__get(url)
+        if is_full:
+            return response
+        return response['Result']
+
     def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False):
         url = RestfulMethod.get_transaction(self.__url, tx_hash)
         response = self.__get(url)
@@ -275,3 +302,24 @@ class RestfulClient(object):
         if is_full:
             return response
         return response['Result']
+
+    def get_merkle_proof(self, tx_hash: str, is_full: bool = False):
+        url = RestfulMethod.get_merkle_proof(self.__url, tx_hash)
+        response = self.__get(url)
+        if is_full:
+            return response
+        return response['Result']
+
+    def get_memory_pool_tx_count(self, is_full: bool = False):
+        url = RestfulMethod.get_mem_pool_tx_count(self.__url)
+        response = self.__get(url)
+        if is_full:
+            return response
+        return response['Result']
+
+    def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False) -> List[dict] or dict:
+        url = RestfulMethod.get_mem_pool_tx_state(self.__url, tx_hash)
+        response = self.__get(url)
+        if is_full:
+            return response
+        return response['Result']['State']
