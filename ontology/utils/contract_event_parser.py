@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from typing import List
+
 from ontology.common.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
@@ -61,6 +63,14 @@ class ContractEventParser(object):
             if notify['ContractAddress'] == hex_contract_address:
                 specify_notify_list.append(notify)
         return specify_notify_list
+
+    @staticmethod
+    def get_event_from_event_list_by_contract_address(event_list: list, hex_contract_address: str) -> List[dict]:
+        specify_event_list = list()
+        for event in event_list:
+            if event['ContractAddress'] == hex_contract_address:
+                specify_event_list.append(event)
+        return specify_event_list
 
     @staticmethod
     def get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
