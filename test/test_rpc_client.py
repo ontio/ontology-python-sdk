@@ -6,6 +6,7 @@ import unittest
 
 from random import choice
 
+from ontology.exception.exception import SDKException
 from ontology.network.rpc import RpcClient
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
@@ -122,8 +123,13 @@ class TestRpcClient(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
+    def test_get_grant_ong(self):
+        b58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
+        grant_ong = rpc_client.get_grant_ong(b58_address)
+        self.assertGreaterEqual(grant_ong, 0)
+
     def test_get_allowance(self):
-        base58_address = "AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA"
+        base58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         allowance = rpc_client.get_allowance('ong', base58_address, base58_address)
         self.assertEqual(allowance, '0')
 
@@ -181,9 +187,30 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
 
     def test_get_merkle_proof(self):
-        tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
-        proof = rpc_client.get_merkle_proof(tx_hash)
-        self.assertEqual(proof['Type'], 'MerkleProof')
+        tx_hash_1 = '12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3'
+        merkle_proof_1 = rpc_client.get_merkle_proof(tx_hash_1)
+        self.assertEqual('MerkleProof', merkle_proof_1['Type'])
+        self.assertEqual(0, merkle_proof_1['BlockHeight'])
+        tx_hash_2 = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
+        merkle_proof_2 = rpc_client.get_merkle_proof(tx_hash_2)
+        self.assertEqual('MerkleProof', merkle_proof_2['Type'])
+        self.assertEqual(0, merkle_proof_2['BlockHeight'])
+        tx_hash_3 = '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290'
+        merkle_proof_3 = rpc_client.get_merkle_proof(tx_hash_3)
+        self.assertEqual('MerkleProof', merkle_proof_3['Type'])
+        self.assertEqual(0, merkle_proof_3['BlockHeight'])
+        tx_hash_4 = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
+        merkle_proof_4 = rpc_client.get_merkle_proof(tx_hash_4)
+        self.assertEqual('MerkleProof', merkle_proof_4['Type'])
+        self.assertEqual(0, merkle_proof_4['BlockHeight'])
+        tx_hash_5 = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
+        merkle_proof_5 = rpc_client.get_merkle_proof(tx_hash_5)
+        self.assertEqual('MerkleProof', merkle_proof_5['Type'])
+        self.assertEqual(0, merkle_proof_5['BlockHeight'])
+        tx_hash_6 = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
+        merkle_proof_6 = rpc_client.get_merkle_proof(tx_hash_6)
+        self.assertEqual('MerkleProof', merkle_proof_6['Type'])
+        self.assertEqual(0, merkle_proof_6['BlockHeight'])
 
     def test_send_raw_transaction(self):
         sdk = OntologySdk()
@@ -214,6 +241,33 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(result['Result'], '01')
         self.assertEqual(result['Gas'], 20000)
         self.assertEqual(result['State'], 1)
+
+    def test_get_memory_pool_tx_count(self):
+        tx_count = rpc_client.get_memory_pool_tx_count()
+        self.assertGreaterEqual(tx_count, [0, 0])
+
+    def test_get_memory_pool_tx_state(self):
+        tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
+        try:
+            rpc_client.get_memory_pool_tx_state(tx_hash)
+        except SDKException as e:
+            self.assertIn('unknown transaction', e.args[1])
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
+        sdk = OntologySdk()
+        sdk.rpc.set_address(rpc_address)
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        gas_limit = 20000000
+        gas_price = 500
+        b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        value = 10
+        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        tx_state = rpc_client.get_memory_pool_tx_state(tx_hash)
+        self.assertEqual(1, tx_state[0]['Type'])
+        self.assertEqual(0, tx_state[1]['Type'])
 
 
 if __name__ == '__main__':

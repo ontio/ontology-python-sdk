@@ -9,21 +9,12 @@ from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.network.restful import RestfulClient
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.connect_manager import TEST_RESTFUL_ADDRESS
+from ontology.network.connect_manager import TEST_RESTFUL_ADDRESS, TEST_RPC_ADDRESS
 from ontology.ont_sdk import OntologySdk
+from ontology.utils.contract_data_parser import ContractDataParser
 
 restful_address = choice(TEST_RESTFUL_ADDRESS)
-
 restful_client = RestfulClient(restful_address)
-
-private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-acc = Account(private_key1, SignatureScheme.SHA256withECDSA)
-acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-pub_keys = [acc.get_public_key_bytes(), acc2.get_public_key_bytes(), acc3.get_public_key_bytes()]
-multi_addr = Address.address_from_multi_pub_keys(2, pub_keys)
 
 
 class TestRestfulClient(unittest.TestCase):
@@ -65,7 +56,15 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual(block['Header']['Height'], height)
 
     def test_get_balance(self):
-        base58_address = "ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6"
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
+        acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
+        pub_keys = [acct.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_addr = Address.address_from_multi_pub_keys(2, pub_keys)
+        base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         address_balance = restful_client.get_balance(base58_address)
         try:
             address_balance['ont']
@@ -77,7 +76,7 @@ class TestRestfulClient(unittest.TestCase):
         except KeyError:
             raised = True
             self.assertFalse(raised, 'Exception raised')
-        address_balance = restful_client.get_balance(acc.get_address_base58())
+        address_balance = restful_client.get_balance(acct.get_address_base58())
         try:
             address_balance['ont']
         except KeyError:
@@ -101,6 +100,11 @@ class TestRestfulClient(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
+    def test_get_grant_ong(self):
+        b58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
+        grant_ong = restful_client.get_grant_ong(b58_address)
+        self.assertGreaterEqual(grant_ong, 0)
+
     def test_get_smart_contract(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         contract = restful_client.get_smart_contract(hex_contract_address)
@@ -117,8 +121,15 @@ class TestRestfulClient(unittest.TestCase):
         print(event_list)
         self.assertEqual(0, len(event_list))
 
+    def test_get_storage(self):
+        contract_address = "0100000000000000000000000000000000000000"
+        key = "746f74616c537570706c79"
+        value = restful_client.get_storage(contract_address, key)
+        value = ContractDataParser.to_int(value)
+        self.assertEqual(1000000000, value)
+
     def test_get_allowance(self):
-        base58_address = "AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA"
+        base58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         allowance = restful_client.get_allowance('ong', base58_address, base58_address)
         self.assertEqual(allowance, '0')
 
@@ -158,6 +169,60 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual('01', result['Result'])
         self.assertEqual(20000, result['Gas'])
         self.assertEqual(1, result['State'])
+
+    def test_get_merkle_proof(self):
+        tx_hash_1 = '12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3'
+        merkle_proof_1 = restful_client.get_merkle_proof(tx_hash_1)
+        self.assertEqual('MerkleProof', merkle_proof_1['Type'])
+        self.assertEqual(0, merkle_proof_1['BlockHeight'])
+        tx_hash_2 = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
+        merkle_proof_2 = restful_client.get_merkle_proof(tx_hash_2)
+        self.assertEqual('MerkleProof', merkle_proof_2['Type'])
+        self.assertEqual(0, merkle_proof_2['BlockHeight'])
+        tx_hash_3 = '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290'
+        merkle_proof_3 = restful_client.get_merkle_proof(tx_hash_3)
+        self.assertEqual('MerkleProof', merkle_proof_3['Type'])
+        self.assertEqual(0, merkle_proof_3['BlockHeight'])
+        tx_hash_4 = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
+        merkle_proof_4 = restful_client.get_merkle_proof(tx_hash_4)
+        self.assertEqual('MerkleProof', merkle_proof_4['Type'])
+        self.assertEqual(0, merkle_proof_4['BlockHeight'])
+        tx_hash_5 = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
+        merkle_proof_5 = restful_client.get_merkle_proof(tx_hash_5)
+        self.assertEqual('MerkleProof', merkle_proof_5['Type'])
+        self.assertEqual(0, merkle_proof_5['BlockHeight'])
+        tx_hash_6 = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
+        merkle_proof_6 = restful_client.get_merkle_proof(tx_hash_6)
+        self.assertEqual('MerkleProof', merkle_proof_6['Type'])
+        self.assertEqual(0, merkle_proof_6['BlockHeight'])
+
+    def test_get_memory_pool_tx_count(self):
+        tx_count = restful_client.get_memory_pool_tx_count()
+        self.assertGreaterEqual(tx_count, [0, 0])
+
+    def test_get_memory_poll_tx_state(self):
+        tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
+        try:
+            restful_client.get_memory_pool_tx_state(tx_hash)
+        except SDKException as e:
+            self.assertIn('UNKNOWN TRANSACTION', e.args[1])
+        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
+        sdk = OntologySdk()
+        rpc_address = choice(TEST_RPC_ADDRESS)
+        sdk.rpc.set_address(rpc_address)
+        oep4 = sdk.neo_vm().oep4()
+        oep4.set_contract_address(contract_address)
+        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        gas_limit = 20000000
+        gas_price = 500
+        b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        value = 10
+        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        tx_state = restful_client.get_memory_pool_tx_state(tx_hash)
+        self.assertEqual(1, tx_state[0]['Type'])
+        self.assertEqual(0, tx_state[1]['Type'])
 
 
 if __name__ == '__main__':
