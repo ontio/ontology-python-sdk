@@ -15,8 +15,12 @@ from ontology.exception.exception import SDKException
 class Address(object):
     __COIN_VERSION = b'\x17'
 
-    def __init__(self, value: bytes):
-        self.ZERO = value  # 20 bytes
+    def __init__(self, script_hash: bytes):
+        if not isinstance(script_hash, bytes):
+            raise SDKException(ErrorCode.other_error('Invalid script hash.'))
+        if len(script_hash) != 20:
+            raise SDKException(ErrorCode.other_error('Invalid script hash.'))
+        self.ZERO = script_hash
 
     @staticmethod
     def to_script_hash(byte_script):

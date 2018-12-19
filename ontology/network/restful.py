@@ -39,7 +39,7 @@ class RestfulMethod(object):
 
     @staticmethod
     def get_block_by_hash(url: str, block_hash: str):
-        return f'{url}/api/v1/block/details/hash/{block_hash}?raw=1'
+        return f'{url}/api/v1/block/details/hash/{block_hash}?raw=0'
 
     @staticmethod
     def get_account_balance(url: str, b58_address: str):

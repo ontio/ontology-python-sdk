@@ -15,7 +15,7 @@ from ontology.exception.exception import SDKException
 
 class WalletData(object):
     def __init__(self, name: str = "MyWallet", version: str = "1.1", create_time: str = "", default_id: str = "",
-                 default_address="", scrypt: Scrypt = None, identities: list = None, accounts: list = None):
+                 default_address="", scrypt: Scrypt = None, identities: List[Identity] = None, accounts: list = None):
         if scrypt is None:
             scrypt = Scrypt()
         if not isinstance(scrypt, Scrypt):

@@ -25,7 +25,9 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class WalletManager(object):
-    def __init__(self, scheme=SignatureScheme.SHA256withECDSA):
+    def __init__(self, scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
+        if not isinstance(scheme, SignatureScheme):
+            raise SDKException(ErrorCode.other_error('Invalid signature scheme.'))
         self.scheme = scheme
         self.wallet_file = WalletData()
         self.wallet_in_mem = WalletData()
@@ -33,11 +35,9 @@ class WalletManager(object):
 
     def open_wallet(self, wallet_path: str):
         self.wallet_path = wallet_path
-        if is_file_exist(wallet_path) is False:
-            # create a new wallet file
+        if not is_file_exist(wallet_path):
             self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
             self.save()
-        # wallet file exists now
         self.wallet_file = self.load()
         self.wallet_in_mem = self.wallet_file
         return self.wallet_file
