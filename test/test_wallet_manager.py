@@ -4,6 +4,7 @@
 import os
 import random
 import unittest
+from memory_profiler import profile
 
 from ontology.utils import utils
 from ontology.account.account import Account
@@ -14,6 +15,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class TestWalletManager(unittest.TestCase):
+    @profile(precision=6)
     def test_create_write(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -29,6 +31,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_open_wallet(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -37,6 +40,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_open_cyano_wallet(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'cyano_wallet.json')
@@ -45,6 +49,7 @@ class TestWalletManager(unittest.TestCase):
         account = wm.get_account('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', '1234567890')
         self.assertTrue(isinstance(account, Account))
 
+    @profile(precision=6)
     def test_wallet_data(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'wallet.dat')
@@ -92,6 +97,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(dict_accounts['salt'], 'DqS/T2FmSmYabWdW1vQYzQ==')
         self.assertEqual(dict_accounts['signature_scheme'], 'SHA256withECDSA')
 
+    @profile(precision=6)
     def test_get_account(self):
         wallet_manager = WalletManager()
         password = 'password'
@@ -112,6 +118,7 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(b58_address1, import_acct.get_address_base58())
         self.assertEqual(base64_salt, acct1.salt)
 
+    @profile(precision=6)
     def test_get_accounts(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -125,6 +132,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_set_default_identity_by_index(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -143,6 +151,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_set_default_identity_by_ont_id(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -165,6 +174,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_set_default_account_by_index(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -183,6 +193,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_set_default_account_by_address(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -201,6 +212,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_get_default_account(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -218,6 +230,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_import_identity(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -236,6 +249,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_create_identity_from_pri_key(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -247,6 +261,7 @@ class TestWalletManager(unittest.TestCase):
         wm.write_wallet()
         os.remove(path)
 
+    @profile(precision=6)
     def test_import_account(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
@@ -261,6 +276,7 @@ class TestWalletManager(unittest.TestCase):
         wm.save()
         os.remove(path)
 
+    @profile(precision=6)
     def test_create_account_from_private_key(self):
         wm = WalletManager()
         path = os.path.join(os.getcwd(), 'test.json')
