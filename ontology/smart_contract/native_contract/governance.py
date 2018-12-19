@@ -201,7 +201,7 @@ class Governance(object):
 
     def get_peer_unbind_ong(self, address: str):
         timestamp0 = 1530316800
-        current_height = self.__sdk.rpc.get_block_count()
+        current_height = self.__sdk.rpc.test_get_block_height()
         block = self.__sdk.rpc.get_block_by_height(current_height - 1)
         timestamp = block['Header']['Timestamp'] - timestamp0
         total_stake = self.get_total_stake(address)

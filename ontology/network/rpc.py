@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-import requests
-
 from sys import maxsize
+from typing import List
+
+import requests
 from Cryptodome.Random.random import randint
 
 from ontology.common.error_code import ErrorCode
@@ -184,6 +185,18 @@ class RpcClient(object):
             return response
         return response['result']
 
+    def get_block_height(self, is_full: bool = False) -> int:
+        """
+        This interface is used to get the decimal block height in current network.
+
+        Return:
+            the decimal total height of blocks in current network.
+        """
+        result = self.get_block_count(is_full=True)
+        if is_full:
+            return result
+        return result - 1
+
     def get_current_block_hash(self, is_full: bool = False) -> str:
         """
         This interface is used to get the hexadecimal hash value of the highest block in current network.
@@ -272,7 +285,7 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> dict:
+    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
         """
         This interface is used to get the corresponding smart contract event based on the height of block.
 
@@ -284,9 +297,12 @@ class RpcClient(object):
         response = self.__post(self.__url, payload)
         if is_full:
             return response
-        return response['result']
+        event_list = response['result']
+        if event_list is None:
+            event_list = list()
+        return event_list
 
-    def get_raw_transaction(self, tx_hash: str, is_full: bool = False) -> dict:
+    def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
         This interface is used to get the corresponding transaction information based on the specified hash value.
 
@@ -322,14 +338,10 @@ class RpcClient(object):
         """
         This interface is used to get the corresponding merkle proof based on the specified hexadecimal hash value.
 
-        Args:
-         tx_hash (str):
-            an hexadecimal transaction hash value.
-
-        Return:
-            the merkle proof in dictionary form.
+        :param tx_hash: an hexadecimal transaction hash value.
+        :param is_full:
+        :return: the merkle proof in dictionary form.
         """
-
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MERKLE_PROOF, [tx_hash, 1])
         response = self.__post(self.__url, payload)
         if is_full:
@@ -339,15 +351,10 @@ class RpcClient(object):
     def send_raw_transaction(self, tx: Transaction, is_full: bool = False) -> str:
         """
         This interface is used to send the transaction into the network.
-
-        Args:
-         tx (Transaction):
-            Transaction object in ontology Python SDK.
-
-        Return:
-            a hexadecimal transaction hash value.
+        :param tx: Transaction object in ontology Python SDK.
+        :param is_full:
+        :return: a hexadecimal transaction hash value.
         """
-
         tx_data = tx.serialize(is_hex=True).decode('ascii')
         payload = self.generate_json_rpc_payload(RpcMethod.SEND_TRANSACTION, [tx_data])
         response = self.__post(self.__url, payload)
