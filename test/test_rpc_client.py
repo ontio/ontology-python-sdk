@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import binascii
 import unittest
 
 from random import choice
@@ -126,6 +126,11 @@ class TestRpcClient(unittest.TestCase):
         height = 0
         event = rpc_client.get_smart_contract_event_by_height(height)
         self.assertEqual(event[0]['State'], 1)
+
+        height = rpc_client.get_block_height()
+        height -= 1
+        event = rpc_client.get_smart_contract_event_by_height(height)
+        print(event)
 
     def test_get_transaction_by_tx_hash(self):
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"

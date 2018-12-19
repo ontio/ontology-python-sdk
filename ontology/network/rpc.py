@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-import requests
-
 from sys import maxsize
+from typing import List
+
+import requests
 from Cryptodome.Random.random import randint
 
 from ontology.common.error_code import ErrorCode
@@ -171,7 +172,7 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_block_height(self, is_full: bool = False) -> int:
+    def get_block_count(self, is_full: bool = False) -> int:
         """
         This interface is used to get the decimal block number in current network.
 
@@ -183,6 +184,18 @@ class RpcClient(object):
         if is_full:
             return response
         return response['result']
+
+    def get_block_height(self, is_full: bool = False) -> int:
+        """
+        This interface is used to get the decimal block height in current network.
+
+        Return:
+            the decimal total height of blocks in current network.
+        """
+        result = self.get_block_count(is_full=True)
+        if is_full:
+            return result
+        return result - 1
 
     def get_current_block_hash(self, is_full: bool = False) -> str:
         """
@@ -272,7 +285,7 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> dict:
+    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
         """
         This interface is used to get the corresponding smart contract event based on the height of block.
 
@@ -284,7 +297,10 @@ class RpcClient(object):
         response = self.__post(self.__url, payload)
         if is_full:
             return response
-        return response['result']
+        event_list = response['result']
+        if event_list is None:
+            event_list = list()
+        return event_list
 
     def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
