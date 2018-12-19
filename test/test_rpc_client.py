@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import binascii
+import time
 import unittest
 
 from random import choice
@@ -9,6 +10,7 @@ from ontology.network.rpc import RpcClient
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
+from ontology.utils.contract_event_parser import ContractEventParser
 from ontology.utils.utils import get_random_hex_str
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.network.connect_manager import TEST_RPC_ADDRESS
@@ -16,6 +18,7 @@ from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 
 rpc_address = choice(TEST_RPC_ADDRESS)
+rpc_address = 'http://polaris3.ont.io:20336'
 rpc_client = RpcClient(rpc_address)
 
 private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -122,15 +125,35 @@ class TestRpcClient(unittest.TestCase):
         event = rpc_client.get_smart_contract_event_by_tx_hash(tx_hash)
         self.assertEqual(event['TxHash'], tx_hash)
 
+    def test_a(self):
+        height = 563471
+        event_list = rpc_client.get_smart_contract_event_by_height(height)
+        if event_list is not None:
+            hex_contract_address = '55c494d57ac7cbaad565b5e19ea757dcfe315e29'
+            for event in event_list:
+                notify = ContractEventParser.get_event_from_event_list_by_contract_address(event['Notify'],
+                                                                                           hex_contract_address)
+                print(notify)
+
     def test_get_smart_contract_event_by_block(self):
         height = 0
         event = rpc_client.get_smart_contract_event_by_height(height)
         self.assertEqual(event[0]['State'], 1)
 
-        height = rpc_client.get_block_height()
-        height -= 1
-        event = rpc_client.get_smart_contract_event_by_height(height)
-        print(event)
+    def test_sync_block(self):
+        current_height = rpc_client.get_block_height()
+        start_time = time.perf_counter()
+        while True:
+            end_time = time.perf_counter()
+            if end_time - start_time > 10:
+                break
+            time.sleep(1)
+            height = rpc_client.get_block_height()
+            current_height = (height, current_height)[height - current_height == 1]
+            if height != current_height:
+                current_height = height
+                event_list = rpc_client.get_smart_contract_event_by_height(height)
+                self.assertGreaterEqual(len(event_list), 0)
 
     def test_get_transaction_by_tx_hash(self):
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
