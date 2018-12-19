@@ -221,7 +221,7 @@ class TestRpcClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = Asset.new_transfer_transaction('ont', b58_from_address, b58_to_address, amount, b58_from_address,
+        tx = Asset.new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
                                             gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = rpc_client.send_raw_transaction(tx)
@@ -235,7 +235,7 @@ class TestRpcClient(unittest.TestCase):
         acct2 = Account(pri_key2)
         b58_address_1 = acct.get_address_base58()
         b58_address_2 = acct2.get_address_base58()
-        tx = Asset.new_transfer_transaction('ont', b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
+        tx = Asset.new_transfer_transaction('ong', b58_address_1, b58_address_2, 2, b58_address_1, 20000, 500)
         tx = sdk.sign_transaction(tx, acct)
         result = rpc_client.send_raw_transaction_pre_exec(tx)
         self.assertEqual(result['Result'], '01')

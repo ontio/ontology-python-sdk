@@ -46,7 +46,7 @@ class TestRestfulClient(unittest.TestCase):
         self.assertGreaterEqual(network_id, 0)
 
     def test_get_block_by_hash(self):
-        block_hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
+        block_hash = "1aae9881945b42a30072c608674687c6d9845b29c8c34f91c65081d6bc631868"
         block = restful_client.get_block_by_hash(block_hash)
         self.assertEqual(block['Hash'], block_hash)
 
@@ -118,7 +118,6 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual(10, len(event_list))
         height = 1309737
         event_list = restful_client.get_smart_contract_event_by_height(height)
-        print(event_list)
         self.assertEqual(0, len(event_list))
 
     def test_get_storage(self):
@@ -147,7 +146,7 @@ class TestRestfulClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm().asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, amount,
+        tx = sdk.native_vm().asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
                                                               b58_from_address, gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = restful_client.send_raw_transaction(tx)
@@ -162,7 +161,7 @@ class TestRestfulClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm().asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, amount,
+        tx = sdk.native_vm().asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
                                                               b58_from_address, gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         result = restful_client.send_raw_transaction_pre_exec(tx)
