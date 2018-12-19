@@ -195,7 +195,7 @@ class RpcClient(object):
         result = self.get_block_count(is_full=True)
         if is_full:
             return result
-        return result - 1
+        return result['result'] - 1
 
     def get_current_block_hash(self, is_full: bool = False) -> str:
         """
