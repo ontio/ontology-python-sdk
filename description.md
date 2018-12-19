@@ -22,21 +22,22 @@ This is an API set that allows you to interact with an Ontology nodes.
 
 |       | Main Function                         |
 | :---: | :------------------------------------ |
-| 1     | get_version()                         |
-| 2     | get_balance()                         |
-| 3     | get_allowance()                       |
-| 4     | get_gas_price()                       |
-| 5     | get_network_id()                      |
-| 6     | get_node_count()                      |
-| 7     | test_get_block_height()                     |
-| 8     | get_block_by_hash()                   |
-| 9     | get_block_by_height()                 |
-| 10    | get_current_block_hash()              |
-| 11    | get_block_hash_by_height()            |
-| 12    | get_storage()                         |
-| 13    | get_smart_contract()                  |
-| 14    | get_smart_contract_event_by_tx_hash() |
-| 15    | get_smart_contract_event_by_height()  |
+|   1   | get_version()                         |
+|   2   | get_balance()                         |
+|   3   | get_allowance()                       |
+|   4   | get_gas_price()                       |
+|   5   | get_network_id()                      |
+|   6   | get_node_count()                      |
+|   7   | get_block_count()                     |
+|   8   | get_block_height()                    |
+|   9   | get_block_by_hash()                   |
+|  10   | get_block_by_height()                 |
+|  11   | get_current_block_hash()              |
+|  12   | get_block_hash_by_height()            |
+|  13   | get_storage()                         |
+|  14   | get_smart_contract()                  |
+|  15   | get_smart_contract_event_by_tx_hash() |
+|  16   | get_smart_contract_event_by_height()  |
 
 ### Wallet
 
