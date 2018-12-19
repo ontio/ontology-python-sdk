@@ -2,7 +2,27 @@
 
 <p align="center" class="version">Version 0.1.3</p>
 
-<!-- TOC -->autoauto- [Introduction](#introduction)auto- [Preparations](#preparations)auto- [Interface](#interface)auto    - [Network](#network)auto    - [Wallet](#wallet)auto    - [Account](#account)auto    - [Identity](#identity)auto    - [AccountManager](#accountmanager)auto    - [IdentityManager](#identitymanager)auto    - [Asset](#asset)auto    - [ABI](#abi)auto    - [OEP4](#oep4)auto    - [Utils](#utils)auto- [Contribution](#contribution)auto- [Naming](#naming)auto    - [Overview](#overview)auto    - [Names to Avoid](#names-to-avoid)auto    - [Naming Convention](#naming-convention)auto    - [Guidelines derived from Guido's Recommendations](#guidelines-derived-from-guidos-recommendations)auto- [Site](#site)auto- [License](#license)autoauto<!-- /TOC -->
+- [Introduction](#introduction)
+- [Preparations](#preparations)
+- [Interface](#interface)
+  - [Network](#network)
+  - [Wallet](#wallet)
+  - [Account](#account)
+  - [Identity](#identity)
+  - [AccountManager](#accountmanager)
+  - [IdentityManager](#identitymanager)
+  - [Asset](#asset)
+  - [ABI](#abi)
+  - [OEP4](#oep4)
+  - [Utils](#utils)
+- [Contribution](#contribution)
+- [Naming](#naming)
+  - [Overview](#overview)
+  - [Names to Avoid](#names-to-avoid)
+  - [Naming Convention](#naming-convention)
+  - [Guidelines derived from Guido's Recommendations](#guidelines-derived-from-guidos-recommendations)
+- [Site](#site)
+- [License](#license)
 
 English | [中文](README_CN.md)
 
