@@ -24,6 +24,7 @@ class RpcMethod(object):
     GET_BLOCK_COUNT = "getblockcount"
     GET_BLOCK_HASH = "getblockhash"
     GET_CURRENT_BLOCK_HASH = "getbestblockhash"
+    GET_BLOCK_HEIGHT_BY_HASH = "getblockheightbytxhash"
     GET_BALANCE = "getbalance"
     GET_ALLOWANCE = "getallowance"
     GET_SMART_CONTRACT_EVENT = "getsmartcodeevent"
@@ -65,10 +66,22 @@ class RpcClient(object):
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url])))
         except requests.exceptions.ConnectionError:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url])))
+        try:
+            content = response.content.decode('utf-8')
+        except Exception as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         if response.status_code != 200:
             raise SDKException(ErrorCode.other_error(response.content.decode('utf-8')))
-        response = json.loads(response.content.decode('utf-8'))
-        return response
+        try:
+            content = json.loads(content)
+        except json.decoder.JSONDecodeError as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
+        if content['error'] != 0:
+            if content['result'] != '':
+                raise SDKException(ErrorCode.other_error(content['result']))
+            else:
+                raise SDKException(ErrorCode.other_error(content['desc']))
+        return content
 
     @staticmethod
     def __get(url, payload):
@@ -81,10 +94,22 @@ class RpcClient(object):
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url])))
         except requests.exceptions.ConnectionError:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url])))
+        try:
+            content = response.content.decode('utf-8')
+        except Exception as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         if response.status_code != 200:
-            raise SDKException(ErrorCode.other_error(response.content.decode('utf-8')))
-        response = json.loads(response.content.decode('utf-8'))
-        return response
+            raise SDKException(ErrorCode.other_error(content))
+        try:
+            content = json.loads(content)
+        except json.decoder.JSONDecodeError as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
+        if content['error'] != 0:
+            if content['result'] != '':
+                raise SDKException(ErrorCode.other_error(content['result']))
+            else:
+                raise SDKException(ErrorCode.other_error(content['desc']))
+        return content
 
     def generate_json_rpc_payload(self, method, param=None):
         if param is None:
@@ -172,7 +197,7 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_block_count(self, is_full: bool = False) -> int:
+    def get_block_count(self, is_full: bool = False) -> int or dict:
         """
         This interface is used to get the decimal block number in current network.
 
@@ -185,17 +210,32 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_block_height(self, is_full: bool = False) -> int:
+    def get_block_height(self, is_full: bool = False) -> int or dict:
         """
         This interface is used to get the decimal block height in current network.
 
         Return:
             the decimal total height of blocks in current network.
         """
-        result = self.get_block_count(is_full=True)
+        response = self.get_block_count(is_full=True)
+        response['result'] -= 1
         if is_full:
-            return result
-        return result['result'] - 1
+            return response
+        return response['result']
+
+    def get_block_height_by_tx_hash(self, tx_hash: str, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_HEIGHT_BY_HASH, [tx_hash])
+        response = self.__post(self.__url, payload)
+        if is_full:
+            return response
+        return response['result']
+
+    def get_block_count_by_tx_hash(self, tx_hash: str, is_full: bool = False):
+        response = self.get_block_height_by_tx_hash(tx_hash, is_full=True)
+        response['result'] += 1
+        if is_full:
+            return response
+        return response['result']
 
     def get_current_block_hash(self, is_full: bool = False) -> str:
         """
@@ -301,6 +341,9 @@ class RpcClient(object):
         if event_list is None:
             event_list = list()
         return event_list
+
+    def get_smart_contract_event_by_count(self, count: int, is_full: bool = False) -> List[dict]:
+        return self.get_smart_contract_event_by_height(count - 1, is_full)
 
     def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
