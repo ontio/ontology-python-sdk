@@ -73,7 +73,7 @@ class ContractEventParser(object):
         return specify_event_list
 
     @staticmethod
-    def get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
+    def get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list or dict:
         ContractEventParser.__check_event(event)
         notify_list = ContractEventParser.get_notify_list(event)
         specify_notify_list = list()
