@@ -1,7 +1,9 @@
-<h1 align="center">本体 Python SDK</h1>
+<h1 align="center">本体 Python 软件开发工具包</h1>
 
-<p align="center" class="version">版本： v0.1.3</p>
-
+![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)
+![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
+![pypi-l](https://img.shields.io/pypi/l/ontology-python-sdk.svg)
+![pypi-w](https://img.shields.io/pypi/wheel/ontology-python-sdk.svg)
 - [简介](#简介)
 - [准备](#准备)
 - [接口](#接口)
