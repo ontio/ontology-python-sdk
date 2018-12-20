@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+
 from typing import List
 from sys import maxsize
 from websockets import client
@@ -33,6 +34,8 @@ class WebsocketClient(object):
         self.__ws_client = await client.connect(self.__url)
 
     async def __send_recv(self, msg: dict, is_full: bool):
+        if self.__ws_client is None or self.__ws_client.closed:
+            await self.connect()
         await self.__ws_client.send(json.dumps(msg))
         response = await self.__ws_client.recv()
         response = json.loads(response)
@@ -54,7 +57,7 @@ class WebsocketClient(object):
         msg = dict(Action='getconnectioncount', Id=self.__id, Version='1.0.0')
         return await self.__send_recv(msg, is_full)
 
-    async def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
+    async def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='gettransaction', Id=self.__id, Version='1.0.0', Hash=tx_hash, Raw=0)
@@ -84,14 +87,30 @@ class WebsocketClient(object):
         msg = dict(Action='getblockbyhash', Version='1.0.0', Id=self.__id, Hash=block_hash)
         return await self.__send_recv(msg, is_full)
 
-    async def subscribe(self, contract_address_list: List[str], is_event: bool = False, is_json_block: bool = False,
+    async def subscribe(self, contract_address_list: List[str] or str, is_event: bool = False,
+                        is_json_block: bool = False,
                         is_raw_block: bool = False, is_tx_hash: bool = False, is_full: bool = False) -> dict:
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
+        if isinstance(contract_address_list, str):
+            contract_address_list = [contract_address_list]
         msg = dict(Action='subscribe', Version='1.0.0', Id=self.__id, ConstractsFilter=contract_address_list,
                    SubscribeEvent=is_event, SubscribeJsonBlock=is_json_block, SubscribeRawBlock=is_raw_block,
                    SubscribeBlockTxHashs=is_tx_hash)
         return await self.__send_recv(msg, is_full)
+
+    async def recv_subscribe_info(self, is_full: bool = False):
+        response = await self.__ws_client.recv()
+        response = json.loads(response)
+        if is_full:
+            return response
+        if response['Error'] != 0:
+            raise SDKException(ErrorCode.other_error(response.get('Result', '')))
+        return response.get('Result', dict())
+
+    async def close_connect(self):
+        if isinstance(self.__ws_client, client.WebSocketClientProtocol) and not self.__ws_client.closed:
+            await self.__ws_client.close()
 
     async def send_raw_transaction(self, tx: Transaction, is_full: bool = False):
         tx_data = tx.serialize(is_hex=True).decode('ascii')
