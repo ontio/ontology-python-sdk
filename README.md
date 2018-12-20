@@ -1,8 +1,8 @@
 <h1 align="center">Python SDK For Ontology</h1>
 
-![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)
-![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
 ![pypi-l](https://img.shields.io/pypi/l/ontology-python-sdk.svg)
+![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
+![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)
 ![pypi-w](https://img.shields.io/pypi/wheel/ontology-python-sdk.svg)
 
 - [Introduction](#introduction)
