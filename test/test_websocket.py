@@ -24,14 +24,19 @@ websocket_client.set_address(websocket_address)
 
 
 class TestWebsocketClient(unittest.TestCase):
+    @staticmethod
+    async def heartbeat_case():
+        response = await websocket_client.send_heartbeat()
+        await websocket_client.close_connect()
+        return response
+
     def test_heartbeat(self):
-        response = asyncio.get_event_loop().run_until_complete(websocket_client.send_heartbeat())
+        response = asyncio.get_event_loop().run_until_complete(TestWebsocketClient.heartbeat_case())
         self.assertEqual(None, response['ConstractsFilter'])
         self.assertEqual(False, response['SubscribeEvent'])
         self.assertEqual(False, response['SubscribeJsonBlock'])
         self.assertEqual(False, response['SubscribeRawBlock'])
         self.assertEqual(False, response['SubscribeBlockTxHashs'])
-        websocket_client.close_connect()
 
     @staticmethod
     async def oep4_transfer(hex_contract_address, from_acct, b58_to_address, value):
@@ -60,22 +65,25 @@ class TestWebsocketClient(unittest.TestCase):
         transfer_task = event_loop.create_task(
             TestWebsocketClient.oep4_transfer(hex_contract_address, from_acct, b58_to_address, value))
 
-        response, event = await subscribe_task
-        self.assertEqual([hex_contract_address], response['ConstractsFilter'])
-        self.assertEqual(True, response['SubscribeEvent'])
-        self.assertEqual(False, response['SubscribeJsonBlock'])
-        self.assertEqual(False, response['SubscribeRawBlock'])
-        self.assertEqual(False, response['SubscribeBlockTxHashs'])
-        self.assertEqual(64, len(event['TxHash']))
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
-        notify = ContractDataParser.parser_oep4_transfer_notify(notify)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('transfer', notify['States'][0])
-        self.assertEqual(from_acct.get_address_base58(), notify['States'][1])
-        self.assertEqual(b58_to_address, notify['States'][2])
-        self.assertEqual(value, notify['States'][3])
-        tx_hash = await transfer_task
-        self.assertEqual(64, len(tx_hash))
+        try:
+            response, event = await asyncio.wait_for(subscribe_task, timeout=10)
+            self.assertEqual([hex_contract_address], response['ConstractsFilter'])
+            self.assertEqual(True, response['SubscribeEvent'])
+            self.assertEqual(False, response['SubscribeJsonBlock'])
+            self.assertEqual(False, response['SubscribeRawBlock'])
+            self.assertEqual(False, response['SubscribeBlockTxHashs'])
+            self.assertEqual(64, len(event['TxHash']))
+            notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+            notify = ContractDataParser.parser_oep4_transfer_notify(notify)
+            self.assertEqual(hex_contract_address, notify['ContractAddress'])
+            self.assertEqual('transfer', notify['States'][0])
+            self.assertEqual(from_acct.get_address_base58(), notify['States'][1])
+            self.assertEqual(b58_to_address, notify['States'][2])
+            self.assertEqual(value, notify['States'][3])
+            tx_hash = await transfer_task
+            self.assertEqual(64, len(tx_hash))
+        except asyncio.TimeoutError:
+            pass
         await websocket_client.close_connect()
 
     def test_subscribe(self):
@@ -85,12 +93,12 @@ class TestWebsocketClient(unittest.TestCase):
     @staticmethod
     async def get_connection_count_case():
         response = await websocket_client.get_connection_count()
+        await websocket_client.close_connect()
         return response
 
     def test_get_connection_count(self):
         response = asyncio.get_event_loop().run_until_complete(TestWebsocketClient.get_connection_count_case())
         self.assertGreater(response, 0)
-        websocket_client.close_connect()
 
     @staticmethod
     async def get_smart_contract_event_by_tx_hash_case(tx_hash):
@@ -105,7 +113,6 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(500, response['GasPrice'])
         self.assertEqual(21000000, response['GasLimit'])
         self.assertEqual(208, response['TxType'])
-        websocket_client.close_connect()
 
     @staticmethod
     async def get_block_height_case():
