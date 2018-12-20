@@ -7,7 +7,7 @@ from ontology.crypto.signature_handler import SignatureHandler
 
 from ontology.core.sig import Sig
 from ontology.crypto.key_type import KeyType
-from ontology.rpc.rpc import RpcClient
+from ontology.network.rpc import RpcClient
 from ontology.common import define as Common
 from ontology.account.account import Account
 from ontology.smart_contract.neo_vm import NeoVm
@@ -16,15 +16,21 @@ from ontology.common.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.native_vm import NativeVm
+from ontology.network.connect_manager import ConnectMgr, ConnectType
 from ontology.wallet.wallet_manager import WalletManager
+from ontology.network.websocket import WebsocketClient
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class OntologySdk(object):
     _instance_lock = threading.Lock()
 
-    def __init__(self):
+    def __init__(self, rpc_address: str = '', ws_address: str = ''):
+        self.__rpc_connector = ConnectMgr(rpc_address, ConnectType.RPC)
+        self.__ws_connector = ConnectMgr(ws_address, ConnectType.Websocket)
+        self.__default_connector = None
         self.rpc = RpcClient()
+        self.websocket = WebsocketClient()
         self.wallet_manager = WalletManager()
         self.__native_vm = None
         self.__neo_vm = None
@@ -36,6 +42,23 @@ class OntologySdk(object):
                 if not hasattr(OntologySdk, "_instance"):
                     OntologySdk._instance = object.__new__(cls)
         return OntologySdk._instance
+
+    def set_default_connector(self, connector: ConnectMgr):
+        self.__default_connector = connector
+
+    def default_connector(self):
+        return self.__default_connector
+
+    @property
+    def rpc_connector(self) -> ConnectMgr:
+        return self.__rpc_connector
+
+    @rpc_connector.setter
+    def rpc_connector(self, connector: ConnectMgr):
+        self.__rpc_connector = connector
+
+    def ws_connector(self):
+        return self.__ws_connector
 
     def native_vm(self):
         if self.__native_vm is None:
