@@ -1,4 +1,4 @@
-# Python SDK for Ontology
+# Ontology Python SDK
 
 ![pypi-l](https://img.shields.io/pypi/l/ontology-python-sdk.svg)
 ![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
