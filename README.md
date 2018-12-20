@@ -1,4 +1,4 @@
-<h1 align="center">Python SDK for Ontology</h1>
+<h1 align="center">Ontology Python SDK</h1>
 
 ![pypi-l](https://img.shields.io/pypi/l/ontology-python-sdk.svg)
 ![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
