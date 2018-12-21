@@ -87,7 +87,7 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(len(block_hash), 64)
 
     def test_get_balance(self):
-        base58_address = "ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6"
+        base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         address_balance = rpc_client.get_balance(base58_address)
         try:
             address_balance['ont']
@@ -182,8 +182,8 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(tx['Hash'], tx_hash)
 
     def test_get_smart_contract(self):
-        contract_address = "0239dcf9b4a46f15c5f23f20d52fac916a0bac0d"
-        contract = rpc_client.get_smart_contract(contract_address)
+        hex_contract_address = "0100000000000000000000000000000000000000"
+        contract = rpc_client.get_smart_contract(hex_contract_address)
         self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
 
     def test_get_merkle_proof(self):
@@ -195,22 +195,27 @@ class TestRpcClient(unittest.TestCase):
         merkle_proof_2 = rpc_client.get_merkle_proof(tx_hash_2)
         self.assertEqual('MerkleProof', merkle_proof_2['Type'])
         self.assertEqual(0, merkle_proof_2['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_2['TransactionsRoot'])
         tx_hash_3 = '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290'
         merkle_proof_3 = rpc_client.get_merkle_proof(tx_hash_3)
         self.assertEqual('MerkleProof', merkle_proof_3['Type'])
         self.assertEqual(0, merkle_proof_3['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_3['TransactionsRoot'])
         tx_hash_4 = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
         merkle_proof_4 = rpc_client.get_merkle_proof(tx_hash_4)
         self.assertEqual('MerkleProof', merkle_proof_4['Type'])
         self.assertEqual(0, merkle_proof_4['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_4['TransactionsRoot'])
         tx_hash_5 = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
         merkle_proof_5 = rpc_client.get_merkle_proof(tx_hash_5)
         self.assertEqual('MerkleProof', merkle_proof_5['Type'])
         self.assertEqual(0, merkle_proof_5['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_5['TransactionsRoot'])
         tx_hash_6 = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
         merkle_proof_6 = rpc_client.get_merkle_proof(tx_hash_6)
         self.assertEqual('MerkleProof', merkle_proof_6['Type'])
         self.assertEqual(0, merkle_proof_6['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_6['TransactionsRoot'])
 
     def test_send_raw_transaction(self):
         sdk = OntologySdk()

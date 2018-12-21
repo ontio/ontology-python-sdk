@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
 import asyncio
-import time
 import unittest
 
 from random import choice
@@ -13,9 +11,9 @@ from ontology.account.account import Account
 from ontology.network.websocket import WebsocketClient
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
-from ontology.network.connect_manager import TEST_WS_ADDRESS, TEST_RPC_ADDRESS
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
+from ontology.network.connect_manager import TEST_WS_ADDRESS, TEST_RPC_ADDRESS
 
 remote_rpc_address = choice(TEST_RPC_ADDRESS)
 websocket_address = choice(TEST_WS_ADDRESS)
@@ -101,6 +99,65 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertGreater(response, 0)
 
     @staticmethod
+    async def get_session_count():
+        response = await websocket_client.get_session_count()
+        await websocket_client.close_connect()
+        return response
+
+    def test_get_session_count(self):
+        event_loop = asyncio.get_event_loop()
+        count = event_loop.run_until_complete(TestWebsocketClient.get_session_count())
+        self.assertGreaterEqual(count, 1)
+
+    @staticmethod
+    async def get_balance(b58_address: str):
+        balance = await websocket_client.get_balance(b58_address)
+        return balance
+
+    def test_get_balance(self):
+        b58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
+        event_loop = asyncio.get_event_loop()
+        balance = event_loop.run_until_complete(TestWebsocketClient.get_balance(b58_address))
+        self.assertGreaterEqual(balance['ont'], 1)
+        self.assertGreaterEqual(balance['ong'], 1)
+
+    @staticmethod
+    async def get_storage(hex_contract_address: str, key: str):
+        storage = await websocket_client.get_storage(hex_contract_address, key)
+        await websocket_client.close_connect()
+        return storage
+
+    def test_get_storage(self):
+        hex_contract_address = '0100000000000000000000000000000000000000'
+        key = '746f74616c537570706c79'
+        event_loop = asyncio.get_event_loop()
+        value = event_loop.run_until_complete(TestWebsocketClient.get_storage(hex_contract_address, key))
+        value = ContractDataParser.to_int(value)
+        self.assertEqual(1000000000, value)
+
+    @staticmethod
+    async def get_smart_contract_case(hex_contract_address: str):
+        response = await websocket_client.get_smart_contract(hex_contract_address)
+        await websocket_client.close_connect()
+        return response
+
+    def test_get_smart_contract(self):
+        hex_contract_address = '0100000000000000000000000000000000000000'
+        event_loop = asyncio.get_event_loop()
+        response = event_loop.run_until_complete(TestWebsocketClient.get_smart_contract_case(hex_contract_address))
+        self.assertEqual(True, response['NeedStorage'])
+        self.assertEqual('ONT', response['Name'])
+        self.assertEqual('1.0', response['CodeVersion'])
+        self.assertEqual('Ontology Team', response['Author'])
+        self.assertEqual('contact@ont.io', response['Email'])
+        self.assertEqual('Ontology Network ONT Token', response['Description'])
+        hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
+        response = event_loop.run_until_complete(TestWebsocketClient.get_smart_contract_case(hex_contract_address))
+        self.assertEqual(True, response['NeedStorage'])
+        self.assertEqual('DINGXIN', response['Author'])
+        self.assertEqual('A sample of OEP4', response['Description'])
+
+    @staticmethod
     async def get_smart_contract_event_by_tx_hash_case(tx_hash):
         response = await websocket_client.get_smart_contract_event_by_tx_hash(tx_hash)
         await websocket_client.close_connect()
@@ -110,9 +167,29 @@ class TestWebsocketClient(unittest.TestCase):
         tx_hash = '7bc2dd4693996133c15e6349c3f8dd1edeba2fcd3219c8bc2b854c939337c8ff'
         event_loop = asyncio.get_event_loop()
         response = event_loop.run_until_complete(TestWebsocketClient.get_smart_contract_event_by_tx_hash_case(tx_hash))
-        self.assertEqual(500, response['GasPrice'])
-        self.assertEqual(21000000, response['GasLimit'])
-        self.assertEqual(208, response['TxType'])
+        self.assertEqual(tx_hash, response['TxHash'])
+        self.assertEqual(1, response['State'])
+        self.assertEqual(1, len(response['Notify']))
+
+    @staticmethod
+    async def get_smart_contract_event_by_height_case(height):
+        response = await websocket_client.get_smart_contract_event_by_height(height)
+        await websocket_client.close_connect()
+        return response
+
+    def test_get_smart_contract_event_by_height(self):
+        height = 0
+        event_loop = asyncio.get_event_loop()
+        event_list = event_loop.run_until_complete(TestWebsocketClient.get_smart_contract_event_by_height_case(height))
+        self.assertEqual(10, len(event_list))
+        for tx in event_list:
+            self.assertEqual(64, len(tx['TxHash']))
+            self.assertEqual(1, tx['State'])
+            self.assertEqual(0, tx['GasConsumed'])
+            self.assertTrue(isinstance(tx['Notify'], list))
+        height = 1309737
+        event_list = event_loop.run_until_complete(TestWebsocketClient.get_smart_contract_event_by_height_case(height))
+        self.assertEqual(0, len(event_list))
 
     @staticmethod
     async def get_block_height_case():
@@ -123,6 +200,21 @@ class TestWebsocketClient(unittest.TestCase):
     def test_get_block_height(self):
         height = asyncio.get_event_loop().run_until_complete(TestWebsocketClient.get_block_height_case())
         self.assertGreater(height, 556748)
+
+    @staticmethod
+    async def get_block_height_by_tx_hash_case(tx_hash):
+        response = await websocket_client.get_block_height_by_tx_hash(tx_hash)
+        await websocket_client.close_connect()
+        return response
+
+    def test_get_block_height_by_tx_hash(self):
+        tx_hash = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
+        event_loop = asyncio.get_event_loop()
+        height = event_loop.run_until_complete(TestWebsocketClient.get_block_height_by_tx_hash_case(tx_hash))
+        self.assertEqual(0, height)
+        tx_hash = '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb'
+        height = event_loop.run_until_complete(TestWebsocketClient.get_block_height_by_tx_hash_case(tx_hash))
+        self.assertEqual(1024, height)
 
     @staticmethod
     async def get_block_hash_by_height_case(height):
@@ -186,6 +278,44 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(1, event['State'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+
+    @staticmethod
+    async def get_merkle_proof_case(tx_hash: str):
+        merkle_proof = await websocket_client.get_merkle_proof(tx_hash)
+        await websocket_client.close_connect()
+        return merkle_proof
+
+    def test_get_merkle_proof(self):
+        event_loop = asyncio.get_event_loop()
+        tx_hash_1 = '12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3'
+        merkle_proof_1 = event_loop.run_until_complete(TestWebsocketClient.get_merkle_proof_case(tx_hash_1))
+        self.assertEqual('MerkleProof', merkle_proof_1['Type'])
+        self.assertEqual(0, merkle_proof_1['BlockHeight'])
+        tx_hash_2 = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
+        merkle_proof_2 = event_loop.run_until_complete(TestWebsocketClient.get_merkle_proof_case(tx_hash_2))
+        self.assertEqual('MerkleProof', merkle_proof_2['Type'])
+        self.assertEqual(0, merkle_proof_2['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_2['TransactionsRoot'])
+        tx_hash_3 = '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290'
+        merkle_proof_3 = event_loop.run_until_complete(TestWebsocketClient.get_merkle_proof_case(tx_hash_3))
+        self.assertEqual('MerkleProof', merkle_proof_3['Type'])
+        self.assertEqual(0, merkle_proof_3['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_3['TransactionsRoot'])
+        tx_hash_4 = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
+        merkle_proof_4 = event_loop.run_until_complete(TestWebsocketClient.get_merkle_proof_case(tx_hash_4))
+        self.assertEqual('MerkleProof', merkle_proof_4['Type'])
+        self.assertEqual(0, merkle_proof_4['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_4['TransactionsRoot'])
+        tx_hash_5 = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
+        merkle_proof_5 = event_loop.run_until_complete(TestWebsocketClient.get_merkle_proof_case(tx_hash_5))
+        self.assertEqual('MerkleProof', merkle_proof_5['Type'])
+        self.assertEqual(0, merkle_proof_5['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_5['TransactionsRoot'])
+        tx_hash_6 = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
+        merkle_proof_6 = event_loop.run_until_complete(TestWebsocketClient.get_merkle_proof_case(tx_hash_6))
+        self.assertEqual('MerkleProof', merkle_proof_6['Type'])
+        self.assertEqual(0, merkle_proof_6['BlockHeight'])
+        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_6['TransactionsRoot'])
 
 
 if __name__ == '__main__':
