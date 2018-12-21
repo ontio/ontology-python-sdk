@@ -111,6 +111,11 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual(True, contract['NeedStorage'])
         self.assertEqual('DINGXIN', contract['Author'])
         self.assertEqual('A sample of OEP4', contract['Description'])
+        hex_contract_address = '0100000000000000000000000000000000000000'
+        contract = restful_client.get_smart_contract(hex_contract_address)
+        self.assertEqual(True, contract['NeedStorage'])
+        self.assertEqual('Ontology Team', contract['Author'])
+        self.assertEqual('Ontology Network ONT Token', contract['Description'])
 
     def test_get_smart_contract_event_by_height(self):
         height = 0
