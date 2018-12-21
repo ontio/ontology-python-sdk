@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import binascii
+
 from time import time
 
 from ontology.common.address import Address
@@ -9,13 +11,13 @@ from ontology.common.define import ZERO_ADDRESS
 from ontology.common.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
 class NeoVm(object):
@@ -28,8 +30,24 @@ class NeoVm(object):
     def claim_record(self):
         return ClaimRecord(self.__sdk)
 
+    @staticmethod
+    def avm_code_to_hex_contract_address(avm_code: str):
+        hex_contract_address = Address.address_from_vm_code(avm_code).to_reverse_hex_str()
+        return hex_contract_address
+
+    @staticmethod
+    def avm_code_to_bytes_contract_address(avm_code: str):
+        bytes_contract_address = Address.address_from_vm_code(avm_code).to_bytes()
+        return bytes_contract_address
+
+    @staticmethod
+    def avm_code_to_bytearray_contract_address(avm_code: str):
+        bytearray_contract_address = Address.address_from_vm_code(avm_code).to_bytearray()
+        return bytearray_contract_address
+
     def send_transaction(self, contract_address: str or bytes or bytearray, acct: Account, payer_acct: Account,
-                         gas_limit: int, gas_price: int, func: AbiFunction or InvokeFunction, pre_exec: bool):
+                         gas_limit: int, gas_price: int, func: AbiFunction or InvokeFunction, pre_exec: bool,
+                         is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
         elif isinstance(func, InvokeFunction):
@@ -48,7 +66,7 @@ class NeoVm(object):
                 raise SDKException(ErrorCode.param_err('the data type of contract address is incorrect.'))
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
-            return self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+            return self.__sdk.default_connector.send_raw_transaction_pre_exec(tx, is_full)
         else:
             unix_time_now = int(time())
             params.append(0x67)
@@ -61,7 +79,7 @@ class NeoVm(object):
             self.__sdk.sign_transaction(tx, payer_acct)
             if isinstance(acct, Account) and acct.get_address_base58() != payer_acct.get_address_base58():
                 self.__sdk.add_sign_transaction(tx, acct)
-            return self.__sdk.rpc.send_raw_transaction(tx)
+            return self.__sdk.default_connector.send_raw_transaction(tx, is_full)
 
     @staticmethod
     def make_deploy_transaction(code_str: str, need_storage: bool, name: str, code_version: str, author: str,
