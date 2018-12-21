@@ -6,6 +6,7 @@ from os import path
 from time import sleep
 
 from test import password
+
 from ontology.ont_sdk import OntologySdk
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction

@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
+
 import time
 import unittest
+import binascii
 
+from random import choice
+
+from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.ont_sdk import OntologySdk
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.network.connect_manager import TEST_RPC_ADDRESS
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
-from ontology.utils.utils import deserialize_stack_item, deserialize_hex
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 sdk = OntologySdk()
-remote_rpc_address = 'http://polaris3.ont.io:20336'
+remote_rpc_address = choice(TEST_RPC_ADDRESS)
 local_rpc_address = 'http://localhost:20336'
 sdk.rpc.set_address(remote_rpc_address)
 gas_limit = 20000000
@@ -34,28 +37,32 @@ class TestWalletManager(unittest.TestCase):
         bytearray_contract_address = bytearray(binascii.a2b_hex(contract_address))
         bytearray_contract_address.reverse()
         func = InvokeFunction('name')
-        name = sdk.neo_vm().send_transaction(bytearray_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(bytearray_contract_address, None, None, 0, 0, func, True)
+        name = result['Result']
         name = ContractDataParser.to_utf8_str(name)
         self.assertEqual('DXToken', name)
 
     def test_oep4_symbol(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('symbol')
-        symbol = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        symbol = result['Result']
         symbol = ContractDataParser.to_utf8_str(symbol)
         self.assertEqual('DX', symbol)
 
     def test_oep4_decimal(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('decimals')
-        decimals = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        decimals = result['Result']
         decimals = ContractDataParser.to_int(decimals)
         self.assertEqual(10, decimals)
 
     def test_oep4_total_supply(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('totalSupply')
-        total_supply = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        total_supply = result['Result']
         total_supply = ContractDataParser.to_int(total_supply)
         self.assertEqual(10000000000000000000, total_supply)
 
@@ -64,7 +71,8 @@ class TestWalletManager(unittest.TestCase):
         func = InvokeFunction('balanceOf')
         bytes_address = acct1.get_address().to_bytes()
         func.set_params_value(bytes_address)
-        balance = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        balance = result['Result']
         balance = ContractDataParser.to_int(balance)
         self.assertGreater(balance, 100)
 
@@ -196,6 +204,39 @@ class TestWalletManager(unittest.TestCase):
         states[1][1][2] = ContractDataParser.to_int(states[1][1][2])
         self.assertEqual(100, states[1][1][2])
 
+    def test_notify_pre_exec(self):
+        bool_msg = True
+        int_msg = 1024
+        list_msg = [1, 1024, 2048]
+        str_msg = 'Hello'
+        bytes_address_msg = acct1.get_address().to_bytes()
+        hex_contract_address = '4855735ffadad50e7000d73e1c4e96f38d225f70'
+        notify_args = InvokeFunction('notify_args')
+        notify_args.set_params_value(bool_msg, int_msg, list_msg, str_msg, bytes_address_msg)
+        rpc_address = 'http://polaris5.ont.io:20336'
+        sdk.set_rpc_address(rpc_address)
+        response = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, notify_args, True)
+        sdk.set_rpc_address(remote_rpc_address)
+        response['Result'] = ContractDataParser.to_bool(response['Result'])
+        self.assertEqual(1, response['State'])
+        self.assertEqual(20000, response['Gas'])
+        self.assertEqual(True, response['Result'])
+        notify = response['Notify'][0]
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        states = notify['States']
+        states[0] = ContractDataParser.to_utf8_str(states[0])
+        self.assertEqual('notify args', states[0])
+        states[1] = ContractDataParser.to_bool(states[1])
+        self.assertEqual(True, states[1])
+        states[2] = ContractDataParser.to_int(states[2])
+        self.assertEqual(int_msg, states[2])
+        states[3] = ContractDataParser.to_int_list(states[3])
+        self.assertEqual(list_msg, states[3])
+        states[4] = ContractDataParser.to_utf8_str(states[4])
+        self.assertEqual(str_msg, states[4])
+        states[5] = ContractDataParser.to_b58_address(states[5])
+        self.assertEqual(acct1.get_address_base58(), states[5])
+
     def test_notify(self):
         hex_contract_address = '6690b6638251be951dded8c537678200a470c679'
         notify_args = InvokeFunction('testHello')
@@ -242,14 +283,16 @@ class TestWalletManager(unittest.TestCase):
         dict_msg = {'key': 'value'}
         func = InvokeFunction('testMap')
         func.set_params_value(dict_msg)
-        dict_value = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        dict_value = result['Result']
         dict_value = ContractDataParser.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
         list_value = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
         dict_msg = {'key': list_value}
         func = InvokeFunction('testMap')
         func.set_params_value(dict_msg)
-        dict_value = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        dict_value = result['Result']
         dict_value = ContractDataParser.to_int_list(dict_value)
         self.assertEqual(list_value, dict_value)
 
@@ -258,7 +301,8 @@ class TestWalletManager(unittest.TestCase):
         key = 'key'
         func = InvokeFunction('testGetMap')
         func.set_params_value(key)
-        dict_value = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        dict_value = result['Result']
         dict_value = ContractDataParser.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
 
@@ -286,7 +330,8 @@ class TestWalletManager(unittest.TestCase):
         key = 'key'
         func = InvokeFunction('testGetMapInMap')
         func.set_params_value(key)
-        value = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        value = result['Result']
         value = ContractDataParser.to_utf8_str(value)
         self.assertEqual('value', value)
 

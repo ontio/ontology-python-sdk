@@ -26,6 +26,22 @@ class TestAddress(unittest.TestCase):
         decode_address = Address.b58decode(b58_address).to_bytes()
         self.assertEqual(rand_code, decode_address)
 
+    def test_to_hex_str(self):
+        avm_code = '58c56b6a00527ac46a51527ac46a00c30548656c6c6f9c6416006a51c300c36a52527ac46a52c3650b006c' \
+                   '756661006c756655c56b6a00527ac46a00c3681253797374656d2e52756e74696d652e4c6f6761516c7566'
+        hex_address = Address.address_from_vm_code(avm_code).to_hex_str()
+        self.assertEqual('d6686ea70162643870ee26bd7714e23271e79b1d', hex_address)
+
+    def test_to_reverse_hex_str(self):
+        avm_code = '58c56b6a00527ac46a51527ac46a00c30548656c6c6f9c6416006a51c300c36a52527ac46a52c3650b006c' \
+                   '756661006c756655c56b6a00527ac46a00c3681253797374656d2e52756e74696d652e4c6f6761516c7566'
+        hex_contract_address = Address.address_from_vm_code(avm_code).to_reverse_hex_str()
+        self.assertEqual('1d9be77132e21477bd26ee7038646201a76e68d6', hex_contract_address)
+        hex_contract_address = Address.address_from_vm_code(avm_code).to_reverse_hex_str()
+        self.assertEqual('1d9be77132e21477bd26ee7038646201a76e68d6', hex_contract_address)
+        hex_contract_address = Address.address_from_vm_code(avm_code).to_reverse_hex_str()
+        self.assertEqual('1d9be77132e21477bd26ee7038646201a76e68d6', hex_contract_address)
+
 
 if __name__ == '__main__':
     unittest.main()
