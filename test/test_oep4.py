@@ -1,23 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
-import json
+
 import time
 import unittest
+import binascii
 
+from os import path
+from random import choice
+
+from test import password
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.network.connect_manager import TEST_RPC_ADDRESS
 
-remote_rpc_address = 'http://polaris3.ont.io:20336'
-local_rpc_address = 'http://localhost:20336'
+sdk = OntologySdk()
+remote_rpc_address = choice(TEST_RPC_ADDRESS)
+
+wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
+wallet_manager = sdk.wallet_manager
+wallet_manager.open_wallet(wallet_path)
+acct1 = wallet_manager.get_account('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', password)
+acct2 = wallet_manager.get_account('AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve', password)
+acct3 = wallet_manager.get_account('Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1', password)
+acct4 = wallet_manager.get_account('AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe', password)
+wallet_manager.save()
 
 
 class TestOep4(unittest.TestCase):
     def test_set_contract_address(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '85848b5ec3b15617e396bdd62cb49575738dd413'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -25,7 +39,7 @@ class TestOep4(unittest.TestCase):
 
     def test_get_name(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -33,7 +47,7 @@ class TestOep4(unittest.TestCase):
 
     def test_get_symbol(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -41,7 +55,7 @@ class TestOep4(unittest.TestCase):
 
     def test_get_decimal(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address1 = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address1)
@@ -55,7 +69,7 @@ class TestOep4(unittest.TestCase):
 
     def test_init(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -66,12 +80,12 @@ class TestOep4(unittest.TestCase):
         tx_hash = oep4.init(acct, acct, gas_limit, gas_price)
         self.assertEqual(len(tx_hash), 64)
         time.sleep(6)
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify'][0]
+        notify = sdk.default_connector.get_smart_contract_event_by_tx_hash(tx_hash)['Notify'][0]
         self.assertEqual('Already initialized!', bytes.fromhex(notify['States']).decode())
 
     def test_get_total_supply(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -79,7 +93,7 @@ class TestOep4(unittest.TestCase):
 
     def test_transfer(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -94,7 +108,7 @@ class TestOep4(unittest.TestCase):
 
     def test_balance_of(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -107,7 +121,7 @@ class TestOep4(unittest.TestCase):
 
     def test_transfer_multi(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -146,10 +160,10 @@ class TestOep4(unittest.TestCase):
         tx_hash = oep4.transfer_multi(transfer_list, signers[0], signers, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         time.sleep(6)
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            event = sdk.default_connector.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][:-1]
             self.assertEqual(len(transfer_list), len(notify))
             for index in range(len(notify)):
@@ -166,7 +180,7 @@ class TestOep4(unittest.TestCase):
 
     def test_approve(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -183,10 +197,10 @@ class TestOep4(unittest.TestCase):
         tx_hash = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, gas_limit, gas_price)
         self.assertEqual(len(tx_hash), 64)
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         time.sleep(6)
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            event = sdk.default_connector.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
             states = notify['States']
             self.assertEqual('approval', bytes.fromhex(states[0]).decode())
@@ -202,7 +216,7 @@ class TestOep4(unittest.TestCase):
 
     def test_allowance(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -217,7 +231,7 @@ class TestOep4(unittest.TestCase):
 
     def test_transfer_from(self):
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm().oep4()
         oep4.set_contract_address(contract_address)
@@ -241,10 +255,10 @@ class TestOep4(unittest.TestCase):
                                      gas_price)
         self.assertEqual(64, len(tx_hash))
         sdk = OntologySdk()
-        sdk.set_rpc(remote_rpc_address)
+        sdk.set_rpc_address(remote_rpc_address)
         time.sleep(6)
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            event = sdk.rpc_connector.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
             self.assertEqual(2, len(notify))
             self.assertEqual('transfer', bytes.fromhex(notify['States'][0]).decode())
