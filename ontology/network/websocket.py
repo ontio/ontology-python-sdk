@@ -3,14 +3,15 @@
 
 import json
 
-from typing import List
 from sys import maxsize
+from typing import List
 from websockets import client
 from Cryptodome.Random.random import randint
 
 from ontology.common.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data_parser import ContractDataParser
 
 
 class WebsocketClient(object):
@@ -32,6 +33,10 @@ class WebsocketClient(object):
 
     async def connect(self):
         self.__ws_client = await client.connect(self.__url)
+
+    async def close_connect(self):
+        if isinstance(self.__ws_client, client.WebSocketClientProtocol) and not self.__ws_client.closed:
+            await self.__ws_client.close()
 
     async def __send_recv(self, msg: dict, is_full: bool):
         if self.__ws_client is None or self.__ws_client.closed:
@@ -57,16 +62,65 @@ class WebsocketClient(object):
         msg = dict(Action='getconnectioncount', Id=self.__id, Version='1.0.0')
         return await self.__send_recv(msg, is_full)
 
+    async def get_session_count(self, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getsessioncount', Id=self.__id, Version='1.0.0')
+        return await self.__send_recv(msg, is_full)
+
+    async def get_balance(self, b58_address: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getbalance', Id=self.__id, Version='1.0.0', Addr=b58_address)
+        response = await self.__send_recv(msg, is_full=True)
+        response['Result'] = dict((k, int(v)) for k, v in response['Result'].items())
+        if is_full:
+            return response
+        return response['Result']
+
+    async def get_merkle_proof(self, tx_hash: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getmerkleproof', Id=self.__id, Version='1.0.0', Hash=tx_hash, Raw=0)
+        return await self.__send_recv(msg, is_full)
+
+    async def get_storage(self, hex_contract_address: str, key: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getstorage', Id=self.__id, Version='1.0.0', Hash=hex_contract_address, Key=key)
+        return await self.__send_recv(msg, is_full)
+
+    async def get_smart_contract(self, hex_contract_address: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getcontract', Id=self.__id, Version='1.0.0', Hash=hex_contract_address, Raw=0)
+        response = await self.__send_recv(msg, is_full=True)
+        if is_full:
+            return response
+        return response['Result']
+
     async def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
-        msg = dict(Action='gettransaction', Id=self.__id, Version='1.0.0', Hash=tx_hash, Raw=0)
+        msg = dict(Action='getsmartcodeeventbyhash', Id=self.__id, Version='1.0.0', Hash=tx_hash, Raw=0)
+        return await self.__send_recv(msg, is_full)
+
+    async def get_smart_contract_event_by_height(self, height: int, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getsmartcodeeventbyheight', Id=self.__id, Version='1.0.0', Height=height)
         return await self.__send_recv(msg, is_full)
 
     async def get_block_height(self, is_full: bool = False) -> dict:
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getblockheight', Id=self.__id, Version='1.0.0')
+        return await self.__send_recv(msg, is_full)
+
+    async def get_block_height_by_tx_hash(self, tx_hash: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getblockheightbytxhash', Id=self.__id, Version='1.0.0', Hash=tx_hash)
         return await self.__send_recv(msg, is_full)
 
     async def get_block_hash_by_height(self, height: int, is_full: bool = False):
@@ -107,10 +161,6 @@ class WebsocketClient(object):
         if response['Error'] != 0:
             raise SDKException(ErrorCode.other_error(response.get('Result', '')))
         return response.get('Result', dict())
-
-    async def close_connect(self):
-        if isinstance(self.__ws_client, client.WebSocketClientProtocol) and not self.__ws_client.closed:
-            await self.__ws_client.close()
 
     async def send_raw_transaction(self, tx: Transaction, is_full: bool = False):
         tx_data = tx.serialize(is_hex=True).decode('ascii')
