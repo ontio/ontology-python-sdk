@@ -1,36 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
-import json
-import time
+
 import unittest
+from os import path
+from time import sleep
 
+from test import password
 from ontology.ont_sdk import OntologySdk
-from ontology.common.address import Address
-from ontology.account.account import Account
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.abi.parameter import Parameter
+from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
-rpc_address = 'http://polaris3.ont.io:20336'
-# rpc_address = 'http://127.0.0.1:20336'
 sdk = OntologySdk()
-sdk.set_rpc(rpc_address)
+sdk.rpc_connector.connect_to_test_net()
 
-private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-private_key4 = 'f9d2d30ffb22dffdf4f14ad6f1303460efc633ea8a3014f638eaa19c259bada1'
-acct1 = Account(private_key, SignatureScheme.SHA256withECDSA)
-acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-acct4 = Account(private_key4, SignatureScheme.SHA256withECDSA)
+wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
+wallet_manager = sdk.wallet_manager
+wallet_manager.open_wallet(wallet_path)
+acct1 = wallet_manager.get_account('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', password)
+acct2 = wallet_manager.get_account('AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve', password)
+acct3 = wallet_manager.get_account('Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1', password)
+acct4 = wallet_manager.get_account('AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe', password)
+wallet_manager.save()
 
 
 class TestNeoVm(unittest.TestCase):
-
     def test_big_int(self):
         num_dec = 135241956301000000
         bit_length = 57
@@ -41,7 +34,7 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual(num_hex_str_big, num_dec.to_bytes(8, 'big').hex())
 
     def test_get_balance(self):
-        acct_balance = sdk.rpc.get_balance(acct1.get_address_base58())
+        acct_balance = sdk.rpc_connector.get_balance(acct1.get_address_base58())
         try:
             acct_balance['ont']
         except KeyError:
@@ -53,7 +46,7 @@ class TestNeoVm(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
-        acct_balance_2 = sdk.rpc.get_balance(acct1.get_address_base58())
+        acct_balance_2 = sdk.rpc_connector.get_balance(acct1.get_address_base58())
         try:
             acct_balance_2['ont']
         except KeyError:
@@ -65,7 +58,7 @@ class TestNeoVm(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
-        acct_balance_3 = sdk.rpc.get_balance(acct1.get_address_base58())
+        acct_balance_3 = sdk.rpc_connector.get_balance(acct1.get_address_base58())
         try:
             acct_balance_3['ont']
         except KeyError:
@@ -77,7 +70,7 @@ class TestNeoVm(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
-        acct_balance_4 = sdk.rpc.get_balance(acct1.get_address_base58())
+        acct_balance_4 = sdk.rpc_connector.get_balance(acct1.get_address_base58())
         try:
             acct_balance_4['ont']
         except KeyError:
@@ -100,46 +93,47 @@ class TestNeoVm(unittest.TestCase):
         self.assertGreaterEqual(int(acct4_unbound_ong), 0)
 
     def test_address_from_vm_code(self):
-        code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
-               '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
-               '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
-        code_hex_address = '362cb5608b3eca61d4846591ebb49688900fedd0'
-        code_address = Address.address_from_vm_code(code)
-        self.assertEqual(code_address.to_reverse_hex_str(), code_hex_address)
+        avm_code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
+                   '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
+                   '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
+        hex_contract_address = sdk.neo_vm().avm_code_to_hex_contract_address(avm_code)
+        self.assertEqual('362cb5608b3eca61d4846591ebb49688900fedd0', hex_contract_address)
 
     def test_make_deploy_transaction(self):
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
                '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
-        payer = acct2
+        payer = acct1
         b58_payer = payer.get_address_base58()
         gas_limit = 20000000
         gas_price = 500
         tx = sdk.neo_vm().make_deploy_transaction(code, True, 'name', 'v1.0', 'author', 'email', 'desp', b58_payer,
                                                   gas_limit, gas_price)
         sdk.sign_transaction(tx, payer)
-        res = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(len(res), 64)
+        tx_hash = sdk.rpc_connector.send_raw_transaction(tx)
+        self.assertEqual(len(tx_hash), 64)
 
     def test_invoke_transaction(self):
-        code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
-               '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
-               '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
-        abi_str = '{"hash":"0x362cb5608b3eca61d4846591ebb49688900fedd0","entrypoint":"Main","functions":[{' \
-                  '"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],' \
-                  '"returntype":"Any"},{"name":"Hello","parameters":[{"name":"msg","type":"String"}],' \
-                  '"returntype":"Void"}],"events":[]} '
-        abi = json.loads(abi_str)
-        abi_info = AbiInfo(abi['hash'], abi['entrypoint'], abi['functions'], abi['events'])
-        func = abi_info.get_function("Main")
-        func.set_params_value("Hello", "args")
-        contract_address = Address.address_from_vm_code(code).to_bytes()
-        res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
-        self.assertEqual(res, '00')
-        func = abi_info.get_function("Hello")
-        func.set_params_value("value")
-        res = sdk.neo_vm().send_transaction(contract_address, None, None, 0, 0, func, True)
-        self.assertEqual(res, '01')
+        avm_code = '58c56b6a00527ac46a51527ac46a00c30548656c6c6f9c6416006a51c300c36a52527ac46a52c3650b006c756' \
+                   '661006c756655c56b6a00527ac46a00c3681553797374656d2e52756e74696d652e4e6f7469667961516c7566'
+        hex_contract_address = sdk.neo_vm().avm_code_to_hex_contract_address(avm_code)
+        self.assertEqual('39f3fb644842c808828817bd73da0946d99f237f', hex_contract_address)
+        hello = InvokeFunction('Hello')
+        hello.set_params_value('Ontology')
+        response = sdk.neo_vm().send_transaction(hex_contract_address, None, None, 0, 0, hello, True)
+        self.assertEqual(1, response['State'])
+        result = response['Result']
+        result = ContractDataParser.to_bool(result)
+        self.assertEqual(True, result)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.neo_vm().send_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, hello, False)
+        sleep(6)
+        response = sdk.default_connector.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = response['Notify'][0]
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        notify['States'] = ContractDataParser.to_utf8_str(notify['States'])
+        self.assertEqual('Ontology', notify['States'])
 
 
 if __name__ == '__main__':
