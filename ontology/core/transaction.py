@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
-import json
-from binascii import b2a_hex, a2b_hex
 
-from ontology.common.address import Address
+import json
+import binascii
+
+from typing import List
+
 from ontology.core.sig import Sig
+from ontology.common import define
 from ontology.crypto.digest import Digest
+from ontology.common.address import Address
+from ontology.account.account import Account
+from ontology.core.program import ProgramBuilder
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
@@ -14,7 +21,7 @@ from ontology.io.memory_stream import StreamManager
 
 class Transaction(object):
     def __init__(self, version=0, tx_type=None, nonce=None, gas_price=None, gas_limit=None, payer=None, payload=None,
-                 attributes=None, sigs=None, hash=None):
+                 attributes=None, sigs: List[Sig] = None):
         self.version = version
         self.tx_type = tx_type
         self.nonce = nonce
@@ -23,7 +30,7 @@ class Transaction(object):
         self.payer = payer  # 20 bytes
         self.payload = payload
         self.attributes = attributes
-        self.sigs = sigs  # Sig class array
+        self.sigs = sigs
 
     def __iter__(self):
         data = dict()
@@ -64,16 +71,16 @@ class Transaction(object):
 
     def hash256_explorer(self) -> str:
         tx_serial = self.serialize_unsigned()
-        tx_serial = a2b_hex(tx_serial)
+        tx_serial = binascii.a2b_hex(tx_serial)
         digest = Digest.hash256(tx_serial)
         if isinstance(digest, bytes):
-            return b2a_hex(digest[::-1]).decode('ascii')
+            return binascii.b2a_hex(digest[::-1]).decode('ascii')
         else:
             return ''
 
     def hash256_bytes(self) -> bytes:
         tx_serial = self.serialize_unsigned()
-        tx_serial = a2b_hex(tx_serial)
+        tx_serial = binascii.a2b_hex(tx_serial)
         r = Digest.hash256(tx_serial, False)
         if isinstance(r, bytes):
             return r
@@ -82,7 +89,7 @@ class Transaction(object):
 
     def hash256_hex(self) -> str:
         tx_serial = self.serialize_unsigned()
-        tx_serial = a2b_hex(tx_serial)
+        tx_serial = binascii.a2b_hex(tx_serial)
         r = Digest.hash256(tx_serial, True)
         if isinstance(r, str):
             return r
@@ -124,3 +131,60 @@ class Transaction(object):
         for i in range(0, sigs_len):
             tx.sigs.append(Sig.deserialize(reader))
         return tx
+
+    def sign_transaction(self, signer: Account):
+        """
+        This interface is used to sign the transaction.
+
+        :param signer: an Account object which will sign the transaction.
+        :return: a Transaction object which has been signed.
+        """
+        tx_hash = self.hash256_bytes()
+        sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
+        sig = [Sig([signer.get_public_key_bytes()], 1, [sig_data])]
+        self.sigs = sig
+
+    def add_sign_transaction(self, signer: Account):
+        """
+        This interface is used to add signature into the transaction.
+
+        :param signer: an Account object which will sign the transaction.
+        :return: a Transaction object which has been signed.
+        """
+        if self.sigs is None or len(self.sigs) == 0:
+            self.sigs = []
+        elif len(self.sigs) >= define.TX_MAX_SIG_SIZE:
+            raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
+        tx_hash = self.hash256_bytes()
+        sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
+        sig = Sig([signer.serialize_public_key()], 1, [sig_data])
+        self.sigs.append(sig)
+
+    def add_multi_sign_transaction(self, m: int, pub_keys: list, signer: Account):
+        """
+        This interface is used to generate an Transaction object which has multi signature.
+
+        :param tx: a Transaction object which will be signed.
+        :param m: the amount of signer.
+        :param pub_keys: a list of public keys.
+        :param signer: an Account object which will sign the transaction.
+        :return: a Transaction object which has been signed.
+        """
+        pub_keys = ProgramBuilder.sort_publickeys(pub_keys)
+        tx_hash = self.hash256_bytes()
+        sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
+        if self.sigs is None or len(self.sigs) == 0:
+            self.sigs = []
+        elif len(self.sigs) >= define.TX_MAX_SIG_SIZE:
+            raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
+        else:
+            for i in range(len(self.sigs)):
+                if self.sigs[i].public_keys == pub_keys:
+                    if len(self.sigs[i].sig_data) + 1 > len(pub_keys):
+                        raise SDKException(ErrorCode.param_err('too more sigData'))
+                    if self.sigs[i].M != m:
+                        raise SDKException(ErrorCode.param_err('M error'))
+                    self.sigs[i].sig_data.append(sig_data)
+                    return
+        sig = Sig(pub_keys, m, [sig_data])
+        self.sigs.append(sig)
