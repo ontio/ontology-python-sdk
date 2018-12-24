@@ -34,7 +34,7 @@ class TestWalletManager(unittest.TestCase):
         bytearray_contract_address = bytearray(binascii.a2b_hex(contract_address))
         bytearray_contract_address.reverse()
         func = InvokeFunction('name')
-        result = sdk.neo_vm.send_transaction(bytearray_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(bytearray_contract_address, None, None, 0, 0, func, True)
         name = result['Result']
         name = ContractDataParser.to_utf8_str(name)
         self.assertEqual('DXToken', name)
@@ -42,7 +42,7 @@ class TestWalletManager(unittest.TestCase):
     def test_oep4_symbol(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('symbol')
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         symbol = result['Result']
         symbol = ContractDataParser.to_utf8_str(symbol)
         self.assertEqual('DX', symbol)
@@ -50,7 +50,7 @@ class TestWalletManager(unittest.TestCase):
     def test_oep4_decimal(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('decimals')
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         decimals = result['Result']
         decimals = ContractDataParser.to_int(decimals)
         self.assertEqual(10, decimals)
@@ -58,7 +58,7 @@ class TestWalletManager(unittest.TestCase):
     def test_oep4_total_supply(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('totalSupply')
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         total_supply = result['Result']
         total_supply = ContractDataParser.to_int(total_supply)
         self.assertEqual(10000000000000000000, total_supply)
@@ -68,7 +68,7 @@ class TestWalletManager(unittest.TestCase):
         func = InvokeFunction('balanceOf')
         bytes_address = acct1.get_address().to_bytes()
         func.set_params_value(bytes_address)
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         balance = result['Result']
         balance = ContractDataParser.to_int(balance)
         self.assertGreater(balance, 100)
@@ -80,7 +80,7 @@ class TestWalletManager(unittest.TestCase):
         bytes_to_address = acct2.get_address().to_bytes()
         value = 1
         func.set_params_value(bytes_from_address, bytes_to_address, value)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -101,7 +101,7 @@ class TestWalletManager(unittest.TestCase):
         bytes_spender_address = acct2.get_address().to_bytes()
         amount = 10
         func.set_params_value(bytes_owner_address, bytes_spender_address, amount)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -127,7 +127,7 @@ class TestWalletManager(unittest.TestCase):
         transfer2 = [bytes_from_address2, bytes_to_address2, value2]
         func = InvokeFunction('transferMulti')
         func.set_params_value(transfer1, transfer2)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states_list = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -156,7 +156,7 @@ class TestWalletManager(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi')
         func.set_params_value(transfer_list)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -181,7 +181,7 @@ class TestWalletManager(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi_args')
         func.set_params_value(transfer_1, transfer_2)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -212,7 +212,7 @@ class TestWalletManager(unittest.TestCase):
         notify_args.set_params_value(bool_msg, int_msg, list_msg, str_msg, bytes_address_msg)
         rpc_address = 'http://polaris5.ont.io:20336'
         sdk.set_rpc_address(rpc_address)
-        response = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, notify_args, True)
+        response = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, notify_args, True)
         sdk.rpc.connect_to_test_net()
         response['Result'] = ContractDataParser.to_bool(response['Result'])
         self.assertEqual(1, response['State'])
@@ -243,7 +243,7 @@ class TestWalletManager(unittest.TestCase):
         str_msg = 'Hello'
         bytes_address_msg = acct1.get_address().to_bytes()
         notify_args.set_params_value(bool_msg, int_msg, bytes_msg, str_msg, bytes_address_msg)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, notify_args,
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, notify_args,
                                                 False)
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -266,7 +266,7 @@ class TestWalletManager(unittest.TestCase):
         list_msg = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
         func = InvokeFunction('testList')
         func.set_params_value(list_msg)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -280,7 +280,7 @@ class TestWalletManager(unittest.TestCase):
         dict_msg = {'key': 'value'}
         func = InvokeFunction('testMap')
         func.set_params_value(dict_msg)
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         dict_value = result['Result']
         dict_value = ContractDataParser.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
@@ -288,7 +288,7 @@ class TestWalletManager(unittest.TestCase):
         dict_msg = {'key': list_value}
         func = InvokeFunction('testMap')
         func.set_params_value(dict_msg)
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         dict_value = result['Result']
         dict_value = ContractDataParser.to_int_list(dict_value)
         self.assertEqual(list_value, dict_value)
@@ -298,7 +298,7 @@ class TestWalletManager(unittest.TestCase):
         key = 'key'
         func = InvokeFunction('testGetMap')
         func.set_params_value(key)
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         dict_value = result['Result']
         dict_value = ContractDataParser.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
@@ -313,7 +313,7 @@ class TestWalletManager(unittest.TestCase):
         dict_msg = {'key': dict_value, 'key1': int_value, 'key2': str_value, 'key3': bool_value, 'key4': list_value}
         func = InvokeFunction('testMapInMap')
         func.set_params_value(dict_msg)
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -327,7 +327,7 @@ class TestWalletManager(unittest.TestCase):
         key = 'key'
         func = InvokeFunction('testGetMapInMap')
         func.set_params_value(key)
-        result = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
         value = result['Result']
         value = ContractDataParser.to_utf8_str(value)
         self.assertEqual('value', value)

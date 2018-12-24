@@ -4,11 +4,8 @@
 import asyncio
 import unittest
 
-from random import choice
-
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
-from ontology.network.websocket import WebsocketClient
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
@@ -277,6 +274,22 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(1, event['State'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+
+    def test_send_raw_transaction_pre_exec(self):
+        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
+        b58_from_address = acct.get_address_base58()
+        b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
+        amount = 1
+        gas_price = 500
+        gas_limit = 20000
+        tx = Asset.new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
+                                            gas_limit, gas_price)
+        tx.sign_transaction(acct)
+        event_loop = asyncio.get_event_loop()
+        response = event_loop.run_until_complete(websocket_client.send_raw_transaction_pre_exec(tx))
+        self.assertEqual('01', response['Result'])
+        self.assertEqual(1, response['State'])
 
     @staticmethod
     async def get_merkle_proof_case(tx_hash: str):

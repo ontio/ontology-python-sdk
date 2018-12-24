@@ -112,14 +112,14 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual('39f3fb644842c808828817bd73da0946d99f237f', hex_contract_address)
         hello = InvokeFunction('Hello')
         hello.set_params_value('Ontology')
-        response = sdk.neo_vm.send_transaction(hex_contract_address, None, None, 0, 0, hello, True)
+        response = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, hello, True)
         self.assertEqual(1, response['State'])
         result = response['Result']
         result = ContractDataParser.to_bool(result)
         self.assertEqual(True, result)
         gas_limit = 20000
         gas_price = 500
-        tx_hash = sdk.neo_vm.send_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, hello, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, hello, False)
         sleep(6)
         response = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = response['Notify'][0]

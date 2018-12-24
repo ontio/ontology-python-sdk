@@ -49,5 +49,5 @@ class Nep5(object):
             return obj["Gas"]
         if acct is None or payer_acct is None:
             raise Exception("acct or payer_acct should not be None")
-        return self.__sdk.neo_vm.send_transaction(bytearray(self.contract_addr), acct, payer_acct, gas_limit, gas_price,
+        return self.__sdk.rpc.send_neo_vm_transaction(bytearray(self.contract_addr), acct, payer_acct, gas_limit, gas_price,
                                                     func, pre_exec)

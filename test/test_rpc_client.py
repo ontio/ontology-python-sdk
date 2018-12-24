@@ -14,21 +14,14 @@ from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.rpc import TEST_RPC_ADDRESS
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 
 sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()
 
-private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-acc = Account(private_key1, SignatureScheme.SHA256withECDSA)
-acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-pub_keys = [acc.get_public_key_bytes(), acc2.get_public_key_bytes(), acc3.get_public_key_bytes()]
-multi_addr = Address.address_from_multi_pub_keys(2, pub_keys)
+pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 
 class TestRpcClient(unittest.TestCase):
@@ -100,7 +93,7 @@ class TestRpcClient(unittest.TestCase):
         except KeyError:
             raised = True
             self.assertFalse(raised, 'Exception raised')
-        address_balance = sdk.rpc.get_balance(acc.get_address_base58())
+        address_balance = sdk.rpc.get_balance(acct1.get_address_base58())
         try:
             address_balance['ont']
         except KeyError:
@@ -112,7 +105,7 @@ class TestRpcClient(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
 
-        multi_address_balance = sdk.rpc.get_balance(multi_addr.b58encode())
+        multi_address_balance = sdk.rpc.get_balance(multi_address.b58encode())
         try:
             multi_address_balance['ont']
         except KeyError:
@@ -266,9 +259,12 @@ class TestRpcClient(unittest.TestCase):
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)
-        self.assertEqual(1, tx_state[0]['Type'])
-        self.assertEqual(0, tx_state[1]['Type'])
+        try:
+            tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)
+            self.assertEqual(1, tx_state[0]['Type'])
+            self.assertEqual(0, tx_state[1]['Type'])
+        except SDKException as e:
+            self.assertIn('unknown transaction', e.args[1])
 
 
 if __name__ == '__main__':
