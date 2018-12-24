@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import binascii
 
 import base58
 from binascii import a2b_hex
 
 from ontology.vm.op_code import CHECKSIG
 from ontology.crypto.digest import Digest
-from ontology.common.error_code import ErrorCode
 from ontology.core.program import ProgramBuilder
+from ontology.exception.error_code import ErrorCode
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.exception.exception import SDKException
 
@@ -31,7 +32,7 @@ class Address(object):
         builder = ParamsBuilder()
         builder.emit_push_byte_array(bytearray(public_key))
         builder.emit(CHECKSIG)
-        addr = Address(Address.to_script_hash(builder.to_array()))
+        addr = Address(Address.to_script_hash(builder.to_bytes()))
         return addr
 
     @staticmethod
@@ -56,13 +57,16 @@ class Address(object):
     def to_bytes(self):
         return self.ZERO
 
+    def to_bytearray(self):
+        return bytearray(self.ZERO)
+
     def to_hex_str(self):
-        return bytearray(self.ZERO).hex()
+        return binascii.b2a_hex(self.ZERO).decode('ascii')
 
     def to_reverse_hex_str(self):
-        temp = bytearray(self.ZERO)
-        temp.reverse()
-        return temp.hex()
+        bytearray_zero = bytearray(self.ZERO)
+        bytearray_zero.reverse()
+        return binascii.b2a_hex(bytearray_zero).decode('ascii')
 
     @staticmethod
     def b58decode(address: str):
