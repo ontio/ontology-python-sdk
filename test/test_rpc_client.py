@@ -6,19 +6,15 @@ import unittest
 
 from random import choice
 
-from test import acct1, acct2, acct3, acct4
+from test import acct1, acct2, acct3
 
 from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
-
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
 
 pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
 multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
@@ -26,36 +22,52 @@ multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         version = sdk.rpc.get_version()
         self.assertIn('v', version)
 
     def test_get_connection_count(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         count = sdk.rpc.get_connection_count()
         self.assertGreaterEqual(count, 0)
 
     def test_get_gas_price(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         price = sdk.rpc.get_gas_price()
         self.assertGreater(price, 0)
 
     def test_get_network_id(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         network_id = sdk.rpc.get_network_id()
         self.assertGreaterEqual(network_id, 0)
 
     def test_get_block_by_hash(self):
-        block_hash = "44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c"
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
+        block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
         block = sdk.rpc.get_block_by_hash(block_hash)
         self.assertEqual(block['Hash'], block_hash)
 
     def test_get_block_by_height(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         height = 0
         block = sdk.rpc.get_block_by_height(height)
         self.assertEqual(block['Header']['Height'], height)
 
     def test_get_block_height(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         count = sdk.rpc.get_block_height()
         self.assertGreater(count, 103712)
 
     def test_get_block_height_by_tx_hash(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
         block_height = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
         self.assertEqual(0, block_height)
@@ -64,6 +76,8 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(564235, block_height)
 
     def test_get_block_count_by_tx_hash(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
         block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
         self.assertEqual(1, block_count)
@@ -72,15 +86,21 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(564236, block_count)
 
     def test_get_current_block_hash(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         current_block_hash = sdk.rpc.get_current_block_hash()
         self.assertEqual(len(current_block_hash), 64)
 
     def test_get_block_hash_by_height(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         height = 0
         block_hash = sdk.rpc.get_block_hash_by_height(height)
         self.assertEqual(len(block_hash), 64)
 
     def test_get_balance(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         address_balance = sdk.rpc.get_balance(base58_address)
         try:
@@ -118,16 +138,22 @@ class TestRpcClient(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
 
     def test_get_grant_ong(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         b58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         grant_ong = sdk.rpc.get_grant_ong(b58_address)
         self.assertGreaterEqual(grant_ong, 0)
 
     def test_get_allowance(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         base58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         allowance = sdk.rpc.get_allowance('ong', base58_address, base58_address)
         self.assertEqual(allowance, '0')
 
     def test_get_storage(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = sdk.rpc.get_storage(contract_address, key)
@@ -135,11 +161,15 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(1000000000, value)
 
     def test_get_smart_contract_event_by_tx_hash(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         self.assertEqual(event['TxHash'], tx_hash)
 
     def test_get_smart_contract_event_by_height(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         height = 0
         event_list = sdk.rpc.get_smart_contract_event_by_height(height)
         self.assertEqual(10, len(event_list))
@@ -148,6 +178,8 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(0, len(event_list))
 
     def test_get_smart_contract_event_by_count(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         count = 1
         event_list = sdk.rpc.get_smart_contract_event_by_count(count)
         self.assertEqual(10, len(event_list))
@@ -156,6 +188,8 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(0, len(event_list))
 
     def test_sync_block(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         current_height = sdk.rpc.get_block_height()
         start_time = time.perf_counter()
         while True:
@@ -171,16 +205,22 @@ class TestRpcClient(unittest.TestCase):
                 self.assertGreaterEqual(len(event_list), 0)
 
     def test_get_transaction_by_tx_hash(self):
-        tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
+        tx_hash = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
         tx = sdk.rpc.get_transaction_by_tx_hash(tx_hash)
         self.assertEqual(tx['Hash'], tx_hash)
 
     def test_get_smart_contract(self):
-        hex_contract_address = "0100000000000000000000000000000000000000"
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
+        hex_contract_address = '0100000000000000000000000000000000000000'
         contract = sdk.rpc.get_smart_contract(hex_contract_address)
         self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
 
     def test_get_merkle_proof(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         tx_hash_1 = '12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3'
         merkle_proof_1 = sdk.rpc.get_merkle_proof(tx_hash_1)
         self.assertEqual('MerkleProof', merkle_proof_1['Type'])
@@ -212,6 +252,8 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_6['TransactionsRoot'])
 
     def test_send_raw_transaction(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         b58_from_address = acct2.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
         amount = 1
@@ -219,27 +261,33 @@ class TestRpcClient(unittest.TestCase):
         gas_limit = 20000
         tx = Asset.new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
                                             gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct2)
+        tx = tx.sign_transaction(acct2)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
 
     def test_send_raw_transaction_pre_exec(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         random_pk = get_random_hex_str(64)
         random_acct = Account(random_pk)
         b58_address_1 = acct2.get_address_base58()
         random_b58_address = random_acct.get_address_base58()
         tx = Asset.new_transfer_transaction('ong', b58_address_1, random_b58_address, 2, b58_address_1, 20000, 500)
-        tx = sdk.sign_transaction(tx, acct2)
+        tx = tx.sign_transaction(acct2)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(result['Result'], '01')
         self.assertEqual(result['Gas'], 20000)
         self.assertEqual(result['State'], 1)
 
     def test_get_memory_pool_tx_count(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         tx_count = sdk.rpc.get_memory_pool_tx_count()
         self.assertGreaterEqual(tx_count, [0, 0])
 
     def test_get_memory_pool_tx_state(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
         tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
         try:
             sdk.rpc.get_memory_pool_tx_state(tx_hash)
