@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
-
 from typing import List
 
 from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.control import Control
 from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
@@ -37,10 +35,8 @@ class WalletData(object):
             if isinstance(dict_identity, dict):
                 list_controls = list()
                 try:
-                    try:
-                        is_default = dict_identity['isDefault']
-                    except Exception as e:
-                        is_default = False
+
+                    is_default = dict_identity.get('isDefault', False)
                     for control_data in dict_identity['controls']:
                         list_controls.append(Control.dict2obj(control_data))
                     identity = Identity(ont_id=dict_identity['ontid'], label=dict_identity['label'],
