@@ -3,8 +3,8 @@
 
 from binascii import a2b_hex
 from ontology.utils import utils
-from ontology.common.error_code import ErrorCode
 from ontology.io.memory_stream import MemoryStream
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.vm.op_code import PUSHDATA1, PUSHDATA2, PUSHDATA4, PUSH0, PUSH1, PUSHM1, PUSHBYTES75, APPCALL
 
@@ -73,5 +73,8 @@ class ParamsBuilder:
         else:
             raise SDKException(ErrorCode.param_err('type error, write byte failed.'))
 
-    def to_array(self):
+    def to_bytes(self) -> bytes:
         return a2b_hex(self.ms.ToArray())
+
+    def to_bytearray(self) -> bytearray:
+        return bytearray(a2b_hex(self.ms.ToArray()))
