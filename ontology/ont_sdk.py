@@ -252,7 +252,6 @@ class OntologySdk(object):
             key_type = KeyType.ECDSA
         elif len(public_key) == 35:
             key_type = KeyType.from_label(public_key[0])
-        handler = SignatureHandler(key_type, SignatureScheme.SHA256withECDSA)
         if key_type == KeyType.ECDSA:
             handler = SignatureHandler(key_type, SignatureScheme.SHA256withECDSA)
         elif key_type == KeyType.SM2:
