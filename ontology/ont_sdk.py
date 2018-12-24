@@ -36,9 +36,9 @@ class OntologySdk(object):
         self.__default_signature_scheme = default_signature_scheme
 
     def __new__(cls, *args, **kwargs):
-        if not hasattr(OntologySdk, "_instance"):
+        if not hasattr(OntologySdk, '_instance'):
             with OntologySdk._instance_lock:
-                if not hasattr(OntologySdk, "_instance"):
+                if not hasattr(OntologySdk, '_instance'):
                     OntologySdk._instance = object.__new__(cls)
         return OntologySdk._instance
 
