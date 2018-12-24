@@ -4,7 +4,7 @@
 from ecdsa import util, NIST256p, SigningKey
 
 from ontology.crypto.curve import Curve
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
