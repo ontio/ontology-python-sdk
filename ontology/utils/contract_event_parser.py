@@ -3,7 +3,7 @@
 
 from typing import List
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
