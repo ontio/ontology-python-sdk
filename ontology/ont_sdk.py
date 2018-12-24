@@ -113,7 +113,7 @@ class OntologySdk(object):
 
     def set_rpc_address(self, rpc_address: str):
         if self.__rpc is None:
-            self.__rpc = ConnectMgr(rpc_address, ConnectType.RPC)
+            self.__rpc = RpcClient(rpc_address)
         else:
             self.__rpc.set_address(rpc_address)
 
