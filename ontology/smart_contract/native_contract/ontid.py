@@ -36,10 +36,11 @@ class OntId(object):
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
-                         invoke_code, bytearray(), [], bytearray())
+                         invoke_code, bytearray(), [])
         return tx
 
-    def send_registry_ont_id_transaction(self, identity: Identity, password: str, payer: Account, gas_limit: int, gas_price: int):
+    def send_registry_ont_id_transaction(self, identity: Identity, password: str, payer: Account, gas_limit: int,
+                                         gas_price: int):
         """
         This interface is used to send a Transaction object which is used to registry ontid.
 
@@ -82,7 +83,7 @@ class OntId(object):
         unix_time_now = int(time())
         array_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, array_payer_address, invoke_code, bytearray(),
-                         [], bytearray())
+                         [])
         return tx
 
     def send_add_attribute_transaction(self, identity: Identity, password: str, attribute_list: list, payer: Account,
@@ -125,7 +126,7 @@ class OntId(object):
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
-                         invoke_code, bytearray(), [], bytearray())
+                         invoke_code, bytearray(), [])
         return tx
 
     def send_remove_attribute_transaction(self, identity: Identity, password: str, path: str, payer: Account,
@@ -168,7 +169,7 @@ class OntId(object):
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addKey", args)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_bytes(),
-                         invoke_code, bytearray(), [], bytearray())
+                         invoke_code, bytearray(), [])
         return tx
 
     def send_add_public_key_transaction(self, identity: Identity, password: str, new_hex_public_key: str,
@@ -238,7 +239,7 @@ class OntId(object):
         unix_time_now = int(time())
         bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
-                         [], bytearray())
+                         [])
         return tx
 
     def send_remove_public_key_transaction(self, identity: Identity, password: str, hex_remove_public_key: str,
@@ -296,7 +297,7 @@ class OntId(object):
         unix_time_now = int(time())
         bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
-                         [], bytearray())
+                         [])
         return tx
 
     def send_add_recovery_transaction(self, identity: Identity, password: str, b58_recovery_address: str,
@@ -336,7 +337,7 @@ class OntId(object):
         unix_time_now = int(time())
         payer = Address(a2b_hex("0000000000000000000000000000000000000000".encode())).to_bytes()
         return Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(),
-                           [], bytearray())
+                           [])
 
     def send_get_ddo(self, ont_id: str) -> dict:
         """
