@@ -93,7 +93,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         contract_address.reverse()
 #         gas_limit = 20000000
 #         gas_price = 500
-#         res = sdk.neo_vm.send_transaction(contract_address, acc, acc, gas_limit, gas_price, func, False)
+#         res = sdk.rpc.send_neo_vm_transaction(contract_address, acc, acc, gas_limit, gas_price, func, False)
 #         time.sleep(6)
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
