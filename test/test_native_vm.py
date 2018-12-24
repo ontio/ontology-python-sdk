@@ -9,8 +9,8 @@ from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
 rpc_address = 'http://polaris3.ont.io:20336'
-# rpc_address = "http://127.0.0.1:20336"
 sdk = OntologySdk()
+sdk.rpc.connect_to_test_net()
 
 private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
 private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -24,9 +24,8 @@ acct4 = Account(private_key4, SignatureScheme.SHA256withECDSA)
 
 class TestNativeVm(unittest.TestCase):
     def test_native_vm_transaction(self):
-        sdk.set_rpc_address(rpc_address)
-        asset = sdk.native_vm.asset()
         amount = 1
+        asset = sdk.native_vm.asset()
         tx = asset.new_transfer_transaction('ont', acct2.get_address_base58(), acct1.get_address_base58(), amount,
                                             acct1.get_address_base58(), 20000, 500)
         sdk.sign_transaction(tx, acct1)
@@ -47,7 +46,6 @@ class TestNativeVm(unittest.TestCase):
             self.assertIn('[Transfer] balance insufficient', e.args[1])
 
     def test_native_vm_withdraw_ong(self):
-        sdk.set_rpc_address(rpc_address)
         payer = acct2
         b58_payer_address = payer.get_address_base58()
         amount = 1
