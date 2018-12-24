@@ -5,13 +5,17 @@ import json
 
 from sys import maxsize
 from typing import List
+from random import choice
+
 from websockets import client
 from Cryptodome.Random.random import randint
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data_parser import ContractDataParser
+
+TEST_WS_ADDRESS = ['ws://polaris1.ont.io:20335', 'ws://polaris2.ont.io:20335', 'ws://polaris3.ont.io:20335']
+MAIN_WS_ADDRESS = ['ws://dappnode1.ont.io:20335', 'ws://dappnode2.ont.io:20335']
 
 
 class WebsocketClient(object):
@@ -30,6 +34,14 @@ class WebsocketClient(object):
 
     def get_address(self):
         return self.__url
+
+    def connect_to_test_net(self):
+        restful_address = choice(TEST_WS_ADDRESS)
+        self.set_address(restful_address)
+
+    def connect_to_main_net(self):
+        restful_address = choice(MAIN_WS_ADDRESS)
+        self.set_address(restful_address)
 
     async def connect(self):
         self.__ws_client = await client.connect(self.__url)

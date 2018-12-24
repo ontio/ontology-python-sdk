@@ -2,14 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import json
+from random import choice
+
 import requests
 
 from typing import List
-from urllib.parse import urljoin
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+
+TEST_RESTFUL_ADDRESS = ['http://polaris1.ont.io:20334', 'http://polaris2.ont.io:20334', 'http://polaris3.ont.io:20334']
+MAIN_RESTFUL_ADDRESS = ['http://dappnode1.ont.io:20334', 'http://dappnode2.ont.io:20334']
 
 
 class RestfulMethod(object):
@@ -111,6 +115,14 @@ class RestfulClient(object):
 
     def get_address(self):
         return self.__url
+
+    def connect_to_test_net(self):
+        restful_address = choice(TEST_RESTFUL_ADDRESS)
+        self.set_address(restful_address)
+
+    def connect_to_main_net(self):
+        restful_address = choice(MAIN_RESTFUL_ADDRESS)
+        self.set_address(restful_address)
 
     def __post(self, url: str, data: str):
         try:

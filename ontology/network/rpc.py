@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import json
+from random import choice
 from sys import maxsize
 from typing import List
 
 import requests
 from Cryptodome.Random.random import randint
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+
+TEST_RPC_ADDRESS = ['http://polaris1.ont.io:20336', 'http://polaris2.ont.io:20336', 'http://polaris3.ont.io:20336']
+MAIN_RPC_ADDRESS = ['http://dappnode1.ont.io:20336', 'http://dappnode2.ont.io:20336']
 
 
 class RpcMethod(object):
@@ -58,6 +62,14 @@ class RpcClient(object):
             self.__qid = randint(0, maxsize)
         return self.__qid
 
+    def connect_to_test_net(self):
+        rpc_address = choice(TEST_RPC_ADDRESS)
+        self.set_address(rpc_address)
+
+    def connect_to_main_net(self):
+        rpc_address = choice(MAIN_RPC_ADDRESS)
+        self.set_address(rpc_address)
+
     @staticmethod
     def __post(url, payload):
         header = {'Content-type': 'application/json'}
@@ -74,7 +86,7 @@ class RpcClient(object):
         except Exception as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         if response.status_code != 200:
-            raise SDKException(ErrorCode.other_error(response.content.decode('utf-8')))
+            raise SDKException(ErrorCode.other_error(content))
         try:
             content = json.loads(content)
         except json.decoder.JSONDecodeError as e:
