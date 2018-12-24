@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import binascii
+import json
 from binascii import b2a_hex, a2b_hex
 
+from ontology.common.address import Address
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
 from ontology.io.binary_writer import BinaryWriter
@@ -22,7 +24,22 @@ class Transaction(object):
         self.payload = payload
         self.attributes = attributes
         self.sigs = sigs  # Sig class array
-        self.hash = hash  # 32 bytes
+
+    def __iter__(self):
+        data = dict()
+        data['version'] = self.version
+        data['txType'] = self.tx_type
+        data['nonce'] = self.nonce
+        data['gasPrice'] = self.gas_price
+        data['gasLimit'] = self.gas_limit
+        data['payer'] = Address(self.payer).b58encode()
+        data['payload'] = binascii.b2a_hex(self.payload).decode('ascii')
+        data['attributes'] = binascii.b2a_hex(self.attributes).decode('ascii')
+        data['sigs'] = list()
+        for sig in self.sigs:
+            data['sigs'].append(dict(sig))
+        for key, value in data.items():
+            yield (key, value)
 
     def serialize_unsigned(self) -> bytes:
         ms = StreamManager.GetStream()
@@ -88,8 +105,8 @@ class Transaction(object):
             return a2b_hex(bytes_tx)
 
     @staticmethod
-    def deserialize_from(txbytes: bytes):
-        ms = StreamManager.GetStream(txbytes)
+    def deserialize_from(bytes_tx: bytes):
+        ms = StreamManager.GetStream(bytes_tx)
         reader = BinaryReader(ms)
         tx = Transaction()
         tx.version = reader.read_uint8()
@@ -99,11 +116,11 @@ class Transaction(object):
         tx.gas_limit = reader.read_uint64()
         tx.payer = reader.read_bytes(20)
         tx.payload = reader.read_var_bytes()
-        attri_len = reader.read_var_int()
-        if attri_len is 0:
+        attribute_len = reader.read_var_int()
+        if attribute_len is 0:
             tx.attributes = bytearray()
         sigs_len = reader.read_var_int()
         tx.sigs = []
-        for i in range(sigs_len):
+        for i in range(0, sigs_len):
             tx.sigs.append(Sig.deserialize(reader))
         return tx
