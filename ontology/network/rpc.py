@@ -83,21 +83,21 @@ class RpcClient(object):
         try:
             response = requests.post(url, json=payload, headers=header, timeout=10)
         except requests.exceptions.MissingSchema as e:
-            raise SDKException(ErrorCode.connect_err(e.args[0]))
-        except requests.exceptions.ConnectTimeout:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url])))
-        except requests.exceptions.ConnectionError:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url])))
+            raise SDKException(ErrorCode.connect_err(e.args[0])) from e
+        except requests.exceptions.ConnectTimeout as e:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url]))) from e
+        except requests.exceptions.ConnectionError as e:
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from e
         try:
             content = response.content.decode('utf-8')
         except Exception as e:
-            raise SDKException(ErrorCode.other_error(e.args[0]))
+            raise SDKException(ErrorCode.other_error(e.args[0])) from e
         if response.status_code != 200:
             raise SDKException(ErrorCode.other_error(content))
         try:
             content = json.loads(content)
         except json.decoder.JSONDecodeError as e:
-            raise SDKException(ErrorCode.other_error(e.args[0]))
+            raise SDKException(ErrorCode.other_error(e.args[0])) from e
         if content['error'] != 0:
             if content['result'] != '':
                 raise SDKException(ErrorCode.other_error(content['result']))
