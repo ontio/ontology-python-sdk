@@ -109,7 +109,7 @@ class Transaction(object):
         if is_hex:
             return bytes_tx
         else:
-            return a2b_hex(bytes_tx)
+            return binascii.a2b_hex(bytes_tx)
 
     @staticmethod
     def deserialize_from(bytes_tx: bytes):

@@ -10,9 +10,6 @@ from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
-sdk = OntologySdk()
-remote_rpc_address = sdk.get_random_test_rpc_address()
-
 
 class TestOep4(unittest.TestCase):
     def test_set_contract_address(self):

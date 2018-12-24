@@ -5,11 +5,9 @@ import time
 import unittest
 import binascii
 
-from random import choice
+from test import acct1, acct2, acct3
 
 from ontology.ont_sdk import OntologySdk
-from ontology.account.account import Account
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
@@ -18,14 +16,6 @@ sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()
 gas_limit = 20000000
 gas_price = 500
-
-private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-
-acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
-acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
 
 
 class TestWalletManager(unittest.TestCase):
@@ -244,7 +234,7 @@ class TestWalletManager(unittest.TestCase):
         bytes_address_msg = acct1.get_address().to_bytes()
         notify_args.set_params_value(bool_msg, int_msg, bytes_msg, str_msg, bytes_address_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, notify_args,
-                                                False)
+                                                  False)
         time.sleep(6)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)

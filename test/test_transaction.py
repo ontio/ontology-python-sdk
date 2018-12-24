@@ -49,8 +49,8 @@ class TestTransaction(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         sdk = OntologySdk()
-        asset = sdk.native_vm.asset()
         sdk.rpc.connect_to_test_net()
+        asset = sdk.native_vm.asset()
         tx1 = asset.new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
                                              gas_limit, gas_price)
         tx_bytes = tx1.serialize()
