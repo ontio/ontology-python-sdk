@@ -8,9 +8,10 @@ from ontology.utils import utils
 from ontology.common.define import *
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.vm.build_vm import build_native_invoke_code
 
 
@@ -56,14 +57,12 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        balance = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        array = bytearray(binascii.a2b_hex(balance.encode('ascii')))
-        array.reverse()
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
-            balance = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except ValueError:
-            balance = 0
-        return balance
+            balance = ContractDataParser.to_int(response['Result'])
+            return balance
+        except SDKException:
+            return 0
 
     def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> int:
         """
@@ -89,14 +88,12 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        allowance = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        array = bytearray(binascii.a2b_hex(allowance.encode('ascii')))
-        array.reverse()
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
-            allowance = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except ValueError:
-            allowance = 0
-        return allowance
+            allowance = ContractDataParser.to_int(response['Result'])
+            return allowance
+        except SDKException:
+            return 0
 
     def query_unbound_ong(self, base58_address: str) -> int:
         """
@@ -106,8 +103,8 @@ class Asset(object):
         :return: the amount of unbound ong in the form of int.
         """
         contract_address = utils.get_asset_address('ont')
-        result = self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
-        return int(result)
+        unbound_ong = self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
+        return int(unbound_ong)
 
     def query_name(self, asset: str) -> str:
         """
@@ -130,8 +127,10 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return bytes.fromhex(res).decode()
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        name = response['Result']
+        name = ContractDataParser.to_utf8_str(name)
+        return name
 
     def query_symbol(self, asset: str) -> str:
         """
@@ -154,8 +153,9 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return bytes.fromhex(res).decode()
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        symbol = ContractDataParser.to_utf8_str(response['Result'])
+        return symbol
 
     def query_decimals(self, asset: str) -> int:
         """
@@ -178,8 +178,12 @@ class Asset(object):
         hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
                          hash_value)
-        decimal = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return int(decimal)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        try:
+            decimal = ContractDataParser.to_int(response['Result'])
+            return decimal
+        except SDKException:
+            return 0
 
     @staticmethod
     def new_transfer_transaction(asset: str, b58_from_address: str, b58_to_address: str, amount: int,

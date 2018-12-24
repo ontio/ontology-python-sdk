@@ -346,8 +346,8 @@ class OntId(object):
         :return: a DDO object in the from of dict.
         """
         tx = OntId.new_get_ddo_transaction(ont_id)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return OntId.parse_ddo(ont_id, res)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        return OntId.parse_ddo(ont_id, response['Result'])
 
     @staticmethod
     def parse_ddo(ont_id: str, ddo: str) -> dict:
