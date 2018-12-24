@@ -49,7 +49,7 @@ class RpcMethod(object):
     GET_MEM_POOL_TX_COUNT = 'getmempooltxcount'
     GET_MEM_POOL_TX_STATE = 'getmempooltxstate'
 
-    RPC_VERSION = "2.0"
+    RPC_VERSION = '2.0'
 
 
 class RpcClient(object):
