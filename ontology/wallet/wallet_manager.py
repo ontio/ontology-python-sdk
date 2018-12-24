@@ -16,7 +16,7 @@ from ontology.utils.utils import is_file_exist
 from ontology.wallet.wallet import WalletData
 from ontology.utils.utils import get_random_hex_str
 from ontology.wallet.account import AccountData
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
 from ontology.exception.exception import SDKException
 from ontology.wallet.identity import Identity, did_ont
@@ -31,7 +31,7 @@ class WalletManager(object):
         self.scheme = scheme
         self.wallet_file = WalletData()
         self.wallet_in_mem = WalletData()
-        self.wallet_path = ""
+        self.wallet_path = ''
 
     def open_wallet(self, wallet_path: str):
         self.wallet_path = wallet_path
@@ -49,22 +49,10 @@ class WalletManager(object):
                 content = content[len(codecs.BOM_UTF8):]
             content = content.decode('utf-8')
             obj = json.loads(content)
-            try:
-                create_time = obj['createTime']
-            except KeyError:
-                create_time = ''
-            try:
-                default_id = obj['defaultOntid']
-            except KeyError:
-                default_id = ''
-            try:
-                default_address = obj['defaultAccountAddress']
-            except KeyError:
-                default_address = ''
-            try:
-                identities = obj['identities']
-            except KeyError:
-                identities = list()
+            create_time = obj.get('createTime', '')
+            default_id = obj.get('defaultOntid', '')
+            default_address = obj.get('defaultAccountAddress', '')
+            identities = obj.get('identities', list())
             try:
                 scrypt_dict = obj['scrypt']
                 scrypt_obj = Scrypt(scrypt_dict.get('n', 16384), scrypt_dict.get('r', 8), scrypt_dict.get('p', 8),

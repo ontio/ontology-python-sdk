@@ -3,6 +3,8 @@
 
 from ontology.core.program_info import ProgramInfo
 from ontology.crypto.key_type import KeyType
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 from ontology.io.binary_reader import BinaryReader
 from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG, PUSH1
 from ontology.io.binary_writer import BinaryWriter
@@ -27,7 +29,7 @@ class ProgramBuilder(object):
         builder = ParamsBuilder()
         builder.emit_push_byte_array(public_key)
         builder.emit(CHECKSIG)
-        return builder.to_array()
+        return builder.to_bytes()
 
     @staticmethod
     def push_bytes(data):
@@ -89,31 +91,35 @@ class ProgramBuilder(object):
         return sorted(publicKeys, key=ProgramBuilder.compare_pubkey)
 
     @staticmethod
-    def program_from_multi_pubkey(m: int, pubkeys: []):
-        n = len(pubkeys)
-        if m <= 0 or m > n or n > define.MULTI_SIG_MAX_PUBKEY_SIZE:
-            raise Exception("param error")
+    def program_from_multi_pubkey(m: int, pub_keys: []) -> bytes:
+        n = len(pub_keys)
+        if m <= 0:
+            raise SDKException(ErrorCode.other_error(f'Param error: m == {m}'))
+        if m > n:
+            raise SDKException(ErrorCode.other_error(f'Param error: m == {m} n == {n}'))
+        if n > define.MULTI_SIG_MAX_PUBKEY_SIZE:
+            raise SDKException(ErrorCode.other_error(f'Param error: n == {n} > {define.MULTI_SIG_MAX_PUBKEY_SIZE}'))
         builder = ParamsBuilder()
         builder.emit_push_integer(m)
-        pubkeys = ProgramBuilder.sort_publickeys(pubkeys)
-        for pubkey in pubkeys:
-            builder.emit_push_byte_array(pubkey)
+        pub_keys = ProgramBuilder.sort_publickeys(pub_keys)
+        for pk in pub_keys:
+            builder.emit_push_byte_array(pk)
         builder.emit_push_integer(n)
         builder.emit(CHECKMULTISIG)
-        return builder.to_array()
+        return builder.to_bytes()
 
     @staticmethod
     def get_param_info(program: bytes):
         ms = StreamManager.GetStream(program)
         reader = BinaryReader(ms)
-        list = []
+        param_info = []
         while True:
             try:
                 res = ProgramBuilder.read_bytes(reader)
             except:
                 break
-            list.append(res)
-        return list
+            param_info.append(res)
+        return param_info
 
     @staticmethod
     def get_program_info(program: bytes) -> ProgramInfo:
@@ -124,11 +130,11 @@ class ProgramBuilder(object):
         reader = BinaryReader(ms)
         info = ProgramInfo()
         if end == int.from_bytes(CHECKSIG, 'little'):
-            pubkeys = ProgramBuilder.read_bytes(reader)
-            info.set_pubkey([pubkeys])
+            pub_keys = ProgramBuilder.read_bytes(reader)
+            info.set_pubkey([pub_keys])
             info.set_m(1)
         elif end == int.from_bytes(CHECKMULTISIG, 'little'):
-            length = program[len(program) - 2] - int.from_bytes(PUSH1, 'little')
+            length = program[len(program) - 2] - int.from_bytes(PUSH1, 'little') + 1
             m = reader.read_byte() - int.from_bytes(PUSH1, 'little') + 1
             pub = []
             for i in range(length):

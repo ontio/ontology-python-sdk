@@ -3,7 +3,7 @@
 
 import unittest
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.exception.exception import SDKRuntimeException
 

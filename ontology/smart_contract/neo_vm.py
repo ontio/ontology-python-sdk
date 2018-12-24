@@ -8,7 +8,7 @@ from time import time
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.common.define import ZERO_ADDRESS
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.oep4 import Oep4
@@ -44,42 +44,6 @@ class NeoVm(object):
     def avm_code_to_bytearray_contract_address(avm_code: str):
         bytearray_contract_address = Address.address_from_vm_code(avm_code).to_bytearray()
         return bytearray_contract_address
-
-    def send_transaction(self, contract_address: str or bytes or bytearray, acct: Account, payer_acct: Account,
-                         gas_limit: int, gas_price: int, func: AbiFunction or InvokeFunction, pre_exec: bool,
-                         is_full: bool = False):
-        if isinstance(func, AbiFunction):
-            params = BuildParams.serialize_abi_function(func)
-        elif isinstance(func, InvokeFunction):
-            params = func.create_invoke_code()
-        else:
-            raise SDKException(ErrorCode.other_error('the type of func is error.'))
-        if isinstance(contract_address, str) and len(contract_address) == 40:
-            contract_address = bytearray(binascii.a2b_hex(contract_address))
-            contract_address.reverse()
-        if pre_exec:
-            if isinstance(contract_address, bytes):
-                tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
-            elif isinstance(contract_address, bytearray):
-                tx = NeoVm.make_invoke_transaction(contract_address, bytearray(params), b'', 0, 0)
-            else:
-                raise SDKException(ErrorCode.param_err('the data type of contract address is incorrect.'))
-            if acct is not None:
-                self.__sdk.sign_transaction(tx, acct)
-            return self.__sdk.default_connector.send_raw_transaction_pre_exec(tx, is_full)
-        else:
-            unix_time_now = int(time())
-            params.append(0x67)
-            for i in contract_address:
-                params.append(i)
-            if payer_acct is None:
-                raise SDKException(ErrorCode.param_err('payer account is None.'))
-            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_bytes(),
-                             params, bytearray(), [], bytearray())
-            self.__sdk.sign_transaction(tx, payer_acct)
-            if isinstance(acct, Account) and acct.get_address_base58() != payer_acct.get_address_base58():
-                self.__sdk.add_sign_transaction(tx, acct)
-            return self.__sdk.default_connector.send_raw_transaction(tx, is_full)
 
     @staticmethod
     def make_deploy_transaction(code_str: str, need_storage: bool, name: str, code_version: str, author: str,

@@ -42,10 +42,11 @@ class TestOntologySdk(TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        asset = sdk.native_vm().asset()
+        asset = sdk.native_vm.asset()
         self.assertEqual('AcAR5ZhtxiS66ydXrKWTZMXo13LcsvgYnD', b58_multi_address)
         tx = asset.new_transfer_transaction('ong', b58_acct1_address, b58_multi_address, amount, b58_acct1_address,
                                             gas_limit, gas_price)
+        print(tx.__dict__)
         sdk.add_sign_transaction(tx, acct1)
 
         tx = asset.new_transfer_transaction('ont', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,

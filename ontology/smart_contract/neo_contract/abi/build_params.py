@@ -1,6 +1,6 @@
 from enum import Enum
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.struct_type import Struct
@@ -49,7 +49,7 @@ class BuildParams(object):
         for j in range(length):
             i = length - 1 - j
             BuildParams.push_param(param_list[i], builder)
-        return bytearray(builder.to_array())
+        return builder.to_bytearray()
 
     @staticmethod
     def create_code_params_script_builder(param_list: list, builder: ParamsBuilder):
@@ -57,7 +57,7 @@ class BuildParams(object):
         for j in range(length):
             i = length - 1 - j
             BuildParams.push_param(param_list[i], builder)
-        return builder.to_array()
+        return builder.to_bytes()
 
     @staticmethod
     def push_param(param, builder: ParamsBuilder):
@@ -126,4 +126,4 @@ class BuildParams(object):
                 builder.emit_push_integer(int(value))
             else:
                 raise Exception("param error")
-        return builder.to_array()
+        return builder.to_bytes()

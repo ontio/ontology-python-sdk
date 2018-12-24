@@ -4,7 +4,7 @@ from time import time
 from ontology.account.account import Account
 from ontology.common.address import Address
 from ontology.common.define import ZERO_ADDRESS
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 from ontology.vm.build_vm import build_native_invoke_code

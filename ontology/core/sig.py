@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import binascii
 
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
@@ -14,10 +17,19 @@ class Sig(object):
         self.M = M
         self.sig_data = sig_data
 
+    def __iter__(self):
+        data = dict(M=self.M, publicKeys=list(), sigData=list())
+        for key in self.public_keys:
+            data['publicKeys'].append(binascii.b2a_hex(key).decode('ascii'))
+        for s_data in self.sig_data:
+            data['sigData'].append(binascii.b2a_hex(s_data).decode('ascii'))
+        for key, value in data.items():
+            yield (key, value)
+
     def serialize(self) -> bytes:
         invoke_script = ProgramBuilder.program_from_params(self.sig_data)
         if len(self.public_keys) == 0:
-            raise ValueError("no public key in sig")
+            raise SDKException(ErrorCode.other_error('Public key in sig is empty.'))
 
         if len(self.public_keys) == 1:
             verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
@@ -51,6 +63,3 @@ class Sig(object):
         sig.public_keys = info.pubkeys
         sig.M = info.m
         return sig
-
-
-

@@ -10,7 +10,7 @@ import struct
 import binascii
 import importlib
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
@@ -47,7 +47,7 @@ class BinaryReader(object):
         """
         return struct.unpack(fmt, self.stream.read(length))[0]
 
-    def read_byte(self, do_ord=True):
+    def read_byte(self, do_ord=True) -> int:
         """
         Read a single byte.
         Args:

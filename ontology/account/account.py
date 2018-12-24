@@ -7,7 +7,6 @@ import binascii
 import base58
 from binascii import b2a_hex, a2b_hex
 
-from ontology.common.error_code import ErrorCode
 from ontology.crypto.curve import Curve
 from ontology.crypto.digest import Digest
 from ontology.crypto.scrypt import Scrypt
@@ -15,6 +14,7 @@ from ontology.common.address import Address
 from ontology.crypto.key_type import KeyType
 from ontology.crypto.signature import Signature
 from ontology.crypto.aes_handler import AESHandler
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler

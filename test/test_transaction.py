@@ -2,9 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+from time import sleep
 
-from ontology.core.transaction import Transaction
 from ontology.utils import utils
+
+from ontology.ont_sdk import OntologySdk
+from ontology.account.account import Account
+from ontology.common.address import Address
+from ontology.core.transaction import Transaction
+from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.utils.contract_event_parser import ContractEventParser
 
 
 class TestTransaction(unittest.TestCase):
@@ -24,6 +31,86 @@ class TestTransaction(unittest.TestCase):
         self.assertGreaterEqual(tx.gas_limit, 0)
         self.assertGreaterEqual(tx.gas_price, 0)
         self.assertGreaterEqual(tx.nonce, 0)
+
+    def test_multi_serialize(self):
+        private_key1 = 'e05876a5ca900d2397b95d52763255b59a029cb33d9bfc5ad56cb4569b05418a'
+        private_key2 = 'f784e0dd0ab4077328bf314f8d63aa35fb4f28d6fd37326ff84f1e30801dcd2a'
+        private_key3 = '6c5e3c0c8c3c88529f5c6b68594f372f834244f25327a9f88d67201e087dbdd1'
+        acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        m = 2
+        multi_address = Address.address_from_multi_pub_keys(m, pub_keys)
+        b58_multi_address = multi_address.b58encode()
+        b58_acct1_address = acct1.get_address_base58()
+        b58_acct2_address = acct2.get_address_base58()
+        amount = 1000000000
+        gas_price = 500
+        gas_limit = 20000
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
+        asset = sdk.native_vm.asset()
+        tx1 = asset.new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
+                                             gas_limit, gas_price)
+        tx_bytes = tx1.serialize()
+        tx2 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx1), dict(tx2))
+
+        sdk.sign_transaction(tx2, acct1)
+        tx_bytes = tx2.serialize()
+        tx3 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx2), dict(tx3))
+        sdk.add_multi_sign_transaction(tx3, m, pub_keys, acct1)
+        tx_bytes = tx3.serialize()
+        tx4 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx3), dict(tx4))
+        sdk.add_multi_sign_transaction(tx4, m, pub_keys, acct2)
+        tx_bytes = tx4.serialize()
+        tx5 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx4), dict(tx5))
+        tx_hash = sdk.rpc.send_raw_transaction(tx5)
+        self.assertEqual(64, len(tx_hash))
+        sleep(6)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        contract_address = '0200000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
+        for event in notify:
+            self.assertEqual(event['States'][0], 'transfer')
+
+        multi_address = Address.address_from_multi_pub_keys(m, pub_keys[::-1])
+        b58_multi_address = multi_address.b58encode()
+        b58_acct1_address = acct1.get_address_base58()
+        b58_acct2_address = acct2.get_address_base58()
+        amount = 1000000000
+        gas_price = 500
+        gas_limit = 20000
+        tx1 = asset.new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
+                                             gas_limit, gas_price)
+        tx_bytes = tx1.serialize()
+        tx2 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx1), dict(tx2))
+
+        sdk.sign_transaction(tx2, acct1)
+        tx_bytes = tx2.serialize()
+        tx3 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx2), dict(tx3))
+        sdk.add_multi_sign_transaction(tx3, m, pub_keys, acct1)
+        tx_bytes = tx3.serialize()
+        tx4 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx3), dict(tx4))
+        sdk.add_multi_sign_transaction(tx4, m, pub_keys, acct2)
+        tx_bytes = tx4.serialize()
+        tx5 = Transaction.deserialize_from(tx_bytes)
+        self.assertEqual(dict(tx4), dict(tx5))
+        tx_hash = sdk.rpc.send_raw_transaction(tx5)
+        self.assertEqual(64, len(tx_hash))
+        sleep(6)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        contract_address = '0200000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
+        for event in notify:
+            self.assertEqual(event['States'][0], 'transfer')
 
 
 if __name__ == '__main__':

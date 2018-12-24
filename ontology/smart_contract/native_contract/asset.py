@@ -8,9 +8,10 @@ from ontology.utils import utils
 from ontology.common.define import *
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.vm.build_vm import build_native_invoke_code
 
 
@@ -53,17 +54,13 @@ class Asset(object):
         gas_limit = 0
         attributes = bytearray()
         signers = list()
-        hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
-                         hash_value)
-        balance = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        array = bytearray(binascii.a2b_hex(balance.encode('ascii')))
-        array.reverse()
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
-            balance = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except ValueError:
-            balance = 0
-        return balance
+            balance = ContractDataParser.to_int(response['Result'])
+            return balance
+        except SDKException:
+            return 0
 
     def query_allowance(self, asset: str, b58_from_address: str, b58_to_address: str) -> int:
         """
@@ -86,17 +83,13 @@ class Asset(object):
         gas_limit = 0
         attributes = bytearray()
         signers = list()
-        hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
-                         hash_value)
-        allowance = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        array = bytearray(binascii.a2b_hex(allowance.encode('ascii')))
-        array.reverse()
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
-            allowance = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except ValueError:
-            allowance = 0
-        return allowance
+            allowance = ContractDataParser.to_int(response['Result'])
+            return allowance
+        except SDKException:
+            return 0
 
     def query_unbound_ong(self, base58_address: str) -> int:
         """
@@ -106,8 +99,8 @@ class Asset(object):
         :return: the amount of unbound ong in the form of int.
         """
         contract_address = utils.get_asset_address('ont')
-        result = self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
-        return int(result)
+        unbound_ong = self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
+        return int(unbound_ong)
 
     def query_name(self, asset: str) -> str:
         """
@@ -128,10 +121,11 @@ class Asset(object):
         attributes = bytearray()
         signers = list()
         hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
-                         hash_value)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return bytes.fromhex(res).decode()
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        name = response['Result']
+        name = ContractDataParser.to_utf8_str(name)
+        return name
 
     def query_symbol(self, asset: str) -> str:
         """
@@ -152,10 +146,10 @@ class Asset(object):
         attributes = bytearray()
         signers = list()
         hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
-                         hash_value)
-        res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return bytes.fromhex(res).decode()
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        symbol = ContractDataParser.to_utf8_str(response['Result'])
+        return symbol
 
     def query_decimals(self, asset: str) -> int:
         """
@@ -176,10 +170,13 @@ class Asset(object):
         attributes = bytearray()
         signers = list()
         hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers,
-                         hash_value)
-        decimal = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return int(decimal)
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        try:
+            decimal = ContractDataParser.to_int(response['Result'])
+            return decimal
+        except SDKException:
+            return 0
 
     @staticmethod
     def new_transfer_transaction(asset: str, b58_from_address: str, b58_to_address: str, amount: int,
@@ -218,9 +215,8 @@ class Asset(object):
         tx_type = 0xd1
         attributes = bytearray()
         signers = list()
-        hash_value = bytearray()
         return Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, attributes,
-                           signers, hash_value)
+                           signers)
 
     @staticmethod
     def new_approve_transaction(asset: str, b58_send_address: str, b58_recv_address: str, amount: int,
@@ -254,8 +250,7 @@ class Asset(object):
         args = {"from": raw_send, "to": raw_recv, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), [],
-                           bytearray())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
 
     @staticmethod
     def new_transfer_from_transaction(asset: str, b58_send_address: str, b58_from_address: str, b58_recv_address: str,
@@ -283,8 +278,7 @@ class Asset(object):
         args = {"sender": raw_sender, "from": raw_from, "to": raw_to, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transferFrom", args)
         unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), [],
-                           bytearray())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
 
     @staticmethod
     def new_withdraw_ong_transaction(b58_claimer_address: str, b58_recv_address: str, amount: int,
@@ -319,8 +313,7 @@ class Asset(object):
         invoke_code = build_native_invoke_code(ong_contract_address, bytes([0]), "transferFrom", args)
         unix_time_now = int(time())
         payer_array = Address.b58decode(b58_payer_address).to_bytes()
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_array, invoke_code, bytearray(), [],
-                           bytearray())
+        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_array, invoke_code, bytearray(), list())
 
     def send_transfer(self, asset: str, from_acct: Account, b58_to_address: str, amount: int, payer: Account,
                       gas_limit: int, gas_price: int):

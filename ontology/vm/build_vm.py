@@ -14,7 +14,7 @@ def build_native_invoke_code(contract_address: bytearray, version: bytes, method
     builder.emit_push_integer(int.from_bytes(version, 'little'))
     builder.emit(SYSCALL)
     builder.emit_push_byte_array("Ontology.Native.Invoke".encode())
-    return builder.to_array()
+    return builder.to_bytes()
 
 
 def build_neo_vm_param(builder, params):
