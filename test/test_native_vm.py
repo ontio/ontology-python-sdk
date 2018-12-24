@@ -25,7 +25,7 @@ acct4 = Account(private_key4, SignatureScheme.SHA256withECDSA)
 class TestNativeVm(unittest.TestCase):
     def test_native_vm_transaction(self):
         sdk.set_rpc_address(rpc_address)
-        asset = sdk.native_vm().asset()
+        asset = sdk.native_vm.asset()
         amount = 1
         tx = asset.new_transfer_transaction('ont', acct2.get_address_base58(), acct1.get_address_base58(), amount,
                                             acct1.get_address_base58(), 20000, 500)
@@ -51,7 +51,7 @@ class TestNativeVm(unittest.TestCase):
         payer = acct2
         b58_payer_address = payer.get_address_base58()
         amount = 1
-        asset = sdk.native_vm().asset()
+        asset = sdk.native_vm.asset()
         tx = asset.new_withdraw_ong_transaction(b58_payer_address, b58_payer_address, amount, b58_payer_address, 20000,
                                                 500)
         sdk.sign_transaction(tx, payer)

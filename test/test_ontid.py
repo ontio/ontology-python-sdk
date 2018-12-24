@@ -19,7 +19,7 @@ sdk.rpc.set_address(rpc_address)
 
 class TestOntId(unittest.TestCase):
     def test_new_registry_ont_id_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         hex_public_key = acct.get_public_key_hex()
@@ -41,7 +41,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_send_registry(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         label = 'label'
@@ -63,7 +63,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_send_get_ddo(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
         acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         parsed_ddo = ont_id.send_get_ddo(acct_did)
@@ -73,7 +73,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
 
     def test_new_get_ddo_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
         acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         tx = ont_id.new_get_ddo_transaction(acct_did)
@@ -85,7 +85,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
 
     def test_new_add_attribute_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
         attribute_list = [attribute]
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -102,7 +102,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(tx.hash256_explorer(), tx_hash)
 
     def test_new_remove_attribute_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         hex_public_key = acct.get_public_key_hex()
@@ -130,7 +130,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_send_add_attributes(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
         attribute_list = [attribute]
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -153,7 +153,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual('try', bytes.fromhex(notify[0]['States'][3][0]).decode())
 
     def test_remove_attribute(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         label = 'label'
         password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -178,7 +178,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_new_add_remove_public_key_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         hex_public_key = acct.get_public_key_hex()
@@ -227,7 +227,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_send_add_remove_public_key_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         label = 'label'
         password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -278,7 +278,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_new_add_recovery_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         gas_limit = 20000
         gas_price = 500
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -302,7 +302,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(msg, e.args[1])
 
     def test_send_add_recovery_transaction(self):
-        ont_id = sdk.native_vm().ont_id()
+        ont_id = sdk.native_vm.ont_id()
         label = 'label'
         password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -329,7 +329,7 @@ class TestOntId(unittest.TestCase):
 
     # TODO
     # def test_send_add_public_key_by_recovery(self):
-    #     ont_id = sdk.native_vm().ont_id()
+    #     ont_id = sdk.native_vm.ont_id()
 
 
 if __name__ == '__main__':

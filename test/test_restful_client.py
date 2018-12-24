@@ -7,14 +7,15 @@ from random import choice
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
-from ontology.network.restful import RestfulClient
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.connect_manager import TEST_RESTFUL_ADDRESS, TEST_RPC_ADDRESS
+from ontology.network.restful import TEST_RESTFUL_ADDRESS
+from ontology.network.rpc import TEST_RPC_ADDRESS
 from ontology.ont_sdk import OntologySdk
 from ontology.utils.contract_data_parser import ContractDataParser
 
 restful_address = choice(TEST_RESTFUL_ADDRESS)
-restful_client = RestfulClient(restful_address)
+sdk = OntologySdk(restful_address=restful_address)
+restful_client = sdk.restful
 
 
 class TestRestfulClient(unittest.TestCase):
@@ -151,7 +152,7 @@ class TestRestfulClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm().asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
                                                               b58_from_address, gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = restful_client.send_raw_transaction(tx)
@@ -166,7 +167,7 @@ class TestRestfulClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm().asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
                                                               b58_from_address, gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         result = restful_client.send_raw_transaction_pre_exec(tx)
@@ -214,7 +215,7 @@ class TestRestfulClient(unittest.TestCase):
         sdk = OntologySdk()
         rpc_address = choice(TEST_RPC_ADDRESS)
         sdk.rpc.set_address(rpc_address)
-        oep4 = sdk.neo_vm().oep4()
+        oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)

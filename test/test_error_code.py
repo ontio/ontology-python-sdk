@@ -3,7 +3,7 @@
 
 import unittest
 
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 
 
 class TestErrorCode(unittest.TestCase):

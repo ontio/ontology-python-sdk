@@ -7,18 +7,18 @@ import unittest
 from random import choice
 
 from ontology.exception.exception import SDKException
-from ontology.network.rpc import RpcClient
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.connect_manager import TEST_RPC_ADDRESS
+from ontology.network.rpc import TEST_RPC_ADDRESS
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 
 rpc_address = choice(TEST_RPC_ADDRESS)
-rpc_client = RpcClient(rpc_address)
+sdk = OntologySdk(rpc_address=rpc_address)
+rpc_client = sdk.rpc
 
 private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
 private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
@@ -260,7 +260,7 @@ class TestRpcClient(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         sdk = OntologySdk()
         sdk.rpc.set_address(rpc_address)
-        oep4 = sdk.neo_vm().oep4()
+        oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)

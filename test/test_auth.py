@@ -45,7 +45,7 @@ class TestAuth(unittest.TestCase):
         b58_payer = acc.get_address_base58()
         gas_limit = 20000000
         gas_price = 500
-        tx = sdk.neo_vm().make_deploy_transaction(code, True, 'name', 'v1.0', 'author', 'email', 'desp', b58_payer,
+        tx = sdk.neo_vm.make_deploy_transaction(code, True, 'name', 'v1.0', 'author', 'email', 'desp', b58_payer,
                                                   gas_limit, gas_price)
         sdk.sign_transaction(tx, acc)
         res = sdk.rpc.send_raw_transaction(tx)
@@ -53,10 +53,10 @@ class TestAuth(unittest.TestCase):
         print(sdk.rpc.get_smart_contract("bc9795db0abe9d2d9ea565286a237dbf6b407165"))
 
     def test_register(self):
-        tx = sdk.native_vm().ont_id().new_registry_ont_id_transaction(admin_identity.ont_id,
+        tx = sdk.native_vm.ont_id().new_registry_ont_id_transaction(admin_identity.ont_id,
                                                                       admin_identity.controls[0].public_key,
                                                                       acc.get_address_base58(), 20000, 0)
-        tx2 = sdk.native_vm().ont_id().new_registry_ont_id_transaction(new_admin_identity.ont_id,
+        tx2 = sdk.native_vm.ont_id().new_registry_ont_id_transaction(new_admin_identity.ont_id,
                                                                        new_admin_identity.controls[0].public_key,
                                                                        acc.get_address_base58(), 20000, 0)
         print(new_admin_identity.controls[0].public_key)
@@ -81,9 +81,9 @@ class TestAuth(unittest.TestCase):
             self.assertIn('register ONT ID error: already registered', e.args[1])
 
     def test_getddo(self):
-        tx = sdk.native_vm().ont_id().new_get_ddo_transaction(new_admin_identity.ont_id)
+        tx = sdk.native_vm.ont_id().new_get_ddo_transaction(new_admin_identity.ont_id)
         res = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        print(sdk.native_vm().ont_id().parse_ddo(new_admin_identity.ont_id, res))
+        print(sdk.native_vm.ont_id().parse_ddo(new_admin_identity.ont_id, res))
 
     def test_init(self):
         abi = json.loads(abi_str)
@@ -93,7 +93,7 @@ class TestAuth(unittest.TestCase):
         contract_address.reverse()
         gas_limit = 20000000
         gas_price = 500
-        res = sdk.neo_vm().send_transaction(contract_address, acc, acc, gas_limit, gas_price, func, False)
+        res = sdk.neo_vm.send_transaction(contract_address, acc, acc, gas_limit, gas_price, func, False)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 
@@ -103,7 +103,7 @@ class TestAuth(unittest.TestCase):
         code_address.reverse()
         gas_limit = 20000000
         gas_price = 500
-        txhash = sdk.native_vm().auth().send_transfer(admin_identity, "111111", 1, code_address.hex(),
+        txhash = sdk.native_vm.auth().send_transfer(admin_identity, "111111", 1, code_address.hex(),
                                                       new_admin_identity.ont_id, acc, gas_limit, gas_price)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
@@ -117,7 +117,7 @@ class TestAuth(unittest.TestCase):
         function_name.append("foo2")
         gas_limit = 20000000
         gas_price = 500
-        res = sdk.native_vm().auth().assign_funcs_to_role(new_admin_identity, "111111", 1, code_address.hex(), "role3",
+        res = sdk.native_vm.auth().assign_funcs_to_role(new_admin_identity, "111111", 1, code_address.hex(), "role3",
                                                           function_name, acc, gas_limit, gas_price)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
@@ -130,7 +130,7 @@ class TestAuth(unittest.TestCase):
         ont_ids.append(identity.ont_id)
         gas_limit = 20000000
         gas_price = 500
-        res = sdk.native_vm().auth().assign_ont_ids_to_role(new_admin_identity, "111111", 1, code_address.hex(),
+        res = sdk.native_vm.auth().assign_ont_ids_to_role(new_admin_identity, "111111", 1, code_address.hex(),
                                                             "role3",
                                                             ont_ids, acc, gas_limit, gas_price)
         time.sleep(6)
@@ -140,7 +140,7 @@ class TestAuth(unittest.TestCase):
         contract_address = "bc9795db0abe9d2d9ea565286a237dbf6b407165"
         code_address = bytearray.fromhex(contract_address)
         code_address.reverse()
-        res = sdk.native_vm().auth().verify_token(admin_identity, "111111", 1, code_address.hex(), "foo")
+        res = sdk.native_vm.auth().verify_token(admin_identity, "111111", 1, code_address.hex(), "foo")
         print("res:", res)
 
     def test_delegate(self):
@@ -149,7 +149,7 @@ class TestAuth(unittest.TestCase):
         code_address.reverse()
         gas_limit = 20000000
         gas_price = 500
-        txhash = sdk.native_vm().auth().delegate(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
+        txhash = sdk.native_vm.auth().delegate(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
                                                  "role", 60 * 5, 1, acc, gas_limit, gas_price)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
@@ -160,7 +160,7 @@ class TestAuth(unittest.TestCase):
         code_address.reverse()
         gas_limit = 20000000
         gas_price = 500
-        txhash = sdk.native_vm().auth().withdraw(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
+        txhash = sdk.native_vm.auth().withdraw(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
                                                  "role", acc, gas_limit, gas_price)
         time.sleep(6)
         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
