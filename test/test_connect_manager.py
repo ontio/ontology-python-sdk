@@ -4,18 +4,17 @@ import time
 import unittest
 from random import choice
 
-from ontology.account.account import Account
-from ontology.common.address import Address
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.exception.exception import SDKException
-from ontology.network.connect_manager import TEST_RESTFUL_ADDRESS, TEST_RPC_ADDRESS
 from ontology.ont_sdk import OntologySdk
+from ontology.common.address import Address
+from ontology.account.account import Account
+from ontology.utils.utils import get_random_hex_str
+from ontology.exception.exception import SDKException
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.utils import get_random_hex_str
 
 sdk = OntologySdk()
-sdk.rpc.set_connect_test_net()
+sdk.rpc.connect_to_test_net()
 rpc = sdk.rpc
 
 
@@ -250,9 +249,6 @@ class TestRpcClient(unittest.TestCase):
         except SDKException as e:
             self.assertIn('unknown transaction', e.args[1])
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        sdk = OntologySdk()
-        rpc_address = choice(TEST_RPC_ADDRESS)
-        sdk.rpc.set_address(rpc_address)
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
         private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'

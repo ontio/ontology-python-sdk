@@ -10,15 +10,12 @@ from random import choice
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.connect_manager import TEST_RPC_ADDRESS
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 sdk = OntologySdk()
-remote_rpc_address = choice(TEST_RPC_ADDRESS)
-local_rpc_address = 'http://localhost:20336'
-sdk.rpc.set_address(remote_rpc_address)
+sdk.rpc.connect_to_test_net()
 gas_limit = 20000000
 gas_price = 500
 

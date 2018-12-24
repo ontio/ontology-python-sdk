@@ -13,12 +13,11 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
-from ontology.network.connect_manager import TEST_WS_ADDRESS, TEST_RPC_ADDRESS
 
-remote_rpc_address = choice(TEST_RPC_ADDRESS)
-websocket_address = choice(TEST_WS_ADDRESS)
-websocket_client = WebsocketClient()
-websocket_client.set_address(websocket_address)
+sdk = OntologySdk()
+sdk.websocket.connect_to_test_net()
+websocket_client = sdk.websocket
+sdk.rpc.connect_to_test_net()
 
 
 class TestWebsocketClient(unittest.TestCase):
