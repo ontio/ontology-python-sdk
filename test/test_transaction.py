@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
+
 import unittest
-import binascii
 from time import sleep
 
-from ontology.core.transaction import Transaction
 from ontology.utils import utils
 
 from ontology.ont_sdk import OntologySdk
