@@ -8,7 +8,7 @@ from time import time
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.common.define import ZERO_ADDRESS
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.oep4 import Oep4
@@ -66,7 +66,7 @@ class NeoVm(object):
                 raise SDKException(ErrorCode.param_err('the data type of contract address is incorrect.'))
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
-            return self.__sdk.default_connector.send_raw_transaction_pre_exec(tx, is_full)
+            return self.__sdk.rpc.send_raw_transaction_pre_exec(tx, is_full)
         else:
             unix_time_now = int(time())
             params.append(0x67)
@@ -79,7 +79,7 @@ class NeoVm(object):
             self.__sdk.sign_transaction(tx, payer_acct)
             if isinstance(acct, Account) and acct.get_address_base58() != payer_acct.get_address_base58():
                 self.__sdk.add_sign_transaction(tx, acct)
-            return self.__sdk.default_connector.send_raw_transaction(tx, is_full)
+            return self.__sdk.rpc.send_raw_transaction(tx, is_full)
 
     @staticmethod
     def make_deploy_transaction(code_str: str, need_storage: bool, name: str, code_version: str, author: str,

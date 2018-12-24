@@ -1,4 +1,4 @@
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.parameter import Parameter
 

@@ -6,7 +6,7 @@ import binascii
 
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.common.error_code import ErrorCode
+from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
@@ -34,7 +34,7 @@ class Oep4(object):
 
     def __get_token_setting(self, func_name: str) -> str:
         func = InvokeFunction(func_name)
-        res = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
+        res = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
         return res.get('Result', '')
 
     @staticmethod
@@ -94,7 +94,7 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('init')
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, acct, payer_acct, gas_limit,
+        tx_hash = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, acct, payer_acct, gas_limit,
                                                        gas_price,
                                                        func, False)
         return tx_hash
@@ -107,7 +107,7 @@ class Oep4(object):
         :return: the total supply of the oep4 token.
         """
         func = InvokeFunction('totalSupply')
-        response = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0,
+        response = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, None, None, 0,
                                                         0, func, True)
         try:
             total_supply = ContractDataParser.to_int(response['Result'])
@@ -127,7 +127,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_address)
         address = Address.b58decode(b58_address).to_bytes()
         func.set_params_value(address)
-        result = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
+        result = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
         try:
             balance = ContractDataParser.to_int(result['Result'])
         except SDKException:
@@ -159,7 +159,7 @@ class Oep4(object):
         from_address = from_acct.get_address().to_bytes()
         to_address = Address.b58decode(b58_to_address).to_bytes()
         func.set_params_value(from_address, to_address, value)
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, from_acct, payer_acct,
+        tx_hash = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, from_acct, payer_acct,
                                                        gas_limit,
                                                        gas_price, func, False)
         return tx_hash
@@ -206,7 +206,7 @@ class Oep4(object):
                          bytearray(), [], bytearray())
         for index in range(signers_len):
             self.__sdk.add_sign_transaction(tx, signers[index])
-        tx_hash = self.__sdk.rpc_connector.send_raw_transaction(tx)
+        tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
         return tx_hash
 
     def approve(self, owner_acct: Account, b58_spender_address: str, amount: int, payer_acct: Account, gas_limit: int,
@@ -234,7 +234,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_spender_address)
         spender_address = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner_address, spender_address, amount)
-        tx_hash = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, owner_acct, payer_acct,
+        tx_hash = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, owner_acct, payer_acct,
                                                        gas_limit,
                                                        gas_price, func, False)
         return tx_hash
@@ -254,7 +254,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_spender_address)
         spender = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner, spender)
-        result = self.__sdk.neo_vm().send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
+        result = self.__sdk.neo_vm.send_transaction(self.__bytearry_contract_address, None, None, 0, 0, func, True)
         try:
             allowance = ContractDataParser.to_int(result['Result'])
         except SDKException:
@@ -300,5 +300,5 @@ class Oep4(object):
         self.__sdk.sign_transaction(tx, spender_acct)
         if spender_acct.get_address_base58() != payer_acct.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer_acct)
-        tx_hash = self.__sdk.rpc_connector.send_raw_transaction(tx)
+        tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
         return tx_hash
