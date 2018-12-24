@@ -2,16 +2,23 @@
 # -*- coding: utf-8 -*-
 
 import json
-from random import choice
-from sys import maxsize
-from typing import List
-
 import requests
+import binascii
+
+from time import time
+from typing import List
+from sys import maxsize
+from random import choice
 from Cryptodome.Random.random import randint
 
-from ontology.exception.error_code import ErrorCode
+from ontology.account.account import Account
 from ontology.core.transaction import Transaction
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
+from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.smart_contract.neo_vm import NeoVm
 
 TEST_RPC_ADDRESS = ['http://polaris1.ont.io:20336', 'http://polaris2.ont.io:20336', 'http://polaris3.ont.io:20336']
 MAIN_RPC_ADDRESS = ['http://dappnode1.ont.io:20336', 'http://dappnode2.ont.io:20336']
@@ -413,6 +420,20 @@ class RpcClient(object):
             return response
         return response['result']
 
+    def get_memory_pool_tx_count(self, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_COUNT)
+        response = self.__post(self.__url, payload)
+        if is_full:
+            return response
+        return response['result']
+
+    def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
+        response = self.__post(self.__url, payload)
+        if is_full:
+            return response
+        return response['result']['State']
+
     def send_raw_transaction(self, tx: Transaction, is_full: bool = False) -> str:
         """
         This interface is used to send the transaction into the network.
@@ -442,16 +463,38 @@ class RpcClient(object):
             return response
         return response['result']
 
-    def get_memory_pool_tx_count(self, is_full: bool = False):
-        payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_COUNT)
-        response = self.__post(self.__url, payload)
-        if is_full:
-            return response
-        return response['result']
-
-    def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
-        payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
-        response = self.__post(self.__url, payload)
-        if is_full:
-            return response
-        return response['result']['State']
+    def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, acct: Account or None,
+                                payer_acct: Account or None, gas_limit: int, gas_price: int,
+                                func: AbiFunction or InvokeFunction, pre_exec: bool, is_full: bool = False):
+        if isinstance(func, AbiFunction):
+            params = BuildParams.serialize_abi_function(func)
+        elif isinstance(func, InvokeFunction):
+            params = func.create_invoke_code()
+        else:
+            raise SDKException(ErrorCode.other_error('the type of func is error.'))
+        if isinstance(contract_address, str) and len(contract_address) == 40:
+            contract_address = bytearray(binascii.a2b_hex(contract_address))
+            contract_address.reverse()
+        if pre_exec:
+            if isinstance(contract_address, bytes):
+                tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
+            elif isinstance(contract_address, bytearray):
+                tx = NeoVm.make_invoke_transaction(contract_address, bytearray(params), b'', 0, 0)
+            else:
+                raise SDKException(ErrorCode.param_err('the data type of contract address is incorrect.'))
+            if acct is not None:
+                tx.sign_transaction(acct)
+            return self.send_raw_transaction_pre_exec(tx, is_full)
+        else:
+            unix_time_now = int(time())
+            params.append(0x67)
+            for i in contract_address:
+                params.append(i)
+            if payer_acct is None:
+                raise SDKException(ErrorCode.param_err('payer account is None.'))
+            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_bytes(),
+                             params, bytearray(), [])
+            tx.sign_transaction(payer_acct)
+            if isinstance(acct, Account) and acct.get_address_base58() != payer_acct.get_address_base58():
+                tx.add_sign_transaction(acct)
+            return self.send_raw_transaction(tx, is_full)
