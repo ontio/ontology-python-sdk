@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
+
 import time
 import unittest
+
+from test import acct1, acct2, acct3, acct4
 
 from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
@@ -10,25 +12,20 @@ from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
-# rpc_address = "http://127.0.0.1:20336"
-
-rpc_address = 'http://polaris3.ont.io:20336'
 sdk = OntologySdk()
-sdk.rpc.set_address(rpc_address)
+sdk.rpc.connect_to_test_net()
 
 
 class TestOntId(unittest.TestCase):
     def test_new_registry_ont_id_transaction(self):
         ont_id = sdk.native_vm.ont_id()
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        hex_public_key = acct.get_public_key_hex()
-        b58_address = acct.get_address_base58()
+        hex_public_key = acct2.get_public_key_hex()
+        b58_address = acct2.get_address_base58()
         acct_did = "did:ont:" + b58_address
         gas_limit = 20000
         gas_price = 500
         tx = ont_id.new_registry_ont_id_transaction(acct_did, hex_public_key, b58_address, gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx = sdk.sign_transaction(tx, acct2)
         self.assertEqual(64, len(tx.hash256_hex()))
         self.assertEqual(600, len(tx.serialize(is_hex=True)))
         try:
@@ -43,7 +40,6 @@ class TestOntId(unittest.TestCase):
     def test_send_registry(self):
         ont_id = sdk.native_vm.ont_id()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         label = 'label'
         password = 'password'
         try:
@@ -54,7 +50,7 @@ class TestOntId(unittest.TestCase):
         gas_limit = 20000
         gas_price = 500
         try:
-            ont_id.send_registry_ont_id_transaction(identity, password, acct, gas_limit, gas_price)
+            ont_id.send_registry_ont_id_transaction(identity, password, acct2, gas_limit, gas_price)
         except SDKException as e:
             self.assertEqual(59000, e.args[0])
             msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] ' \
@@ -89,31 +85,27 @@ class TestOntId(unittest.TestCase):
         ont_id = sdk.native_vm.ont_id()
         attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
         attribute_list = [attribute]
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        hex_public_key = acct.get_public_key_hex()
-        b58_address = acct.get_address_base58()
+        hex_public_key = acct2.get_public_key_hex()
+        b58_address = acct2.get_address_base58()
         acct_did = "did:ont:" + b58_address
         gas_limit = 20000
         gas_price = 500
         tx = ont_id.new_add_attribute_transaction(acct_did, hex_public_key, attribute_list, b58_address, gas_limit,
                                                   gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx = sdk.sign_transaction(tx, acct2)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(tx.hash256_explorer(), tx_hash)
 
     def test_new_remove_attribute_transaction(self):
         ont_id = sdk.native_vm.ont_id()
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        hex_public_key = acct.get_public_key_hex()
-        b58_address = acct.get_address_base58()
+        hex_public_key = acct2.get_public_key_hex()
+        b58_address = acct2.get_address_base58()
         acct_did = "did:ont:" + b58_address
         gas_limit = 20000
         gas_price = 500
         path = 'try'
         tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx = sdk.sign_transaction(tx, acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(tx.hash256_explorer(), tx_hash)
@@ -158,13 +150,12 @@ class TestOntId(unittest.TestCase):
         label = 'label'
         password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
         gas_limit = 20000
         gas_price = 500
         path = 'try'
         try:
-            tx_hash = ont_id.send_remove_attribute_transaction(identity, password, path, acct, gas_limit, gas_price)
+            tx_hash = ont_id.send_remove_attribute_transaction(identity, password, path, acct2, gas_limit, gas_price)
             time.sleep(6)
             notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
             self.assertEqual('Attribute', notify[0]['States'][0])
