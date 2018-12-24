@@ -112,10 +112,10 @@ class OntologySdk(object):
         return self.__neo_vm
 
     def set_rpc_address(self, rpc_address: str):
-        if self.__rpc is None:
-            self.__rpc = RpcClient(rpc_address)
-        else:
+        if isinstance(self.__rpc, RpcClient):
             self.__rpc.set_address(rpc_address)
+        else:
+            self.__rpc = RpcClient(rpc_address)
 
     def get_rpc_address(self):
         if self.__rpc is None:
@@ -139,10 +139,10 @@ class OntologySdk(object):
         return MAIN_RPC_ADDRESS
 
     def set_restful_address(self, restful_address: str):
-        if not isinstance(self.__restful, RestfulClient):
-            self.__restful = RestfulClient(restful_address)
-        else:
+        if isinstance(self.__restful, RestfulClient):
             self.__restful.set_address(restful_address)
+        else:
+            self.__restful = RestfulClient(restful_address)
 
     def get_restful_address(self):
         if not isinstance(self.__restful, RestfulClient):
@@ -166,10 +166,10 @@ class OntologySdk(object):
         return MAIN_RESTFUL_ADDRESS
 
     def set_websocket_address(self, websocket_address: str):
-        if not isinstance(self.__websocket, WebsocketClient):
-            self.__websocket = WebsocketClient(websocket_address)
-        else:
+        if isinstance(self.__websocket, WebsocketClient):
             self.__websocket.set_address(websocket_address)
+        else:
+            self.__websocket = WebsocketClient(websocket_address)
 
     def get_websocket_address(self):
         if not isinstance(self.__websocket, WebsocketClient):
