@@ -98,8 +98,8 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('init')
-        tx_hash = self.__network.send_neo_vm_transaction(self.__bytearry_contract_address, acct, payer_acct,
-                                                             gas_limit, gas_price, func, False)
+        tx_hash = self.__network.send_neo_vm_transaction(self.__bytearry_contract_address, acct, payer_acct, gas_limit,
+                                                         gas_price, func, False)
         return tx_hash
 
     def get_total_supply(self) -> int:
@@ -261,7 +261,6 @@ class Oep4(object):
         except SDKException:
             allowance = 0
         return allowance
-
 
     def transfer_from(self, spender_acct: Account, b58_from_address: str, b58_to_address: str, value: int,
                       payer_acct: Account, gas_limit: int, gas_price: int):
