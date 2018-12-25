@@ -84,9 +84,9 @@ class RpcClient(object):
             response = requests.post(url, json=payload, headers=header, timeout=10)
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0])) from None
-        except requests.exceptions.ConnectTimeout as e:
+        except requests.exceptions.ConnectTimeout:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url]))) from None
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from None
         try:
             content = response.content.decode('utf-8')

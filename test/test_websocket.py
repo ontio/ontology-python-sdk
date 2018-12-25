@@ -4,6 +4,8 @@
 import asyncio
 import unittest
 
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.crypto.signature_scheme import SignatureScheme
@@ -108,11 +110,13 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_balance(b58_address: str):
+        if not isinstance(b58_address, str):
+            raise SDKException(ErrorCode.other_error('Invalid base58 encode address.'))
         balance = await websocket_client.get_balance(b58_address)
         return balance
 
     def test_get_balance(self):
-        b58_address = acct4
+        b58_address = acct4.get_address_base58()
         event_loop = asyncio.get_event_loop()
         balance = event_loop.run_until_complete(TestWebsocketClient.get_balance(b58_address))
         self.assertGreaterEqual(balance['ont'], 1)

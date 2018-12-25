@@ -38,10 +38,16 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        token_symbol = asset.query_symbol('ont')
-        self.assertEqual('ONT', token_symbol)
-        token_symbol = asset.query_symbol('ong')
-        self.assertEqual('ONG', token_symbol)
+        try:
+            token_symbol = asset.query_symbol('ont')
+            self.assertEqual('ONT', token_symbol)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            token_symbol = asset.query_symbol('ong')
+            self.assertEqual('ONG', token_symbol)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_decimals(self):
         sdk = OntologySdk()
@@ -53,21 +59,33 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(1, decimals)
 
     def test_unbound_ong(self):
-        b58_address1 = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        b58_address2 = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        b58_address3 = 'Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1'
-        b58_address4 = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
+        b58_address1 = acct1.get_address_base58()
+        b58_address2 = acct2.get_address_base58()
+        b58_address3 = acct3.get_address_base58()
+        b58_address4 = acct4.get_address_base58()
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
-        self.assertGreaterEqual(acct1_unbound_ong, 0)
-        acct2_unbound_ong = asset.query_unbound_ong(b58_address2)
-        self.assertGreaterEqual(acct2_unbound_ong, 0)
-        acct3_unbound_ong = asset.query_unbound_ong(b58_address3)
-        self.assertGreaterEqual(acct3_unbound_ong, 0)
-        acct4_unbound_ong = asset.query_unbound_ong(b58_address4)
-        self.assertGreaterEqual(acct4_unbound_ong, 0)
+        try:
+            acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
+            self.assertGreaterEqual(acct1_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            acct2_unbound_ong = asset.query_unbound_ong(b58_address2)
+            self.assertGreaterEqual(acct2_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            acct3_unbound_ong = asset.query_unbound_ong(b58_address3)
+            self.assertGreaterEqual(acct3_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            acct4_unbound_ong = asset.query_unbound_ong(b58_address4)
+            self.assertGreaterEqual(acct4_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_balance(self):
         sdk = OntologySdk()
@@ -76,16 +94,25 @@ class TestAsset(unittest.TestCase):
         private_key = utils.get_random_hex_str(64)
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_address = acct.get_address_base58()
-        balance = asset.query_balance('ont', b58_address)
-        self.assertTrue(isinstance(balance, int))
-        self.assertGreaterEqual(balance, 0)
-        balance = asset.query_balance('ong', b58_address)
-        self.assertTrue(isinstance(balance, int))
-        self.assertGreaterEqual(balance, 0)
-        b58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        balance = asset.query_balance('ong', b58_address)
-        self.assertTrue(isinstance(balance, int))
-        self.assertGreaterEqual(balance, 1)
+        try:
+            balance = asset.query_balance('ont', b58_address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            balance = asset.query_balance('ong', b58_address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        b58_address = acct2.get_address_base58()
+        try:
+            balance = asset.query_balance('ong', b58_address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 1)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_allowance(self):
         sdk = OntologySdk()
