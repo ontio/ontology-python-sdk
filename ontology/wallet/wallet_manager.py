@@ -247,9 +247,9 @@ class WalletManager(object):
         for index in range(len(self.wallet_in_mem.accounts)):
             if info.address_base58 == self.wallet_in_mem.accounts[index].b58_address:
                 return self.wallet_in_mem.accounts[index]
-        return None
+        raise SDKException(ErrorCode.other_error(f'Create account from key {private_key} failed.'))
 
-    def get_account(self, b58_address_or_ontid: str, password: str) -> Account or None:
+    def get_account(self, b58_address_or_ontid: str, password: str) -> Account:
         """
         :param b58_address_or_ontid: a base58 encode address or ontid
         :param password: a password which is used to decrypt the encrypted private key.
@@ -273,7 +273,7 @@ class WalletManager(object):
                     private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
                                                                       self.wallet_in_mem.scrypt.get_n(), self.scheme)
                     return Account(private_key, self.scheme)
-        return None
+        raise SDKException(ErrorCode.other_error(f'Get account {b58_address_or_ontid} failed.'))
 
     def get_default_identity(self) -> Identity:
         for identity in self.wallet_in_mem.identities:

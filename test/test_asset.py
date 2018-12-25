@@ -101,11 +101,10 @@ class TestAsset(unittest.TestCase):
     def test_new_approve_transaction(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        sender = Account(private_key, SignatureScheme.SHA256withECDSA)
+        sender = acct1
         b58_send_address = sender.get_address_base58()
         b58_payer_address = sender.get_address_base58()
-        b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_recv_address = acct2.get_address_base58()
         amount = 5
         gas_price = 500
         gas_limit = 20000
@@ -186,11 +185,10 @@ class TestAsset(unittest.TestCase):
     def test_new_transfer_from_transaction(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        sender = Account(private_key, SignatureScheme.SHA256withECDSA)
+        sender = acct2
         b58_sender_address = sender.get_address_base58()
         b58_payer_address = sender.get_address_base58()
-        b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
+        b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()
         old_from_balance = sdk.rpc.get_balance(b58_from_address)
         old_recv_balance = sdk.rpc.get_balance(b58_recv_address)
