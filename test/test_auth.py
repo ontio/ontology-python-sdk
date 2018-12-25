@@ -10,27 +10,27 @@ from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 
-rpc_address = 'http://polaris3.ont.io:20336'
-
-sdk = OntologySdk()
-sdk.set_rpc_address(rpc_address)
-private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-acc = Account(private_key, SignatureScheme.SHA256withECDSA)
-acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-
-admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111",
-                                                                     '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf')
-
-new_admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
-                                                                         '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114')
-
-identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
-                                                               '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f')
-
-abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Main","functions":[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],"returntype":"Any"},{"name":"foo","parameters":[],"returntype":"String"},{"name":"foo2","parameters":[],"returntype":"String"},{"name":"foo3","parameters":[],"returntype":"String"},{"name":"init","parameters":[],"returntype":"Boolean"}],"events":[]}'
+# rpc_address = 'http://polaris3.ont.io:20336'
+#
+# sdk = OntologySdk()
+# sdk.set_rpc_address(rpc_address)
+# private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+# private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+# private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
+# acc = Account(private_key, SignatureScheme.SHA256withECDSA)
+# acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
+# acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
+#
+# admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111",
+#                                                                      '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf')
+#
+# new_admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
+#                                                                          '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114')
+#
+# identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
+#                                                                '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f')
+#
+# abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Main","functions":[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],"returntype":"Any"},{"name":"foo","parameters":[],"returntype":"String"},{"name":"foo2","parameters":[],"returntype":"String"},{"name":"foo3","parameters":[],"returntype":"String"},{"name":"init","parameters":[],"returntype":"Boolean"}],"events":[]}'
 #
 #
 # class TestAuth(unittest.TestCase):

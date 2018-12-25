@@ -23,9 +23,8 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(ong_address, asset.get_asset_address('ong'))
 
     def test_query_name(self):
-        rpc_address = 'http://polaris3.ont.io:20336'
         sdk = OntologySdk()
-        sdk.rpc.set_address(rpc_address)
+        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         token_name = asset.query_name('ont')
         self.assertEqual('ONT Token', token_name)
