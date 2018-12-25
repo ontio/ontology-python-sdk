@@ -10,27 +10,27 @@ from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 
-rpc_address = 'http://polaris3.ont.io:20336'
-
-sdk = OntologySdk()
-sdk.set_rpc_address(rpc_address)
-private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-acc = Account(private_key, SignatureScheme.SHA256withECDSA)
-acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-
-admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111",
-                                                                     '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf')
-
-new_admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
-                                                                         '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114')
-
-identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
-                                                               '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f')
-
-abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Main","functions":[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],"returntype":"Any"},{"name":"foo","parameters":[],"returntype":"String"},{"name":"foo2","parameters":[],"returntype":"String"},{"name":"foo3","parameters":[],"returntype":"String"},{"name":"init","parameters":[],"returntype":"Boolean"}],"events":[]}'
+# rpc_address = 'http://polaris3.ont.io:20336'
+#
+# sdk = OntologySdk()
+# sdk.set_rpc_address(rpc_address)
+# private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
+# private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+# private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
+# acc = Account(private_key, SignatureScheme.SHA256withECDSA)
+# acc2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
+# acc3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
+#
+# admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss", "111111",
+#                                                                      '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf')
+#
+# new_admin_identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
+#                                                                          '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114')
+#
+# identity = sdk.wallet_manager.create_identity_from_private_key("sss2", "111111",
+#                                                                '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f')
+#
+# abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Main","functions":[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args","type":"Array"}],"returntype":"Any"},{"name":"foo","parameters":[],"returntype":"String"},{"name":"foo2","parameters":[],"returntype":"String"},{"name":"foo3","parameters":[],"returntype":"String"},{"name":"init","parameters":[],"returntype":"Boolean"}],"events":[]}'
 #
 #
 # class TestAuth(unittest.TestCase):
@@ -49,7 +49,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #                                                   gas_limit, gas_price)
 #         sdk.sign_transaction(tx, acc)
 #         res = sdk.rpc.send_raw_transaction(tx)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract("bc9795db0abe9d2d9ea565286a237dbf6b407165"))
 #
 #     def test_register(self):
@@ -69,13 +69,13 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         sdk.add_sign_transaction(tx2, account2)
 #         try:
 #             tx_hash = sdk.rpc.send_raw_transaction(tx)
-#             time.sleep(6)
+#             time.sleep(random.randint(6, 10))
 #             print(sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash))
 #         except SDKException as e:
 #             self.assertIn('register ONT ID error: already registered', e.args[1])
 #         try:
 #             tx_hash = sdk.rpc.send_raw_transaction(tx2)
-#             time.sleep(6)
+#             time.sleep(random.randint(6, 10))
 #             print(sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash))
 #         except SDKException as e:
 #             self.assertIn('register ONT ID error: already registered', e.args[1])
@@ -94,7 +94,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         gas_limit = 20000000
 #         gas_price = 500
 #         res = sdk.rpc.send_neo_vm_transaction(contract_address, acc, acc, gas_limit, gas_price, func, False)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_transfer(self):
@@ -105,7 +105,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         gas_price = 500
 #         txhash = sdk.native_vm.auth().send_transfer(admin_identity, "111111", 1, code_address.hex(),
 #                                                       new_admin_identity.ont_id, acc, gas_limit, gas_price)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
 #
 #     def test_assign_funcs_to_role(self):
@@ -119,7 +119,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         gas_price = 500
 #         res = sdk.native_vm.auth().assign_funcs_to_role(new_admin_identity, "111111", 1, code_address.hex(), "role3",
 #                                                           function_name, acc, gas_limit, gas_price)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_assign_ont_ids_to_role(self):
@@ -133,7 +133,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         res = sdk.native_vm.auth().assign_ont_ids_to_role(new_admin_identity, "111111", 1, code_address.hex(),
 #                                                             "role3",
 #                                                             ont_ids, acc, gas_limit, gas_price)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_verify_token(self):
@@ -151,7 +151,7 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         gas_price = 500
 #         txhash = sdk.native_vm.auth().delegate(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
 #                                                  "role", 60 * 5, 1, acc, gas_limit, gas_price)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
 #
 #     def test_withdraw(self):
@@ -162,5 +162,5 @@ abi_str = '{"hash":"0xbc9795db0abe9d2d9ea565286a237dbf6b407165","entrypoint":"Ma
 #         gas_price = 500
 #         txhash = sdk.native_vm.auth().withdraw(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
 #                                                  "role", acc, gas_limit, gas_price)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))

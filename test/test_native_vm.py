@@ -3,23 +3,13 @@
 
 import unittest
 
-from ontology.ont_sdk import OntologySdk
-from ontology.account.account import Account
-from ontology.exception.exception import SDKException
-from ontology.crypto.signature_scheme import SignatureScheme
+from test import acct1, acct2
 
-rpc_address = 'http://polaris3.ont.io:20336'
+from ontology.ont_sdk import OntologySdk
+from ontology.exception.exception import SDKException
+
 sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()
-
-private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-private_key4 = "f9d2d30ffb22dffdf4f14ad6f1303460efc633ea8a3014f638eaa19c259bada1"
-acct1 = Account(private_key, SignatureScheme.SHA256withECDSA)
-acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-acct4 = Account(private_key4, SignatureScheme.SHA256withECDSA)
 
 
 class TestNativeVm(unittest.TestCase):

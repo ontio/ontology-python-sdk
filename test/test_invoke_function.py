@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import random
 import time
 import unittest
 import binascii
@@ -18,7 +18,7 @@ gas_limit = 20000000
 gas_price = 500
 
 
-class TestWalletManager(unittest.TestCase):
+class TestInvokeFunction(unittest.TestCase):
     def test_oep4_name(self):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         bytearray_contract_address = bytearray(binascii.a2b_hex(contract_address))
@@ -72,7 +72,7 @@ class TestWalletManager(unittest.TestCase):
         func.set_params_value(bytes_from_address, bytes_to_address, value)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -93,7 +93,7 @@ class TestWalletManager(unittest.TestCase):
         func.set_params_value(bytes_owner_address, bytes_spender_address, amount)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -118,7 +118,7 @@ class TestWalletManager(unittest.TestCase):
         func = InvokeFunction('transferMulti')
         func.set_params_value(transfer1, transfer2)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states_list = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states_list[0][0] = ContractDataParser.to_utf8_str(states_list[0][0])
@@ -148,7 +148,7 @@ class TestWalletManager(unittest.TestCase):
         func.set_params_value(transfer_list)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -173,7 +173,7 @@ class TestWalletManager(unittest.TestCase):
         func.set_params_value(transfer_1, transfer_2)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -235,7 +235,7 @@ class TestWalletManager(unittest.TestCase):
         notify_args.set_params_value(bool_msg, int_msg, bytes_msg, str_msg, bytes_address_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, notify_args,
                                                   False)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -257,7 +257,7 @@ class TestWalletManager(unittest.TestCase):
         func = InvokeFunction('testList')
         func.set_params_value(list_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -304,7 +304,7 @@ class TestWalletManager(unittest.TestCase):
         func = InvokeFunction('testMapInMap')
         func.set_params_value(dict_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])

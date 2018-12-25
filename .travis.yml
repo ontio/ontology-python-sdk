@@ -2,12 +2,11 @@
 sudo: false
 language: python
 # command to install dependencies
-install: "make"
-# command to run tests
 python:
     - "3.6"
-    - "3.7"
+    - "3.6-dev"  # 3.6 development branch
+    - "3.7-dev"  # 3.7 development branch
 install:
     - pip install -r requirements.txt
 script:
-    - python -m unittest discover -s /home/travis/build/NashMiao/ontology-python-sdk/test -t /home/travis/build/NashMiao/ontology-python-sdk/test
+    - python -m unittest discover
