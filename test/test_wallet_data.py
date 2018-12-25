@@ -30,7 +30,7 @@ class TestWalletData(unittest.TestCase):
         address_list = list()
         for i in range(size):
             address = random.randint(0, 1000000000)
-            acct = AccountData(address=address)
+            acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
@@ -48,7 +48,7 @@ class TestWalletData(unittest.TestCase):
         address_list = list()
         for i in range(size):
             address = random.randint(0, 1000000000)
-            acct = AccountData(address=address)
+            acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
@@ -56,7 +56,7 @@ class TestWalletData(unittest.TestCase):
         for i in range(size * 2):
             index = random.choice(range(size))
             acct = wallet.get_account_by_index(index)
-            self.assertEqual(address_list[index], acct.get_b58_address())
+            self.assertEqual(address_list[index], acct.b58_address)
 
     def test_get_account_by_address(self):
         test_id = "test_ont_id"
@@ -65,7 +65,7 @@ class TestWalletData(unittest.TestCase):
         address_list = list()
         for i in range(size):
             address = random.randint(0, 1000000000)
-            acct = AccountData(address=address)
+            acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
@@ -73,7 +73,7 @@ class TestWalletData(unittest.TestCase):
         for i in range(size * 2):
             rand_address = random.choice(address_list)
             acct = wallet.get_account_by_b58_address(rand_address)
-            self.assertEqual(rand_address, acct.get_b58_address())
+            self.assertEqual(rand_address, acct.b58_address)
 
     def test_add_identity(self):
         test_id = "test_ont_id"

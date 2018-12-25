@@ -173,7 +173,7 @@ class WalletManager(object):
             label = str(uuid.uuid4())[0:8]
         if account_flag:
             for index in range(len(self.wallet_in_mem.accounts)):
-                if acct.b58_address == self.wallet_in_mem.accounts[index].get_b58_address():
+                if acct.b58_address == self.wallet_in_mem.accounts[index].b58_address:
                     raise SDKException(ErrorCode.other_error('Wallet account exists.'))
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.is_default = True
@@ -218,7 +218,7 @@ class WalletManager(object):
                                                           Scrypt().get_n(), self.scheme)
         info = self.create_account_info(label, pwd, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].get_b58_address():
+            if info.address_base58 == self.wallet_in_mem.accounts[index].b58_address:
                 return self.wallet_in_mem.accounts[index]
         return None
 
@@ -245,7 +245,7 @@ class WalletManager(object):
         salt = get_random_hex_str(16)
         info = self.create_account_info(label, password, salt, private_key)
         for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].get_b58_address():
+            if info.address_base58 == self.wallet_in_mem.accounts[index].b58_address:
                 return self.wallet_in_mem.accounts[index]
         return None
 
