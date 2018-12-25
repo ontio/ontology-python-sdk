@@ -10,6 +10,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
+from test import acct4
 
 sdk = OntologySdk()
 sdk.websocket.connect_to_test_net()
@@ -111,7 +112,7 @@ class TestWebsocketClient(unittest.TestCase):
         return balance
 
     def test_get_balance(self):
-        b58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
+        b58_address = acct4
         event_loop = asyncio.get_event_loop()
         balance = event_loop.run_until_complete(TestWebsocketClient.get_balance(b58_address))
         self.assertGreaterEqual(balance['ont'], 1)

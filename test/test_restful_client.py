@@ -153,7 +153,7 @@ class TestRestfulClient(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
-                                                              b58_from_address, gas_limit, gas_price)
+                                                            b58_from_address, gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = restful_client.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
@@ -168,7 +168,7 @@ class TestRestfulClient(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
-                                                              b58_from_address, gas_limit, gas_price)
+                                                            b58_from_address, gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         result = restful_client.send_raw_transaction_pre_exec(tx)
         self.assertEqual('01', result['Result'])
@@ -225,9 +225,12 @@ class TestRestfulClient(unittest.TestCase):
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        tx_state = restful_client.get_memory_pool_tx_state(tx_hash)
-        self.assertEqual(1, tx_state[0]['Type'])
-        self.assertEqual(0, tx_state[1]['Type'])
+        try:
+            tx_state = restful_client.get_memory_pool_tx_state(tx_hash)
+            self.assertEqual(1, tx_state[0]['Type'])
+            self.assertEqual(0, tx_state[1]['Type'])
+        except SDKException as e:
+            self.assertIn('UNKNOWN TRANSACTION', e.args[1])
 
 
 if __name__ == '__main__':
