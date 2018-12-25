@@ -5,7 +5,7 @@ import time
 import random
 import unittest
 
-from test import acct1, acct2
+from test import acct1, acct2, acct3, acct4
 
 from ontology.exception.exception import SDKException
 from ontology.utils import utils
@@ -218,11 +218,10 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        from_acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        payer = Account(private_key, SignatureScheme.SHA256withECDSA)
+        from_acct = acct3
+        payer = acct4
         b58_from_address = from_acct.get_address_base58()
-        b58_to_address = 'Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1'
+        b58_to_address = acct1.get_address_base58()
         old_from_acct_balance = asset.query_balance('ont', b58_from_address)
         old_to_acct_balance = asset.query_balance('ont', b58_to_address)
         amount = 1
