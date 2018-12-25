@@ -266,9 +266,9 @@ class WalletManager(object):
                     return Account(private_key, self.scheme)
         else:
             for index in range(len(self.wallet_in_mem.accounts)):
-                if self.wallet_in_mem.accounts[index].get_b58_address() == b58_address_or_ontid:
+                if self.wallet_in_mem.accounts[index].b58_address == b58_address_or_ontid:
                     key = self.wallet_in_mem.accounts[index].key
-                    addr = self.wallet_in_mem.accounts[index].get_b58_address()
+                    addr = self.wallet_in_mem.accounts[index].b58_address
                     salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
                     private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
                                                                       self.wallet_in_mem.scrypt.get_n(), self.scheme)

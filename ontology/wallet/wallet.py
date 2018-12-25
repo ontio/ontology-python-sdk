@@ -56,11 +56,11 @@ class WalletData(object):
                 except KeyError:
                     public_key = ''
                 try:
-                    acct = AccountData(address=dict_account['address'], enc_alg=dict_account['enc-alg'],
+                    acct = AccountData(b58_address=dict_account['address'], enc_alg=dict_account['enc-alg'],
                                        key=dict_account['key'], algorithm=dict_account['algorithm'],
                                        salt=dict_account['salt'], param=dict_account['parameters'],
                                        label=dict_account['label'], public_key=public_key,
-                                       sign_scheme=dict_account['signatureScheme'],
+                                       sig_scheme=dict_account['signatureScheme'],
                                        is_default=dict_account['isDefault'], lock=dict_account['lock'])
                 except KeyError:
                     raise SDKException(ErrorCode.param_error)
