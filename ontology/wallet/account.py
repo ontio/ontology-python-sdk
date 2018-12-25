@@ -12,30 +12,30 @@ class AccountData(object):
         if param is None:
             param = {"curve": "P-256"}
         self.__b58_address = address
-        self.algorithm = algorithm
-        self.enc_alg = enc_alg
-        self.is_default = is_default
+        self.__algorithm = algorithm
+        self.__enc_alg = enc_alg
+        self.__is_default = is_default
         self.__key = key
         self.__label = label
-        self.lock = lock
+        self.__lock = lock
         self.parameters = param
-        self.salt = salt
+        self.__salt = salt
         self.__public_key = public_key
-        self.signature_scheme = sign_scheme
+        self.__signature_scheme = sign_scheme
 
     def __iter__(self):
         data = dict()
         data['address'] = self.__b58_address
-        data['algorithm'] = self.algorithm
-        data['enc-alg'] = self.enc_alg
-        data['isDefault'] = self.is_default
+        data['algorithm'] = self.__algorithm
+        data['enc-alg'] = self.__enc_alg
+        data['isDefault'] = self.__is_default
         data['key'] = self.__key
         data['label'] = self.__label
-        data['lock'] = self.lock
+        data['lock'] = self.__lock
         data['parameters'] = self.parameters
-        data['salt'] = self.salt
+        data['salt'] = self.__salt
         data['publicKey'] = self.__public_key
-        data['signatureScheme'] = self.signature_scheme
+        data['signatureScheme'] = self.__signature_scheme
         for key, value in data.items():
             yield (key, value)
 
@@ -50,20 +50,36 @@ class AccountData(object):
         self.__b58_address = b58_address
 
     @property
+    def algorithm(self):
+        return self.__algorithm
+
+    @algorithm.setter
+    def algorithm(self, alg):
+        self.__algorithm = alg
+
+    @property
+    def enc_alg(self):
+        return self.__enc_alg
+
+    @enc_alg.setter
+    def enc_alg(self, enc_alg):
+        self.__enc_alg = enc_alg
+
+    @property
+    def is_default(self):
+        return self.__is_default
+
+    @is_default.setter
+    def is_default(self, is_default: bool):
+        self.__is_default = is_default
+
+    @property
     def key(self):
         return self.__key
 
     @key.setter
     def key(self, key):
         self.__key = key
-
-    @property
-    def public_key(self):
-        return self.__public_key
-
-    @public_key.setter
-    def public_key(self, pub_key):
-        self.__public_key = pub_key
 
     @property
     def label(self):
@@ -75,11 +91,36 @@ class AccountData(object):
             raise SDKException(ErrorCode.other_error('Invalid label.'))
         self.__label = label
 
+    @property
+    def lock(self):
+        return self.__lock
 
+    @lock.setter
+    def lock(self, lock):
+        self.__lock = lock
 
+    @property
+    def salt(self):
+        return self.__salt
 
-    def get_public_key_bytes(self):
-        return self.public_key
+    @salt.setter
+    def salt(self, salt):
+        self.__salt = salt
 
-    def get_key(self):
-        return self.key
+    @property
+    def public_key(self):
+        return self.__public_key
+
+    @public_key.setter
+    def public_key(self, pub_key):
+        self.__public_key = pub_key
+
+    @property
+    def signature_scheme(self):
+        return self.__signature_scheme
+
+    @signature_scheme.setter
+    def signature_scheme(self, sig_scheme: str):
+        if not isinstance(sig_scheme, str):
+            raise SDKException(ErrorCode.other_error('Invalid signature scheme.'))
+        self.__signature_scheme = sig_scheme
