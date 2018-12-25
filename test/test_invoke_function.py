@@ -18,7 +18,7 @@ gas_limit = 20000000
 gas_price = 500
 
 
-class TestWalletManager(unittest.TestCase):
+class TestInvokeFunction(unittest.TestCase):
     def test_oep4_name(self):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         bytearray_contract_address = bytearray(binascii.a2b_hex(contract_address))
