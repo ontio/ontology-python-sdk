@@ -179,7 +179,7 @@ class TestWalletManager(unittest.TestCase):
         for index in range(size):
             wm.get_wallet().set_default_account_by_index(index)
             default_address = wm.get_wallet().get_default_account_address()
-            self.assertEqual(accounts[index].get_b58_address(), default_address)
+            self.assertEqual(accounts[index].b58_address, default_address)
         wm.write_wallet()
         os.remove(path)
 
@@ -195,9 +195,9 @@ class TestWalletManager(unittest.TestCase):
         self.assertEqual(len(accounts), size)
         self.assertRaises(SDKException, wm.get_wallet().set_default_account_by_address, '1')
         for acct in accounts:
-            wm.get_wallet().set_default_account_by_address(acct.get_b58_address())
+            wm.get_wallet().set_default_account_by_address(acct.b58_address)
             default_address = wm.get_wallet().get_default_account_address()
-            self.assertEqual(default_address, acct.get_b58_address())
+            self.assertEqual(default_address, acct.b58_address)
         wm.write_wallet()
         os.remove(path)
 
@@ -271,7 +271,7 @@ class TestWalletManager(unittest.TestCase):
         account = wm.create_account_from_private_key(label, password, private_key)
         b58_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         wm.save()
-        self.assertEqual(b58_address, account.get_b58_address())
+        self.assertEqual(b58_address, account.b58_address)
         os.remove(path)
 
 

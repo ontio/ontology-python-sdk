@@ -173,7 +173,7 @@ class WalletManager(object):
             label = str(uuid.uuid4())[0:8]
         if account_flag:
             for index in range(len(self.wallet_in_mem.accounts)):
-                if acct.b58_address == self.wallet_in_mem.accounts[index].get_b58_address():
+                if acct.b58_address == self.wallet_in_mem.accounts[index].b58_address:
                     raise SDKException(ErrorCode.other_error('Wallet account exists.'))
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.is_default = True
