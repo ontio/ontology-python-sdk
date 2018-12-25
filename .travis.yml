@@ -1,12 +1,13 @@
-
 sudo: false
 language: python
-# command to install dependencies
 python:
-    - "3.6"
-    - "3.6-dev"  # 3.6 development branch
-    - "3.7-dev"  # 3.7 development branch
+- '3.6'
+- 3.6-dev
+- 3.7-dev
 install:
-    - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-    - python -m unittest discover
+- python -m unittest discover
+env:
+  global:
+    secure: XJk0tC+8QFozp4ha1N0EWYCa4mL+QLE19VQOfV7YVabsL1mi0Q1PHWNwqrpPaKnQ5F5okj+4UpTScR7sKK9Sxrb4w4+FnbkUficJeTHr8mxd17N9dd2/MxF7u+g+9tMirwLEI38XfFZunefCGSpzOfB3jy0Tl+qWXkalnICu1nI=
