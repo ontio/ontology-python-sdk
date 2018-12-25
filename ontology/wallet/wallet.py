@@ -132,7 +132,7 @@ class WalletData(object):
         for acct in self.accounts:
             acct.is_default = False
         self.accounts[index].is_default = True
-        self.default_account_address = self.accounts[index].get_b58_address()
+        self.default_account_address = self.accounts[index].b58_address
 
     def set_default_account_by_address(self, b58_address: str):
         """
@@ -144,7 +144,7 @@ class WalletData(object):
         index = -1
         for acct in self.accounts:
             index += 1
-            if acct.get_b58_address() == b58_address:
+            if acct.b58_address == b58_address:
                 flag = False
                 break
         if flag:
