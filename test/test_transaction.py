@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+
 from time import sleep
 
-from ontology.utils import utils
+from test import acct1, acct2, acct3
 
+from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
-from ontology.account.account import Account
 from ontology.common.address import Address
 from ontology.core.transaction import Transaction
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_event_parser import ContractEventParser
 
 
@@ -33,12 +33,6 @@ class TestTransaction(unittest.TestCase):
         self.assertGreaterEqual(tx.nonce, 0)
 
     def test_multi_serialize(self):
-        private_key1 = 'e05876a5ca900d2397b95d52763255b59a029cb33d9bfc5ad56cb4569b05418a'
-        private_key2 = 'f784e0dd0ab4077328bf314f8d63aa35fb4f28d6fd37326ff84f1e30801dcd2a'
-        private_key3 = '6c5e3c0c8c3c88529f5c6b68594f372f834244f25327a9f88d67201e087dbdd1'
-        acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-        acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         m = 2
         multi_address = Address.address_from_multi_pub_keys(m, pub_keys)
@@ -82,7 +76,7 @@ class TestTransaction(unittest.TestCase):
         b58_multi_address = multi_address.b58encode()
         b58_acct1_address = acct1.get_address_base58()
         b58_acct2_address = acct2.get_address_base58()
-        amount = 1000000000
+        amount = 100000
         gas_price = 500
         gas_limit = 20000
         tx1 = asset.new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
