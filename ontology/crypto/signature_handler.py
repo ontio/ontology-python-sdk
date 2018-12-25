@@ -54,8 +54,7 @@ class SignatureHandler(object):
         vk = ecdsa.VerifyingKey.from_string(public_key, curve=ecdsa.NIST256p)
         try:
             return vk.verify(signature[1:], msg, hashfunc=sha256)
-        except Exception as e:
-            print(e)
+        except Exception:
             return False
 
     @staticmethod

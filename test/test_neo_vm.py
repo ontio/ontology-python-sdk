@@ -96,7 +96,6 @@ class TestNeoVm(unittest.TestCase):
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
         payer = acct1
         b58_payer = payer.get_address_base58()
-        print(b58_payer)
         gas_limit = 20000000
         gas_price = 500
         tx = sdk.neo_vm.make_deploy_transaction(code, True, 'name', 'v1.0', 'author', 'email', 'desp', b58_payer,
