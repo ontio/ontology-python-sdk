@@ -6,8 +6,8 @@ from ontology.exception.exception import SDKException
 
 
 class AccountData(object):
-    def __init__(self, b58_address: str = '', enc_alg: str = "aes-256-gcm", key: str = "", algorithm: str = 'ECDSA',
-                 salt="", param: dict = None, label: str = "", public_key: str = "",
+    def __init__(self, b58_address: str = '', enc_alg: str = 'aes-256-gcm', key: str = '', algorithm: str = 'ECDSA',
+                 salt: str = '', param: dict = None, label: str = "", public_key: str = '',
                  sig_scheme: str = 'SHA256withECDSA', is_default: bool = True, lock: bool = False):
         if param is None:
             param = dict(curve='P-256')
@@ -18,7 +18,7 @@ class AccountData(object):
         self.__key = key
         self.__label = label
         self.__lock = lock
-        self.parameters = param
+        self.__parameters = param
         self.__salt = salt
         self.__public_key = public_key
         self.__signature_scheme = sig_scheme
@@ -32,21 +32,21 @@ class AccountData(object):
         data['key'] = self.__key
         data['label'] = self.__label
         data['lock'] = self.__lock
-        data['parameters'] = self.parameters
+        data['parameters'] = self.__parameters
         data['salt'] = self.__salt
         data['publicKey'] = self.__public_key
         data['signatureScheme'] = self.__signature_scheme
         for key, value in data.items():
             yield (key, value)
 
-    # TODO: add check point
-
     @property
     def b58_address(self):
         return self.__b58_address
 
     @b58_address.setter
-    def b58_address(self, b58_address):
+    def b58_address(self, b58_address: str):
+        if not isinstance(b58_address, str):
+            raise SDKException(ErrorCode.other_error('Invalid base58 encode address.'))
         self.__b58_address = b58_address
 
     @property
@@ -82,7 +82,9 @@ class AccountData(object):
         return self.__key
 
     @key.setter
-    def key(self, key):
+    def key(self, key: str):
+        if not isinstance(key, str):
+            raise SDKException(ErrorCode.other_error('Invalid key type.'))
         self.__key = key
 
     @property
@@ -106,11 +108,23 @@ class AccountData(object):
         self.__lock = lock
 
     @property
+    def parameters(self):
+        return self.__parameters
+
+    @parameters.setter
+    def parameters(self, param: dict):
+        if not isinstance(param, dict):
+            raise SDKException(ErrorCode.other_error('Invalid parameters type.'))
+        self.__parameters = param
+
+    @property
     def salt(self):
         return self.__salt
 
     @salt.setter
-    def salt(self, salt):
+    def salt(self, salt: str):
+        if not isinstance(salt, str):
+            raise SDKException(ErrorCode.other_error('Invalid salt.'))
         self.__salt = salt
 
     @property
@@ -118,7 +132,9 @@ class AccountData(object):
         return self.__public_key
 
     @public_key.setter
-    def public_key(self, pub_key):
+    def public_key(self, pub_key: str):
+        if not isinstance(pub_key, str):
+            raise SDKException(ErrorCode.other_error('Invalid public key.'))
         self.__public_key = pub_key
 
     @property
