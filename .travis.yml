@@ -10,4 +10,5 @@ python:
 install:
     - pip install -r requirements.txt
 script:
+    - "${pwd}/test"
     - python -m unittest discover -s "${pwd}/test" -t "${pwd}/test"
