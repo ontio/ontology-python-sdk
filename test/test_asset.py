@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import random
+
 import time
+import random
 import unittest
+
+from test import acct1, acct2
 
 from ontology.exception.exception import SDKException
 from ontology.utils import utils
@@ -116,10 +119,8 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        to_acct = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        from_acct = acct1
+        to_acct = acct2
 
         b58_from_address = from_acct.get_address_base58()
         b58_to_address = to_acct.get_address_base58()
@@ -156,6 +157,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
 
         time.sleep(random.randint(6, 10))
+
         balance_1 = sdk.rpc.get_balance(b58_from_address)
         balance_2 = sdk.rpc.get_balance(b58_to_address)
 
@@ -176,8 +178,8 @@ class TestAsset(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
         gas = gas_limit * gas_price
-        self.assertEqual(int(old_ont_balance_1) - 1, int(new_ont_balance_1))
-        self.assertEqual(int(old_ont_balance_2) + 1, int(new_ont_balance_2))
+        self.assertEqual(int(old_ont_balance_1) - amount, int(new_ont_balance_1))
+        self.assertEqual(int(old_ont_balance_2) + amount, int(new_ont_balance_2))
         self.assertEqual((int(old_ong_balance_1) - int(new_ong_balance_1)), gas)
         self.assertEqual(int(old_ong_balance_2), int(new_ong_balance_2))
 
