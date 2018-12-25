@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
+
 import time
 import unittest
-
-from random import choice
 
 from test import acct1, acct2, acct3
 
