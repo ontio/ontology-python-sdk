@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from os import path
 from time import sleep
 
 from test import acct1, acct2, acct3, acct4
