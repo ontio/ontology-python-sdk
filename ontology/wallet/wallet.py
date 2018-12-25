@@ -169,7 +169,7 @@ class WalletData(object):
 
     def get_account_by_b58_address(self, b58_address: str):
         for index in range(len(self.accounts)):
-            if self.accounts[index].get_b58_address() == b58_address:
+            if self.accounts[index].b58_address == b58_address:
                 return self.accounts[index]
         return None
 

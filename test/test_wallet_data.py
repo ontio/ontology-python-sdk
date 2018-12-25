@@ -30,7 +30,7 @@ class TestWalletData(unittest.TestCase):
         address_list = list()
         for i in range(size):
             address = random.randint(0, 1000000000)
-            acct = AccountData(address=address)
+            acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
@@ -48,7 +48,7 @@ class TestWalletData(unittest.TestCase):
         address_list = list()
         for i in range(size):
             address = random.randint(0, 1000000000)
-            acct = AccountData(address=address)
+            acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
@@ -65,7 +65,7 @@ class TestWalletData(unittest.TestCase):
         address_list = list()
         for i in range(size):
             address = random.randint(0, 1000000000)
-            acct = AccountData(address=address)
+            acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
