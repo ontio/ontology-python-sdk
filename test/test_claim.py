@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
 import unittest
 
 from ontology.claim.claim import Header, Payload
@@ -12,7 +11,7 @@ class TestClaim(unittest.TestCase):
         claim_header = Header()
         claim_header_dict = dict(claim_header)
         self.assertTrue(isinstance(claim_header_dict, dict))
-        self.assertEqual('ONT-ES256', claim_header_dict['alg'])
+        self.assertEqual('ES256', claim_header_dict['alg'])
 
     def test_payload(self):
         ver = '0.7.0'
@@ -36,6 +35,8 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
 
+    def test_signature_info(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
