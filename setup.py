@@ -10,7 +10,7 @@ with open(path.join(getcwd(), 'description.md')) as f:
 
 setup(
     name='ontology-python-sdk',
-    version='0.1.19',
+    version='0.1.20',
     description='Comprehensive Python library for the Ontology BlockChain.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -21,6 +21,7 @@ setup(
     license='GNU Lesser General Public License v3 (LGPLv3)',
     packages=find_packages(exclude=['test_*.py', 'test']),
     install_requires=[
+        'websockets'
         'pycryptodomex',
         'cryptography',
         'ecdsa',
