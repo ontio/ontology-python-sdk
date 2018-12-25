@@ -1,23 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
-
 from time import time
 
 from ontology.common.address import Address
-from ontology.account.account import Account
 from ontology.common.define import ZERO_ADDRESS
-from ontology.exception.error_code import ErrorCode
-from ontology.core.transaction import Transaction
-from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
 class NeoVm(object):

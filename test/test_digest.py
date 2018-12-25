@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import binascii
 import unittest
 
 from ontology.crypto.digest import Digest
@@ -27,6 +28,14 @@ class TestDigest(unittest.TestCase):
         hex_hash160_digest = '1c9b7b48049a8f98699bca22a5856c5ef571cd68'
         self.assertEqual(hash160_digest, Digest.hash160(msg))
         self.assertEqual(hex_hash160_digest, Digest.hash160(msg, is_hex=True))
+
+    def test_sha256_xor(self):
+        h1 = Digest.sha256(int.to_bytes(1000, 2, 'little'), is_hex=True)
+        h2 = Digest.sha256(int.to_bytes(89, 1, 'little'), is_hex=True)
+        h = hex(int(h1, 16) ^ int(h2, 16))[2::]
+        self.assertEqual('4307fbbb7e5b7c8f0339b060d171c49c881901d78ab712e60d805af9f9dc4ca1', h1)
+        self.assertEqual('18f5384d58bcb1bba0bcd9e6a6781d1a6ac2cc280c330ecbab6cb7931b721552', h2)
+        self.assertEqual('5bf2c3f626e7cd34a38569867709d986e2dbcdff86841c2da6eced6ae2ae59f3', h)
 
 
 if __name__ == '__main__':

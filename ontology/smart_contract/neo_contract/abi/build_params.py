@@ -1,13 +1,26 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from enum import Enum
 
-from ontology.exception.error_code import ErrorCode
-from ontology.exception.exception import SDKException
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.struct_type import Struct
 from ontology.utils import utils
-from ontology.vm.op_code import PACK, NEWMAP, TOALTSTACK, DUPFROMALTSTACK, SETITEM, FROMALTSTACK, NEWSTRUCT, SWAP, \
-    APPEND
+from ontology.exception.error_code import ErrorCode
 from ontology.vm.params_builder import ParamsBuilder
+from ontology.exception.exception import SDKException
+from ontology.smart_contract.neo_contract.abi.struct_type import Struct
+from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+
+from ontology.vm.op_code import (
+    PACK,
+    NEWMAP,
+    TOALTSTACK,
+    DUPFROMALTSTACK,
+    SETITEM,
+    FROMALTSTACK,
+    NEWSTRUCT,
+    SWAP,
+    APPEND
+)
 
 
 class BuildParams(object):
