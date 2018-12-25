@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+
 
 class AccountData(object):
     def __init__(self, address: str = '', enc_alg: str = "aes-256-gcm", key: str = "", algorithm="ECDSA", salt="",
@@ -13,7 +16,7 @@ class AccountData(object):
         self.enc_alg = enc_alg
         self.is_default = is_default
         self.key = key
-        self.label = label
+        self.__label = label
         self.lock = lock
         self.parameters = param
         self.salt = salt
@@ -27,7 +30,7 @@ class AccountData(object):
         data['enc-alg'] = self.enc_alg
         data['isDefault'] = self.is_default
         data['key'] = self.key
-        data['label'] = self.label
+        data['label'] = self.__label
         data['lock'] = self.lock
         data['parameters'] = self.parameters
         data['salt'] = self.salt
@@ -36,8 +39,15 @@ class AccountData(object):
         for key, value in data.items():
             yield (key, value)
 
-    def set_label(self, label: str):
-        self.label = label
+    @property
+    def label(self):
+        return self.__label
+
+    @label.setter
+    def label(self, label: str):
+        if not isinstance(label, str):
+            raise SDKException(ErrorCode.other_error('Invalid label.'))
+        self.__label = label
 
     def set_b58_address(self, b58_address):
         self.b58_address = b58_address
@@ -47,9 +57,6 @@ class AccountData(object):
 
     def set_key(self, key):
         self.key = key
-
-    def get_label(self):
-        return self.label
 
     def get_b58_address(self):
         return self.b58_address
