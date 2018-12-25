@@ -11,33 +11,59 @@ class AccountData(object):
                  is_default: bool = True, lock: bool = False):
         if param is None:
             param = {"curve": "P-256"}
-        self.b58_address = address
+        self.__b58_address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.is_default = is_default
-        self.key = key
+        self.__key = key
         self.__label = label
         self.lock = lock
         self.parameters = param
         self.salt = salt
-        self.public_key = public_key
+        self.__public_key = public_key
         self.signature_scheme = sign_scheme
 
     def __iter__(self):
         data = dict()
-        data['address'] = self.b58_address
+        data['address'] = self.__b58_address
         data['algorithm'] = self.algorithm
         data['enc-alg'] = self.enc_alg
         data['isDefault'] = self.is_default
-        data['key'] = self.key
+        data['key'] = self.__key
         data['label'] = self.__label
         data['lock'] = self.lock
         data['parameters'] = self.parameters
         data['salt'] = self.salt
-        data['publicKey'] = self.public_key
+        data['publicKey'] = self.__public_key
         data['signatureScheme'] = self.signature_scheme
         for key, value in data.items():
             yield (key, value)
+
+    # TODO: add check point
+
+    @property
+    def b58_address(self):
+        return self.__b58_address
+
+    @b58_address.setter
+    def b58_address(self, b58_address):
+        self.__b58_address = b58_address
+
+    @property
+    def key(self):
+        return self.__key
+
+    @key.setter
+    def key(self, key):
+        self.__key = key
+
+    @property
+    def public_key(self):
+        return self.__public_key
+
+    @public_key.setter
+    def public_key(self, pub_key):
+        self.__public_key = pub_key
 
     @property
     def label(self):
@@ -49,17 +75,8 @@ class AccountData(object):
             raise SDKException(ErrorCode.other_error('Invalid label.'))
         self.__label = label
 
-    def set_b58_address(self, b58_address):
-        self.b58_address = b58_address
 
-    def set_public_key(self, public_key):
-        self.public_key = public_key
 
-    def set_key(self, key):
-        self.key = key
-
-    def get_b58_address(self):
-        return self.b58_address
 
     def get_public_key_bytes(self):
         return self.public_key
