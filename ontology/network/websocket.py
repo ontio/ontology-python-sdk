@@ -189,7 +189,6 @@ class WebsocketClient(object):
     async def send_raw_transaction_pre_exec(self, tx: Transaction, is_full: bool = False):
         tx_data = tx.serialize(is_hex=True).decode('ascii')
         msg = dict(Action='sendrawtransaction', Version='1.0.0', Id=self.__id, PreExec='1', Data=tx_data)
-        print(json.dumps(msg))
         return await self.__send_recv(msg, is_full)
 
     async def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, acct: Account,
