@@ -36,7 +36,7 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
 
     def test_signature_info(self):
-
+        pass
 
 if __name__ == '__main__':
     unittest.main()
