@@ -17,7 +17,7 @@ sdk.rpc.connect_to_test_net()
 
 class TestOntologySdk(unittest.TestCase):
     def test_open_wallet(self):
-        path = os.path.join(os.getcwd(), 'test.json')
+        path = os.path.join(os.path.dirname(__file__), 'test.json')
         wallet = sdk.open_wallet(path)
         self.assertTrue(wallet, isinstance(wallet, WalletData))
         os.remove(path)
