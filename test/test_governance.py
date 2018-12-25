@@ -30,7 +30,7 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 #             print("res:", res)
 #             print("txhash:", tx.hash256_bytes().hex())
 #             sdk.wallet_manager.write_wallet()
-#             time.sleep(6)
+#             time.sleep(random.randint(6, 10))
 #             tx2 = sdk.native_vm.ont_id().new_get_ddo_transaction(identity.ont_id)
 #             res2 = sdk.rpc.send_raw_transaction_pre_exec(tx2)
 #             print("res2:", res2)
@@ -52,12 +52,12 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 #         identity = identities[0]
 #         res = sdk.native_vm.governance().register_candidate(account1, peer_publickey, 10000, identity, password, 1,
 #                                                               account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_unregister_candidate(self):
 #         res = sdk.native_vm.governance().unregister_candidate(account1, peer_publickey, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_authorize_for_peer(self):
@@ -68,7 +68,7 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 #         res = sdk.native_vm.governance().authorize_for_peer(account1, peer_publickeys, withdraw_lists, account1,
 #                                                               20000, 0)
 #         print("res:", res)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_get_authorize_info(self):
@@ -89,7 +89,7 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 #         res = sdk.native_vm.governance().unauthorize_for_peer(account1, peer_publickeys, withdraw_lists, account1,
 #                                                                 20000, 0)
 #         print("res:", res)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_withdraw(self):
@@ -98,42 +98,42 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 #         withdraw_lists = list()
 #         withdraw_lists.append(500)
 #         res = sdk.native_vm.governance().withdraw(account1, peer_publickeys, withdraw_lists, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_quit_node(self):
 #         res = sdk.native_vm.governance().quit_node(account1, peer_publickey, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_withdraw_fee(self):
 #         res = sdk.native_vm.governance().withdraw_fee(account1, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_withdraw_ong(self):
 #         res = sdk.native_vm.governance().withdraw_ong(account1, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_change_max_authorization(self):
 #         res = sdk.native_vm.governance().change_max_authorization(account1, peer_publickey, 10000, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_add_init_pos(self):
 #         res = sdk.native_vm.governance().add_init_pos(account1, peer_publickey, 1000, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_reduce_init_pos(self):
 #         res = sdk.native_vm.governance().reduce_init_pos(account1, peer_publickey, 1000, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_set_peer_cost(self):
 #         res = sdk.native_vm.governance().set_peer_cost(account1, peer_publickey, 90, account1, 20000, 0)
-#         time.sleep(6)
+#         time.sleep(random.randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_get_peer_attributes(self):

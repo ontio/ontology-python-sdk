@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import random
 import time
 import unittest
 
@@ -155,7 +155,7 @@ class TestAsset(unittest.TestCase):
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
 
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         balance_1 = sdk.rpc.get_balance(b58_from_address)
         balance_2 = sdk.rpc.get_balance(b58_to_address)
 
@@ -201,7 +201,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
-            time.sleep(6)
+            time.sleep(random.randint(6, 10))
             new_from_balance = sdk.rpc.get_balance(b58_from_address)
             new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
             self.assertEqual(int(old_from_balance['ont']) - amount, int(new_from_balance['ont']))
@@ -229,7 +229,7 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         new_from_acct_balance = asset.query_balance('ont', b58_from_address)
         new_to_acct_balance = asset.query_balance('ont', b58_to_address)
         self.assertEqual(old_from_acct_balance - amount, new_from_acct_balance)
@@ -322,7 +322,7 @@ class TestAsset(unittest.TestCase):
         except SDKException as e:
             self.assertIn('[Transfer] balance insufficient', e.args[1])
             return
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         new_from_balance = sdk.rpc.get_balance(b58_from_address)
         new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
         self.assertEqual(int(old_from_balance['ont']) - amount, int(new_from_balance['ont']))

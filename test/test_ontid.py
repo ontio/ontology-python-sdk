@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import random
 import time
 import unittest
 
@@ -109,7 +109,7 @@ class TestOntId(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(tx.hash256_explorer(), tx_hash)
-            time.sleep(6)
+            time.sleep(random.randint(6, 10))
             notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
             self.assertEqual('Attribute', notify[0]['States'][0])
             self.assertEqual('remove', notify[0]['States'][1])
@@ -138,7 +138,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = ont_id.send_add_attribute_transaction(identity, password, attribute_list, acct, gas_limit,
                                                         gas_price)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
         self.assertEqual('Attribute', notify[0]['States'][0])
         self.assertEqual('add', notify[0]['States'][1])
@@ -156,7 +156,7 @@ class TestOntId(unittest.TestCase):
         path = 'try'
         try:
             tx_hash = ont_id.send_remove_attribute_transaction(identity, password, path, acct2, gas_limit, gas_price)
-            time.sleep(6)
+            time.sleep(random.randint(6, 10))
             notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
             self.assertEqual('Attribute', notify[0]['States'][0])
             self.assertEqual('remove', notify[0]['States'][1])
@@ -185,7 +185,7 @@ class TestOntId(unittest.TestCase):
                                                    gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
         self.assertEqual('PublicKey', notify[0]['States'][0])
         self.assertEqual('add', notify[0]['States'][1])
@@ -203,7 +203,7 @@ class TestOntId(unittest.TestCase):
                                                       gas_limit, gas_price)
         tx = sdk.sign_transaction(tx, acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
         self.assertEqual('PublicKey', notify[0]['States'][0])
         self.assertEqual('remove', notify[0]['States'][1])
@@ -237,7 +237,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
                                                          gas_price)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
         self.assertEqual('PublicKey', notify[0]['States'][0])
         self.assertEqual('add', notify[0]['States'][1])
@@ -253,7 +253,7 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = ont_id.send_remove_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
                                                             gas_price)
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
         self.assertEqual('PublicKey', notify[0]['States'][0])
         self.assertEqual('remove', notify[0]['States'][1])
