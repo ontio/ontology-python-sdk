@@ -33,19 +33,35 @@ class TestAccount(unittest.TestCase):
                                                                   SignatureScheme.SHA256withECDSA)
         self.assertEqual(private_key, decoded_private_key)
 
-    def test_get_gcm_decoded_private_key(self):
+    def test_export_and_get_gcm_decoded_private_key(self):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        salt = base64.b64decode("pwLIUKAf2bAbTseH/WYrfQ==".encode('ascii')).decode('latin-1')
+        salt = base64.b64decode('pwLIUKAf2bAbTseH/WYrfQ=='.encode('ascii')).decode('latin-1')
         account = Account(private_key, SignatureScheme.SHA256withECDSA)
-        enc_private_key = account.export_gcm_encrypted_private_key("1", salt, 16384)
-        self.assertEqual(enc_private_key, 'Yl1e9ugbVADd8a2SbAQ56UfUvr3e9hD2eNXAM9xNjhnefB+YuNXDFvUrIRaYth+L')
+        b58_address = account.get_address_base58()
+        n = 16384
+        password = 'password'
+        enc_private_key = account.export_gcm_encrypted_private_key(password, salt, n)
+        decoded_private_key = Account.get_gcm_decoded_private_key(enc_private_key, password, b58_address, salt, n,
+                                                                  SignatureScheme.SHA256withECDSA)
+        self.assertEqual(private_key, decoded_private_key)
+
+    def test_get_gcm_decoded_private_key(self):
+        encrypted_key_str = '2WMxsxp7+365+i9Rzq1UdXmlX1XzrOu0r9ntNVNZ1XeC3EU3PNNg7XiGCcfP3ReO'
+        password = '88882668'
+        b58_address = 'AMeJEzSMSNMZThqGoxBVVFwKsGXpAdVriS'
+        salt = base64.b64decode('GXIs0bRy50tEfFuCF/h/yA==')
+        n = 4096
+        private_key = Account.get_gcm_decoded_private_key(encrypted_key_str, password, b58_address, salt, n,
+                                                          SignatureScheme.SHA256withECDSA)
+        self.assertEqual('3708995d9be2c1f02a9bf9c9e38936b7367df715a1c7f65e89f3976480915f2e', private_key)
 
     def test_generate_signature(self):
         raw_hex_data = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         account = Account(raw_hex_data, SignatureScheme.SHA256withECDSA)
-        data = account.generate_signature(bytes("test".encode()), SignatureScheme.SHA256withECDSA)
-        # TODO: add verify signature
-        # print(data.hex())
+        msg = 'test'.encode('utf-8')
+        signature = account.generate_signature(msg, SignatureScheme.SHA256withECDSA)
+        result = account.verify_signature(msg, signature)
+        self.assertEqual(True, result)
 
     def test_serialize_private_key(self):
         hex_private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
