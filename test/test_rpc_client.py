@@ -301,9 +301,12 @@ class TestRpcClient(unittest.TestCase):
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)
-        self.assertEqual(1, tx_state[0]['Type'])
-        self.assertEqual(0, tx_state[1]['Type'])
+        try:
+            tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)
+            self.assertEqual(1, tx_state[0]['Type'])
+            self.assertEqual(0, tx_state[1]['Type'])
+        except SDKException as e:
+            self.assertIn('unknown transaction', e.args[1])
 
 
 if __name__ == '__main__':
