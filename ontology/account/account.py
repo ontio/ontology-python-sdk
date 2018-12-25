@@ -49,7 +49,7 @@ class Account(object):
             raise TypeError
         return byte_signature
 
-    def verify_signature(self, msg: bytearray, signature: bytearray):
+    def verify_signature(self, msg: bytes, signature: bytes):
         if msg is None or signature is None:
             raise Exception(ErrorCode.param_err("param should not be None"))
         handler = SignatureHandler(self.__keyType, self.__signature_scheme)
@@ -169,7 +169,7 @@ class Account(object):
         private_key = b2a_hex(private_key).decode('ascii')
         acct = Account(private_key, scheme)
         if acct.get_address().b58encode() != b58_address:
-            raise RuntimeError
+            raise SDKException(ErrorCode.other_error('Address error.'))
         return private_key
 
     def serialize_private_key(self):
