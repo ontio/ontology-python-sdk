@@ -2,7 +2,7 @@ from os import path
 
 from ontology.ont_sdk import OntologySdk
 
-password = input('password: ')
+password = 'password'
 sdk = OntologySdk()
 wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
 wallet_manager = sdk.wallet_manager
