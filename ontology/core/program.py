@@ -59,7 +59,6 @@ class ProgramBuilder(object):
     @staticmethod
     def read_bytes(reader: BinaryReader):
         code = reader.read_byte()
-        key_len = 0
         if code == int.from_bytes(PUSHDATA4, 'little'):
             temp = reader.read_uint32()
             key_len = temp
@@ -69,7 +68,7 @@ class ProgramBuilder(object):
         elif code == int.from_bytes(PUSHDATA1, 'little'):
             temp = reader.read_uint8()
             key_len = int(temp)
-        elif code <= int.from_bytes(PUSHBYTES75, 'little') and code >= int.from_bytes(PUSHBYTES1, 'little'):
+        elif int.from_bytes(PUSHBYTES75, 'little') >= code >= int.from_bytes(PUSHBYTES1, 'little'):
             key_len = code - int.from_bytes(PUSHBYTES1, 'little') + 1
         else:
             key_len = 0
