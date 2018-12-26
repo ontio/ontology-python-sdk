@@ -5,16 +5,15 @@ import time
 import random
 import unittest
 
-from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.contract_event_parser import ContractEventParser
 from test import acct1, acct2, acct3, acct4
 
-from ontology.exception.exception import SDKException
 from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
+from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
+from ontology.utils.contract_event_parser import ContractEventParser
 
 
 class TestAsset(unittest.TestCase):
