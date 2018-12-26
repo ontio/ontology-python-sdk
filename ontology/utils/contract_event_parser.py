@@ -81,7 +81,7 @@ class ContractEventParser(object):
             if notify['ContractAddress'] == hex_contract_address:
                 specify_notify_list.append(notify)
         if len(specify_notify_list) == 1:
-            specify_notify_list = notify_list[0]
+            specify_notify_list = specify_notify_list[0]
         return specify_notify_list
 
     @staticmethod

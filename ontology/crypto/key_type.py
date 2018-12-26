@@ -28,7 +28,7 @@ class KeyType(Enum):
             return KeyType.EDDSA
 
     @staticmethod
-    def from_pubkey(pubkey: []):
+    def from_pubkey(pubkey: bytes):
         if len(pubkey) == 33:
             return KeyType.ECDSA
         else:

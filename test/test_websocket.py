@@ -12,7 +12,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct4
+from test import acct4, acct1, acct2
 
 sdk = OntologySdk()
 sdk.websocket.connect_to_test_net()
@@ -53,10 +53,9 @@ class TestWebsocketClient(unittest.TestCase):
         return response, event
 
     async def subscribe_oep4_case(self, event_loop):
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        from_acct =acct1
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_to_address = acct2.get_address_base58()
         value = 10
         subscribe_task = event_loop.create_task(TestWebsocketClient.subscribe_oep4_transfer_event(hex_contract_address))
         transfer_task = event_loop.create_task(

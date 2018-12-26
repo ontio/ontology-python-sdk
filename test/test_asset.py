@@ -5,6 +5,8 @@ import time
 import random
 import unittest
 
+from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_event_parser import ContractEventParser
 from test import acct1, acct2, acct3, acct4
 
 from ontology.exception.exception import SDKException
@@ -152,25 +154,6 @@ class TestAsset(unittest.TestCase):
         b58_to_address = to_acct.get_address_base58()
         b58_payer_address = b58_from_address
 
-        balance_1 = sdk.rpc.get_balance(b58_from_address)
-        balance_2 = sdk.rpc.get_balance(b58_to_address)
-
-        old_ont_balance_1 = 0
-        old_ont_balance_2 = 0
-        old_ong_balance_1 = 0
-        old_ong_balance_2 = 0
-        try:
-            old_ont_balance_1 = balance_1['ont']
-            old_ont_balance_2 = balance_2['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            old_ong_balance_1 = balance_1['ong']
-            old_ong_balance_2 = balance_2['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
         amount = 1
         gas_price = 500
         gas_limit = 20000
@@ -184,30 +167,18 @@ class TestAsset(unittest.TestCase):
 
         time.sleep(random.randint(6, 10))
 
-        balance_1 = sdk.rpc.get_balance(b58_from_address)
-        balance_2 = sdk.rpc.get_balance(b58_to_address)
-
-        new_ont_balance_1 = 0
-        new_ont_balance_2 = 0
-        new_ong_balance_1 = 0
-        new_ong_balance_2 = 0
-        try:
-            new_ont_balance_1 = balance_1['ont']
-            new_ont_balance_2 = balance_2['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            new_ong_balance_1 = balance_1['ong']
-            new_ong_balance_2 = balance_2['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        gas = gas_limit * gas_price
-        self.assertEqual(int(old_ont_balance_1) - amount, int(new_ont_balance_1))
-        self.assertEqual(int(old_ont_balance_2) + amount, int(new_ont_balance_2))
-        self.assertEqual((int(old_ong_balance_1) - int(new_ong_balance_1)), gas)
-        self.assertEqual(int(old_ong_balance_2), int(new_ong_balance_2))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        ont_contract_address = '0100000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, ont_contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(b58_from_address, notify['States'][1])
+        self.assertEqual(b58_to_address, notify['States'][2])
+        self.assertEqual(amount, notify['States'][3])
+        ong_contract_address = '0200000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, ong_contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(b58_payer_address, notify['States'][1])
+        self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
     def test_new_transfer_from_transaction(self):
         sdk = OntologySdk()
@@ -265,8 +236,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        claimer = Account(private_key, SignatureScheme.SHA256withECDSA)
+        claimer = acct1
         b58_claimer_address = claimer.get_address_base58()
         b58_recv_address = claimer.get_address_base58()
         b58_payer_address = claimer.get_address_base58()
@@ -282,10 +252,8 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
 
     def test_send_withdraw_ong_transaction(self):
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-        claimer = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        payer = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        claimer = acct1
+        payer = acct2
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
@@ -301,14 +269,12 @@ class TestAsset(unittest.TestCase):
             self.assertIn(msg, e.args[1])
 
     def test_send_approve(self):
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-        sender = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        payer = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        sender = acct1
+        payer = acct2
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_recv_address = acct2.get_address_base58()
         amount = 1
         gas_limit = 20000
         gas_price = 500
@@ -328,13 +294,12 @@ class TestAsset(unittest.TestCase):
             self.assertIn(msg, e.args[1])
 
     def test_send_transfer_from(self):
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        sender = Account(private_key, SignatureScheme.SHA256withECDSA)
+        sender = acct2
         payer = sender
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
+        b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()
         old_from_balance = sdk.rpc.get_balance(b58_from_address)
         old_recv_balance = sdk.rpc.get_balance(b58_recv_address)
@@ -345,14 +310,13 @@ class TestAsset(unittest.TestCase):
             tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
                                                gas_limit, gas_price)
             self.assertEqual(64, len(tx_hash))
+            time.sleep(random.randint(6, 10))
+            new_from_balance = sdk.rpc.get_balance(b58_from_address)
+            new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
+            self.assertEqual(int(old_from_balance['ont']) - amount, int(new_from_balance['ont']))
+            self.assertEqual(int(old_recv_balance['ont']) + amount, int(new_recv_balance['ont']))
         except SDKException as e:
             self.assertIn('[Transfer] balance insufficient', e.args[1])
-            return
-        time.sleep(random.randint(6, 10))
-        new_from_balance = sdk.rpc.get_balance(b58_from_address)
-        new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
-        self.assertEqual(int(old_from_balance['ont']) - amount, int(new_from_balance['ont']))
-        self.assertEqual(int(old_recv_balance['ont']) + amount, int(new_recv_balance['ont']))
 
 
 if __name__ == '__main__':
