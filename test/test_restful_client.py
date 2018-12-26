@@ -227,8 +227,8 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         try:
             tx_state = restful_client.get_memory_pool_tx_state(tx_hash)
-            self.assertEqual(1, tx_state[0]['Type'])
-            self.assertEqual(0, tx_state[1]['Type'])
+            self.assertGreaterEqual(tx_state[0]['Height'], 0)
+            self.assertGreaterEqual(tx_state[1]['Height'], 0)
         except SDKException:
             pass
 

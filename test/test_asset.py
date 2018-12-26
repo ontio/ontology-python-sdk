@@ -5,6 +5,8 @@ import time
 import random
 import unittest
 
+from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_event_parser import ContractEventParser
 from test import acct1, acct2, acct3, acct4
 
 from ontology.exception.exception import SDKException
@@ -152,25 +154,6 @@ class TestAsset(unittest.TestCase):
         b58_to_address = to_acct.get_address_base58()
         b58_payer_address = b58_from_address
 
-        balance_1 = sdk.rpc.get_balance(b58_from_address)
-        balance_2 = sdk.rpc.get_balance(b58_to_address)
-
-        old_ont_balance_1 = 0
-        old_ont_balance_2 = 0
-        old_ong_balance_1 = 0
-        old_ong_balance_2 = 0
-        try:
-            old_ont_balance_1 = balance_1['ont']
-            old_ont_balance_2 = balance_2['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            old_ong_balance_1 = balance_1['ong']
-            old_ong_balance_2 = balance_2['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
         amount = 1
         gas_price = 500
         gas_limit = 20000
@@ -184,30 +167,18 @@ class TestAsset(unittest.TestCase):
 
         time.sleep(random.randint(6, 10))
 
-        balance_1 = sdk.rpc.get_balance(b58_from_address)
-        balance_2 = sdk.rpc.get_balance(b58_to_address)
-
-        new_ont_balance_1 = 0
-        new_ont_balance_2 = 0
-        new_ong_balance_1 = 0
-        new_ong_balance_2 = 0
-        try:
-            new_ont_balance_1 = balance_1['ont']
-            new_ont_balance_2 = balance_2['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            new_ong_balance_1 = balance_1['ong']
-            new_ong_balance_2 = balance_2['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        gas = gas_limit * gas_price
-        self.assertEqual(int(old_ont_balance_1) - amount, int(new_ont_balance_1))
-        self.assertEqual(int(old_ont_balance_2) + amount, int(new_ont_balance_2))
-        self.assertEqual((int(old_ong_balance_1) - int(new_ong_balance_1)), gas)
-        self.assertEqual(int(old_ong_balance_2), int(new_ong_balance_2))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        ont_contract_address = '0100000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, ont_contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(b58_from_address, notify['States'][1])
+        self.assertEqual(b58_to_address, notify['States'][2])
+        self.assertEqual(amount, notify['States'][3])
+        ong_contract_address = '0200000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, ong_contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(b58_payer_address, notify['States'][1])
+        self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
     def test_new_transfer_from_transaction(self):
         sdk = OntologySdk()
