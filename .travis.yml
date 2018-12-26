@@ -13,5 +13,4 @@ env:
 install:
 - pip install -r requirements.txt
 script:
-  - export SDK_TEST_PASSWORD=$SDK_TEST_PASSWORD
   - python -m unittest discover
