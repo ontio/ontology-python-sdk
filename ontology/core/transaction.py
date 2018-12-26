@@ -160,7 +160,7 @@ class Transaction(object):
         sig = Sig([signer.serialize_public_key()], 1, [sig_data])
         self.sigs.append(sig)
 
-    def add_multi_sign_transaction(self, m: int, pub_keys: list, signer: Account):
+    def add_multi_sign_transaction(self, m: int, pub_keys: List[bytes] or List[str], signer: Account):
         """
         This interface is used to generate an Transaction object which has multi signature.
 
@@ -170,7 +170,10 @@ class Transaction(object):
         :param signer: an Account object which will sign the transaction.
         :return: a Transaction object which has been signed.
         """
-        pub_keys = ProgramBuilder.sort_publickeys(pub_keys)
+        for index in range(len(pub_keys)):
+            if isinstance(pub_keys[index], str):
+                pub_keys[index] = pub_keys[index].encode('ascii')
+        pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
         tx_hash = self.hash256_bytes()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
         if self.sigs is None or len(self.sigs) == 0:

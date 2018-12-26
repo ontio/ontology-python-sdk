@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import binascii
+from typing import List
 
 from ontology.core.program_info import ProgramInfo
 from ontology.crypto.key_type import KeyType
@@ -76,18 +78,27 @@ class ProgramBuilder(object):
         return res
 
     @staticmethod
-    def compare_pubkey(o1):
-        if KeyType.from_pubkey(o1) == KeyType.SM2:
-            raise Exception("not supported")
-        elif KeyType.from_pubkey(o1) == KeyType.ECDSA:
-            x = o1[1:]
+    def compare_pubkey(pub_key: bytes):
+        if not isinstance(pub_key, bytes):
+            raise SDKException(ErrorCode.other_error('Invalid key.'))
+        if KeyType.from_pubkey(pub_key) == KeyType.SM2:
+            raise SDKException(ErrorCode.other_error('Unsupported key type'))
+        elif KeyType.from_pubkey(pub_key) == KeyType.ECDSA:
+            x = pub_key[1:]
             return util.string_to_number(x)
         else:
-            return str(o1)
+            return str(pub_key)
 
     @staticmethod
-    def sort_publickeys(publicKeys: []):
-        return sorted(publicKeys, key=ProgramBuilder.compare_pubkey)
+    def sort_public_keys(pub_keys: List[bytes] or List[str]):
+        """
+        :param pub_keys: a list of public keys in format of bytes.
+        :return: sorted public keys.
+        """
+        for index in range(len(pub_keys)):
+            if isinstance(pub_keys[index], str):
+                pub_keys[index] = pub_keys[index].encode('ascii')
+        return sorted(pub_keys, key=ProgramBuilder.compare_pubkey)
 
     @staticmethod
     def program_from_multi_pubkey(m: int, pub_keys: []) -> bytes:
@@ -100,7 +111,7 @@ class ProgramBuilder(object):
             raise SDKException(ErrorCode.other_error(f'Param error: n == {n} > {define.MULTI_SIG_MAX_PUBKEY_SIZE}'))
         builder = ParamsBuilder()
         builder.emit_push_integer(m)
-        pub_keys = ProgramBuilder.sort_publickeys(pub_keys)
+        pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
         for pk in pub_keys:
             builder.emit_push_byte_array(pk)
         builder.emit_push_integer(n)
