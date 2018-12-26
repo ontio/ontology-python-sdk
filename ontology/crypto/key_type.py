@@ -3,10 +3,13 @@
 
 from enum import Enum, unique
 
+from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+
 
 @unique
 class KeyType(Enum):
-
     ECDSA = b'\x12'
     SM2 = b'\x13'
     EDDSA = b'\x14'
@@ -34,5 +37,29 @@ class KeyType(Enum):
         else:
             return KeyType.from_label(pubkey[0])
 
-
-
+    @staticmethod
+    def from_signature_scheme(scheme: SignatureScheme):
+        if scheme == SignatureScheme.SHA224withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA256withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA384withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA384withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA512withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA3_224withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA3_256withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA3_384withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SHA3_512withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.RIPEMD160withECDSA:
+            return KeyType.ECDSA
+        elif scheme == SignatureScheme.SM3withSM2:
+            return KeyType.SM2
+        else:
+            raise SDKException(ErrorCode.other_error('invalid signature scheme.'))
