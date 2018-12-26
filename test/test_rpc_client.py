@@ -304,7 +304,7 @@ class TestRpcClient(unittest.TestCase):
         try:
             tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)
             self.assertTrue(isinstance(tx_state[0]['Type'], int))
-            self.assertEqual(isinstance(tx_state[1]['Type'], int))
+            self.assertTrue(isinstance(tx_state[1]['Type'], int))
         except SDKException as e:
             self.assertIn('unknown transaction', e.args[1])
 

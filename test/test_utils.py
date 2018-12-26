@@ -66,8 +66,6 @@ class TestUtil(unittest.TestCase):
         self.assertTrue(bs5.hex() == "f0e07f")
         self.assertTrue(bs6.hex() == "101f7fff")
         self.assertTrue(bs7.hex() == "f0e08000")
-        print(bs8.hex())
-        print(bs9.hex())
 
 
 if __name__ == '__main__':

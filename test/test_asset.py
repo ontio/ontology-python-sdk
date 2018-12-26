@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import random
+
 import time
+import random
 import unittest
+
+from test import acct1, acct2, acct3, acct4
 
 from ontology.exception.exception import SDKException
 from ontology.utils import utils
@@ -35,10 +38,16 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        token_symbol = asset.query_symbol('ont')
-        self.assertEqual('ONT', token_symbol)
-        token_symbol = asset.query_symbol('ong')
-        self.assertEqual('ONG', token_symbol)
+        try:
+            token_symbol = asset.query_symbol('ont')
+            self.assertEqual('ONT', token_symbol)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            token_symbol = asset.query_symbol('ong')
+            self.assertEqual('ONG', token_symbol)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_decimals(self):
         sdk = OntologySdk()
@@ -50,21 +59,33 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(1, decimals)
 
     def test_unbound_ong(self):
-        b58_address1 = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        b58_address2 = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        b58_address3 = 'Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1'
-        b58_address4 = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
+        b58_address1 = acct1.get_address_base58()
+        b58_address2 = acct2.get_address_base58()
+        b58_address3 = acct3.get_address_base58()
+        b58_address4 = acct4.get_address_base58()
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
-        self.assertGreaterEqual(acct1_unbound_ong, 0)
-        acct2_unbound_ong = asset.query_unbound_ong(b58_address2)
-        self.assertGreaterEqual(acct2_unbound_ong, 0)
-        acct3_unbound_ong = asset.query_unbound_ong(b58_address3)
-        self.assertGreaterEqual(acct3_unbound_ong, 0)
-        acct4_unbound_ong = asset.query_unbound_ong(b58_address4)
-        self.assertGreaterEqual(acct4_unbound_ong, 0)
+        try:
+            acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
+            self.assertGreaterEqual(acct1_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            acct2_unbound_ong = asset.query_unbound_ong(b58_address2)
+            self.assertGreaterEqual(acct2_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            acct3_unbound_ong = asset.query_unbound_ong(b58_address3)
+            self.assertGreaterEqual(acct3_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            acct4_unbound_ong = asset.query_unbound_ong(b58_address4)
+            self.assertGreaterEqual(acct4_unbound_ong, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_balance(self):
         sdk = OntologySdk()
@@ -73,16 +94,25 @@ class TestAsset(unittest.TestCase):
         private_key = utils.get_random_hex_str(64)
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_address = acct.get_address_base58()
-        balance = asset.query_balance('ont', b58_address)
-        self.assertTrue(isinstance(balance, int))
-        self.assertGreaterEqual(balance, 0)
-        balance = asset.query_balance('ong', b58_address)
-        self.assertTrue(isinstance(balance, int))
-        self.assertGreaterEqual(balance, 0)
-        b58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        balance = asset.query_balance('ong', b58_address)
-        self.assertTrue(isinstance(balance, int))
-        self.assertGreaterEqual(balance, 1)
+        try:
+            balance = asset.query_balance('ont', b58_address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        try:
+            balance = asset.query_balance('ong', b58_address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 0)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+        b58_address = acct2.get_address_base58()
+        try:
+            balance = asset.query_balance('ong', b58_address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 1)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_allowance(self):
         sdk = OntologySdk()
@@ -98,11 +128,10 @@ class TestAsset(unittest.TestCase):
     def test_new_approve_transaction(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        sender = Account(private_key, SignatureScheme.SHA256withECDSA)
+        sender = acct1
         b58_send_address = sender.get_address_base58()
         b58_payer_address = sender.get_address_base58()
-        b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_recv_address = acct2.get_address_base58()
         amount = 5
         gas_price = 500
         gas_limit = 20000
@@ -116,10 +145,8 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        to_acct = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        from_acct = acct1
+        to_acct = acct2
 
         b58_from_address = from_acct.get_address_base58()
         b58_to_address = to_acct.get_address_base58()
@@ -156,6 +183,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
 
         time.sleep(random.randint(6, 10))
+
         balance_1 = sdk.rpc.get_balance(b58_from_address)
         balance_2 = sdk.rpc.get_balance(b58_to_address)
 
@@ -176,19 +204,18 @@ class TestAsset(unittest.TestCase):
             raised = True
             self.assertFalse(raised, 'Exception raised')
         gas = gas_limit * gas_price
-        self.assertEqual(int(old_ont_balance_1) - 1, int(new_ont_balance_1))
-        self.assertEqual(int(old_ont_balance_2) + 1, int(new_ont_balance_2))
+        self.assertEqual(int(old_ont_balance_1) - amount, int(new_ont_balance_1))
+        self.assertEqual(int(old_ont_balance_2) + amount, int(new_ont_balance_2))
         self.assertEqual((int(old_ong_balance_1) - int(new_ong_balance_1)), gas)
         self.assertEqual(int(old_ong_balance_2), int(new_ong_balance_2))
 
     def test_new_transfer_from_transaction(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        sender = Account(private_key, SignatureScheme.SHA256withECDSA)
+        sender = acct2
         b58_sender_address = sender.get_address_base58()
         b58_payer_address = sender.get_address_base58()
-        b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
+        b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()
         old_from_balance = sdk.rpc.get_balance(b58_from_address)
         old_recv_balance = sdk.rpc.get_balance(b58_recv_address)
@@ -218,11 +245,10 @@ class TestAsset(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        from_acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        payer = Account(private_key, SignatureScheme.SHA256withECDSA)
+        from_acct = acct3
+        payer = acct4
         b58_from_address = from_acct.get_address_base58()
-        b58_to_address = 'Ad4H6AB3iY7gBGNukgBLgLiB6p3v627gz1'
+        b58_to_address = acct1.get_address_base58()
         old_from_acct_balance = asset.query_balance('ont', b58_from_address)
         old_to_acct_balance = asset.query_balance('ont', b58_to_address)
         amount = 1
