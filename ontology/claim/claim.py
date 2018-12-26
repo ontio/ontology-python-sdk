@@ -160,4 +160,3 @@ class Claim(object):
         self.__head = Header()
         self.__payload = Payload()
         self.__signature = SignatureInfo()
-        self.__merkle_proof
