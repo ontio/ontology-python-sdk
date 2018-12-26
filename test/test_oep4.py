@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import random
+
 import time
+import random
 import unittest
 import binascii
+
+from test import acct1, acct2, acct3
 
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
@@ -60,7 +63,7 @@ class TestOep4(unittest.TestCase):
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         gas_limit = 20000000
         gas_price = 500
-        tx_hash = oep4.init(acct, acct, gas_limit, gas_price)
+        tx_hash = oep4.init(acct, acct1, gas_limit, gas_price)
         self.assertEqual(len(tx_hash), 64)
         time.sleep(random.randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify'][0]
@@ -108,12 +111,6 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-        acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-        acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
         transfer_list = list()
 
         b58_from_address1 = acct1.get_address_base58()
@@ -167,11 +164,9 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        owner_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        owner_acct = acct1
         hex_owner_address = owner_acct.get_address_hex()
-        spender = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        spender = acct2
         b58_spender_address = spender.get_address_base58()
         hex_spender_address = spender.get_address_hex()
         amount = 100
@@ -203,10 +198,6 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct1 = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
         b58_owner_address = acct1.get_address_base58()
         b58_spender_address = acct2.get_address_base58()
         allowance = oep4.allowance(b58_owner_address, b58_spender_address)
@@ -218,16 +209,13 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-        spender_acct = Account(private_key2, SignatureScheme.SHA256withECDSA)
+        spender_acct = acct2
 
-        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        from_acct = acct1
         b58_from_address = from_acct.get_address_base58()
         hex_from_address = from_acct.get_address_hex()
 
-        to_acct = Account(private_key3, SignatureScheme.SHA256withECDSA)
+        to_acct = acct3
         b58_to_address = to_acct.get_address_base58()
         hex_to_address = to_acct.get_address_hex()
 
