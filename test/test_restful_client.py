@@ -12,6 +12,7 @@ from ontology.network.restful import TEST_RESTFUL_ADDRESS
 from ontology.network.rpc import TEST_RPC_ADDRESS
 from ontology.ont_sdk import OntologySdk
 from ontology.utils.contract_data_parser import ContractDataParser
+from test import acct4, acct3
 
 restful_address = choice(TEST_RESTFUL_ADDRESS)
 sdk = OntologySdk(restful_address=restful_address)
@@ -217,11 +218,10 @@ class TestRestfulClient(unittest.TestCase):
         sdk.rpc.set_address(rpc_address)
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        from_acct = acct4
         gas_limit = 20000000
         gas_price = 500
-        b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_to_address = acct3.get_address_base58()
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
@@ -229,8 +229,8 @@ class TestRestfulClient(unittest.TestCase):
             tx_state = restful_client.get_memory_pool_tx_state(tx_hash)
             self.assertEqual(1, tx_state[0]['Type'])
             self.assertEqual(0, tx_state[1]['Type'])
-        except SDKException as e:
-            self.assertIn('UNKNOWN TRANSACTION', e.args[1])
+        except SDKException:
+            pass
 
 
 if __name__ == '__main__':

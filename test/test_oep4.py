@@ -6,7 +6,7 @@ import random
 import unittest
 import binascii
 
-from test import acct1, acct2, acct3
+from test import acct1, acct2, acct3, acct4
 
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
@@ -83,11 +83,10 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        from_acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
+        from_acct = acct1
         gas_limit = 20000000
         gas_price = 500
-        b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_to_address = acct2.get_address_base58()
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
@@ -98,8 +97,8 @@ class TestOep4(unittest.TestCase):
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.set_contract_address(contract_address)
-        b58_address1 = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        b58_address2 = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        b58_address1 = acct3.get_address_base58()
+        b58_address2 = acct4.get_address_base58()
         balance = oep4.balance_of(b58_address1)
         self.assertGreaterEqual(balance, 10)
         balance = oep4.balance_of(b58_address2)
