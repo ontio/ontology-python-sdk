@@ -10,9 +10,9 @@ class Identity(object):
     def __init__(self, ont_id: str = '', label: str = '', lock: bool = False, controls: list = None, is_default=False):
         if controls is None:
             controls = list()
-        self.ont_id = ont_id
-        if self.ont_id != '' and not ont_id.startswith(DID_ONT):
+        if not isinstance(ont_id, str):
             raise SDKException(ErrorCode.other_error('Invalid OntId.'))
+        self.ont_id = ont_id
         self.label = label
         self.lock = lock
         self.controls = controls
