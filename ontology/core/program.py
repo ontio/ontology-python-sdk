@@ -126,7 +126,7 @@ class ProgramBuilder(object):
         while True:
             try:
                 res = ProgramBuilder.read_bytes(reader)
-            except:
+            except SDKException:
                 break
             param_info.append(res)
         return param_info
