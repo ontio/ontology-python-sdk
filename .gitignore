@@ -111,3 +111,5 @@ ontology_dapp_box.egg-info
 
 *.dat
 *.json
+coverage.xml
+coverage/
