@@ -4,6 +4,8 @@
 import asyncio
 import unittest
 
+from test import acct1, acct2, acct3, acct4
+
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
@@ -12,7 +14,6 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct4, acct1, acct2
 
 sdk = OntologySdk()
 sdk.websocket.connect_to_test_net()
@@ -43,7 +44,7 @@ class TestWebsocketClient(unittest.TestCase):
         oep4.set_contract_address(hex_contract_address)
         gas_limit = 20000000
         gas_price = 500
-        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
+        tx_hash = oep4.transfer(from_acct, b58_to_address, value, acct3, gas_limit, gas_price)
         return tx_hash
 
     @staticmethod
@@ -53,7 +54,7 @@ class TestWebsocketClient(unittest.TestCase):
         return response, event
 
     async def subscribe_oep4_case(self, event_loop):
-        from_acct =acct1
+        from_acct = acct1
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         b58_to_address = acct2.get_address_base58()
         value = 10
