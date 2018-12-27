@@ -1,10 +1,11 @@
 <h1 align="center">本体 Python 软件开发工具包</h1>
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ontio/ontology-python-sdk/&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&utm_medium=referral&utm_content=ontio/ontology-python-sdk/&utm_campaign=Badge_Coverage)
+![pypi-w](https://img.shields.io/pypi/wheel/ontology-python-sdk.svg)
+![travis](https://travis-ci.org/NashMiao/ontology-python-sdk.svg?branch=master)
 ![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
 ![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)
-![pypi-w](https://img.shields.io/pypi/wheel/ontology-python-sdk.svg)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ontio/ontology-python-sdk/&amp;utm_campaign=Badge_Grade)
-![travis](https://travis-ci.org/NashMiao/ontology-python-sdk.svg?branch=master)
 
 - [简介](#简介)
 - [准备](#准备)
