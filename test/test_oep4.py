@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import time
-import random
 import unittest
 import binascii
+
+from Cryptodome.Random.random import randint
 
 from test import acct1, acct2, acct3, acct4
 

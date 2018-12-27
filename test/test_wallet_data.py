@@ -82,7 +82,7 @@ class TestWalletData(unittest.TestCase):
         wallet = WalletData(default_id=test_id)
         size = 10
         for i in range(size):
-            rand_id = randint(0, 1000000000)
+            rand_id = str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             self.assertEqual(len(wallet.get_identities()), i + 1)
@@ -93,7 +93,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = randint(0, 1000000000)
+            rand_id = str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
@@ -111,7 +111,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = randint(0, 1000000000)
+            rand_id = str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)

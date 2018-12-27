@@ -259,7 +259,7 @@ class WalletManager(object):
             raise SDKException(ErrorCode.other_error('Invalid OntId.'))
         for index in range(len(self.wallet_in_mem.identities)):
             if self.wallet_in_mem.identities[index].ont_id == ont_id:
-                addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
+                addr = self.wallet_in_mem.identities[index].ont_id.replace(DID_ONT, "")
                 key = self.wallet_in_mem.identities[index].controls[0].key
                 salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
                 n = self.wallet_in_mem.scrypt.get_n()
