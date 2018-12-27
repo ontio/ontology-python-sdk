@@ -39,8 +39,7 @@ class Nep5(object):
         if pre_exec:
             params = BuildParams.serialize_abi_function(func)
             unix_time_now = int(time())
-            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytearray(),
-                             params, bytearray(), [], bytearray())
+            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytearray(), params, bytearray(), [])
             if acct is not None:
                 self.__sdk.sign_transaction(tx, acct)
             obj = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
@@ -49,5 +48,6 @@ class Nep5(object):
             return obj["Gas"]
         if acct is None or payer_acct is None:
             raise Exception("acct or payer_acct should not be None")
-        return self.__sdk.rpc.send_neo_vm_transaction(bytearray(self.contract_addr), acct, payer_acct, gas_limit, gas_price,
-                                                    func, pre_exec)
+        return self.__sdk.rpc.send_neo_vm_transaction(bytearray(self.contract_addr), acct, payer_acct, gas_limit,
+                                                      gas_price,
+                                                      func, pre_exec)
