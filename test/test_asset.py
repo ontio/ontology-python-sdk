@@ -164,7 +164,7 @@ class TestAsset(unittest.TestCase):
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
 
-        time.sleep(random.randint(6, 10))
+        time.sleep(randint(6, 10))
 
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         ont_contract_address = '0100000000000000000000000000000000000000'
@@ -191,7 +191,7 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
-        time.sleep(random.randint(6, 10))
+        time.sleep(randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
@@ -213,7 +213,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
-            time.sleep(random.randint(6, 10))
+            time.sleep(randint(6, 10))
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
             self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
@@ -295,7 +295,7 @@ class TestAsset(unittest.TestCase):
             tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
                                                gas_limit, gas_price)
             self.assertEqual(64, len(tx_hash))
-            time.sleep(random.randint(6, 10))
+            time.sleep(randint(6, 10))
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
             self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])

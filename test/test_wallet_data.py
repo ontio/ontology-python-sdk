@@ -4,6 +4,8 @@
 import random
 import unittest
 
+from Cryptodome.Random.random import randint, choice
+
 from ontology.wallet.wallet import WalletData
 from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
@@ -29,14 +31,14 @@ class TestWalletData(unittest.TestCase):
         size = 10
         address_list = list()
         for i in range(size):
-            address = random.randint(0, 1000000000)
+            address = randint(0, 1000000000)
             acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
 
         for i in range(size):
-            rand_address = random.choice(address_list)
+            rand_address = choice(address_list)
             wallet.remove_account(rand_address)
             address_list.remove(rand_address)
             self.assertEqual(len(wallet.accounts), size - i - 1)
@@ -47,7 +49,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         address_list = list()
         for i in range(size):
-            address = random.randint(0, 1000000000)
+            address = randint(0, 1000000000)
             acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
@@ -64,7 +66,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         address_list = list()
         for i in range(size):
-            address = random.randint(0, 1000000000)
+            address = randint(0, 1000000000)
             acct = AccountData(b58_address=address)
             wallet.add_account(acct)
             address_list.append(address)
@@ -80,7 +82,7 @@ class TestWalletData(unittest.TestCase):
         wallet = WalletData(default_id=test_id)
         size = 10
         for i in range(size):
-            rand_id = random.randint(0, 1000000000)
+            rand_id = randint(0, 1000000000)
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             self.assertEqual(len(wallet.get_identities()), i + 1)
@@ -91,7 +93,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = random.randint(0, 1000000000)
+            rand_id = randint(0, 1000000000)
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
@@ -109,7 +111,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = random.randint(0, 1000000000)
+            rand_id = randint(0, 1000000000)
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
