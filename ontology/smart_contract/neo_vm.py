@@ -38,7 +38,7 @@ class NeoVm(object):
 
     @staticmethod
     def make_deploy_transaction(code_str: str, need_storage: bool, name: str, code_version: str, author: str,
-                                email: str, desp: str, payer: str, gas_limit: int, gas_price: int):
+                                email: str, desp: str, payer: str, gas_limit: int, gas_price: int) -> DeployTransaction:
         unix_time_now = int(time())
         deploy_tx = DeployTransaction()
         deploy_tx.payer = Address.b58decode(payer).to_bytes()

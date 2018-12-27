@@ -5,6 +5,7 @@ import json
 import binascii
 
 from typing import List
+from enum import Enum
 
 from ontology.core.sig import Sig
 from ontology.common import define
@@ -17,6 +18,17 @@ from ontology.exception.exception import SDKException
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
+
+
+class TransactionType(Enum):
+    Bookkeeping = 0x00
+    Bookkeeper = 0x02
+    Claim = 0x03
+    Enrollment = 0x04
+    Vote = 0x05
+    DeployCode = 0xd0
+    InvokeCode = 0xd1
+    TransferTransaction = 0x80
 
 
 class Transaction(object):
@@ -58,7 +70,7 @@ class Transaction(object):
         writer.write_uint64(self.gas_limit)
         writer.write_bytes(bytes(self.payer))
         self.serialize_exclusive_data(writer)
-        if hasattr(self, "payload"):
+        if self.payload is not None:
             writer.write_var_bytes(bytes(self.payload))
         writer.write_var_int(len(self.attributes))
         ms.flush()
