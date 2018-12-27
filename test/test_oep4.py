@@ -65,7 +65,7 @@ class TestOep4(unittest.TestCase):
         gas_price = 500
         tx_hash = oep4.init(acct, acct1, gas_limit, gas_price)
         self.assertEqual(len(tx_hash), 64)
-        time.sleep(random.randint(6, 10))
+        time.sleep(randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify'][0]
         self.assertEqual('Already initialized!', bytes.fromhex(notify['States']).decode())
 
@@ -140,7 +140,7 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        time.sleep(random.randint(6, 10))
+        time.sleep(randint(6, 10))
         try:
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][:-1]
@@ -175,7 +175,7 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(len(tx_hash), 64)
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        time.sleep(random.randint(6, 10))
+        time.sleep(randint(6, 10))
         try:
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
@@ -226,7 +226,7 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
-        time.sleep(random.randint(6, 10))
+        time.sleep(randint(6, 10))
         try:
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]

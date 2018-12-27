@@ -49,7 +49,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #                                                   gas_limit, gas_price)
 #         sdk.sign_transaction(tx, acc)
 #         res = sdk.rpc.send_raw_transaction(tx)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract("bc9795db0abe9d2d9ea565286a237dbf6b407165"))
 #
 #     def test_register(self):
@@ -69,13 +69,13 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         sdk.add_sign_transaction(tx2, account2)
 #         try:
 #             tx_hash = sdk.rpc.send_raw_transaction(tx)
-#             time.sleep(random.randint(6, 10))
+#             time.sleep(randint(6, 10))
 #             print(sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash))
 #         except SDKException as e:
 #             self.assertIn('register ONT ID error: already registered', e.args[1])
 #         try:
 #             tx_hash = sdk.rpc.send_raw_transaction(tx2)
-#             time.sleep(random.randint(6, 10))
+#             time.sleep(randint(6, 10))
 #             print(sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash))
 #         except SDKException as e:
 #             self.assertIn('register ONT ID error: already registered', e.args[1])
@@ -94,7 +94,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         gas_limit = 20000000
 #         gas_price = 500
 #         res = sdk.rpc.send_neo_vm_transaction(contract_address, acc, acc, gas_limit, gas_price, func, False)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_transfer(self):
@@ -105,7 +105,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         gas_price = 500
 #         txhash = sdk.native_vm.auth().send_transfer(admin_identity, "111111", 1, code_address.hex(),
 #                                                       new_admin_identity.ont_id, acc, gas_limit, gas_price)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
 #
 #     def test_assign_funcs_to_role(self):
@@ -119,7 +119,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         gas_price = 500
 #         res = sdk.native_vm.auth().assign_funcs_to_role(new_admin_identity, "111111", 1, code_address.hex(), "role3",
 #                                                           function_name, acc, gas_limit, gas_price)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_assign_ont_ids_to_role(self):
@@ -133,7 +133,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         res = sdk.native_vm.auth().assign_ont_ids_to_role(new_admin_identity, "111111", 1, code_address.hex(),
 #                                                             "role3",
 #                                                             ont_ids, acc, gas_limit, gas_price)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(res))
 #
 #     def test_verify_token(self):
@@ -151,7 +151,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         gas_price = 500
 #         txhash = sdk.native_vm.auth().delegate(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
 #                                                  "role", 60 * 5, 1, acc, gas_limit, gas_price)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
 #
 #     def test_withdraw(self):
@@ -162,5 +162,5 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #         gas_price = 500
 #         txhash = sdk.native_vm.auth().withdraw(identity, "111111", 1, code_address.hex(), admin_identity.ont_id,
 #                                                  "role", acc, gas_limit, gas_price)
-#         time.sleep(random.randint(6, 10))
+#         time.sleep(randint(6, 10))
 #         print(sdk.rpc.get_smart_contract_event_by_tx_hash(txhash))
