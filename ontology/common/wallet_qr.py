@@ -17,7 +17,7 @@ class WalletQR(object):
         control = identity.controls[0]
         address = identity.ont_id[8:]
 
-        if type(wallet_file_or_scrypt) is WalletData:
+        if isinstance(wallet_file_or_scrypt, WalletData):
             scrypt = json.dumps(wallet_file_or_scrypt.scrypt, default=lambda obj: obj.__dict__, sort_keys=True,
                                 indent=4)
         else:
@@ -28,7 +28,7 @@ class WalletQR(object):
 
     @staticmethod
     def export_account_qr_code(wallet_file_or_scrypt, account: AccountData):
-        if type(wallet_file_or_scrypt) is WalletData:
+        if isinstance(wallet_file_or_scrypt, WalletData):
             scrypt = json.dumps(wallet_file_or_scrypt.scrypt, default=lambda obj: obj.__dict__, sort_keys=True,
                                 indent=4)
         else:

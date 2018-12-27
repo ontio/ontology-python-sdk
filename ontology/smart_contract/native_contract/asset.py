@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 from time import time
 
 from ontology.utils import utils

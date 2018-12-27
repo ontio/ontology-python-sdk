@@ -396,7 +396,7 @@ class RpcClient(object):
         :param is_full:
         :return: the information of smart contract in dictionary form.
         """
-        if type(hex_contract_address) != str:
+        if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.param_err('a hexadecimal contract address is required.'))
         if len(hex_contract_address) != 40:
             raise SDKException(ErrorCode.param_err('the length of the contract address should be 40 bytes.'))
