@@ -66,7 +66,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdrawOng", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -79,7 +79,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdrawFee", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -100,7 +100,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "authorizeForPeer", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -121,7 +121,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "unAuthorizeForPeer", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -142,7 +142,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdraw", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -155,7 +155,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "quitNode", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -170,7 +170,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "changeMaxAuthorization", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -184,7 +184,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "addInitPos", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -198,7 +198,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "reduceInitPos", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -212,7 +212,7 @@ class Governance(object):
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "setPeerCost", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
-                         bytearray(), [], bytearray())
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
