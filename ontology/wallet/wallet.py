@@ -13,7 +13,8 @@ from ontology.exception.exception import SDKException
 
 class WalletData(object):
     def __init__(self, name: str = "MyWallet", version: str = "1.1", create_time: str = "", default_id: str = "",
-                 default_address="", scrypt: Scrypt = None, identities: List[Identity] = None, accounts: list = None):
+                 default_address="", scrypt: Scrypt = None, identities: List[Identity] = None,
+                 accounts: List[AccountData] = None):
         if scrypt is None:
             scrypt = Scrypt()
         if not isinstance(scrypt, Scrypt):
@@ -167,11 +168,11 @@ class WalletData(object):
             raise SDKException(ErrorCode.get_account_by_index_err)
         return self.accounts[index]
 
-    def get_account_by_b58_address(self, b58_address: str):
+    def get_account_by_b58_address(self, b58_address: str) -> AccountData:
         for index in range(len(self.accounts)):
             if self.accounts[index].b58_address == b58_address:
                 return self.accounts[index]
-        return None
+        raise SDKException(ErrorCode.other_error('Get account failed.'))
 
     def set_identities(self, identities: list):
         if not isinstance(identities, list):

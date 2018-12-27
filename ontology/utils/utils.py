@@ -101,14 +101,14 @@ def parse_neo_vm_contract_return_type(value, return_type):
 
 
 def parse_neo_vm_contract_return_type_bool(value) -> bool:
-    if type(value) == str:
+    if isinstance(value, str):
         return value == "01"
     else:
         raise ValueError("false, asset to string failed")
 
 
 def parse_neo_vm_contract_return_type_integer(value) -> int:
-    if type(value) == str:
+    if isinstance(value, str):
         data = bytearray.fromhex(value)
         return int.from_bytes(data, byteorder='little', signed=False)
     else:
@@ -116,7 +116,7 @@ def parse_neo_vm_contract_return_type_integer(value) -> int:
 
 
 def parse_neo_vm_contract_return_type_bytearray(value) -> bytearray:
-    if type(value) == str:
+    if isinstance(value, str):
         data = bytearray.fromhex(value)
         return data
     else:

@@ -1,27 +1,26 @@
 #!/usr/bin/env python3
 # # -*- coding: utf-8 -*-
+
 import json
+
 from time import time
 
 from ontology.vm import build_vm
 from ontology.common.define import *
 from ontology.crypto.curve import Curve
-from ontology.network.rpc import RpcClient
 from ontology.common.address import Address
 from ontology.crypto.key_type import KeyType
 from ontology.account.account import Account
 from ontology.wallet.identity import Identity
 from ontology.core.transaction import Transaction
-from ontology.network.restful import RestfulClient
 from ontology.io.binary_reader import BinaryReader
 from ontology.exception.error_code import ErrorCode
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.exception import SDKException
-from ontology.network.websocket import WebsocketClient
 
 
 class OntId(object):
-    def __init__(self, sdk, network: RpcClient or RestfulClient or WebsocketClient = None):
+    def __init__(self, sdk):
         self.__sdk = sdk
 
     def get_network(self):

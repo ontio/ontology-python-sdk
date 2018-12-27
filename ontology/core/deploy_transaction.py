@@ -1,12 +1,11 @@
-from ontology.core.transaction import Transaction
+from ontology.core.transaction import Transaction, TransactionType
 from ontology.io.binary_writer import BinaryWriter
 
 
 class DeployTransaction(Transaction):
     def __init__(self, code=None, need_storage=None, name=None, version=None, author=None, email=None,
                  description=None):
-        # TODO
-        super(Transaction, self).__init__()
+        super().__init__()
         self.code = code
         self.need_storage = need_storage
         self.name = name
@@ -14,7 +13,7 @@ class DeployTransaction(Transaction):
         self.author = author
         self.email = email
         self.description = description
-        self.tx_type = 0xd0
+        self.tx_type = TransactionType.DeployCode.value
 
     def serialize_exclusive_data(self, writer: BinaryWriter):
         writer.write_var_bytes(self.code)

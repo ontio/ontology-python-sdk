@@ -50,11 +50,11 @@ class BinaryWriter(object):
         Args:
             value (bytes, str or int): value to write to the stream.
         """
-        if type(value) is bytes:
+        if isinstance(value, bytes):
             self.stream.write(value)
-        elif type(value) is str:
+        elif isinstance(value, str):
             self.stream.write(value.encode('utf-8'))
-        elif type(value) is int:
+        elif isinstance(value, int):
             self.stream.write(bytes([value]))
 
     def write_bytes(self, value, unhex=True):
@@ -348,7 +348,7 @@ class BinaryWriter(object):
             value (string): value to write to the stream.
             encoding (str): string encoding format.
         """
-        if type(value) is str:
+        if isinstance(value, str):
             value = value.encode(encoding)
 
         length = len(value)
