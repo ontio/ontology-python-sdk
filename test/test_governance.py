@@ -23,7 +23,7 @@ peer_publickey = "021b16a2f74c430256203685c9b742c7c27260b0bb3e76e75fd52bf3065226
 #             identity = sdk.wallet_manager.create_identity("sss", password)
 #             account = sdk.wallet_manager.get_account(identity.ont_id, password)
 #             tx = sdk.native_vm.ont_id().new_registry_ont_id_transaction(identity.ont_id,
-#                                                                           account.serialize_public_key().hex(),
+#                                                                           account.get_public_key_bytes().hex(),
 #                                                                           account.get_address_base58(), 20000, 0)
 #             sdk.sign_transaction(tx, account)
 #             res = sdk.rpc.send_raw_transaction(tx)

@@ -3,15 +3,19 @@
 
 import unittest
 
-from ontology.claim.claim import Header, Payload
+from ontology.claim.header import Header
+from ontology.claim.payload import Payload
 
 
 class TestClaim(unittest.TestCase):
     def test_head(self):
-        claim_header = Header()
+        kid = 'did:ont:TRAtosUZHNSiLhzBdHacyxMX4Bg3cjWy3r#keys-1'
+        claim_header = Header(kid)
         claim_header_dict = dict(claim_header)
+        self.assertEqual(kid, claim_header_dict['kid'])
         self.assertTrue(isinstance(claim_header_dict, dict))
         self.assertEqual('ES256', claim_header_dict['alg'])
+        self.assertEqual(92, len(claim_header.to_json_str()))
 
     def test_payload(self):
         ver = '0.7.0'
@@ -23,7 +27,7 @@ class TestClaim(unittest.TestCase):
         context = 'https://example.com/template/v1'
         clm = dict(Name='Bob Dylan', Age='22')
         clm_rev = dict(typ='AttestContract', addr='8055b362904715fd84536e754868f4c8d27ca3f6')
-        claim_payload = Payload(ver, iss, sub, iat, exp, jti, context, clm, clm_rev)
+        claim_payload = Payload(ver, iss, sub, iat, exp, context, clm, clm_rev, jti)
         claim_payload_dict = dict(claim_payload)
         self.assertEqual(ver, claim_payload_dict['ver'])
         self.assertEqual(iss, claim_payload_dict['iss'])
@@ -34,9 +38,23 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(context, claim_payload_dict['@context'])
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
+        claim_payload = Payload(ver, iss, sub, iat, exp, context, clm, clm_rev)
+        self.assertEqual(415, len(claim_payload.to_json_str()))
+        claim_payload_dict = dict(claim_payload)
+        self.assertEqual(ver, claim_payload_dict['ver'])
+        self.assertEqual(iss, claim_payload_dict['iss'])
+        self.assertEqual(sub, claim_payload_dict['sub'])
+        self.assertEqual(iat, claim_payload_dict['iat'])
+        self.assertEqual(exp, claim_payload_dict['exp'])
+        self.assertEqual(64, len(claim_payload_dict['jti']))
+        self.assertEqual(context, claim_payload_dict['@context'])
+        self.assertEqual(clm, claim_payload_dict['clm'])
+        self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
+        self.assertEqual(415, len(claim_payload.to_json_str()))
 
     def test_signature_info(self):
         pass
+
 
 if __name__ == '__main__':
     unittest.main()

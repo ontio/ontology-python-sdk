@@ -97,7 +97,7 @@ class ProgramBuilder(object):
         """
         for index in range(len(pub_keys)):
             if isinstance(pub_keys[index], str):
-                pub_keys[index] = pub_keys[index].encode('ascii')
+                pub_keys[index] = binascii.a2b_hex(pub_keys[index])
         return sorted(pub_keys, key=ProgramBuilder.compare_pubkey)
 
     @staticmethod

@@ -15,7 +15,6 @@ from ontology.wallet.identity import Identity
 
 
 class Governance(object):
-
     CONTRACT_ADDRESS = "0000000000000000000000000000000000000007"
     AUTHORIZE_INFO_POOL = "voteInfoPool"
     PEER_ATTRIBUTES = "peerAttributes"
@@ -30,16 +29,18 @@ class Governance(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
-    def register_candidate(self, account: Account, peer_pubkey: str, init_pos: int, identity: Identity, password: str, key_no: int,
-                          payer: Account, gas_limit: int, gas_price: int):
+    def register_candidate(self, account: Account, peer_pubkey: str, init_pos: int, identity: Identity, password: str,
+                           key_no: int,
+                           payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
-        param = {"peer_pubkey": peer_pubkey, "address": account.get_address().to_bytes(), "init_pos": init_pos, "ontid": identity.ont_id.encode(), "key_no": key_no}
+        param = {"peer_pubkey": peer_pubkey, "address": account.get_address().to_bytes(), "init_pos": init_pos,
+                 "ontid": identity.ont_id.encode(), "key_no": key_no}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "registerCandidate", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [],
-                         bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
-        ontid_acc = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        ontid_acc = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.add_sign_transaction(tx, ontid_acc)
         if account.get_address_base58() is not payer:
             self.__sdk.add_sign_transaction(tx, payer)
@@ -48,10 +49,11 @@ class Governance(object):
 
     def unregister_candidate(self, account: Account, peer_pubkey: str, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
-        param = {"peer_pubkey":peer_pubkey, "address": account.get_address().to_bytes()}
+        param = {"peer_pubkey": peer_pubkey, "address": account.get_address().to_bytes()}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "unRegisterCandidate", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [])
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -63,7 +65,8 @@ class Governance(object):
         param = {"address": account.get_address().to_bytes()}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdrawOng", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -75,14 +78,16 @@ class Governance(object):
         param = {"address": account.get_address().to_bytes()}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdrawFee", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def authorize_for_peer(self, account: Account, peer_publickeys: list, pos_lists: list, payer: Account, gas_limit: int, gas_price: int):
+    def authorize_for_peer(self, account: Account, peer_publickeys: list, pos_lists: list, payer: Account,
+                           gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         if len(peer_publickeys) != len(pos_lists):
             raise Exception("the length of peer_publickeys should equal the length of pos_lists")
@@ -94,14 +99,16 @@ class Governance(object):
             param["pos_lists" + str(i)] = pos_lists[i]
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "authorizeForPeer", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def unauthorize_for_peer(self, account: Account, peer_publickeys: [], pos_lists: [], payer: Account, gas_limit: int, gas_price: int):
+    def unauthorize_for_peer(self, account: Account, peer_publickeys: [], pos_lists: [], payer: Account, gas_limit: int,
+                             gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         if len(peer_publickeys) != len(pos_lists):
             raise Exception("the length of peer_publickeys should equal the length of pos_lists")
@@ -113,14 +120,16 @@ class Governance(object):
             param["pos_lists" + str(i)] = pos_lists[i]
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "unAuthorizeForPeer", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def withdraw(self, account: Account, peer_publickeys: list, withdraw_list: list, payer: Account, gas_limit: int, gas_price: int):
+    def withdraw(self, account: Account, peer_publickeys: list, withdraw_list: list, payer: Account, gas_limit: int,
+                 gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         if len(peer_publickeys) != len(withdraw_list):
             raise Exception("the length of peer_publickeys should equal the length of pos_lists")
@@ -132,7 +141,8 @@ class Governance(object):
             param["pos_lists" + str(i)] = withdraw_list[i]
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdraw", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -144,55 +154,65 @@ class Governance(object):
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes()}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "quitNode", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def change_max_authorization(self, account: Account, peer_publickey: str, max_authorize: int, payer: Account, gas_limit: int, gas_price: int):
+    def change_max_authorization(self, account: Account, peer_publickey: str, max_authorize: int, payer: Account,
+                                 gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
-        param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "maxAuthorize": max_authorize}
+        param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(),
+                 "maxAuthorize": max_authorize}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "changeMaxAuthorization", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def add_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int, gas_price: int):
+    def add_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int,
+                     gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "pos": pos}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "addInitPos", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def reduce_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int, gas_price: int):
+    def reduce_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int,
+                        gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "pos": pos}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "reduceInitPos", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
-    def set_peer_cost(self, account: Account, peer_publickey: str, peer_cost: int, payer: Account, gas_limit: int, gas_price: int):
+    def set_peer_cost(self, account: Account, peer_publickey: str, peer_cost: int, payer: Account, gas_limit: int,
+                      gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "peer_cost": peer_cost}
         invoke_code = build_native_invoke_code(contract_address, bytes([0]), "setPeerCost", param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code, bytearray(), [], bytearray())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
+                         bytearray(), [], bytearray())
         self.__sdk.sign_transaction(tx, account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
@@ -478,9 +498,3 @@ class PeerPoolItem(object):
         item["init_pos"] = self.init_pos
         item["total_pos"] = self.total_pos
         return item
-
-
-
-
-
-

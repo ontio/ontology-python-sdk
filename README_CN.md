@@ -89,8 +89,8 @@ This is an API set that allows you to generate Ontology accounts and sign transa
 | :---: | :--------------------------------- |
 |   1   | export_wif()                       |
 |   2   | get_signature_scheme()             |
-|   3   | serialize_public_key()             |
-|   4   | serialize_private_key()            |
+|   3   | get_public_key_bytes()             |
+|   4   | get_private_key_bytes()            |
 |   5   | get_public_key_hex()               |
 |   6   | get_public_key_bytes()             |
 |   7   | get_private_key_from_wif()         |

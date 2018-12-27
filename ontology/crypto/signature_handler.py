@@ -1,26 +1,29 @@
- #!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from binascii import b2a_hex
 
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import utils
-from cryptography.hazmat.primitives import hashes
+
 import ecdsa
-from ecdsa.numbertheory import square_root_mod_prime
-from ecdsa.util import string_to_number, number_to_string
 from hashlib import sha256
 from ecdsa import ellipticcurve, VerifyingKey
+from ecdsa.numbertheory import square_root_mod_prime
+from ecdsa.util import string_to_number, number_to_string
 
+from ontology.crypto.key_type import KeyType
 from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 
 
 class SignatureHandler(object):
-    def __init__(self, key_type, scheme):
+    def __init__(self, key_type: KeyType, scheme: SignatureScheme):
         self.__type = key_type
         self.__scheme = scheme
 
-    def generateSignature(self, pri_key, msg:bytes):
+    def generate_signature(self, pri_key: bytes, msg: bytes) -> str:
         if self.__scheme == SignatureScheme.SHA224withECDSA:
             private_key = ec.derive_private_key(int(pri_key, 16), ec.SECP224R1(), default_backend())
             signature = private_key.sign(
@@ -40,11 +43,12 @@ class SignatureHandler(object):
                 ec.ECDSA(hashes.SHA384())
             )
         else:
-            raise RuntimeError
+            raise SDKException(ErrorCode.other_error('Invalid signature scheme.'))
         sign = SignatureHandler.dsa_der_to_plain(signature)
         return sign
 
-    def verify_signature(self, public_key: bytes, msg: bytes, signature: bytes):
+    @staticmethod
+    def verify_signature(public_key: bytes, msg: bytes, signature: bytes):
         if public_key.startswith(b'\x02') or public_key.startswith(b'\x03'):
             public_key = SignatureHandler.uncompress_public_key(public_key)
         elif public_key.startswith(b'\x04'):
@@ -62,10 +66,10 @@ class SignatureHandler(object):
         r, s = utils.decode_dss_signature(signature)
         r = hex(r)[2:]
         if len(r) < 64:
-            r = "".join(['0' for i in range(64-len(r))]) + r
+            r = "".join(['0' for i in range(64 - len(r))]) + r
         s = hex(s)[2:]
         if len(s) < 64:
-            s = "".join(['0' for i in range(64-len(s))]) + s
+            s = "".join(['0' for i in range(64 - len(s))]) + s
         return r + s
 
     @staticmethod

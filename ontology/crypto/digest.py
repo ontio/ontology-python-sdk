@@ -6,7 +6,7 @@ import hashlib
 
 class Digest(object):
     @staticmethod
-    def __sha256(msg: bytes, is_hex: bool = False):
+    def __sha256(msg: bytes, is_hex: bool = False) -> bytes or str:
         m = hashlib.sha256()
         m.update(msg)
         if is_hex:
@@ -15,7 +15,7 @@ class Digest(object):
             return m.digest()
 
     @staticmethod
-    def ripemd160(msg: bytes, is_hex: bool = False):
+    def ripemd160(msg: bytes, is_hex: bool = False) -> bytes or str:
         h = hashlib.new('ripemd160')
         h.update(msg)
         if is_hex:
@@ -24,7 +24,7 @@ class Digest(object):
             return h.digest()
 
     @staticmethod
-    def sha256(msg: bytes, offset: int = 0, length: int = 0, is_hex: bool = False):
+    def sha256(msg: bytes, offset: int = 0, length: int = 0, is_hex: bool = False) -> bytes or str:
         if offset != 0 and len(msg) > offset + length:
             msg = msg[offset:offset + length]
         return Digest.__sha256(msg, is_hex)

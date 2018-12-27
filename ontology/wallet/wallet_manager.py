@@ -5,6 +5,7 @@ import json
 import uuid
 import base64
 import codecs
+
 from datetime import datetime
 
 from ontology.common.define import DID_ONT
@@ -12,16 +13,15 @@ from ontology.crypto.scrypt import Scrypt
 from ontology.wallet.control import Control
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.utils.utils import is_file_exist
 from ontology.wallet.wallet import WalletData
-from ontology.utils.utils import get_random_hex_str
+from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
 from ontology.exception.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
 from ontology.exception.exception import SDKException
-from ontology.wallet.identity import Identity, did_ont
 from ontology.wallet.identity_info import IdentityInfo
 from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.utils.utils import get_random_hex_str, is_file_exist
 
 
 class WalletManager(object):
@@ -120,9 +120,9 @@ class WalletManager(object):
     def __create_identity(self, label: str, pwd: str, salt: str, private_key: str):
         acct = self.__create_account(label, pwd, salt, private_key, False)
         info = IdentityInfo()
-        info.ont_id = did_ont + acct.get_address_base58()
-        info.pubic_key = acct.serialize_public_key().hex()
-        info.private_key = acct.serialize_private_key().hex()
+        info.ont_id = DID_ONT + acct.get_address_base58()
+        info.pubic_key = acct.get_public_key_bytes().hex()
+        info.private_key = acct.get_private_key_bytes().hex()
         info.pri_key_wif = acct.export_wif().encode('ascii')
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_bytes().hex()
@@ -165,7 +165,7 @@ class WalletManager(object):
         if pwd is not None:
             acct.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         else:
-            acct.key = account.serialize_private_key().hex()
+            acct.key = account.get_private_key_bytes().hex()
 
         acct.b58_address = account.get_address_base58()
         # set label
@@ -180,21 +180,21 @@ class WalletManager(object):
                 self.wallet_in_mem.default_account_address = acct.b58_address
             acct.label = label
             acct.salt = base64.b64encode(salt.encode('latin-1')).decode('ascii')
-            acct.public_key = account.serialize_public_key().hex()
+            acct.public_key = account.get_public_key_bytes().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
             for index in range(len(self.wallet_in_mem.identities)):
-                if self.wallet_in_mem.identities[index].ont_id == did_ont + acct.b58_address:
+                if self.wallet_in_mem.identities[index].ont_id == DID_ONT + acct.b58_address:
                     raise SDKException(ErrorCode.other_error('Wallet identity exists.'))
             idt = Identity()
-            idt.ont_id = did_ont + acct.b58_address
+            idt.ont_id = DID_ONT + acct.b58_address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
                 idt.is_default = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
             ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.b58_address,
-                          public_key=account.serialize_public_key().hex())
+                          public_key=account.get_public_key_bytes().hex())
             idt.controls.append(ctl)
             self.wallet_in_mem.identities.append(idt)
         return account
@@ -225,8 +225,8 @@ class WalletManager(object):
     def create_account_info(self, label: str, pwd: str, salt: str, private_key: str) -> AccountInfo:
         acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
-        info.address_base58 = Address.address_from_bytes_pubkey(acct.serialize_public_key()).b58encode()
-        info.public_key = acct.serialize_public_key().hex()
+        info.address_base58 = Address.address_from_bytes_pubkey(acct.get_public_key_bytes()).b58encode()
+        info.public_key = acct.get_public_key_bytes().hex()
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().get_n())
         info.address_u160 = acct.get_address().to_bytes().hex()
         info.salt = salt
@@ -249,31 +249,39 @@ class WalletManager(object):
                 return self.wallet_in_mem.accounts[index]
         raise SDKException(ErrorCode.other_error(f'Create account from key {private_key} failed.'))
 
-    def get_account(self, b58_address_or_ontid: str, password: str) -> Account:
+    def get_account_by_ont_id(self, ont_id: str, password: str) -> Account:
         """
-        :param b58_address_or_ontid: a base58 encode address or ontid
+        :param ont_id: OntId.
         :param password: a password which is used to decrypt the encrypted private key.
         :return:
         """
-        if b58_address_or_ontid.startswith(DID_ONT):
-            for index in range(len(self.wallet_in_mem.identities)):
-                if self.wallet_in_mem.identities[index].ont_id == b58_address_or_ontid:
-                    addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
-                    key = self.wallet_in_mem.identities[index].controls[0].key
-                    salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
-                                                                      self.wallet_in_mem.scrypt.get_n(), self.scheme)
-                    return Account(private_key, self.scheme)
-        else:
-            for index in range(len(self.wallet_in_mem.accounts)):
-                if self.wallet_in_mem.accounts[index].b58_address == b58_address_or_ontid:
-                    key = self.wallet_in_mem.accounts[index].key
-                    addr = self.wallet_in_mem.accounts[index].b58_address
-                    salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
-                    private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt,
-                                                                      self.wallet_in_mem.scrypt.get_n(), self.scheme)
-                    return Account(private_key, self.scheme)
-        raise SDKException(ErrorCode.other_error(f'Get account {b58_address_or_ontid} failed.'))
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.other_error('Invalid OntId.'))
+        for index in range(len(self.wallet_in_mem.identities)):
+            if self.wallet_in_mem.identities[index].ont_id == ont_id:
+                addr = self.wallet_in_mem.identities[index].ont_id.replace(did_ont, "")
+                key = self.wallet_in_mem.identities[index].controls[0].key
+                salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
+                n = self.wallet_in_mem.scrypt.get_n()
+                private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, n, self.scheme)
+                return Account(private_key, self.scheme)
+        raise SDKException(ErrorCode.other_error(f'Get account {ont_id} failed.'))
+
+    def get_account_by_b58_address(self, b58_address: str, password: str) -> Account:
+        """
+        :param b58_address: a base58 encode address.
+        :param password: a password which is used to decrypt the encrypted private key.
+        :return:
+        """
+        for index in range(len(self.wallet_in_mem.accounts)):
+            if self.wallet_in_mem.accounts[index].b58_address == b58_address:
+                key = self.wallet_in_mem.accounts[index].key
+                addr = self.wallet_in_mem.accounts[index].b58_address
+                salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
+                n = self.wallet_in_mem.scrypt.get_n()
+                private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, n, self.scheme)
+                return Account(private_key, self.scheme)
+        raise SDKException(ErrorCode.other_error(f'Get account {b58_address} failed.'))
 
     def get_default_identity(self) -> Identity:
         for identity in self.wallet_in_mem.identities:

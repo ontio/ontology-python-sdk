@@ -42,6 +42,16 @@ class OntologySdk(object):
                     OntologySdk._instance = object.__new__(cls)
         return OntologySdk._instance
 
+    def get_network(self) -> RpcClient or RestfulClient or WebsocketClient:
+        if self.__rpc.get_address() != '':
+            return self.__rpc
+        elif self.__restful.get_address() != '':
+            return self.__restful
+        elif self.__websocket.get_address() != '':
+            return self.__websocket
+        else:
+            raise SDKException(ErrorCode.other_error('Invalid network instance.'))
+
     @property
     def wallet_manager(self):
         if self.__wallet_manager is None:
@@ -206,7 +216,7 @@ class OntologySdk(object):
             raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         tx_hash = tx.hash256_bytes()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
-        sig = Sig([signer.serialize_public_key()], 1, [sig_data])
+        sig = Sig([signer.get_public_key_bytes()], 1, [sig_data])
         tx.sigs.append(sig)
         return tx
 
@@ -247,15 +257,16 @@ class OntologySdk(object):
 
     @staticmethod
     def verify_signature(public_key: bytearray, data: bytearray, signature: bytearray):
-        key_type = KeyType.ECDSA
         if len(public_key) == 33:
             key_type = KeyType.ECDSA
         elif len(public_key) == 35:
             key_type = KeyType.from_label(public_key[0])
+        else:
+            raise SDKException(ErrorCode.other_error('Unsupported key type'))
         if key_type == KeyType.ECDSA:
             handler = SignatureHandler(key_type, SignatureScheme.SHA256withECDSA)
         elif key_type == KeyType.SM2:
             handler = SignatureHandler(key_type, SignatureScheme.SM3withSM2)
         else:
-            raise Exception('Unsupported key type')
+            raise SDKException(ErrorCode.other_error('Unsupported key type'))
         return handler.verify_signature(public_key, data, signature)

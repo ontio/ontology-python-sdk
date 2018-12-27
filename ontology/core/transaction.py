@@ -157,7 +157,7 @@ class Transaction(object):
             raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         tx_hash = self.hash256_bytes()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
-        sig = Sig([signer.serialize_public_key()], 1, [sig_data])
+        sig = Sig([signer.get_public_key_bytes()], 1, [sig_data])
         self.sigs.append(sig)
 
     def add_multi_sign_transaction(self, m: int, pub_keys: List[bytes] or List[str], signer: Account):

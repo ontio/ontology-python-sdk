@@ -151,7 +151,7 @@ class TestAsset(unittest.TestCase):
 
         b58_from_address = from_acct.get_address_base58()
         b58_to_address = to_acct.get_address_base58()
-        b58_payer_address = b58_from_address
+        b58_payer_address = b58_to_address
 
         amount = 1
         gas_price = 500
@@ -179,6 +179,23 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(b58_payer_address, notify['States'][1])
         self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
+    def test_send_transfer(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
+        asset = sdk.native_vm.asset()
+        from_acct = acct2
+        payer = acct4
+        b58_from_address = from_acct.get_address_base58()
+        b58_to_address = acct1.get_address_base58()
+        amount = 1
+        gas_price = 500
+        gas_limit = 20000
+        tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
+        time.sleep(random.randint(6, 10))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
+        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+
     def test_new_transfer_from_transaction(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
@@ -204,23 +221,6 @@ class TestAsset(unittest.TestCase):
             msg = 'balance insufficient!'
             self.assertEqual(59000, e.args[0])
             self.assertIn(msg, e.args[1])
-
-    def test_send_transfer(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
-        asset = sdk.native_vm.asset()
-        from_acct = acct3
-        payer = acct4
-        b58_from_address = from_acct.get_address_base58()
-        b58_to_address = acct1.get_address_base58()
-        amount = 1
-        gas_price = 500
-        gas_limit = 20000
-        tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
-        time.sleep(random.randint(6, 10))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
-        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
         claimer = acct1

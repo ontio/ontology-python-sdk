@@ -1,22 +1,46 @@
+#!/usr/bin/env python3
+# # -*- coding: utf-8 -*-
+import json
 from time import time
 
-from ontology.account.account import Account
 from ontology.vm import build_vm
-from ontology.core.transaction import Transaction
-from ontology.crypto.key_type import KeyType
-from ontology.common.address import Address
 from ontology.common.define import *
-from ontology.io.memory_stream import StreamManager
-from ontology.io.binary_reader import BinaryReader
 from ontology.crypto.curve import Curve
-from binascii import b2a_hex, a2b_hex
-
+from ontology.network.rpc import RpcClient
+from ontology.common.address import Address
+from ontology.crypto.key_type import KeyType
+from ontology.account.account import Account
 from ontology.wallet.identity import Identity
+from ontology.core.transaction import Transaction
+from ontology.network.restful import RestfulClient
+from ontology.io.binary_reader import BinaryReader
+from ontology.exception.error_code import ErrorCode
+from ontology.io.memory_stream import StreamManager
+from ontology.exception.exception import SDKException
+from ontology.network.websocket import WebsocketClient
 
 
 class OntId(object):
-    def __init__(self, sdk):
+    def __init__(self, sdk, network: RpcClient or RestfulClient or WebsocketClient = None):
         self.__sdk = sdk
+
+    def get_network(self):
+        return self.__sdk.get_network()
+
+    def get_merkle_proof(self, tx_hash: str):
+        if not isinstance(tx_hash, str):
+            raise SDKException(ErrorCode.other_error('Invalid TxHash type.'))
+        if len(tx_hash) != 64:
+            raise SDKException(ErrorCode.other_error('Invalid TxHash.'))
+        network = self.get_network()
+        proof = network.get_merkle_proof(tx_hash)
+        height = network.get_block_height_by_tx_hash(tx_hash)
+        try:
+            merkle_root = proof['TransactionsRoot']
+        except KeyError:
+            raise SDKException(ErrorCode.other_error('Invalid TxHash')) from None
+        merkle_proof = dict(Type='MerkleProof', TxHash=tx_hash, BlockHeight=height, MerkleRoot=merkle_root)
+        print(json.dumps(proof, indent=4))
 
     @staticmethod
     def new_registry_ont_id_transaction(ont_id: str, hex_public_key: str, b58_payer_address: str, gas_limit: int,
@@ -24,14 +48,14 @@ class OntId(object):
         """
         This interface is used to generate a Transaction object which is used to register ONT ID.
 
-        :param ont_id: ontid.
+        :param ont_id: OntId.
         :param hex_public_key: the hexadecimal public key in the form of string.
         :param b58_payer_address: a base58 encode address which indicate who will pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to register ONT ID.
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(hex_public_key)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
         unix_time_now = int(time())
@@ -53,7 +77,7 @@ class OntId(object):
         """
         tx = OntId.new_registry_ont_id_transaction(identity.ont_id, identity.controls[0].public_key,
                                                    payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
@@ -72,7 +96,7 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to add attribute.
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "length": len(attribute_list)}
         for i in range(len(attribute_list)):
             args["key" + str(i)] = bytes(attribute_list[i]["key"].encode())
@@ -101,7 +125,7 @@ class OntId(object):
         """
         tx = OntId.new_add_attribute_transaction(identity.ont_id, identity.controls[0].public_key, attribute_list,
                                                  payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
@@ -121,7 +145,7 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to remove attribute.
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": bytearray.fromhex(hex_public_key)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
         unix_time_now = int(time())
@@ -144,7 +168,7 @@ class OntId(object):
         """
         tx = OntId.new_remove_attribute_transaction(identity.ont_id, identity.controls[0].public_key, path,
                                                     payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
@@ -163,7 +187,7 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to add public key.
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(hex_new_public_key),
                 "pubkey_or_recovery": bytearray.fromhex(hex_public_key_or_recovery)}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addKey", args)
@@ -187,7 +211,7 @@ class OntId(object):
         """
         tx = OntId.new_add_public_key_transaction(identity.ont_id, identity.controls[0].public_key, new_hex_public_key,
                                                   payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
@@ -229,7 +253,7 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to remove public key.
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         bytes_public_key_or_recovery = bytearray.fromhex(hex_public_key_or_recovery)
         bytes_remove_public_key = bytearray.fromhex(hex_remove_public_key)
         bytes_ont_id = ont_id.encode()
@@ -258,7 +282,7 @@ class OntId(object):
         b58_payer_address = payer.get_address_base58()
         tx = OntId.new_remove_public_key_transaction(identity.ont_id, identity.controls[0].public_key,
                                                      hex_remove_public_key, b58_payer_address, gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
@@ -289,7 +313,7 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return:
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
         bytearray_public_key = bytearray.fromhex(hex_public_key)
         args = {"ontid": ont_id.encode(), "recovery": bytes_recovery_address, "pubkey": bytearray_public_key}
@@ -316,7 +340,7 @@ class OntId(object):
         b58_payer_address = payer.get_address_base58()
         tx = OntId.new_add_recovery_transaction(identity.ont_id, identity.controls[0].public_key, b58_recovery_address,
                                                 b58_payer_address, gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account(identity.ont_id, password)
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
@@ -331,7 +355,7 @@ class OntId(object):
         :param ont_id: ontid.
         :return: a hexadecimal serialize DDO object string.
         """
-        contract_address = ONTID_CONTRACT_ADDRESS
+        contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode()}
         invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
         unix_time_now = int(time())
