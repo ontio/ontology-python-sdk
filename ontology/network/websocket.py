@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import json
+import socket
 import binascii
 
 from time import time
 from sys import maxsize
 from typing import List
-from random import choice
 
 from websockets import client
-from Cryptodome.Random.random import randint
+from Cryptodome.Random.random import randint, choice
 
 from ontology.account.account import Account
 from ontology.smart_contract.neo_vm import NeoVm
@@ -51,7 +51,12 @@ class WebsocketClient(object):
         self.set_address(restful_address)
 
     async def connect(self):
-        self.__ws_client = await client.connect(self.__url)
+        try:
+            self.__ws_client = await client.connect(self.__url)
+        except ConnectionAbortedError as e:
+            raise SDKException(ErrorCode.other_error(e.args[1])) from None
+        except socket.gaierror as e:
+            raise SDKException(ErrorCode.other_error(e.args[1])) from None
 
     async def close_connect(self):
         if isinstance(self.__ws_client, client.WebSocketClientProtocol) and not self.__ws_client.closed:
