@@ -223,15 +223,15 @@ class TestAsset(unittest.TestCase):
         sdk.add_sign_transaction(tx, sender)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
-            self.assertEqual(64, len(tx_hash))
-            time.sleep(randint(6, 10))
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-            self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
-            self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
         except SDKException as e:
             msg = 'balance insufficient!'
-            self.assertEqual(59000, e.args[0])
             self.assertIn(msg, e.args[1])
+            return
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(randint(6, 10))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
+        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
         claimer = acct1
