@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import binascii
+from typing import List
 
 import base58
 from binascii import a2b_hex
@@ -37,8 +38,12 @@ class Address(object):
         return addr
 
     @staticmethod
-    def address_from_multi_pub_keys(m: int, pub_keys: []):
+    def address_from_multi_pub_keys(m: int, pub_keys: List[bytes]):
         return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pub_keys)))
+
+    @staticmethod
+    def b58_address_from_multi_pub_keys(m: int, pub_keys: List[bytes]):
+        return Address(Address.to_script_hash(ProgramBuilder.program_from_multi_pubkey(m, pub_keys))).b58encode()
 
     @staticmethod
     def address_from_vm_code(code: str):

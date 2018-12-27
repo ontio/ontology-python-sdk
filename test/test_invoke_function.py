@@ -5,6 +5,7 @@ import time
 import unittest
 import binascii
 
+from ontology.exception.exception import SDKException
 from test import acct1, acct2, acct3
 
 from ontology.ont_sdk import OntologySdk
@@ -70,8 +71,13 @@ class TestInvokeFunction(unittest.TestCase):
         bytes_to_address = acct2.get_address().to_bytes()
         value = 1
         func.set_params_value(bytes_from_address, bytes_to_address, value)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
-        self.assertEqual(64, len(tx_hash))
+        try:
+            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func,
+                                                      False)
+            self.assertEqual(64, len(tx_hash))
+        except SDKException as e:
+            self.assertIn('already in the tx pool', e.args[1])
+            return
         time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -117,7 +123,12 @@ class TestInvokeFunction(unittest.TestCase):
         transfer2 = [bytes_from_address2, bytes_to_address2, value2]
         func = InvokeFunction('transferMulti')
         func.set_params_value(transfer1, transfer2)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
+        try:
+            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func,
+                                                      False)
+        except SDKException as e:
+            self.assertIn('already in the tx pool', e.args[1])
+            return
         time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states_list = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -146,8 +157,13 @@ class TestInvokeFunction(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi')
         func.set_params_value(transfer_list)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
-        self.assertEqual(64, len(tx_hash))
+        try:
+            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func,
+                                                      False)
+            self.assertEqual(64, len(tx_hash))
+        except SDKException as e:
+            self.assertIn('already in the tx pool', e.args[1])
+            return
         time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -171,8 +187,13 @@ class TestInvokeFunction(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi_args')
         func.set_params_value(transfer_1, transfer_2)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
-        self.assertEqual(64, len(tx_hash))
+        try:
+            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func,
+                                                      False)
+            self.assertEqual(64, len(tx_hash))
+        except SDKException as e:
+            self.assertIn('already in the tx pool', e.args[1])
+            return
         time.sleep(random.randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -202,7 +223,11 @@ class TestInvokeFunction(unittest.TestCase):
         notify_args.set_params_value(bool_msg, int_msg, list_msg, str_msg, bytes_address_msg)
         rpc_address = 'http://polaris5.ont.io:20336'
         sdk.set_rpc_address(rpc_address)
-        response = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, notify_args, True)
+        try:
+            response = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, notify_args, True)
+        except SDKException as e:
+            self.assertIn('already in the tx pool', e.args[1])
+            return
         sdk.rpc.connect_to_test_net()
         response['Result'] = ContractDataParser.to_bool(response['Result'])
         self.assertEqual(1, response['State'])

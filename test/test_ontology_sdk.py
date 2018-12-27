@@ -23,16 +23,19 @@ class TestOntologySdk(unittest.TestCase):
         os.remove(path)
 
     def test_add_multi_sign_transaction(self):
+        asset = sdk.native_vm.asset()
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         m = 2
-        multi_address = Address.address_from_multi_pub_keys(m, pub_keys)
-        b58_multi_address = multi_address.b58encode()
-        b58_acct1_address = acct1.get_address_base58()
-        b58_acct2_address = acct2.get_address_base58()
+        b58_multi_address = Address.b58_address_from_multi_pub_keys(m, pub_keys)
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        asset = sdk.native_vm.asset()
+        tx_hash = asset.send_transfer('ont', acct2, b58_multi_address, amount, acct2, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        tx_hash = asset.send_transfer('ong', acct2, b58_multi_address, amount, acct2, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        b58_acct1_address = acct1.get_address_base58()
+        b58_acct2_address = acct2.get_address_base58()
         self.assertEqual('ATyGGJBnANKFbf2tQMp4muUEZK7KuZ52k4', b58_multi_address)
         tx = asset.new_transfer_transaction('ong', b58_acct1_address, b58_multi_address, amount, b58_acct1_address,
                                             gas_limit, gas_price)

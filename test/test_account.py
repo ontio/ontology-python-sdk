@@ -63,11 +63,11 @@ class TestAccount(unittest.TestCase):
         result = account.verify_signature(msg, signature)
         self.assertEqual(True, result)
 
-    def test_serialize_private_key(self):
+    def test_get_private_key_bytes(self):
         hex_private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         account = Account(hex_private_key, SignatureScheme.SHA256withECDSA)
-        hex_serialize_private_key = account.serialize_private_key().hex()
-        self.assertEqual(hex_private_key, hex_serialize_private_key)
+        hex_get_private_key_bytes = account.get_private_key_bytes().hex()
+        self.assertEqual(hex_private_key, hex_get_private_key_bytes)
 
     def test_get_address_base58(self):
         base58_address = "ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6"
@@ -93,11 +93,11 @@ class TestAccount(unittest.TestCase):
         signature_scheme = account.get_signature_scheme()
         self.assertEqual(SignatureScheme, type(signature_scheme))
 
-    def test_serialize_public_key(self):
+    def test_get_public_key_bytes(self):
         hex_private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         hex_public_key = "03036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be889"
         account = Account(hex_private_key, SignatureScheme.SHA256withECDSA)
-        self.assertEqual(hex_public_key, account.serialize_public_key().hex())
+        self.assertEqual(hex_public_key, account.get_public_key_bytes().hex())
 
     def test_export_wif(self):
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'

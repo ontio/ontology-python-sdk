@@ -60,7 +60,7 @@ from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
 #                                                                        new_admin_identity.controls[0].public_key,
 #                                                                        acc.get_address_base58(), 20000, 0)
 #         print(new_admin_identity.controls[0].public_key)
-#         print(acc3.serialize_public_key().hex())
+#         print(acc3.get_public_key_bytes().hex())
 #         sdk.sign_transaction(tx, acc)
 #         sdk.sign_transaction(tx2, acc)
 #         account1 = sdk.wallet_manager.get_account(admin_identity.ont_id, "111111")

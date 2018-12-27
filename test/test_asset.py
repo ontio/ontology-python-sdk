@@ -5,16 +5,15 @@ import time
 import random
 import unittest
 
-from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.contract_event_parser import ContractEventParser
 from test import acct1, acct2, acct3, acct4
 
-from ontology.exception.exception import SDKException
 from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
+from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.smart_contract.native_contract.asset import Asset
+from ontology.utils.contract_event_parser import ContractEventParser
 
 
 class TestAsset(unittest.TestCase):
@@ -152,7 +151,7 @@ class TestAsset(unittest.TestCase):
 
         b58_from_address = from_acct.get_address_base58()
         b58_to_address = to_acct.get_address_base58()
-        b58_payer_address = b58_from_address
+        b58_payer_address = b58_to_address
 
         amount = 1
         gas_price = 500
@@ -180,6 +179,23 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(b58_payer_address, notify['States'][1])
         self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
+    def test_send_transfer(self):
+        sdk = OntologySdk()
+        sdk.rpc.connect_to_test_net()
+        asset = sdk.native_vm.asset()
+        from_acct = acct2
+        payer = acct4
+        b58_from_address = from_acct.get_address_base58()
+        b58_to_address = acct1.get_address_base58()
+        amount = 1
+        gas_price = 500
+        gas_limit = 20000
+        tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
+        time.sleep(random.randint(6, 10))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
+        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+
     def test_new_transfer_from_transaction(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
@@ -188,8 +204,6 @@ class TestAsset(unittest.TestCase):
         b58_payer_address = sender.get_address_base58()
         b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()
-        old_from_balance = sdk.rpc.get_balance(b58_from_address)
-        old_recv_balance = sdk.rpc.get_balance(b58_recv_address)
         amount = 1
         gas_limit = 20000
         gas_price = 500
@@ -200,40 +214,13 @@ class TestAsset(unittest.TestCase):
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
             time.sleep(random.randint(6, 10))
-            new_from_balance = sdk.rpc.get_balance(b58_from_address)
-            new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
-            self.assertEqual(int(old_from_balance['ont']) - amount, int(new_from_balance['ont']))
-            self.assertEqual(int(old_recv_balance['ont']) + amount, int(new_recv_balance['ont']))
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
             self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
         except SDKException as e:
-            msg = '[TransferFrom] approve balance insufficient!'
+            msg = 'balance insufficient!'
             self.assertEqual(59000, e.args[0])
             self.assertIn(msg, e.args[1])
-
-    def test_send_transfer(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
-        asset = sdk.native_vm.asset()
-        from_acct = acct3
-        payer = acct4
-        b58_from_address = from_acct.get_address_base58()
-        b58_to_address = acct1.get_address_base58()
-        old_from_acct_balance = asset.query_balance('ont', b58_from_address)
-        old_to_acct_balance = asset.query_balance('ont', b58_to_address)
-        amount = 1
-        gas_price = 500
-        gas_limit = 20000
-        tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
-        time.sleep(random.randint(6, 10))
-        new_from_acct_balance = asset.query_balance('ont', b58_from_address)
-        new_to_acct_balance = asset.query_balance('ont', b58_to_address)
-        self.assertEqual(old_from_acct_balance - amount, new_from_acct_balance)
-        self.assertEqual(old_to_acct_balance + amount, new_to_acct_balance)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
-        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
         claimer = acct1
@@ -264,7 +251,7 @@ class TestAsset(unittest.TestCase):
             tx_hash = asset.send_withdraw_ong_transaction(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
             self.assertEqual(64, len(tx_hash))
         except SDKException as e:
-            msg = 'has no balance enough to cover gas cost 10000000'
+            msg = 'no balance enough'
             self.assertEqual(59000, e.args[0])
             self.assertIn(msg, e.args[1])
 
@@ -275,21 +262,21 @@ class TestAsset(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_recv_address = acct2.get_address_base58()
-        amount = 1
+        amount = 10
         gas_limit = 20000
         gas_price = 500
         try:
             tx_hash = asset.send_approve('ont', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
             self.assertEqual(len(tx_hash), 64)
         except SDKException as e:
-            msg = 'has no balance enough to cover gas cost 10000000'
+            msg = 'no balance enough'
             self.assertEqual(59000, e.args[0])
             self.assertIn(msg, e.args[1])
         try:
             tx_hash = asset.send_approve('ong', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
             self.assertEqual(len(tx_hash), 64)
         except SDKException as e:
-            msg = 'has no balance enough to cover gas cost 10000000'
+            msg = 'no balance enough'
             self.assertEqual(59000, e.args[0])
             self.assertIn(msg, e.args[1])
 
@@ -301,8 +288,6 @@ class TestAsset(unittest.TestCase):
         asset = sdk.native_vm.asset()
         b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()
-        old_from_balance = sdk.rpc.get_balance(b58_from_address)
-        old_recv_balance = sdk.rpc.get_balance(b58_recv_address)
         amount = 1
         gas_limit = 20000
         gas_price = 500
@@ -311,12 +296,11 @@ class TestAsset(unittest.TestCase):
                                                gas_limit, gas_price)
             self.assertEqual(64, len(tx_hash))
             time.sleep(random.randint(6, 10))
-            new_from_balance = sdk.rpc.get_balance(b58_from_address)
-            new_recv_balance = sdk.rpc.get_balance(b58_recv_address)
-            self.assertEqual(int(old_from_balance['ont']) - amount, int(new_from_balance['ont']))
-            self.assertEqual(int(old_recv_balance['ont']) + amount, int(new_recv_balance['ont']))
+            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
+            self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
         except SDKException as e:
-            self.assertIn('[Transfer] balance insufficient', e.args[1])
+            self.assertIn('balance insufficient', e.args[1])
 
 
 if __name__ == '__main__':

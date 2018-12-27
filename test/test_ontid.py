@@ -8,6 +8,7 @@ from test import acct1, acct2, acct3, acct4
 
 from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
+from ontology.common.define import DID_ONT
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
@@ -17,11 +18,16 @@ sdk.rpc.connect_to_test_net()
 
 
 class TestOntId(unittest.TestCase):
+    def test_get_merkle_proof(self):
+        ont_id = sdk.native_vm.ont_id()
+        tx_hash = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
+        ont_id.get_merkle_proof(tx_hash)
+
     def test_new_registry_ont_id_transaction(self):
         ont_id = sdk.native_vm.ont_id()
         hex_public_key = acct2.get_public_key_hex()
         b58_address = acct2.get_address_base58()
-        acct_did = "did:ont:" + b58_address
+        acct_did = DID_ONT + b58_address
         gas_limit = 20000
         gas_price = 500
         tx = ont_id.new_registry_ont_id_transaction(acct_did, hex_public_key, b58_address, gas_limit, gas_price)

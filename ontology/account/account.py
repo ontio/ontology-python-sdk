@@ -7,6 +7,7 @@ import binascii
 import base58
 from binascii import b2a_hex, a2b_hex
 
+from ontology.common.define import DID_ONT
 from ontology.crypto.curve import Curve
 from ontology.crypto.digest import Digest
 from ontology.crypto.scrypt import Scrypt
@@ -37,13 +38,13 @@ class Account(object):
             raise TypeError
         self.__private_key = a2b_hex(private_key.encode())  # 32 bytes
         self.__curve_name = Curve.P256
-        self.__publicKey = Signature.ec_get_pubkey_by_prikey(self.__private_key, self.__curve_name)  # 33 bytes
-        self.__address = Address.address_from_bytes_pubkey(self.__publicKey)  # address is a class type
+        self.__public_key = Signature.ec_get_pubkey_by_prikey(self.__private_key, self.__curve_name)  # 33 bytes
+        self.__address = Address.address_from_bytes_pubkey(self.__public_key)  # address is a class type
 
     def generate_signature(self, msg: bytes, signature_scheme: SignatureScheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:
             handler = SignatureHandler(self.__keyType, signature_scheme)
-            signature_value = handler.generateSignature(b2a_hex(self.__private_key), msg)
+            signature_value = handler.generate_signature(b2a_hex(self.__private_key), msg)
             byte_signature = Signature(signature_scheme, signature_value).to_byte()
         else:
             raise TypeError
@@ -53,7 +54,10 @@ class Account(object):
         if msg is None or signature is None:
             raise Exception(ErrorCode.param_err("param should not be None"))
         handler = SignatureHandler(self.__keyType, self.__signature_scheme)
-        return handler.verify_signature(self.serialize_public_key(), msg, signature)
+        return handler.verify_signature(self.get_public_key_bytes(), msg, signature)
+
+    def get_ont_id(self):
+        return DID_ONT + self.get_address_base58()
 
     def get_address(self):
         """
@@ -88,22 +92,6 @@ class Account(object):
         :return: big-endian hexadecimal account address.
         """
         return self.__address.to_reverse_hex_str()
-
-    def get_public_key_bytes(self) -> bytes:
-        """
-        This interface is used to get the account's public key in the form of bytes.
-
-        :return: the public key in the form of bytes.
-        """
-        return self.__publicKey
-
-    def get_public_key_hex(self) -> str:
-        """
-        This interface is used to get the account's hexadecimal public key in the form of string.
-
-        :return: the hexadecimal public key in the form of string.
-        """
-        return binascii.b2a_hex(self.__publicKey).decode('ascii')
 
     def get_signature_scheme(self) -> SignatureScheme:
         """
@@ -172,7 +160,7 @@ class Account(object):
             raise SDKException(ErrorCode.other_error('Address error.'))
         return private_key
 
-    def serialize_private_key(self):
+    def get_private_key_bytes(self) -> bytes:
         """
         This interface is used to get the private key in the form of bytes.
 
@@ -180,13 +168,29 @@ class Account(object):
         """
         return self.__private_key
 
-    def serialize_public_key(self) -> bytes:
+    def get_private_key_hex(self) -> str:
+        """
+        This interface is used to get the account's hexadecimal public key in the form of string.
+
+        :return: the hexadecimal public key in the form of string.
+        """
+        return binascii.b2a_hex(self.__private_key).decode('ascii')
+
+    def get_public_key_bytes(self) -> bytes:
         """
         This interface is used to get the public key in the form of bytes.
 
         :return: the public key in the form of bytes.
         """
-        return self.__publicKey
+        return self.__public_key
+
+    def get_public_key_hex(self) -> str:
+        """
+        This interface is used to get the account's hexadecimal public key in the form of string.
+
+        :return: the hexadecimal public key in the form of string.
+        """
+        return binascii.b2a_hex(self.__public_key).decode('ascii')
 
     def export_wif(self) -> str:
         """
@@ -196,7 +200,7 @@ class Account(object):
         :return: a WIF encode private key.
         """
         data = b'\x80'
-        data = data + self.serialize_private_key()
+        data = data + self.get_private_key_bytes()
         data += b'\01'
         checksum = Digest.hash256(data[0:34])
         data += checksum[0:4]
