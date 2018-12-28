@@ -12,11 +12,9 @@ from ontology.exception.exception import SDKException
 
 
 class WalletData(object):
-    def __init__(self, name: str = "MyWallet", version: str = "1.1", create_time: str = "", default_id: str = "",
-                 default_address="", scrypt: Scrypt = None, identities: List[Identity] = None,
+    def __init__(self, name: str = 'MyWallet', version: str = '1.1', create_time: str = '', default_id: str = '',
+                 default_address='', scrypt: Scrypt = Scrypt(), identities: List[Identity] = None,
                  accounts: List[AccountData] = None):
-        if scrypt is None:
-            scrypt = Scrypt()
         if not isinstance(scrypt, Scrypt):
             raise SDKException(ErrorCode.other_error('Wallet Data init failed'))
         if identities is None:
@@ -29,10 +27,9 @@ class WalletData(object):
         self.default_ont_id = default_id
         self.default_account_address = default_address
         self.scrypt = scrypt
-        self.identities = list()
-        self.accounts = list()
-        for index in range(len(identities)):
-            dict_identity = identities[index]
+        self.identities = identities
+        self.accounts = accounts
+        for dict_identity in identities:
             if isinstance(dict_identity, dict):
                 list_controls = list()
                 try:
@@ -49,8 +46,7 @@ class WalletData(object):
             else:
                 self.identities = identities
                 break
-        for index in range(len(accounts)):
-            dict_account = accounts[index]
+        for dict_account in accounts:
             if isinstance(dict_account, dict):
                 try:
                     public_key = dict_account['publicKey']
@@ -169,9 +165,9 @@ class WalletData(object):
         return self.accounts[index]
 
     def get_account_by_b58_address(self, b58_address: str) -> AccountData:
-        for index in range(len(self.accounts)):
-            if self.accounts[index].b58_address == b58_address:
-                return self.accounts[index]
+        for acct in self.accounts:
+            if acct.b58_address == b58_address:
+                return acct
         raise SDKException(ErrorCode.other_error('Get account failed.'))
 
     def set_identities(self, identities: list):
@@ -192,9 +188,9 @@ class WalletData(object):
         self.identities.append(id)
 
     def remove_identity(self, ont_id):
-        for index in range(len(self.identities)):
-            if self.identities[index].ont_id == ont_id:
-                del self.identities[index]
+        for identity in self.identities:
+            if identity.ont_id == ont_id:
+                self.identities.remove(identity)
                 return
         raise SDKException(ErrorCode.param_error)
 

@@ -21,7 +21,7 @@ class MerkleVerifier(object):
                 try:
                     sibling = binascii.a2b_hex(node['left'])
                     proof_hash = Digest.sha256(sibling + proof_hash)
-                except:
+                except KeyError:
                     sibling = binascii.a2b_hex(node['right'])
                     proof_hash = Digest.sha256(sibling + proof_hash)
             return proof_hash == merkle_root
