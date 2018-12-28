@@ -27,8 +27,8 @@ class WalletData(object):
         self.default_ont_id = default_id
         self.default_account_address = default_address
         self.scrypt = scrypt
-        self.identities = identities
-        self.accounts = accounts
+        self.identities = list()
+        self.accounts = list()
         for dict_identity in identities:
             if isinstance(dict_identity, dict):
                 list_controls = list()

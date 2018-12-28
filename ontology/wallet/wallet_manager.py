@@ -38,29 +38,29 @@ class WalletManager(object):
         if not is_file_exist(wallet_path):
             self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
             self.save()
-        self.wallet_file = self.load()
+        self.wallet_file = self.load_file()
         self.wallet_in_mem = self.wallet_file
         return self.wallet_file
 
-    def load(self):
+    def load_file(self):
         with open(self.wallet_path, "rb") as f:
             content = f.read()
             if content.startswith(codecs.BOM_UTF8):
                 content = content[len(codecs.BOM_UTF8):]
             content = content.decode('utf-8')
-            obj = json.loads(content)
-            create_time = obj.get('createTime', '')
-            default_id = obj.get('defaultOntid', '')
-            default_address = obj.get('defaultAccountAddress', '')
-            identities = obj.get('identities', list())
+            wallet_dict = json.loads(content)
+            create_time = wallet_dict.get('createTime', '')
+            default_id = wallet_dict.get('defaultOntid', '')
+            default_address = wallet_dict.get('defaultAccountAddress', '')
+            identities = wallet_dict.get('identities', list())
             try:
-                scrypt_dict = obj['scrypt']
+                scrypt_dict = wallet_dict['scrypt']
                 scrypt_obj = Scrypt(scrypt_dict.get('n', 16384), scrypt_dict.get('r', 8), scrypt_dict.get('p', 8),
                                     scrypt_dict.get('dk_len', 64))
-                wallet = WalletData(obj['name'], obj['version'], create_time, default_id, default_address,
-                                    scrypt_obj, identities, obj['accounts'])
+                wallet = WalletData(wallet_dict['name'], wallet_dict['version'], create_time, default_id,
+                                    default_address, scrypt_obj, identities, wallet_dict['accounts'])
             except KeyError as e:
-                raise SDKException(ErrorCode.param_err('wallet file format error: %s.' % e))
+                raise SDKException(ErrorCode.param_err(f'wallet file format error: {e}.'))
         return wallet
 
     def save(self):
