@@ -182,8 +182,7 @@ class Oep4(object):
         :return: the hexadecimal transaction hash value.
         """
         func = InvokeFunction('transferMulti')
-        for index in range(len(transfer_list)):
-            item = transfer_list[index]
+        for index, item in enumerate(transfer_list):
             Oep4.__b58_address_check(item[0])
             Oep4.__b58_address_check(item[1])
             if not isinstance(item[2], int):
@@ -200,14 +199,13 @@ class Oep4(object):
         params.append(0x67)
         for i in self.__bytearry_contract_address:
             params.append(i)
-        signers_len = len(signers)
-        if signers_len == 0:
+        if len(signers) == 0:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
         payer_address = payer_acct.get_address().to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, params,
                          bytearray(), [])
-        for index in range(signers_len):
-            self.__sdk.add_sign_transaction(tx, signers[index])
+        for signer in signers:
+            self.__sdk.add_sign_transaction(tx, signer)
         tx_hash = self.__network.send_raw_transaction(tx)
         return tx_hash
 

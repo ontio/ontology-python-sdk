@@ -146,7 +146,7 @@ class TestOep4(unittest.TestCase):
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][:-1]
             self.assertEqual(len(transfer_list), len(notify))
-            for index in range(len(notify)):
+            for index in notify:
                 self.assertEqual('transfer', bytes.fromhex(notify[index]['States'][0]).decode())
                 self.assertEqual(from_address_list[index], notify[index]['States'][1])
                 self.assertEqual(to_address_list[index], notify[index]['States'][2])

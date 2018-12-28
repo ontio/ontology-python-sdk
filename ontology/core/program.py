@@ -95,9 +95,9 @@ class ProgramBuilder(object):
         :param pub_keys: a list of public keys in format of bytes.
         :return: sorted public keys.
         """
-        for index in range(len(pub_keys)):
-            if isinstance(pub_keys[index], str):
-                pub_keys[index] = binascii.a2b_hex(pub_keys[index])
+        for index, key in range(len(pub_keys)):
+            if isinstance(key, str):
+                pub_keys[index] = binascii.a2b_hex(key)
         return sorted(pub_keys, key=ProgramBuilder.compare_pubkey)
 
     @staticmethod
