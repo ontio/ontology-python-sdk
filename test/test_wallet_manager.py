@@ -101,15 +101,16 @@ class TestWalletManager(unittest.TestCase):
         acct0 = wallet_manager.get_account_by_b58_address(b58_address, password)
         self.assertEqual(acct0.get_address_base58(), b58_address)
         self.assertRaises(SDKException, wallet_manager.get_account_by_b58_address, b58_address, 'wrong_password')
-        b58_address1 = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
+
+        b58_address = 'AHX1wzvdw9Yipk7E9MuLY4GGX4Ym9tHeDe'
         encrypted_pri_key = '8p2q0vLRqyfKmFHhnjUYVWOm12kPm78JWqzkTOi9rrFMBz624KjhHQJpyPmiSSOa'
-        password1 = '111111'
+        password = '111111'
         label = ''
         base64_salt = 'KbiCUr53CZUfKG1M3Gojjw=='
-        acct1 = wallet_manager.import_account(label, encrypted_pri_key, password1, b58_address1, base64_salt)
-        self.assertEqual(b58_address1, acct1.b58_address)
-        import_acct = wallet_manager.get_account_by_b58_address(b58_address1, password1)
-        self.assertEqual(b58_address1, import_acct.get_address_base58())
+        acct1 = wallet_manager.import_account(label, encrypted_pri_key, password, b58_address, base64_salt)
+        self.assertEqual(b58_address, acct1.b58_address)
+        import_acct = wallet_manager.get_account_by_b58_address(b58_address, password)
+        self.assertEqual(b58_address, import_acct.get_address_base58())
         self.assertEqual(base64_salt, acct1.salt)
 
     def test_get_accounts(self):

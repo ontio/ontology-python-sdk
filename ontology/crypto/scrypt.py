@@ -11,47 +11,62 @@ Usage:
 
 from Cryptodome.Protocol import KDF
 
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+
 
 class Scrypt:
     def __init__(self, n=16384, r=8, p=8, dk_len=64):
-        self.n = n
-        self.r = r
-        self.p = p
-        self.dkLen = dk_len
+        self.__n = n
+        self.__r = r
+        self.__p = p
+        self.__dk_len = dk_len
 
     def __iter__(self):
         data = dict()
-        data['n'] = self.n
-        data['r'] = self.r
-        data['p'] = self.p
-        data['dkLen'] = self.dkLen
+        data['n'] = self.__n
+        data['r'] = self.__r
+        data['p'] = self.__p
+        data['dkLen'] = self.__dk_len
         for key, value in data.items():
             yield (key, value)
 
-    def set_dk_len(self, dk_len: int):
-        self.dkLen = dk_len
+    @property
+    def dk_len(self):
+        return self.__dk_len
 
-    def get_dk_len(self):
-        return self.dkLen
+    @dk_len.setter
+    def dk_len(self, dk_len: int):
+        if not isinstance(dk_len, int):
+            raise SDKException(ErrorCode.other_error('Invalid dkLen in scrypt.'))
+        self.__dk_len = dk_len
 
-    def set_n(self, n):
-        self.n = n
+    @property
+    def n(self):
+        return self.__n
 
-    def get_n(self):
-        return self.n
+    @n.setter
+    def n(self, n: int):
+        if not isinstance(n, int):
+            raise SDKException(ErrorCode.other_error('Invalid n in scrypt.'))
+        self.__n = n
 
-    def set_r(self, r: int):
-        self.r = r
+    @property
+    def r(self):
+        return self.__r
 
-    def get_r(self):
-        return self.r
+    @r.setter
+    def r(self, r: int):
+        self.__r = r
 
-    def set_p(self, p):
-        self.p = p
+    @property
+    def p(self):
+        return self.__p
 
-    def get_p(self):
-        return self.p
+    @p.setter
+    def p(self, p):
+        self.__p = p
 
     def generate_kd(self, password: str, salt: str):
-        dk = KDF.scrypt(password, salt, self.dkLen, self.n, self.r, self.p)
+        dk = KDF.scrypt(password, salt, self.__dk_len, self.__n, self.__r, self.__p)
         return dk

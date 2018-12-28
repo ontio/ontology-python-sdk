@@ -10,26 +10,26 @@ class TestScrypt(unittest.TestCase):
     def test_set_dk_len(self):
         dk_len = 64
         scrypt = Scrypt()
-        scrypt.set_dk_len(dk_len)
-        self.assertEqual(dk_len, scrypt.get_dk_len())
+        scrypt.dk_len = dk_len
+        self.assertEqual(dk_len, scrypt.dk_len)
 
     def test_set_n(self):
         n = 5
         scrypt = Scrypt()
-        scrypt.set_n(n)
-        self.assertEqual(n, scrypt.get_n())
+        scrypt.n = n
+        self.assertEqual(n, scrypt.n)
 
     def test_set_p(self):
         n = 5
         scrypt = Scrypt()
-        scrypt.set_n(n)
-        self.assertEqual(n, scrypt.get_n())
+        scrypt.n = n
+        self.assertEqual(n, scrypt.n)
 
     def test_set_r(self):
         r = 5
         scrypt = Scrypt(r)
-        scrypt.set_r(r)
-        self.assertEqual(r, scrypt.get_r())
+        scrypt.r = r
+        self.assertEqual(r, scrypt.r)
 
     def test_generate_kd(self):
         scrypt = Scrypt()
