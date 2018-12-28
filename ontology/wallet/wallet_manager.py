@@ -192,7 +192,7 @@ class WalletManager(object):
             if len(self.wallet_in_mem.identities) == 0:
                 idt.is_default = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
-            ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
+            ctl = Control(kid="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.b58_address,
                           public_key=account.get_public_key_bytes().hex())
             idt.controls.append(ctl)

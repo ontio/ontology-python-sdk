@@ -3,7 +3,7 @@
 
 
 class Control(object):
-    def __init__(self, id="", address='', enc_alg="aes-256-gcm", key="", algorithm='ECDSA', salt="", param=None,
+    def __init__(self, kid="", address='', enc_alg="aes-256-gcm", key="", algorithm='ECDSA', salt="", param=None,
                  hash_value="sha256", public_key=""):
         if param is None:
             param = {"curve": "P-256"}
@@ -11,7 +11,7 @@ class Control(object):
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.hash = hash_value
-        self.id = id
+        self.kid = kid
         self.key = key
         self.parameters = param
         self.salt = salt
@@ -23,7 +23,7 @@ class Control(object):
         data['algorithm'] = self.algorithm
         data['enc-alg'] = self.enc_alg
         data['hash'] = self.hash
-        data['id'] = self.id
+        data['id'] = self.kid
         data['key'] = self.key
         data['parameters'] = self.parameters
         data['salt'] = self.salt
@@ -41,7 +41,7 @@ class Control(object):
             public_key = control_data['publicKey']
         except Exception as e:
             public_key = ""
-        obj = Control(id=control_data['id'], address=control_data['address'], enc_alg=control_data['enc-alg'],
+        obj = Control(kid=control_data['id'], address=control_data['address'], enc_alg=control_data['enc-alg'],
                       key=control_data['key'], algorithm=control_data['algorithm'], salt=control_data['salt'],
                       param=control_data['parameters'], hash_value=hash_value,
                       public_key=public_key)
