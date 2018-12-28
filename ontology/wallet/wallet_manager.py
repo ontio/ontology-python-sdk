@@ -172,8 +172,8 @@ class WalletManager(object):
         if label is None or label == "":
             label = str(uuid.uuid4())[0:8]
         if account_flag:
-            for index in range(len(self.wallet_in_mem.accounts)):
-                if acct.b58_address == self.wallet_in_mem.accounts[index].b58_address:
+            for acct in self.wallet_in_mem.accounts:
+                if acct.b58_address == acct.b58_address:
                     raise SDKException(ErrorCode.other_error('Wallet account exists.'))
             if len(self.wallet_in_mem.accounts) == 0:
                 acct.is_default = True
@@ -183,8 +183,8 @@ class WalletManager(object):
             acct.public_key = account.get_public_key_bytes().hex()
             self.wallet_in_mem.accounts.append(acct)
         else:
-            for index in range(len(self.wallet_in_mem.identities)):
-                if self.wallet_in_mem.identities[index].ont_id == DID_ONT + acct.b58_address:
+            for identity in self.wallet_in_mem.identities:
+                if identity.ont_id == DID_ONT + acct.b58_address:
                     raise SDKException(ErrorCode.other_error('Wallet identity exists.'))
             idt = Identity()
             idt.ont_id = DID_ONT + acct.b58_address
@@ -217,10 +217,10 @@ class WalletManager(object):
         private_key = Account.get_gcm_decoded_private_key(encrypted_pri_key, pwd, base58_address, salt,
                                                           Scrypt().get_n(), self.scheme)
         info = self.create_account_info(label, pwd, salt, private_key)
-        for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].b58_address:
-                return self.wallet_in_mem.accounts[index]
-        return None
+        for acct in self.wallet_in_mem.accounts:
+            if info.address_base58 == acct.b58_address:
+                return acct
+        raise SDKException(ErrorCode.other_error('Import account failed.'))
 
     def create_account_info(self, label: str, pwd: str, salt: str, private_key: str) -> AccountInfo:
         acct = self.__create_account(label, pwd, salt, private_key, True)
@@ -244,9 +244,9 @@ class WalletManager(object):
         """
         salt = get_random_hex_str(16)
         info = self.create_account_info(label, password, salt, private_key)
-        for index in range(len(self.wallet_in_mem.accounts)):
-            if info.address_base58 == self.wallet_in_mem.accounts[index].b58_address:
-                return self.wallet_in_mem.accounts[index]
+        for acct in self.wallet_in_mem.accounts:
+            if info.address_base58 == acct.b58_address:
+                return acct
         raise SDKException(ErrorCode.other_error(f'Create account from key {private_key} failed.'))
 
     def get_account_by_ont_id(self, ont_id: str, password: str) -> Account:
@@ -257,11 +257,11 @@ class WalletManager(object):
         """
         if not ont_id.startswith(DID_ONT):
             raise SDKException(ErrorCode.other_error('Invalid OntId.'))
-        for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ont_id == ont_id:
-                addr = self.wallet_in_mem.identities[index].ont_id.replace(DID_ONT, "")
-                key = self.wallet_in_mem.identities[index].controls[0].key
-                salt = base64.b64decode(self.wallet_in_mem.identities[index].controls[0].salt)
+        for identity in self.wallet_in_mem.identities:
+            if identity.ont_id == ont_id:
+                addr = identity.ont_id.replace(DID_ONT, "")
+                key = identity.controls[0].key
+                salt = base64.b64decode(identity.controls[0].salt)
                 n = self.wallet_in_mem.scrypt.get_n()
                 private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, n, self.scheme)
                 return Account(private_key, self.scheme)
@@ -273,11 +273,11 @@ class WalletManager(object):
         :param password: a password which is used to decrypt the encrypted private key.
         :return:
         """
-        for index in range(len(self.wallet_in_mem.accounts)):
-            if self.wallet_in_mem.accounts[index].b58_address == b58_address:
-                key = self.wallet_in_mem.accounts[index].key
-                addr = self.wallet_in_mem.accounts[index].b58_address
-                salt = base64.b64decode(self.wallet_in_mem.accounts[index].salt)
+        for acct in self.wallet_in_mem.accounts:
+            if acct.b58_address == b58_address:
+                key = acct.key
+                addr = acct.b58_address
+                salt = acct.salt
                 n = self.wallet_in_mem.scrypt.get_n()
                 private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, n, self.scheme)
                 return Account(private_key, self.scheme)

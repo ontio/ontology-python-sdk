@@ -182,9 +182,9 @@ class Transaction(object):
         :param signer: an Account object which will sign the transaction.
         :return: a Transaction object which has been signed.
         """
-        for index in range(len(pub_keys)):
-            if isinstance(pub_keys[index], str):
-                pub_keys[index] = pub_keys[index].encode('ascii')
+        for index, pk in enumerate(pub_keys):
+            if isinstance(pk, str):
+                pub_keys[index] = pk.encode('ascii')
         pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
         tx_hash = self.hash256_bytes()
         sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
