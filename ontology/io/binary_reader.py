@@ -253,13 +253,13 @@ class BinaryReader(object):
             endian = ">"
         return self.unpack('%sQ' % endian, 8)
 
-    def read_var_int(self, max=sys.maxsize):
+    def read_var_int(self, max_size=sys.maxsize):
         """
         Read a variable length integer from the stream.
         The NEO network protocol supports encoded storage for space saving. See: http://docs.neo.org/en-us/node/network-protocol.html#convention
 
         Args:
-            max (int): (Optional) maximum number of bytes to read.
+            max_size (int): (Optional) maximum number of bytes to read.
 
         Returns:
             int:
@@ -267,7 +267,6 @@ class BinaryReader(object):
         fb = self.read_byte()
         if fb is 0:
             return fb
-        value = 0
         if hex(fb) == '0xfd':
             value = self.read_uint16()
         elif hex(fb) == '0xfe':
@@ -276,23 +275,21 @@ class BinaryReader(object):
             value = self.read_uint64()
         else:
             value = fb
-
-        if value > max:
+        if value > max_size:
             raise SDKException(ErrorCode.param_err('Invalid format'))
-
         return int(value)
 
-    def read_var_bytes(self, max=sys.maxsize):
+    def read_var_bytes(self, max_size=sys.maxsize):
         """
         Read a variable length of bytes from the stream.
 
         Args:
-            max (int): (Optional) maximum number of bytes to read.
+            max_size (int): (Optional) maximum number of bytes to read.
 
         Returns:
             bytes:
         """
-        length = self.read_var_int(max)
+        length = self.read_var_int(max_size)
         return self.read_bytes(length)
 
     def read_str(self):
@@ -305,17 +302,17 @@ class BinaryReader(object):
         length = self.read_uint8()
         return self.unpack(str(length) + 's', length)
 
-    def read_var_str(self, max=sys.maxsize):
+    def read_var_str(self, max_size=sys.maxsize):
         """
         Similar to `ReadString` but expects a variable length indicator instead of the fixed 1 byte indicator.
 
         Args:
-            max (int): (Optional) maximum number of bytes to read.
+            max_size (int): (Optional) maximum number of bytes to read.
 
         Returns:
             bytes:
         """
-        length = self.read_var_int(max)
+        length = self.read_var_int(max_size)
         return self.unpack(str(length) + 's', length)
 
     def read_fixed_str(self, length):
@@ -329,13 +326,13 @@ class BinaryReader(object):
         """
         return self.read_bytes(length).rstrip(b'\x00')
 
-    def read_serializable_array(self, class_name, max=sys.maxsize):
+    def read_serializable_array(self, class_name, max_size=sys.maxsize):
         """
         Deserialize a stream into the object specific by `class_name`.
 
         Args:
             class_name (str): a full path to the class to be deserialized into. e.g. 'neo.Core.Block.Block'
-            max (int): (Optional) maximum number of bytes to read.
+            max_size (int): (Optional) maximum number of bytes to read.
 
         Returns:
             list: list of `class_name` objects deserialized from the stream.
@@ -343,7 +340,7 @@ class BinaryReader(object):
         module = '.'.join(class_name.split('.')[:-1])
         klassname = class_name.split('.')[-1]
         klass = getattr(importlib.import_module(module), klassname)
-        length = self.read_var_int(max=max)
+        length = self.read_var_int(max_size=max_size)
         items = []
         try:
             for i in range(0, length):
