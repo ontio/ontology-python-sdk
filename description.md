@@ -2,10 +2,11 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ontio/ontology-python-sdk/&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&utm_medium=referral&utm_content=ontio/ontology-python-sdk/&utm_campaign=Badge_Coverage)
-![pypi-w](https://img.shields.io/pypi/wheel/ontology-python-sdk.svg)
-![travis](https://travis-ci.org/NashMiao/ontology-python-sdk.svg?branch=master)
-![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)
-![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)
+[![Build Status](https://travis-ci.com/ontio/ontology-python-sdk.svg?branch=master)](https://travis-ci.com/ontio/ontology-python-sdk)
+[![pypi-w](https://img.shields.io/pypi/wheel/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
+[![docs](https://img.shields.io/badge/docs-yes-brightgreen.svg)](https://apidoc.ont.io/pythonsdk/#introduction)
+[![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
+[![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
 
 ## Introduction
 
