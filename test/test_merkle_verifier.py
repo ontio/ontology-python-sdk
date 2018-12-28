@@ -22,10 +22,6 @@ class TestMerkleVerifier(unittest.TestCase):
         result = MerkleVerifier.validate_proof(proof, target_hash, merkle_root)
         print(result)
 
-    def test_aa(self):
-        print(json.dumps(sdk.rpc.get_merkle_proof('36e0fd847d927d68475f32a94efff30812ee3ce87c7752973f4dd7476aa2e97e'),
-                         indent=4))
-
 
 if __name__ == '__main__':
     unittest.main()
