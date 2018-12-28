@@ -36,14 +36,13 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_int_list(hex_str_list: list) -> List[int]:
-        for index in range(len(hex_str_list)):
-            item = hex_str_list[index]
+        for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
                 hex_str_list[index] = ContractDataParser.to_int_list(item)
             elif isinstance(item, str):
                 hex_str_list[index] = ContractDataParser.to_int(item)
             else:
-                raise SDKException(ErrorCode.other_error('invalid data'))
+                raise SDKException(ErrorCode.other_error('Invalid data.'))
         return hex_str_list
 
     @staticmethod
@@ -56,8 +55,7 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_bytes_list(hex_str_list: list) -> List[bytes]:
-        for index in range(len(hex_str_list)):
-            item = hex_str_list[index]
+        for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
                 hex_str_list[index] = ContractDataParser.to_bytes_list(item)
             elif isinstance(item, str):
@@ -82,8 +80,7 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_utf8_str_list(hex_str_list: list) -> List[bytes]:
-        for index in range(len(hex_str_list)):
-            item = hex_str_list[index]
+        for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
                 hex_str_list[index] = ContractDataParser.to_utf8_str_list(item)
             elif isinstance(item, str):
@@ -103,8 +100,7 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_b58_address_list(hex_str_list: list) -> List[bytes]:
-        for index in range(len(hex_str_list)):
-            item = hex_str_list[index]
+        for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
                 hex_str_list[index] = ContractDataParser.to_b58_address_list(item)
             elif isinstance(item, str):
@@ -124,8 +120,7 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_bytes_address_list(hex_str_list: list) -> List[bytes]:
-        for index in range(len(hex_str_list)):
-            item = hex_str_list[index]
+        for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
                 hex_str_list[index] = ContractDataParser.to_bytes_address_list(item)
             elif isinstance(item, str):

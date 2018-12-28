@@ -101,10 +101,10 @@ class WalletManager(object):
         scrypt_n = Scrypt().get_n()
         pri_key = Account.get_gcm_decoded_private_key(encrypted_pri_key, pwd, b58_address, salt, scrypt_n, self.scheme)
         info = self.__create_identity(label, pwd, salt, pri_key)
-        for index in range(len(self.wallet_in_mem.identities)):
-            if self.wallet_in_mem.identities[index].ont_id == info.ont_id:
-                return self.wallet_in_mem.identities[index]
-        return None
+        for identity in self.wallet_in_mem.identities:
+            if identity.ont_id == info.ont_id:
+                return identity
+        raise SDKException(ErrorCode.other_error('Import identity failed.'))
 
     def create_identity(self, label: str, pwd: str) -> Identity:
         """
@@ -192,7 +192,7 @@ class WalletManager(object):
             if len(self.wallet_in_mem.identities) == 0:
                 idt.is_default = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
-            ctl = Control(id="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
+            ctl = Control(kid="keys-1", key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
                           address=acct.b58_address,
                           public_key=account.get_public_key_bytes().hex())
             idt.controls.append(ctl)
