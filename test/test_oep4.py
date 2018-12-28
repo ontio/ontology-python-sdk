@@ -7,6 +7,7 @@ import binascii
 
 from Cryptodome.Random.random import randint
 
+from ontology.utils.contract_data_parser import ContractDataParser
 from test import acct1, acct2, acct3, acct4
 
 from ontology.ont_sdk import OntologySdk
@@ -144,15 +145,13 @@ class TestOep4(unittest.TestCase):
         time.sleep(randint(6, 10))
         try:
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-            notify = event['Notify'][:-1]
-            self.assertEqual(len(transfer_list), len(notify))
-            for index in notify:
-                self.assertEqual('transfer', bytes.fromhex(notify[index]['States'][0]).decode())
-                self.assertEqual(from_address_list[index], notify[index]['States'][1])
-                self.assertEqual(to_address_list[index], notify[index]['States'][2])
-                array = bytearray(binascii.a2b_hex(notify[index]['States'][3].encode('ascii')))
-                array.reverse()
-                notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+            notify_list = event['Notify'][:-1]
+            self.assertEqual(len(transfer_list), len(notify_list))
+            for index, notify in enumerate(notify_list):
+                self.assertEqual('transfer', ContractDataParser.to_utf8_str(notify['States'][0]))
+                self.assertEqual(from_address_list[index], notify['States'][1])
+                self.assertEqual(to_address_list[index], notify['States'][2])
+                notify_value = ContractDataParser.to_int(notify['States'][3])
                 self.assertEqual(value_list[index], notify_value)
         except SDKException as e:
             raised = False
@@ -172,7 +171,11 @@ class TestOep4(unittest.TestCase):
         amount = 100
         gas_limit = 20000000
         gas_price = 500
-        tx_hash = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, gas_limit, gas_price)
+        try:
+            tx_hash = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, gas_limit, gas_price)
+        except SDKException as e:
+            self.assertIn('ConnectTimeout', e.args[1])
+            return
         self.assertEqual(len(tx_hash), 64)
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
