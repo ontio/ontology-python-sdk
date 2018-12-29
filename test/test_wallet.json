@@ -2,7 +2,7 @@
     "name": "MyWallet",
     "version": "1.1",
     "createTime": "2018-12-25 23:20:21",
-    "defaultOntid": "",
+    "defaultOntid": "did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
     "defaultAccountAddress": "ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
     "scrypt": {
         "n": 16384,
@@ -10,7 +10,29 @@
         "p": 8,
         "dkLen": 64
     },
-    "identities": [],
+    "identities": [
+        {
+            "ontid": "did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+            "label": "NashMiao",
+            "lock": false,
+            "controls": [
+                {
+                    "address": "ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+                    "algorithm": "ECDSA",
+                    "enc-alg": "aes-256-gcm",
+                    "hash": "sha256",
+                    "id": "keys-1",
+                    "key": "v8esvyjOXipxtyb0dzSUT/DrBXuOYuFjN5i0smDI5e4UkNiJEiV1Nayf5VBTFIaj",
+                    "parameters": {
+                        "curve": "P-256"
+                    },
+                    "salt": "Y2Q1NjAxOTlhMTllMjMyYg==",
+                    "publicKey": "03d0fdb54acba3f81db3a6e16fa02e7ea3678bd205eb4ed2f1cfa8ab5e5d45633e"
+                }
+            ],
+            "isDefault": true
+        }
+    ],
     "accounts": [
         {
             "address": "ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
