@@ -194,11 +194,11 @@ class WalletData(object):
                 return
         raise SDKException(ErrorCode.param_error)
 
-    def get_identity_by_ont_id(self, ont_id: str) -> Identity or None:
+    def get_identity_by_ont_id(self, ont_id: str) -> Identity:
         for identity in self.identities:
             if identity.ont_id == ont_id:
                 return identity
-        return None
+        raise SDKException(ErrorCode.other_error('Get identity failed.'))
 
     def set_default_identity_by_index(self, index: int):
         """
