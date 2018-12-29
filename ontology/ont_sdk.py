@@ -79,9 +79,6 @@ class OntologySdk(object):
         else:
             raise SDKException(ErrorCode.other_error('Invalid signature scheme'))
 
-    def open_wallet(self, wallet_file):
-        return self.__wallet_manager.open_wallet(wallet_file)
-
     @property
     def rpc(self) -> RpcClient:
         return self.__rpc
