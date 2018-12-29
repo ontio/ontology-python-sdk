@@ -15,20 +15,18 @@ class Signature(object):
         self.__value = signature_value
 
     @staticmethod
-    def ec_get_pubkey_by_prikey(privateKey: bytes, curve_name):
+    def ec_get_public_key_by_private_key(private_key: bytes, curve_name) -> bytes:
         if curve_name == Curve.P256:
-            private_key = SigningKey.from_string(string=(privateKey), curve=NIST256p)
-            # public_key = private_key.get_verifying_key().to_string()
+            private_key = SigningKey.from_string(string=private_key, curve=NIST256p)
             verifying_key = private_key.get_verifying_key()
             order = verifying_key.pubkey.order
-            x_str = util.number_to_string(verifying_key.pubkey.point.x(), order)
-            # TODO: add verify
-            # y_str = util.number_to_string(verifying_key.pubkey.point.y(), order)
-            # point_str = util.b("\x04") + x_str + y_str
-            if verifying_key.pubkey.point.y() % 2 == 0:
-                point_str = util.b("\x02") + x_str
+            x_int = verifying_key.pubkey.point.x()
+            y_int = verifying_key.pubkey.point.y()
+            x_str = util.number_to_string(x_int, order)
+            if y_int % 2 == 0:
+                point_str = util.b('\x02') + x_str
             else:
-                point_str = util.b("\x03") + x_str
+                point_str = util.b('\x03') + x_str
         elif curve_name == Curve.P224:
             raise SDKException(ErrorCode.unsupported_key_type)
         elif curve_name == Curve.P384:

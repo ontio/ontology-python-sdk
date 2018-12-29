@@ -38,7 +38,7 @@ class Account(object):
             raise TypeError
         self.__private_key = a2b_hex(private_key.encode())  # 32 bytes
         self.__curve_name = Curve.P256
-        self.__public_key = Signature.ec_get_pubkey_by_prikey(self.__private_key, self.__curve_name)  # 33 bytes
+        self.__public_key = Signature.ec_get_public_key_by_private_key(self.__private_key, self.__curve_name)  # 33 bytes
         self.__address = Address.address_from_bytes_pubkey(self.__public_key)  # address is a class type
 
     def generate_signature(self, msg: bytes, signature_scheme: SignatureScheme):
