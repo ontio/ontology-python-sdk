@@ -54,12 +54,12 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to register ONT ID.
         """
-        contract_address = ONT_ID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(hex_public_key)}
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "regIDWithPublicKey", args)
+        args = dict(ontid=ont_id.encode(), pubkey=bytearray.fromhex(hex_public_key))
+        invoke_code = build_vm.build_native_invoke_code(ONT_ID_CONTRACT_ADDRESS, bytes([0]), 'regIDWithPublicKey', args)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
-                         invoke_code, bytearray(), [])
+        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
+                         [])
         return tx
 
     def send_registry_ont_id_transaction(self, identity: Identity, password: str, payer: Account, gas_limit: int,

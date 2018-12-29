@@ -74,5 +74,8 @@ class Payload(object):
     def to_json_str(self):
         return json.dumps(dict(self))
 
-    def b64encode(self):
+    def to_bytes(self):
+        return self.to_json_str().encode('utf-8')
+
+    def to_base64(self):
         return base64.b64encode(self.to_json_str())

@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import os
-import random
 import unittest
+
+from Cryptodome.Random.random import choice
 
 from ontology.utils import utils
 from ontology.account.account import Account
-from ontology.exception.exception import SDKException
 from ontology.wallet.account import AccountData
+from ontology.exception.exception import SDKException
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 
@@ -17,6 +18,8 @@ class TestWalletManager(unittest.TestCase):
     def test_create_write(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         password = utils.get_random_hex_str(10)
         label = 'label'
@@ -32,6 +35,8 @@ class TestWalletManager(unittest.TestCase):
     def test_open_wallet(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         wm.write_wallet()
@@ -48,6 +53,7 @@ class TestWalletManager(unittest.TestCase):
     def test_wallet_data(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'wallet.dat')
+        self.assertRaises(SDKException, wm.create_wallet, path)
         wm.open_wallet(path)
         self.assertTrue(isinstance(wm, WalletManager))
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
@@ -116,6 +122,8 @@ class TestWalletManager(unittest.TestCase):
     def test_get_accounts(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         password = 'password'
         size = 5
@@ -129,6 +137,8 @@ class TestWalletManager(unittest.TestCase):
     def test_set_default_identity_by_index(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         size = 3
         for i in range(size):
@@ -147,6 +157,8 @@ class TestWalletManager(unittest.TestCase):
     def test_set_default_identity_by_ont_id(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         size = 3
         for i in range(size):
@@ -159,7 +171,7 @@ class TestWalletManager(unittest.TestCase):
         for identity in wm.get_wallet().identities:
             ont_id_list.append(identity.ont_id)
         for index in range(size * 5):
-            rand_ont_id = random.choice(ont_id_list)
+            rand_ont_id = choice(ont_id_list)
             wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
             default_identity = wm.get_default_identity()
             self.assertEqual(rand_ont_id, default_identity.ont_id)
@@ -169,6 +181,8 @@ class TestWalletManager(unittest.TestCase):
     def test_set_default_account_by_index(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         password = 'password'
         size = 3
@@ -187,6 +201,8 @@ class TestWalletManager(unittest.TestCase):
     def test_set_default_account_by_address(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         password = 'password'
         size = 3
@@ -205,6 +221,8 @@ class TestWalletManager(unittest.TestCase):
     def test_get_default_account(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         password = 'password'
         size = 3
@@ -222,6 +240,8 @@ class TestWalletManager(unittest.TestCase):
     def test_import_identity(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         private_key = utils.get_random_hex_str(64)
         acct = Account(private_key)
@@ -240,6 +260,8 @@ class TestWalletManager(unittest.TestCase):
     def test_create_identity_from_pri_key(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         ide = wm.create_identity_from_private_key("ide", "1", private_key)
@@ -251,6 +273,8 @@ class TestWalletManager(unittest.TestCase):
     def test_import_account(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         label = 'label'
         encrypted_pri_key = 'Yl1e9ugbVADd8a2SbAQ56UfUvr3e9hD2eNXAM9xNjhnefB+YuNXDFvUrIRaYth+L'
@@ -265,6 +289,8 @@ class TestWalletManager(unittest.TestCase):
     def test_create_account_from_private_key(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet, path)
+        wm.create_wallet(path)
         wm.open_wallet(path)
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         label = 'hello_account'
