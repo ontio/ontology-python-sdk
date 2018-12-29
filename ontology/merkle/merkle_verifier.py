@@ -13,19 +13,22 @@ from ontology.utils.contract_data_parser import ContractDataParser
 
 class MerkleVerifier(object):
     @staticmethod
-    def generate_blockchain_proof(tx_hash: str, hex_contract_address: str, block_height: int, merkle_root: str,
-                                  proof: List[dict]):
-        if len(tx_hash) != 64:
-            raise SDKException(ErrorCode.other_error('Invalid TxHash.'))
-        if len(hex_contract_address) != 40:
-            raise SDKException(ErrorCode.other_error('Invalid contract address.'))
-        if not isinstance(block_height, int):
-            raise SDKException(ErrorCode.other_error('Invalid block height.'))
-        if len(merkle_root) != 64:
-            raise SDKException(ErrorCode.other_error('Invalid merkle root.'))
-        blockchain_proof = dict(Type='MerkleProof', TxnHash=tx_hash, ContractAddr=hex_contract_address,
-                                BlockHeight=block_height, MerkleRoot=merkle_root, Nodes=proof)
-        return blockchain_proof
+    def get_proof(tx_block_height: int, target_hash_list: List[str], current_block_height: int):
+        proof_node = list()
+        last_node = current_block_height
+        pos = 0
+        while last_node > 0:
+            if tx_block_height % 2 == 1:
+                dict_node = dict(Direction='Left', TargetHash=target_hash_list[pos])
+                proof_node.append(dict_node)
+                pos += 1
+            elif tx_block_height < last_node:
+                dict_node = dict(Direction='Right', TargetHash=target_hash_list[pos])
+                proof_node.append(dict_node)
+                pos += 1
+            tx_block_height //= 2
+            last_node //= 2
+        return proof_node
 
     @staticmethod
     def validate_proof(proof: List[dict], hex_target_hash: str, hex_merkle_root: str):
