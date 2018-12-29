@@ -4,6 +4,7 @@
 import os
 import unittest
 
+from ontology.exception.exception import SDKException
 from test import acct1, acct2, acct3
 
 from ontology.common.address import Address
@@ -18,7 +19,9 @@ sdk.rpc.connect_to_test_net()
 class TestOntologySdk(unittest.TestCase):
     def test_open_wallet(self):
         path = os.path.join(os.path.dirname(__file__), 'test.json')
-        wallet = sdk.open_wallet(path)
+        self.assertRaises(SDKException, sdk.wallet_manager.open_wallet, path)
+        sdk.wallet_manager.create_wallet(path)
+        wallet = sdk.wallet_manager.open_wallet(path)
         self.assertTrue(wallet, isinstance(wallet, WalletData))
         os.remove(path)
 
