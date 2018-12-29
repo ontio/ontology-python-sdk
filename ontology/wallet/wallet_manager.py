@@ -31,19 +31,25 @@ class WalletManager(object):
         self.scheme = scheme
         self.wallet_file = WalletData()
         self.wallet_in_mem = WalletData()
-        self.wallet_path = ''
+        self.__wallet_path = ''
 
     def open_wallet(self, wallet_path: str):
-        self.wallet_path = wallet_path
+        self.__wallet_path = wallet_path
         if not is_file_exist(wallet_path):
-            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-            self.save()
+            raise SDKException(ErrorCode.other_error('Wallet file not found.'))
         self.wallet_file = self.load_file()
         self.wallet_in_mem = self.wallet_file
         return self.wallet_file
 
+    def create_wallet(self, wallet_path: str):
+        if not is_file_exist(wallet_path):
+            self.wallet_in_mem.create_time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+            self.save()
+        else:
+            raise SDKException(ErrorCode.other_error('Wallet file has existed.'))
+
     def load_file(self):
-        with open(self.wallet_path, "rb") as f:
+        with open(self.__wallet_path, "rb") as f:
             content = f.read()
             if content.startswith(codecs.BOM_UTF8):
                 content = content[len(codecs.BOM_UTF8):]
@@ -65,7 +71,7 @@ class WalletManager(object):
 
     def save(self):
         try:
-            with open(self.wallet_path, 'w') as f:
+            with open(self.__wallet_path, 'w') as f:
                 json.dump(self.wallet_in_mem, f, default=lambda obj: dict(obj), indent=4)
         except FileNotFoundError as e:
             raise SDKException(ErrorCode.other_error(e.args[1])) from None
@@ -270,6 +276,9 @@ class WalletManager(object):
                 private_key = Account.get_gcm_decoded_private_key(key, password, addr, salt, n, self.scheme)
                 return Account(private_key, self.scheme)
         raise SDKException(ErrorCode.other_error(f'Get account {ont_id} failed.'))
+
+    def get_identity_by_ont_id(self, ont_id: str) -> Identity:
+        return self.wallet_in_mem.get_identity_by_ont_id(ont_id)
 
     def get_account_by_b58_address(self, b58_address: str, password: str) -> Account:
         """
