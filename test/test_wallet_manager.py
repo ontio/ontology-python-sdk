@@ -53,7 +53,7 @@ class TestWalletManager(unittest.TestCase):
     def test_wallet_data(self):
         wm = WalletManager()
         path = os.path.join(os.path.dirname(__file__), 'wallet.dat')
-        wm.create_wallet(path)
+        self.assertRaises(SDKException, wm.create_wallet, path)
         wm.open_wallet(path)
         self.assertTrue(isinstance(wm, WalletManager))
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
