@@ -64,8 +64,11 @@ class WalletManager(object):
         return wallet
 
     def save(self):
-        with open(self.wallet_path, "w") as f:
-            json.dump(self.wallet_in_mem, f, default=lambda obj: dict(obj), indent=4)
+        try:
+            with open(self.wallet_path, 'w') as f:
+                json.dump(self.wallet_in_mem, f, default=lambda obj: dict(obj), indent=4)
+        except FileNotFoundError as e:
+            raise SDKException(ErrorCode.other_error(e.args[1])) from None
 
     def get_wallet(self):
         return self.wallet_in_mem
