@@ -69,7 +69,10 @@ class ECIES:
         h_tilde = g_tilde * SigningKey.from_string(string=private_key, curve=NIST256p).privkey.secret_multiplier
         seed = b''.join([encode_g_tilde, number_to_string(h_tilde.x(), NIST256p.order)])
         aes_key = pbkdf2(seed, 32)
-        plain_text = AESHandler.aes_cbc_decrypt(cipher_text, iv, aes_key)
+        try:
+            plain_text = AESHandler.aes_cbc_decrypt(cipher_text, iv, aes_key)
+        except ValueError as e:
+            raise SDKException(ErrorCode.other_error(e.args[0]))
         return plain_text
 
     @staticmethod
