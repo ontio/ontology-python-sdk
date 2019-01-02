@@ -79,8 +79,8 @@ class OntId(object):
         tx = OntId.new_registry_ont_id_transaction(identity.ont_id, hex_pub_key, b58_payer_address, gas_limit,
                                                    gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
 
     @staticmethod
