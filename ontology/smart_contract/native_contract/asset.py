@@ -44,7 +44,7 @@ class Asset(object):
         """
         raw_address = Address.b58decode(b58_address).to_bytes()
         contract_address = utils.get_asset_address(asset)
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "balanceOf", raw_address)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "balanceOf", raw_address)
         unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
@@ -73,7 +73,7 @@ class Asset(object):
         raw_from = Address.b58decode(b58_from_address).to_bytes()
         raw_to = Address.b58decode(b58_to_address).to_bytes()
         args = {"from": raw_from, "to": raw_to}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "allowance", args)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "allowance", args)
         unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
@@ -110,7 +110,7 @@ class Asset(object):
         """
         contract_address = utils.get_asset_address(asset)
         method = 'name'
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), method, bytearray())
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
@@ -135,7 +135,7 @@ class Asset(object):
         """
         contract_address = utils.get_asset_address(asset)
         method = 'symbol'
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), method, bytearray())
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
@@ -159,7 +159,7 @@ class Asset(object):
         """
         contract_address = utils.get_asset_address(asset)
         method = 'decimals'
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), method, bytearray())
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
@@ -208,7 +208,7 @@ class Asset(object):
         raw_to = Address.b58decode(b58_to_address).to_bytes()
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
         state = [{"from": raw_from, "to": raw_to, "amount": amount}]
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transfer", state)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "transfer", state)
         unix_time_now = int(time())
         version = 0
         tx_type = 0xd1
@@ -247,7 +247,7 @@ class Asset(object):
         raw_recv = Address.b58decode(b58_recv_address).to_bytes()
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
         args = {"from": raw_send, "to": raw_recv, "amount": amount}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "approve", args)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "approve", args)
         unix_time_now = int(time())
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
 
@@ -275,7 +275,7 @@ class Asset(object):
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
         contract_address = utils.get_asset_address(asset)
         args = {"sender": raw_sender, "from": raw_from, "to": raw_to, "amount": amount}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "transferFrom", args)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "transferFrom", args)
         unix_time_now = int(time())
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
 
@@ -309,7 +309,7 @@ class Asset(object):
         ong_contract_address = utils.get_asset_address("ong")
         args = {"sender": Address.b58decode(b58_claimer_address).to_bytes(), "from": ont_contract_address,
                 "to": Address.b58decode(b58_recv_address).to_bytes(), "value": amount}
-        invoke_code = build_native_invoke_code(ong_contract_address, bytes([0]), "transferFrom", args)
+        invoke_code = build_native_invoke_code(ong_contract_address, b'\x00', "transferFrom", args)
         unix_time_now = int(time())
         payer_array = Address.b58decode(b58_payer_address).to_bytes()
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_array, invoke_code, bytearray(), list())
