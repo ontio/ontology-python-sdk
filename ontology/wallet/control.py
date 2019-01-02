@@ -17,7 +17,7 @@ class Control(object):
         self.key = key
         self.parameters = param
         self.salt = salt
-        self.public_key = public_key
+        self.__public_key = public_key
 
     def __iter__(self):
         data = dict()
@@ -29,7 +29,7 @@ class Control(object):
         data['key'] = self.key
         data['parameters'] = self.parameters
         data['salt'] = self.salt
-        data['publicKey'] = self.public_key
+        data['publicKey'] = self.__public_key
         for key, value in data.items():
             yield (key, value)
 
@@ -50,11 +50,11 @@ class Control(object):
         return obj
 
     @property
-    def key(self):
-        return self.key
+    def public_key(self):
+        return self.__public_key
 
-    @key.setter
-    def key(self, b64_pub_key: str):
+    @public_key.setter
+    def public_key(self, b64_pub_key: str):
         if not isinstance(b64_pub_key, str):
             raise SDKException(ErrorCode.other_error('Invalid public key.'))
-        self.key = b64_pub_key
+        self.__public_key = b64_pub_key
