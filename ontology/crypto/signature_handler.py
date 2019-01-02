@@ -81,7 +81,6 @@ class SignatureHandler(object):
         """
         is_even = public_key.startswith(b'\x02')
         x = string_to_number(public_key[1:])
-
         curve = ecdsa.NIST256p.curve
         order = ecdsa.NIST256p.order
         p = curve.p()
