@@ -74,7 +74,7 @@ class ParamsBuilder:
             raise SDKException(ErrorCode.param_err('type error, write byte failed.'))
 
     def to_bytes(self) -> bytes:
-        return a2b_hex(self.ms.ToArray())
+        return a2b_hex(self.ms.to_bytes())
 
     def to_bytearray(self) -> bytearray:
-        return bytearray(a2b_hex(self.ms.ToArray()))
+        return bytearray(a2b_hex(self.ms.to_bytes()))
