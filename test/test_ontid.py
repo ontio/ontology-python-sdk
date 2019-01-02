@@ -326,9 +326,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertEqual(msg, e.args[1])
 
-    # TODO
-    # def test_send_add_public_key_by_recovery(self):
-    #     ont_id = sdk.native_vm.ont_id()
+    # TODO: test_send_add_public_key_by_recovery
 
 
 if __name__ == '__main__':
