@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-from random import randint
 from ecdsa.curves import NIST256p
 from ecdsa.ellipticcurve import Point
+from Cryptodome.Random.random import randint
 
 from ecdsa.util import (
     string_to_number,
@@ -37,7 +36,6 @@ class ECIES:
         private_key = SigningKey.from_string(string=private_key, curve=NIST256p)
         public_key = private_key.get_verifying_key().to_string()
         return public_key
-
 
     @staticmethod
     def encrypt_with_cbc_mode(plain_text: bytes, public_key: bytes) -> (bytes, bytes, bytes):
