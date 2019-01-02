@@ -85,7 +85,7 @@ class TestTransaction(unittest.TestCase):
         tx2 = Transaction.deserialize_from(tx_bytes)
         self.assertEqual(dict(tx1), dict(tx2))
 
-        sdk.sign_transaction(tx2, acct1)
+        tx2.sign_transaction(acct1)
         tx_bytes = tx2.serialize()
         tx3 = Transaction.deserialize_from(tx_bytes)
         self.assertEqual(dict(tx2), dict(tx3))

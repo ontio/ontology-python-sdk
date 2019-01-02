@@ -35,7 +35,7 @@ class Auth(object):
                       gas_price: str):
         param = {"contract_address": a2b_hex(contract_address.encode()),
                  'new_admin_ont_id': new_admin_ont_id.encode('utf-8'), 'key_no': key_no}
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "transfer", param)
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00', "transfer", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address_bytes(), invoke_code,
                          bytearray(), [])
@@ -45,7 +45,7 @@ class Auth(object):
         contract_address = bytearray.fromhex(contract_address)
         param = {"contract_address": contract_address, "ontid": identity.ont_id.encode('utf-8'),
                  "function_name": function_name.encode('utf-8'), "key_no": key_no}
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "verifyToken",
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00', "verifyToken",
                                                param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, 0, 0, Address(ZERO_ADDRESS).to_bytes(), invoke_code, bytearray(), [])
@@ -64,7 +64,7 @@ class Auth(object):
         for i in range(len(function_name)):
             param['name' + str(i)] = function_name[i]
         param['key_no'] = key_no
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]),
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00',
                                                "assignFuncsToRole", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
@@ -85,7 +85,7 @@ class Auth(object):
         for i in range(len(ont_ids)):
             param['name' + str(i)] = ont_ids[i]
         param['key_no'] = key_no
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]),
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00',
                                                "assignOntIDsToRole", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
@@ -103,7 +103,7 @@ class Auth(object):
         param = {"contract_address": contract_address, "ont_id": identity.ont_id.encode('utf-8'),
                  "to_ont_id": to_ont_id.encode('utf-8'),
                  "role": role.encode('utf-8'), "period": period, "level": level, "key_no": key_no}
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "delegate", param)
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00', "delegate", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -119,7 +119,7 @@ class Auth(object):
         param = {"contract_address": contract_address, "ont_id": initiator_identity.ont_id.encode('utf-8'),
                  "delegate": delegate.encode('utf-8'),
                  "role": role.encode('utf-8'), "key_no": key_no}
-        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), bytes([0]), "withdraw", param)
+        invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00', "withdraw", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])

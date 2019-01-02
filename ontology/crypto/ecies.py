@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import binascii
 
 from ecdsa.curves import NIST256p
 from ecdsa.ellipticcurve import Point
+from ecdsa.numbertheory import square_root_mod_prime
+
 from Cryptodome.Random.random import randint
 
 from ecdsa.util import (
@@ -28,21 +31,64 @@ class ECIES:
         return private_key.to_string()
 
     @staticmethod
-    def ec_get_public_key_by_private_key(private_key: bytes):
+    def get_public_key_by_hex_private_key(private_key: str):
+        if not isinstance(private_key, str):
+            raise SDKException(ErrorCode.other_error('The type of private key should be hexadecimal str.'))
+        if len(private_key) != 64:
+            raise SDKException(ErrorCode.other_error('The length of private key should be 64 bytes.'))
+        private_key = binascii.a2b_hex(private_key)
+        point_str = ECIES.get_public_key_by_bytes_private_key(private_key)
+        return point_str.hex()
+
+    @staticmethod
+    def get_public_key_by_bytes_private_key(private_key: bytes):
         if not isinstance(private_key, bytes):
-            raise SDKException(ErrorCode.other_error('the length of private key should be 32 bytes.'))
+            raise SDKException(ErrorCode.other_error('The type of private key should be bytes.'))
         if len(private_key) != 32:
-            raise SDKException(ErrorCode.other_error('the length of private key should be 32 bytes.'))
+            raise SDKException(ErrorCode.other_error('The length of private key should be 32 bytes.'))
         private_key = SigningKey.from_string(string=private_key, curve=NIST256p)
-        public_key = private_key.get_verifying_key().to_string()
-        return public_key
+        public_key = private_key.get_verifying_key()
+        order = public_key.pubkey.order
+        x_int = public_key.pubkey.point.x()
+        y_int = public_key.pubkey.point.y()
+        x_str = number_to_string(x_int, order)
+        if y_int % 2 == 0:
+            point_str = b''.join([b'\x02', x_str])
+        else:
+            point_str = b''.join([b'\x03', x_str])
+        return point_str
+
+    @staticmethod
+    def __uncompress_public_key(public_key: bytes) -> bytes:
+        """
+        Uncompress the compressed public key.
+        :param public_key: compressed public key
+        :return: uncompressed public key
+        """
+        is_even = public_key.startswith(b'\x02')
+        x = string_to_number(public_key[1:])
+
+        curve = NIST256p.curve
+        order = NIST256p.order
+        p = curve.p()
+        alpha = (pow(x, 3, p) + (curve.a() * x) + curve.b()) % p
+        beta = square_root_mod_prime(alpha, p)
+        if is_even == bool(beta & 1):
+            y = p - beta
+        else:
+            y = beta
+        point = Point(curve, x, y, order)
+        return b''.join([number_to_string(point.x(), order), number_to_string(point.y(), order)])
 
     @staticmethod
     def encrypt_with_cbc_mode(plain_text: bytes, public_key: bytes) -> (bytes, bytes, bytes):
         if not isinstance(public_key, bytes):
-            raise SDKException(ErrorCode.other_error('the length of public key should be 64 bytes.'))
-        if len(public_key) != 64:
-            raise SDKException(ErrorCode.other_error('the length of public key should be 64 bytes.'))
+            raise SDKException(ErrorCode.other_error('the type of public key should be bytes.'))
+        if len(public_key) != 33:
+            raise SDKException(ErrorCode.other_error('the length of public key should be 33 bytes.'))
+        if not (public_key.startswith(b'\x02') or public_key.startswith(b'\x03')):
+            raise SDKException(ErrorCode.other_error('Invalid public key.'))
+        public_key = ECIES.__uncompress_public_key(public_key)
         r = randint(1, NIST256p.order)
         g_tilde = r * NIST256p.generator
         h_tilde = r * VerifyingKey.from_string(string=public_key, curve=NIST256p).pubkey.point
@@ -78,9 +124,12 @@ class ECIES:
     @staticmethod
     def encrypt_with_gcm_mode(plain_text: bytes, hdr: bytes, public_key: bytes):
         if not isinstance(public_key, bytes):
-            raise SDKException(ErrorCode.other_error('the length of public key should be 64 bytes.'))
-        if len(public_key) != 64:
-            raise SDKException(ErrorCode.other_error('the length of public key should be 64 bytes.'))
+            raise SDKException(ErrorCode.other_error('the type of public key should be bytes.'))
+        if len(public_key) != 33:
+            raise SDKException(ErrorCode.other_error('the length of public key should be 33 bytes.'))
+        if not (public_key.startswith(b'\x02') or public_key.startswith(b'\x03')):
+            raise SDKException(ErrorCode.other_error('Invalid public key.'))
+        public_key = ECIES.__uncompress_public_key(public_key)
         r = randint(1, NIST256p.order)
         g_tilde = r * NIST256p.generator
         h_tilde = r * VerifyingKey.from_string(string=public_key, curve=NIST256p).pubkey.point

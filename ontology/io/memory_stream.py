@@ -111,7 +111,7 @@ class MemoryStream(BytesIO):
         """
         return self.writable()
 
-    def ToArray(self):
+    def to_bytes(self):
         """
         Hexlify the stream data.
 

@@ -3,9 +3,9 @@
 
 from binascii import a2b_hex
 
-VERSION_TRANSACTION = bytes([0])
-VERSION_CONTRACT_ONT = bytes([0])
-VERSION_CONTRACT_ONG = bytes([0])
+VERSION_TRANSACTION = b'\x00'
+VERSION_CONTRACT_ONT = b'\x00'
+VERSION_CONTRACT_ONG = b'\x00'
 
 NATIVE_TRANSFER = 'transfer'
 NATIVE_TRANSFER_FROM = 'transferFrom'

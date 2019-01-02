@@ -18,8 +18,8 @@ class TestNativeVm(unittest.TestCase):
         asset = sdk.native_vm.asset()
         tx = asset.new_transfer_transaction('ont', acct2.get_address_base58(), acct1.get_address_base58(), amount,
                                             acct1.get_address_base58(), 20000, 500)
-        sdk.sign_transaction(tx, acct1)
-        sdk.add_sign_transaction(tx, acct2)
+        tx.sign_transaction(acct1)
+        tx.add_sign_transaction(acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
@@ -27,8 +27,8 @@ class TestNativeVm(unittest.TestCase):
             self.assertIn('[Transfer] balance insufficient', e.args[1])
         tx = asset.new_transfer_transaction('ont', acct1.get_address_base58(), acct2.get_address_base58(), amount,
                                             acct1.get_address_base58(), 20000, 500)
-        sdk.sign_transaction(tx, acct2)
-        sdk.add_sign_transaction(tx, acct1)
+        tx.sign_transaction(acct2)
+        tx.add_sign_transaction(acct1)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
@@ -42,7 +42,7 @@ class TestNativeVm(unittest.TestCase):
         asset = sdk.native_vm.asset()
         tx = asset.new_withdraw_ong_transaction(b58_payer_address, b58_payer_address, amount, b58_payer_address, 20000,
                                                 500)
-        sdk.sign_transaction(tx, payer)
+        tx.sign_transaction(payer)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
 

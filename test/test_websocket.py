@@ -272,7 +272,7 @@ class TestWebsocketClient(unittest.TestCase):
         tx = Asset.new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
                                             gas_limit, gas_price)
         sdk = OntologySdk()
-        tx = sdk.sign_transaction(tx, acct)
+        tx.sign_transaction(acct)
         event_loop = asyncio.get_event_loop()
         tx_hash, event = event_loop.run_until_complete(TestWebsocketClient.send_raw_transaction_and_query_tx_case(tx))
         self.assertEqual(tx_hash, event['TxHash'])

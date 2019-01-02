@@ -35,7 +35,7 @@ class Governance(object):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_pubkey": peer_pubkey, "address": account.get_address().to_bytes(), "init_pos": init_pos,
                  "ontid": identity.ont_id.encode(), "key_no": key_no}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "registerCandidate", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "registerCandidate", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -50,7 +50,7 @@ class Governance(object):
     def unregister_candidate(self, account: Account, peer_pubkey: str, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_pubkey": peer_pubkey, "address": account.get_address().to_bytes()}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "unRegisterCandidate", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "unRegisterCandidate", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -63,7 +63,7 @@ class Governance(object):
     def withdraw_ong(self, account: Account, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"address": account.get_address().to_bytes()}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdrawOng", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "withdrawOng", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -76,7 +76,7 @@ class Governance(object):
     def withdraw_fee(self, account: Account, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"address": account.get_address().to_bytes()}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdrawFee", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "withdrawFee", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -97,7 +97,7 @@ class Governance(object):
         param["pos_lists_length"] = len(pos_lists)
         for i in range(len(pos_lists)):
             param["pos_lists" + str(i)] = pos_lists[i]
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "authorizeForPeer", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "authorizeForPeer", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -118,7 +118,7 @@ class Governance(object):
         param["pos_lists_length"] = len(pos_lists)
         for i in range(len(pos_lists)):
             param["pos_lists" + str(i)] = pos_lists[i]
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "unAuthorizeForPeer", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "unAuthorizeForPeer", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -139,7 +139,7 @@ class Governance(object):
         param["pos_lists_length"] = len(withdraw_list)
         for i in range(len(withdraw_list)):
             param["pos_lists" + str(i)] = withdraw_list[i]
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "withdraw", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "withdraw", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -152,7 +152,7 @@ class Governance(object):
     def quit_node(self, account: Account, peer_publickey: str, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes()}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "quitNode", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "quitNode", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -167,7 +167,7 @@ class Governance(object):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(),
                  "maxAuthorize": max_authorize}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "changeMaxAuthorization", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "changeMaxAuthorization", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -181,7 +181,7 @@ class Governance(object):
                      gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "pos": pos}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "addInitPos", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "addInitPos", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -195,7 +195,7 @@ class Governance(object):
                         gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "pos": pos}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "reduceInitPos", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "reduceInitPos", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -209,7 +209,7 @@ class Governance(object):
                       gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
         param = {"peer_publickey": peer_publickey, "address": account.get_address().to_bytes(), "peer_cost": peer_cost}
-        invoke_code = build_native_invoke_code(contract_address, bytes([0]), "setPeerCost", param)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', "setPeerCost", param)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
@@ -324,7 +324,7 @@ class Governance(object):
         stream2 = StreamManager.GetStream()
         writer = BinaryWriter(stream2)
         writer.write_int32(governance_view.view)
-        view_bytes = stream2.ToArray()
+        view_bytes = stream2.to_bytes()
         peer_pool_bytes = self.PEER_POOL.encode('utf-8')
         key_bytes = peer_pool_bytes + a2b_hex(view_bytes)
         value = self.__sdk.rpc.get_storage(contract_address.hex(), key_bytes.hex())

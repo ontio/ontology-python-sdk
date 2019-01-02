@@ -140,7 +140,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx = Asset.new_approve_transaction('ont', b58_send_address, b58_recv_address, amount, b58_payer_address,
                                                gas_limit, gas_price)
-            tx = sdk.sign_transaction(tx, sender)
+            tx.sign_transaction(sender)
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
         except SDKException as e:
@@ -163,8 +163,8 @@ class TestAsset(unittest.TestCase):
 
         tx = asset.new_transfer_transaction('ont', b58_from_address, b58_to_address, amount, b58_payer_address,
                                             gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, from_acct)
-        tx = sdk.add_sign_transaction(tx, to_acct)
+        tx.sign_transaction(from_acct)
+        tx.add_sign_transaction(to_acct)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
