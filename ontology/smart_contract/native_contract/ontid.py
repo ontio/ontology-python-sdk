@@ -74,8 +74,10 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a hexadecimal transaction hash value.
         """
-        tx = OntId.new_registry_ont_id_transaction(identity.ont_id, identity.controls[0].public_key,
-                                                   payer.get_address_base58(), gas_limit, gas_price)
+        b58_payer_address = payer.get_address_base58()
+        hex_pub_key = identity.controls[0].public_key
+        tx = OntId.new_registry_ont_id_transaction(identity.ont_id, hex_pub_key, b58_payer_address, gas_limit,
+                                                   gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
