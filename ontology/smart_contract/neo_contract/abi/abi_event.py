@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+
 
 class AbiEvent(object):
     def __init__(self, name: str, return_type: str, parameters: []):
@@ -10,7 +16,6 @@ class AbiEvent(object):
 
     def set_params_value(self, *objs):
         if len(self.parameters) != len(objs):
-            raise Exception("param error")
-        for i in range(len(objs)):
-            self.parameters[i].set_value(objs[i])
-
+            raise SDKException(ErrorCode.other_error('Param error.'))
+        for i, v in enumerate(objs):
+            self.parameters[i].set_value(v)

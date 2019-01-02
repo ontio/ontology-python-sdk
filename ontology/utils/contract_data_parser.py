@@ -149,7 +149,7 @@ class ContractDataParser(object):
         elif t == BuildParams.Type.struct_type.value or t == BuildParams.Type.array_type.value:
             count = reader.read_var_int()
             item_list = list()
-            for i in range(count):
+            for _ in range(count):
                 item = ContractDataParser.__deserialize_stack_item(reader)
                 item_list.append(item)
             if t == BuildParams.Type.struct_type.value:
@@ -158,7 +158,7 @@ class ContractDataParser(object):
         elif t == BuildParams.Type.dict_type.value:
             count = reader.read_var_int()
             item_dict = dict()
-            for i in range(count):
+            for _ in range(count):
                 key = ContractDataParser.__deserialize_stack_item(reader)
                 value = ContractDataParser.__deserialize_stack_item(reader)
                 item_dict[key] = value
