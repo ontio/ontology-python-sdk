@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 
 
 class Control(object):
@@ -46,3 +48,13 @@ class Control(object):
                       param=control_data['parameters'], hash_value=hash_value,
                       public_key=public_key)
         return obj
+
+    @property
+    def key(self):
+        return self.key
+
+    @key.setter
+    def key(self, b64_pub_key: str):
+        if not isinstance(b64_pub_key, str):
+            raise SDKException(ErrorCode.other_error('Invalid public key.'))
+        self.key = b64_pub_key
