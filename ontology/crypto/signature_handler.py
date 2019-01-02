@@ -73,7 +73,7 @@ class SignatureHandler(object):
         return r + s
 
     @staticmethod
-    def uncompress_public_key(public_key):
+    def uncompress_public_key(public_key: bytes)->bytes:
         """
         Uncompress the compressed public key.
         :param public_key: compressed public key
