@@ -4,6 +4,9 @@
 import time
 import unittest
 
+from ontology.crypto.curve import Curve
+from ontology.crypto.signature import Signature
+from ontology.utils.contract_event_parser import ContractEventParser
 from test import acct1, acct2, acct3, acct4
 
 from Cryptodome.Random.random import randint
@@ -237,45 +240,41 @@ class TestOntId(unittest.TestCase):
         except SDKException as e:
             self.assertIn('Wallet identity exists', e.args[1])
             return
-        rand_private_key = utils.get_random_bytes(32).hex()
-        rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
-        hex_new_public_key = rand_acct.get_public_key_hex()
+        private_key = utils.get_random_bytes(32)
+        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+        hex_new_public_key = public_key.hex()
         password = 'password'
         gas_limit = 20000
         gas_price = 500
         tx_hash = ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
                                                          gas_price)
         time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-        self.assertEqual('PublicKey', notify[0]['States'][0])
-        self.assertEqual('add', notify[0]['States'][1])
-        self.assertEqual(identity.ont_id, notify[0]['States'][2])
-        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = '0300000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('add', notify['States'])
+        self.assertIn(identity.ont_id, notify['States'])
+        self.assertIn(hex_new_public_key, notify['States'])
         try:
-            ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit, gas_price)
+            ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
+                                                   gas_price)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute' \
-                  ' error!: [Invoke] Native serivce function execute error!: add key failed: already exists'
-            self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
-
+            self.assertIn('already exists', e.args[1])
         tx_hash = ont_id.send_remove_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
                                                             gas_price)
         time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-        self.assertEqual('PublicKey', notify[0]['States'][0])
-        self.assertEqual('remove', notify[0]['States'][1])
-        self.assertEqual(identity.ont_id, notify[0]['States'][2])
-        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('remove', notify['States'])
+        self.assertIn(identity.ont_id, notify['States'])
+        self.assertIn(hex_new_public_key, notify['States'])
         try:
             ont_id.send_remove_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
                                                       gas_price)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute ' \
-                  'error!: [Invoke] Native serivce function execute error!: remove key failed: ' \
-                  'public key has already been revoked'
-            self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('public key has already been revoked', e.args[1])
 
     def test_new_add_recovery_transaction(self):
         ont_id = sdk.native_vm.ont_id()
