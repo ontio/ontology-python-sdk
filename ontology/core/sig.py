@@ -35,7 +35,7 @@ class Sig(object):
         if len(self.public_keys) == 1:
             verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
         else:
-            verification_script = ProgramBuilder.program_from_multi_pubkey(self.M, self.public_keys)
+            verification_script = ProgramBuilder.program_from_multi_pubkey(self.m, self.public_keys)
         ms = StreamManager.GetStream()
         writer = BinaryWriter(ms)
         writer.write_var_bytes(invoke_script)
