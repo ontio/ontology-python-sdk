@@ -10,7 +10,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class Signature(object):
-    def __init__(self, signature_scheme, signature_value):
+    def __init__(self, signature_scheme: SignatureScheme, signature_value):
         self.__scheme = signature_scheme
         self.__value = signature_value
 
