@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ontology.common.define import DID_ONT
+from typing import List
+
+from ontology.wallet.control import Control
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
 class Identity(object):
-    def __init__(self, ont_id: str = '', label: str = '', lock: bool = False, controls: list = None, is_default=False):
+    def __init__(self, ont_id: str = '', label: str = '', lock: bool = False, controls: List[Control] = None,
+                 is_default=False):
         if controls is None:
             controls = list()
         if not isinstance(ont_id, str):
