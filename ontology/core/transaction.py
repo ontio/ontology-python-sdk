@@ -39,7 +39,9 @@ class Transaction(object):
         self.nonce = nonce
         self.gas_price = gas_price
         self.gas_limit = gas_limit
-        self.payer = payer  # 20 bytes
+        if payer is None or payer == b'' or payer == bytearray():
+            payer = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        self.payer = payer
         self.payload = payload
         self.attributes = attributes
         self.sigs = sigs
@@ -74,7 +76,7 @@ class Transaction(object):
             writer.write_var_bytes(bytes(self.payload))
         writer.write_var_int(len(self.attributes))
         ms.flush()
-        res = ms.ToArray()
+        res = ms.to_bytes()
         StreamManager.ReleaseStream(ms)
         return res
 
@@ -116,7 +118,7 @@ class Transaction(object):
         for sig in self.sigs:
             writer.write_bytes(sig.serialize())
         ms.flush()
-        bytes_tx = ms.ToArray()
+        bytes_tx = ms.to_bytes()
         StreamManager.ReleaseStream(ms)
         if is_hex:
             return bytes_tx
@@ -197,7 +199,7 @@ class Transaction(object):
                 if self.sigs[i].public_keys == pub_keys:
                     if len(self.sigs[i].sig_data) + 1 > len(pub_keys):
                         raise SDKException(ErrorCode.param_err('too more sigData'))
-                    if self.sigs[i].M != m:
+                    if self.sigs[i].m != m:
                         raise SDKException(ErrorCode.param_err('M error'))
                     self.sigs[i].sig_data.append(sig_data)
                     return
