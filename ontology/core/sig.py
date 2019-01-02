@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import binascii
 
-from ontology.exception.error_code import ErrorCode
-from ontology.exception.exception import SDKException
+from ontology.utils.utils import bytes_reader
+from ontology.core.program import ProgramBuilder
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
-from ontology.utils.utils import bytes_reader
-from ontology.core.program import ProgramBuilder
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 
 
 class Sig(object):
-    def __init__(self, public_keys=None, M=0, sig_data=None):
+    def __init__(self, public_keys=None, m: int = 0, sig_data=None):
         self.public_keys = public_keys  # a list to save public keys
-        self.M = M
+        self.m = m
         self.sig_data = sig_data
 
     def __iter__(self):
-        data = dict(M=self.M, publicKeys=list(), sigData=list())
+        data = dict(M=self.m, publicKeys=list(), sigData=list())
         for key in self.public_keys:
             data['publicKeys'].append(binascii.b2a_hex(key).decode('ascii'))
         for s_data in self.sig_data:
@@ -40,20 +41,19 @@ class Sig(object):
         writer.write_var_bytes(invoke_script)
         writer.write_var_bytes(verification_script)
         ms.flush()
-        res = ms.ToArray()
+        res = ms.to_bytes()
         res = bytes_reader(res)
         StreamManager.ReleaseStream(ms)
         return res
 
     @staticmethod
-    def deserialize_from(sigbytes: bytes):
-        ms = StreamManager.GetStream(sigbytes)
+    def deserialize_from(sig_bytes: bytes):
+        ms = StreamManager.GetStream(sig_bytes)
         reader = BinaryReader(ms)
         return Sig.deserialize(reader)
 
     @staticmethod
     def deserialize(reader: BinaryReader):
-
         invocation_script = reader.read_var_bytes()
         verification_script = reader.read_var_bytes()
         sig = Sig()
@@ -61,5 +61,5 @@ class Sig(object):
         info = ProgramBuilder.get_program_info(verification_script)
 
         sig.public_keys = info.pubkeys
-        sig.M = info.m
+        sig.m = info.m
         return sig
