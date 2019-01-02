@@ -19,7 +19,6 @@ from ontology.wallet.account import AccountData
 from ontology.exception.error_code import ErrorCode
 from ontology.wallet.account_info import AccountInfo
 from ontology.exception.exception import SDKException
-from ontology.wallet.identity_info import IdentityInfo
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.utils import get_random_hex_str, is_file_exist
 
@@ -128,14 +127,8 @@ class WalletManager(object):
 
     def __create_identity(self, label: str, pwd: str, salt: str, private_key: str):
         acct = self.__create_account(label, pwd, salt, private_key, False)
-        info = IdentityInfo()
-        info.ont_id = DID_ONT + acct.get_address_base58()
-        info.pubic_key = acct.get_public_key_bytes().hex()
-        info.private_key = acct.get_private_key_bytes().hex()
-        info.pri_key_wif = acct.export_wif().encode('ascii')
-        info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt, Scrypt().n)
-        info.address_u160 = acct.get_address().to_bytes().hex()
-        return self.wallet_in_mem.get_identity_by_ont_id(info.ont_id)
+        ont_id = DID_ONT + acct.get_address_base58()
+        return self.wallet_in_mem.get_identity_by_ont_id(ont_id)
 
     def create_identity_from_private_key(self, label: str, pwd: str, private_key: str) -> Identity:
         """
