@@ -155,7 +155,7 @@ class TestRestfulClient(unittest.TestCase):
         gas_limit = 20000
         tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
                                                             b58_from_address, gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx.sign_transaction(acct)
         tx_hash = restful_client.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
 
@@ -170,7 +170,7 @@ class TestRestfulClient(unittest.TestCase):
         gas_limit = 20000
         tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
                                                             b58_from_address, gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx.sign_transaction(acct)
         result = restful_client.send_raw_transaction_pre_exec(tx)
         self.assertEqual('01', result['Result'])
         self.assertEqual(20000, result['Gas'])

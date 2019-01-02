@@ -46,9 +46,9 @@ class TestOntologySdk(unittest.TestCase):
 
         tx = asset.new_transfer_transaction('ont', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
                                             gas_limit, gas_price)
-        sdk.sign_transaction(tx, acct1)
-        sdk.add_multi_sign_transaction(tx, m, pub_keys, acct1)
-        sdk.add_multi_sign_transaction(tx, m, pub_keys, acct2)
+        tx.sign_transaction(acct1)
+        tx.add_multi_sign_transaction(m, pub_keys, acct1)
+        tx.add_multi_sign_transaction(m, pub_keys, acct2)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
 

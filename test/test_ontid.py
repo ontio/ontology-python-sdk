@@ -33,7 +33,7 @@ class TestOntId(unittest.TestCase):
         gas_limit = 20000
         gas_price = 500
         tx = ont_id.new_registry_ont_id_transaction(acct_did, hex_public_key, b58_address, gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct2)
+        tx.sign_transaction(acct2)
         self.assertEqual(64, len(tx.hash256_hex()))
         self.assertEqual(600, len(tx.serialize(is_hex=True)))
         try:
@@ -100,7 +100,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx = ont_id.new_add_attribute_transaction(acct_did, hex_public_key, attribute_list, b58_address, gas_limit,
                                                   gas_price)
-        tx = sdk.sign_transaction(tx, acct2)
+        tx.sign_transaction(acct2)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(tx.hash256_explorer(), tx_hash)
 
@@ -113,7 +113,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         path = 'try'
         tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct2)
+        tx.sign_transaction(acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(tx.hash256_explorer(), tx_hash)
@@ -191,7 +191,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx = ont_id.new_add_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address, gas_limit,
                                                    gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx.sign_transaction(acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         time.sleep(randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
@@ -209,7 +209,7 @@ class TestOntId(unittest.TestCase):
 
         tx = ont_id.new_remove_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address,
                                                       gas_limit, gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx.sign_transaction(acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         time.sleep(randint(6, 10))
         notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
@@ -291,7 +291,7 @@ class TestOntId(unittest.TestCase):
         b58_recovery_address = recovery.get_address_base58()
         tx = ont_id.new_add_recovery_transaction(acct_did, hex_public_key, b58_recovery_address, b58_address, gas_limit,
                                                  gas_price)
-        tx = sdk.sign_transaction(tx, acct)
+        tx.sign_transaction(acct)
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:

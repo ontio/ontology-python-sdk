@@ -100,7 +100,7 @@ class TestNeoVm(unittest.TestCase):
         gas_price = 500
         tx = sdk.neo_vm.make_deploy_transaction(code, True, 'name', 'v1.0', 'author', 'email', 'desp', b58_payer,
                                                 gas_limit, gas_price)
-        sdk.sign_transaction(tx, payer)
+        tx.sign_transaction(payer)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(1, result['State'])
 
