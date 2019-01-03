@@ -45,10 +45,10 @@ class TestErrorCode(unittest.TestCase):
         self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], msg)
 
-    def test_invalid_params(self):
+    def test_invalid_acct_params(self):
         code = 51001
         desc = "Account Error, invalid params"
-        value = ErrorCode.invalid_params
+        value = ErrorCode.invalid_acct_params
         self.assertEqual(type(value), dict)
         self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
