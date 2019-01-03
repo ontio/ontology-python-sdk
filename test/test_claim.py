@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import json
 import unittest
 
+from ontology.utils import utils
 from ontology.claim.claim import Claim
+from ontology.crypto.curve import Curve
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
-from ontology.crypto.curve import Curve
 from ontology.crypto.signature import Signature
 from ontology.exception.exception import SDKException
-from ontology.ont_sdk import OntologySdk
-from ontology.utils import utils
 from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct1, password
-
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
+from test import acct1, password, identity1, acct4, sdk
 
 
 class TestClaim(unittest.TestCase):
@@ -84,10 +81,24 @@ class TestClaim(unittest.TestCase):
         self.assertIn(identity.ont_id, notify['States'])
 
     def test_add_public_key(self):
-        private_key = utils.get_random_bytes(32)
-        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
-        print(public_key.hex())
-        sdk.native_vm.ont_id().send_add_public_key_transaction()
+        hex_public_key = '021bab110b458afaa2d65e0ac3f07fe488cbd034df6843a1ccd3f312d2bfaee443'
+        gas_limit = 20000
+        gas_price = 500
+        try:
+            sdk.native_vm.ont_id().add_public_key(identity1, password, hex_public_key, acct4, gas_limit, gas_price)
+        except SDKException as e:
+            self.assertIn('already exists', e.args[1])
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
+        print(json.dumps(pub_keys, indent=4))
+        tx_hash = '2840976d7f0976c1e0ccc5040f4965524e5eb20f592d185225ef6579b0600e9f'
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = '0300000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        print(json.dumps(notify, indent=4))
+        self.assertIn('PublicKey', notify['notify'])
+        self.assertIn('add', notify['notify'])
+        self.assertIn(identity1.ont_id, notify['notify'])
+        self.assertIn(hex_public_key, notify['notify'])
 
     def test_generate_blockchain_proof(self):
         tx_hash = 'd7a81db41b2608f2c5da4a4d84b266a8e8f86c244781287c183ee1129e37a9cd'
