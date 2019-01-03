@@ -22,16 +22,131 @@ from ontology.exception.exception import SDKException
 class OntId(object):
     def __init__(self, sdk):
         self.__sdk = sdk
+        self.__version = b'\x00'
+        self.__contract_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03'
 
-    def get_network(self):
-        return self.__sdk.get_network()
+    @staticmethod
+    def parse_pub_keys(ont_id: str, raw_pub_keys: str or bytes) -> list:
+        if isinstance(raw_pub_keys, str):
+            stream = StreamManager.GetStream(bytearray.fromhex(raw_pub_keys))
+        elif isinstance(raw_pub_keys, bytes):
+            stream = StreamManager.GetStream(raw_pub_keys)
+        else:
+            raise SDKException(ErrorCode.params_type_error('bytes or str parameter is required.'))
+        reader = BinaryReader(stream)
+        pub_keys = list()
+        while True:
+            try:
+                kid = f'{ont_id}#keys-{reader.read_int32()}'
+                bytes_key = reader.read_var_bytes()
+                hex_pub_key = bytes_key.hex()
+                if len(bytes_key) == 33:
+                    key_info = dict(PubKeyId=kid, Type=KeyType.ECDSA.name, Curve=Curve.P256.name, Value=hex_pub_key)
+                else:
+                    key_type = KeyType.from_label(bytes_key[0])
+                    curve = Curve.from_label(bytes_key[1])
+                    key_info = dict(PubKeyId=kid, Type=key_type, Curve=curve, Value=hex_pub_key)
+                pub_keys.append(key_info)
+            except SDKException as e:
+                assert e.args[0] == 10001
+                break
+        return pub_keys
+
+    @staticmethod
+    def parse_attributes(serialized_attributes: str or bytes):
+        if len(serialized_attributes) == 0:
+            return list()
+        if isinstance(serialized_attributes, str):
+            stream = StreamManager.GetStream(bytearray.fromhex(serialized_attributes))
+        elif isinstance(serialized_attributes, bytes):
+            stream = StreamManager.GetStream(serialized_attributes)
+        else:
+            raise SDKException(ErrorCode.params_type_error('bytes or str parameter is required.'))
+        reader = BinaryReader(stream)
+        attributes_list = []
+        while True:
+            try:
+                attr_key = reader.read_var_bytes().decode('utf-8')
+                attr_type = reader.read_var_bytes().decode('utf-8')
+                attr_value = reader.read_var_bytes().decode('utf-8')
+                attr = dict(Key=attr_key, Type=attr_type, Value=attr_value)
+                attributes_list.append(attr)
+            except SDKException as e:
+                assert e.args[0] == 10001
+                break
+        return attributes_list
+
+    @staticmethod
+    def parse_ddo(ont_id: str, serialized_ddo: str or bytes) -> dict:
+        """
+        This interface is used to deserialize a hexadecimal string into a DDO object in the from of dict.
+
+        :param ont_id: the unique ID for identity.
+        :param serialized_ddo: an serialized description object of ONT ID in form of str or bytes.
+        :return: a description object of ONT ID in the from of dict.
+        """
+        if len(serialized_ddo) == 0:
+            return dict()
+        if isinstance(serialized_ddo, str):
+            stream = StreamManager.GetStream(bytearray.fromhex(serialized_ddo))
+        elif isinstance(serialized_ddo, bytes):
+            stream = StreamManager.GetStream(serialized_ddo)
+        else:
+            raise SDKException(ErrorCode.params_type_error('bytes or str parameter is required.'))
+        reader = BinaryReader(stream)
+        try:
+            public_key_bytes = reader.read_var_bytes()
+        except SDKException:
+            public_key_bytes = b''
+        try:
+            attribute_bytes = reader.read_var_bytes()
+        except SDKException:
+            attribute_bytes = b''
+        try:
+            recovery_bytes = reader.read_var_bytes()
+        except SDKException:
+            recovery_bytes = b''
+        if len(recovery_bytes) != 0:
+            b58_recovery = Address(recovery_bytes).b58encode()
+        else:
+            b58_recovery = ''
+        pub_keys = OntId.parse_pub_keys(ont_id, public_key_bytes)
+        attribute_list = OntId.parse_attributes(attribute_bytes)
+        ddo = dict(Owners=pub_keys, Attributes=attribute_list, Recovery=b58_recovery, OntId=ont_id)
+        return ddo
+
+    def get_public_keys(self, ont_id: str):
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        args = dict(ontid=ont_id.encode('utf-8'))
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'getPublicKeys', args)
+        unix_time_now = int(time())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, None, invoke_code, bytearray(), [])
+        response = self.__sdk.get_network().send_raw_transaction_pre_exec(tx)
+        pub_keys = OntId.parse_pub_keys(ont_id, response['Result'])
+        return pub_keys
+
+    def get_ddo(self, ont_id: str) -> dict:
+        """
+        This interface is used to get a DDO object in the from of dict.
+
+        :param ont_id: the unique ID for identity.
+        :return: a description object of ONT ID in the from of dict.
+        """
+        args = dict(ontid=ont_id.encode('utf-8'))
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'getDDO', args)
+        unix_time_now = int(time())
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, None, invoke_code, bytearray(), [])
+        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
+        ddo = OntId.parse_ddo(ont_id, response['Result'])
+        return ddo
 
     def get_merkle_proof(self, tx_hash: str):
         if not isinstance(tx_hash, str):
             raise SDKException(ErrorCode.other_error('Invalid TxHash type.'))
         if len(tx_hash) != 64:
             raise SDKException(ErrorCode.other_error('Invalid TxHash.'))
-        network = self.get_network()
+        network = self.__sdk.get_network()
         proof = network.get_merkle_proof(tx_hash)
         height = network.get_block_height_by_tx_hash(tx_hash)
         try:
@@ -41,8 +156,55 @@ class OntId(object):
         merkle_proof = dict(Type='MerkleProof', TxHash=tx_hash, BlockHeight=height, MerkleRoot=merkle_root)
         print(json.dumps(proof, indent=4))
 
-    @staticmethod
-    def new_registry_ont_id_transaction(ont_id: str, hex_public_key: str, b58_payer_address: str, gas_limit: int,
+    def new_add_public_key_transaction(self, ont_id: str, hex_public_key_or_recovery: str, hex_new_public_key: str,
+                                       payer: str, gas_limit: int, gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to add public key.
+
+        :param ont_id: ontid.
+        :param hex_public_key_or_recovery: the old hexadecimal public key in the form of string.
+        :param hex_new_public_key: the new hexadecimal public key in the form of string.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a Transaction object which is used to add public key.
+        """
+        contract_address = ONT_ID_CONTRACT_ADDRESS
+        args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(hex_new_public_key),
+                "pubkey_or_recovery": bytearray.fromhex(hex_public_key_or_recovery)}
+        invoke_code = build_vm.build_native_invoke_code(contract_address, self.__version, 'addKey', args)
+        unix_time_now = int(time())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_bytes(),
+                         invoke_code, bytearray(), [])
+        return tx
+
+    def add_public_key(self, identity: Identity, password: str, hex_new_public_key: str,
+                       payer: Account, gas_limit: int, gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to add public key.
+
+        :param identity: an Identity object.
+        :param password: a password which is used to decrypt the encrypted private key.
+        :param hex_new_public_key: the new hexadecimal public key in the form of string.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return:  a hexadecimal transaction hash value.
+        """
+        ont_id = identity.ont_id.encode('utf-8')
+        hex_public_key = identity.controls[0].public_key
+        args = dict(ontid=ont_id, pubkey=bytearray.fromhex(hex_new_public_key),
+                    pubkey_or_recovery=bytearray.fromhex(hex_public_key))
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addKey', args)
+        unix_time_now = int(time())
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(),
+                         invoke_code, bytearray(), [])
+        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
+        self.__sdk.sign_transaction(tx, account)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
+    def new_registry_ont_id_transaction(self, ont_id: str, hex_public_key: str, b58_payer_address: str, gas_limit: int,
                                         gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to register ONT ID.
@@ -54,8 +216,9 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to register ONT ID.
         """
-        args = dict(ontid=ont_id.encode(), pubkey=bytearray.fromhex(hex_public_key))
-        invoke_code = build_vm.build_native_invoke_code(ONT_ID_CONTRACT_ADDRESS, bytes([0]), 'regIDWithPublicKey', args)
+        args = dict(ontid=ont_id.encode('utf-8'), pubkey=bytearray.fromhex(hex_public_key))
+        invoke_code = build_vm.build_native_invoke_code(ONT_ID_CONTRACT_ADDRESS, self.__version, 'regIDWithPublicKey',
+                                                        args)
         unix_time_now = int(time())
         bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
@@ -76,15 +239,14 @@ class OntId(object):
         """
         b58_payer_address = payer.get_address_base58()
         hex_pub_key = identity.controls[0].public_key
-        tx = OntId.new_registry_ont_id_transaction(identity.ont_id, hex_pub_key, b58_payer_address, gas_limit,
-                                                   gas_price)
+        tx = self.new_registry_ont_id_transaction(identity.ont_id, hex_pub_key, b58_payer_address, gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         tx.sign_transaction(account)
         tx.add_sign_transaction(payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
 
-    @staticmethod
-    def new_add_attribute_transaction(ont_id: str, hex_public_key: str, attribute_list: list, b58_payer_address: str,
+    def new_add_attribute_transaction(self, ont_id: str, hex_public_key: str, attribute_list: list,
+                                      b58_payer_address: str,
                                       gas_limit: int, gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to add attribute.
@@ -99,12 +261,12 @@ class OntId(object):
         """
         contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "length": len(attribute_list)}
-        for i in range(len(attribute_list)):
+        for i, v in enumerate(attribute_list):
             args["key" + str(i)] = bytes(attribute_list[i]["key"].encode())
             args["type" + str(i)] = bytes(attribute_list[i]["type"].encode())
             args["value" + str(i)] = bytes(attribute_list[i]["value"].encode())
         args["pubkey"] = bytearray.fromhex(hex_public_key)
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addAttributes", args)
+        invoke_code = build_vm.build_native_invoke_code(contract_address, self.__version, "addAttributes", args)
         unix_time_now = int(time())
         array_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, array_payer_address, invoke_code, bytearray(),
@@ -124,16 +286,15 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a hexadecimal transaction hash value.
         """
-        tx = OntId.new_add_attribute_transaction(identity.ont_id, identity.controls[0].public_key, attribute_list,
-                                                 payer.get_address_base58(), gas_limit, gas_price)
+        tx = self.new_add_attribute_transaction(identity.ont_id, identity.controls[0].public_key, attribute_list,
+                                                payer.get_address_base58(), gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
         return tx_hash
 
-    @staticmethod
-    def new_remove_attribute_transaction(ont_id: str, hex_public_key: str, path: str, b58_payer_address: str,
+    def new_remove_attribute_transaction(self, ont_id: str, hex_public_key: str, path: str, b58_payer_address: str,
                                          gas_limit: int, gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to remove attribute.
@@ -148,7 +309,7 @@ class OntId(object):
         """
         contract_address = ONT_ID_CONTRACT_ADDRESS
         args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": bytearray.fromhex(hex_public_key)}
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeAttribute", args)
+        invoke_code = build_vm.build_native_invoke_code(contract_address, self.__version, "removeAttribute", args)
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
                          invoke_code, bytearray(), [])
@@ -167,51 +328,8 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a hexadecimal transaction hash value.
         """
-        tx = OntId.new_remove_attribute_transaction(identity.ont_id, identity.controls[0].public_key, path,
-                                                    payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
-
-    @staticmethod
-    def new_add_public_key_transaction(ont_id: str, hex_public_key_or_recovery: str, hex_new_public_key: str,
-                                       payer: str, gas_limit: int, gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to add public key.
-
-        :param ont_id: ontid.
-        :param hex_public_key_or_recovery: the old hexadecimal public key in the form of string.
-        :param hex_new_public_key: the new hexadecimal public key in the form of string.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return: a Transaction object which is used to add public key.
-        """
-        contract_address = ONT_ID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode(), "pubkey": bytearray.fromhex(hex_new_public_key),
-                "pubkey_or_recovery": bytearray.fromhex(hex_public_key_or_recovery)}
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addKey", args)
-        unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(payer).to_bytes(),
-                         invoke_code, bytearray(), [])
-        return tx
-
-    def send_add_public_key_transaction(self, identity: Identity, password: str, new_hex_public_key: str,
-                                        payer: Account, gas_limit: int, gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to add public key.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param new_hex_public_key: the new hexadecimal public key in the form of string.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return:  a hexadecimal transaction hash value.
-        """
-        tx = OntId.new_add_public_key_transaction(identity.ont_id, identity.controls[0].public_key, new_hex_public_key,
-                                                  payer.get_address_base58(), gas_limit, gas_price)
+        tx = self.new_remove_attribute_transaction(identity.ont_id, identity.controls[0].public_key, path,
+                                                   payer.get_address_base58(), gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
@@ -233,15 +351,15 @@ class OntId(object):
         """
         b58_payer_address = payer.get_address_base58()
         hex_recovery_address = recovery.get_address().to_hex_str()
-        tx = OntId.new_add_public_key_transaction(ont_id, hex_recovery_address, hex_new_public_key, b58_payer_address,
-                                                  gas_limit, gas_price)
+        tx = self.new_add_public_key_transaction(ont_id, hex_recovery_address, hex_new_public_key, b58_payer_address,
+                                                 gas_limit, gas_price)
         self.__sdk.sign_transaction(tx, recovery)
         self.__sdk.add_sign_transaction(tx, payer)
         tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
         return tx_hash
 
-    @staticmethod
-    def new_remove_public_key_transaction(ont_id: str, hex_public_key_or_recovery: str, hex_remove_public_key: str,
+    def new_remove_public_key_transaction(self, ont_id: str, hex_public_key_or_recovery: str,
+                                          hex_remove_public_key: str,
                                           b58_payer_address: str, gas_limit: int, gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to remove public key.
@@ -260,7 +378,7 @@ class OntId(object):
         bytes_ont_id = ont_id.encode()
         args = {"ontid": bytes_ont_id, "pubkey": bytes_remove_public_key,
                 "pubkey_or_recovery": bytes_public_key_or_recovery}
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "removeKey", args)
+        invoke_code = build_vm.build_native_invoke_code(contract_address, self.__version, "removeKey", args)
         unix_time_now = int(time())
         bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
@@ -281,8 +399,8 @@ class OntId(object):
         :return: a hexadecimal transaction hash value.
         """
         b58_payer_address = payer.get_address_base58()
-        tx = OntId.new_remove_public_key_transaction(identity.ont_id, identity.controls[0].public_key,
-                                                     hex_remove_public_key, b58_payer_address, gas_limit, gas_price)
+        tx = self.new_remove_public_key_transaction(identity.ont_id, identity.controls[0].public_key,
+                                                    hex_remove_public_key, b58_payer_address, gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
@@ -293,15 +411,14 @@ class OntId(object):
                                                        gas_limit: int, gas_price: int):
         bytes_recovery_address = recovery.get_address().to_bytes()
         b58_payer_address = payer.get_address_base58()
-        tx = OntId.new_remove_public_key_transaction(ont_id, bytes_recovery_address, hex_remove_public_key,
-                                                     b58_payer_address, gas_limit, gas_price)
+        tx = self.new_remove_public_key_transaction(ont_id, bytes_recovery_address, hex_remove_public_key,
+                                                    b58_payer_address, gas_limit, gas_price)
         self.__sdk.sign_transaction(tx, recovery)
         if recovery.get_address_base58() != payer.get_address_base58():
             self.__sdk.add_sign_transaction(tx, payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
 
-    @staticmethod
-    def new_add_recovery_transaction(ont_id: str, hex_public_key: str, b58_recovery_address: str,
+    def new_add_recovery_transaction(self, ont_id: str, hex_public_key: str, b58_recovery_address: str,
                                      b58_payer_address: str, gas_limit: int, gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to add the recovery.
@@ -318,7 +435,7 @@ class OntId(object):
         bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
         bytearray_public_key = bytearray.fromhex(hex_public_key)
         args = {"ontid": ont_id.encode(), "recovery": bytes_recovery_address, "pubkey": bytearray_public_key}
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "addRecovery", args)
+        invoke_code = build_vm.build_native_invoke_code(contract_address, self.__version, "addRecovery", args)
         unix_time_now = int(time())
         bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
@@ -339,110 +456,10 @@ class OntId(object):
         :return: a Transaction object which is used to add the recovery.
         """
         b58_payer_address = payer.get_address_base58()
-        tx = OntId.new_add_recovery_transaction(identity.ont_id, identity.controls[0].public_key, b58_recovery_address,
-                                                b58_payer_address, gas_limit, gas_price)
+        tx = self.new_add_recovery_transaction(identity.ont_id, identity.controls[0].public_key, b58_recovery_address,
+                                               b58_payer_address, gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         self.__sdk.sign_transaction(tx, account)
         self.__sdk.add_sign_transaction(tx, payer)
         tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
         return tx_hash
-
-    @staticmethod
-    def new_get_ddo_transaction(ont_id: str):
-        """
-        This interface is used to generate a Transaction object which is used to get
-        a hexadecimal serialize DDO object.
-
-        :param ont_id: ontid.
-        :return: a hexadecimal serialize DDO object string.
-        """
-        contract_address = ONT_ID_CONTRACT_ADDRESS
-        args = {"ontid": ont_id.encode()}
-        invoke_code = build_vm.build_native_invoke_code(contract_address, bytes([0]), "getDDO", args)
-        unix_time_now = int(time())
-        payer = Address(a2b_hex("0000000000000000000000000000000000000000".encode())).to_bytes()
-        return Transaction(0, 0xd1, unix_time_now, 0, 0, payer, invoke_code, bytearray(),
-                           [])
-
-    def send_get_ddo(self, ont_id: str) -> dict:
-        """
-        This interface is used to get a DDO object in the from of dict.
-
-        :param ont_id: ontid.
-        :return: a DDO object in the from of dict.
-        """
-        tx = OntId.new_get_ddo_transaction(ont_id)
-        response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
-        return OntId.parse_ddo(ont_id, response['Result'])
-
-    @staticmethod
-    def parse_ddo(ont_id: str, ddo: str) -> dict:
-        """
-        This interface is used to deserialize a hexadecimal string into a DDO object in the from of dict.
-
-        :param ont_id: ontid.
-        :param ddo:  an hexadecimal string.
-        :return: a DDO object in the from of dict.
-        """
-        if ddo == "":
-            return dict()
-        ms = StreamManager.GetStream(a2b_hex(ddo))
-        reader = BinaryReader(ms)
-        try:
-            public_key_bytes = reader.read_var_bytes()
-        except Exception as e:
-            raise e
-        try:
-            attribute_bytes = reader.read_var_bytes()
-        except Exception as e:
-            attribute_bytes = bytearray()
-        try:
-            recovery_bytes = reader.read_var_bytes()
-        except Exception as e:
-            recovery_bytes = bytearray()
-        pubKey_list = []
-        if len(public_key_bytes) != 0:
-            ms = StreamManager.GetStream(public_key_bytes)
-            reader2 = BinaryReader(ms)
-            while True:
-                try:
-                    index = reader2.read_int32()
-                    d = {}
-                    d['PubKeyId'] = ont_id + "#keys-" + str(index)
-                    pubkey = reader2.read_var_bytes()
-                    if len(pubkey) == 33:
-                        d["Type"] = KeyType.ECDSA.name
-                        d["Curve"] = Curve.P256.name
-                        d["Value"] = pubkey.hex()
-                    else:
-                        d["Type"] = KeyType.from_label(pubkey[0])
-                        d["Curve"] = Curve.from_label(pubkey[1])
-                        d["Value"] = pubkey.hex()
-                    pubKey_list.append(d)
-                except Exception as e:
-                    break
-        attribute_list = []
-        if len(attribute_bytes) != 0:
-            ms = StreamManager.GetStream(attribute_bytes)
-            reader2 = BinaryReader(ms)
-
-            while True:
-                try:
-                    d = {}
-                    key = reader2.read_var_bytes()
-                    if len(key) == 0:
-                        break
-                    d["Key"] = str(key, 'utf-8')
-                    d["Type"] = str(reader2.read_var_bytes(), 'utf-8')
-                    d["Value"] = str(reader2.read_var_bytes(), 'utf-8')
-                    attribute_list.append(d)
-                except Exception as e:
-                    break
-        d2 = {}
-        d2["Owners"] = pubKey_list
-        d2["Attributes"] = attribute_list
-        if len(recovery_bytes) != 0:
-            addr = Address(recovery_bytes)
-            d2["Recovery"] = addr.b58encode()
-        d2["OntId"] = ont_id
-        return d2

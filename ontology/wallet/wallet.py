@@ -181,11 +181,31 @@ class WalletData(object):
     def clear_identities(self):
         self.identities = list()
 
-    def add_identity(self, id: Identity):
-        for identity in self.identities:
-            if identity.ont_id == id.ont_id:
+    def add_identity(self, identity: Identity):
+        for item in self.identities:
+            if item.ont_id == identity.ont_id:
                 raise SDKException(ErrorCode.other_error('add identity failed, OntId conflict.'))
-        self.identities.append(id)
+        self.identities.append(identity)
+
+    def __create_identity(self, ont_id: str):
+        for item in self.identities:
+            if item.ont_id == ont_id:
+                return item
+        identity = Identity(ont_id=ont_id)
+        self.identities.append(identity)
+        return identity
+
+    def add_controller(self, ont_id, key: str, kid: int, pub_key: str):
+        try:
+            identity = self.get_identity_by_ont_id(ont_id)
+        except SDKException:
+            identity = self.__create_identity(ont_id)
+        for ctrl in identity.controls:
+            if ctrl.key == key:
+                return identity
+        ctrl = Control(key=key, kid=kid, public_key=pub_key)
+        identity.add_control(ctrl)
+        return identity
 
     def remove_identity(self, ont_id):
         for identity in self.identities:

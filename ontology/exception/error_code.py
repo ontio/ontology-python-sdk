@@ -10,8 +10,34 @@ class ErrorCode:
         data['desc'] = msg
         return data
 
+    @staticmethod
+    def unpack_error(msg: str) -> dict:
+        return ErrorCode.get_error(10001, 'Unpack Error, ' + msg)
+
+    @staticmethod
+    def params_type_error(msg: str) -> dict:
+        return ErrorCode.get_error(20000, 'Interface Error, ' + msg)
+
+    require_bool_params = get_error.__func__(20001, 'Interface Error, the type of parameter should be int.')
+    require_int_params = get_error.__func__(20002, 'Interface Error, the type of parameter should be int.')
+    require_float_params = get_error.__func__(20003, 'Interface Error, the type of parameter should be float.')
+    require_str_params = get_error.__func__(20004, 'Interface Error, the type of parameter should be str.')
+    require_bytes_params = get_error.__func__(20005, 'Interface Error, the type of parameter should be bytes.')
+    require_list_params = get_error.__func__(20006, 'Interface Error, the type of parameter should be list.')
+    require_tuple_params = get_error.__func__(20007, 'Interface Error, the type of parameter should be tuple.')
+    require_set_params = get_error.__func__(20008, 'Interface Error, the type of parameter should be set.')
+    require_dict_params = get_error.__func__(20009, 'Interface Error, the type of parameter should be dict.')
+    require_control_params = get_error.__func__(20009, 'Interface Error, a Control object is required.')
+
+
+    @staticmethod
+    def invalid_ont_id_format(ont_id: str):
+        return ErrorCode.get_error(30001, f'Identity Error, invalid OntId: {ont_id}')
+
+    invalid_ont_id_type = get_error.__func__(30002, 'Identity Error, invalid type of OntId')
+
     # account error
-    invalid_params = get_error.__func__(51001, "Account Error, invalid params")
+    invalid_acct_params = get_error.__func__(51001, "Account Error, invalid params")
     unsupported_key_type = get_error.__func__(51002, "Account Error,unsupported key type")
     invalid_message = get_error.__func__(51003, "Account Error, invalid message")
     without_private = get_error.__func__(51004, "Account Error, account without private key cannot generate signature")

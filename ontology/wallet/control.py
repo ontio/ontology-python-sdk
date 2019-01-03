@@ -5,7 +5,7 @@ from ontology.exception.exception import SDKException
 
 
 class Control(object):
-    def __init__(self, kid="", address='', enc_alg="aes-256-gcm", key="", algorithm='ECDSA', salt="", param=None,
+    def __init__(self, kid='', address='', enc_alg="aes-256-gcm", key='', algorithm='ECDSA', salt="", param=None,
                  hash_value="sha256", public_key=""):
         if param is None:
             param = {"curve": "P-256"}

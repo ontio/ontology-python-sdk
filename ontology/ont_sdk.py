@@ -240,7 +240,7 @@ class OntologySdk(object):
                 if tx.sigs[i].public_keys == pub_keys:
                     if len(tx.sigs[i].sig_data) + 1 > len(pub_keys):
                         raise SDKException(ErrorCode.param_err('too more sigData'))
-                    if tx.sigs[i].M != m:
+                    if tx.sigs[i].m != m:
                         raise SDKException(ErrorCode.param_err('M error'))
                     tx.sigs[i].sig_data.append(sig_data)
                     return tx

@@ -7,6 +7,7 @@ from ontology.ont_sdk import OntologySdk
 
 password = environ['SDK_TEST_PASSWORD']
 sdk = OntologySdk()
+sdk.rpc.connect_to_test_net()
 wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
 wallet_manager = sdk.wallet_manager
 wallet_manager.open_wallet(wallet_path)
@@ -14,4 +15,5 @@ acct1 = wallet_manager.get_account_by_b58_address('ANDfjwrUroaVtvBguDtrWKRMyxFwv
 acct2 = wallet_manager.get_account_by_b58_address('Af1n2cZHhMZumNqKgw9sfCNoTWu9de4NDn', password)
 acct3 = wallet_manager.get_account_by_b58_address('AXJZrP1jBRo398ebfyemsDxDaThsxcXGMk', password)
 acct4 = wallet_manager.get_account_by_b58_address('APvHaLmJUMdAHiVbFHGi11gnFpuK6ozD5j', password)
+identity1 = wallet_manager.get_identity_by_ont_id('did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD')
 wallet_manager.save()

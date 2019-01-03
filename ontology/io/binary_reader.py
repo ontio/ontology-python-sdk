@@ -45,7 +45,11 @@ class BinaryReader(object):
         Returns:
             variable: the result according to the specified format.
         """
-        return struct.unpack(fmt, self.stream.read(length))[0]
+        try:
+            info = struct.unpack(fmt, self.stream.read(length))[0]
+        except struct.error as e:
+            raise SDKException(ErrorCode.unpack_error(e.args[0]))
+        return info
 
     def read_byte(self, do_ord=True) -> int:
         """
