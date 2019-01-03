@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import json
 import time
 import unittest
 
 from ontology.crypto.curve import Curve
 from ontology.crypto.signature import Signature
 from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct1, acct2, acct3, acct4
+from test import acct2
 
 from Cryptodome.Random.random import randint
 
@@ -27,6 +27,33 @@ class TestOntId(unittest.TestCase):
         ont_id = sdk.native_vm.ont_id()
         tx_hash = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
         ont_id.get_merkle_proof(tx_hash)
+
+    def test_get_public_keys(self):
+        ont_id = 'did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR'
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
+        for pk in pub_keys:
+            self.assertIn(ont_id, pk['PubKeyId'])
+            self.assertEqual('ECDSA', pk['Type'])
+            self.assertEqual('P256', pk['Curve'])
+            self.assertEqual(66, len(pk['Value']))
+        ont_id = 'did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD'
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
+        for pk in pub_keys:
+            self.assertIn(ont_id, pk['PubKeyId'])
+            self.assertEqual('ECDSA', pk['Type'])
+            self.assertEqual('P256', pk['Curve'])
+            self.assertEqual(66, len(pk['Value']))
+
+    def test_send_get_ddo(self):
+        ont_id = sdk.native_vm.ont_id()
+        hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
+        acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
+        parsed_ddo = ont_id.send_get_ddo(acct_did)
+        print(json.dumps(parsed_ddo, indent=4))
+        self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', parsed_ddo['Owners'][0]['Curve'])
+        self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
 
     def test_new_registry_ont_id_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -68,29 +95,6 @@ class TestOntId(unittest.TestCase):
                   'service execute error!: [Invoke] Native serivce function execute error!: ' \
                   'register ONT ID error: already registered'
             self.assertEqual(msg, e.args[1])
-
-    def test_send_get_ddo(self):
-        ont_id = sdk.native_vm.ont_id()
-        hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
-        acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        parsed_ddo = ont_id.send_get_ddo(acct_did)
-        self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
-        self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])
-        self.assertEqual('P256', parsed_ddo['Owners'][0]['Curve'])
-        self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
-
-    def test_new_get_ddo_transaction(self):
-        ont_id = sdk.native_vm.ont_id()
-        hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
-        acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        tx = ont_id.new_get_ddo_transaction(acct_did)
-        response = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        ddo = response['Result']
-        parsed_ddo = ont_id.parse_ddo(acct_did, ddo)
-        self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
-        self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])
-        self.assertEqual('P256', parsed_ddo['Owners'][0]['Curve'])
-        self.assertEqual(hex_public_key, parsed_ddo['Owners'][0]['Value'])
 
     def test_new_add_attribute_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -246,8 +250,8 @@ class TestOntId(unittest.TestCase):
         password = 'password'
         gas_limit = 20000
         gas_price = 500
-        tx_hash = ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
-                                                         gas_price)
+        tx_hash = ont_id.add_public_key(identity, password, hex_new_public_key, acct, gas_limit,
+                                        gas_price)
         time.sleep(randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = '0300000000000000000000000000000000000000'
@@ -257,8 +261,8 @@ class TestOntId(unittest.TestCase):
         self.assertIn(identity.ont_id, notify['States'])
         self.assertIn(hex_new_public_key, notify['States'])
         try:
-            ont_id.send_add_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
-                                                   gas_price)
+            ont_id.add_public_key(identity, password, hex_new_public_key, acct, gas_limit,
+                                  gas_price)
         except SDKException as e:
             self.assertIn('already exists', e.args[1])
         tx_hash = ont_id.send_remove_public_key_transaction(identity, password, hex_new_public_key, acct, gas_limit,
