@@ -10,6 +10,7 @@ from ontology.common.define import DID_ONT
 from ontology.wallet.wallet import WalletData
 from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
+from ontology.exception.exception import SDKException
 
 
 class TestWalletData(unittest.TestCase):
@@ -93,6 +94,11 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
+            try:
+                rand_id = str(randint(0, 1000000000))
+                Identity(ont_id=rand_id)
+            except SDKException as e:
+                self.assertTrue(isinstance(e, SDKException))
             rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
@@ -138,6 +144,10 @@ class TestWalletData(unittest.TestCase):
             self.assertEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
             rand_id = DID_ONT + str(randint(0, 1000000000))
             wallet_1.identities[i].ont_id = rand_id
+            try:
+                wallet_1.identities[i].ont_id = str(randint(0, 1000000000))
+            except SDKException as e:
+                self.assertTrue(isinstance(e, SDKException))
             self.assertNotEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
             self.assertNotEqual(id(wallet_1.identities[i]), id(wallet_2.identities[i]))
 
