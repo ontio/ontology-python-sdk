@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import copy
 import random
 import unittest
 
@@ -36,7 +36,6 @@ class TestWalletData(unittest.TestCase):
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
-
         for i in range(size):
             rand_address = choice(address_list)
             wallet.remove_account(rand_address)
@@ -118,6 +117,28 @@ class TestWalletData(unittest.TestCase):
             self.assertEqual(len(wallet.get_identities()), i + 1)
         identities = wallet.get_identities()
         self.assertEqual(len(identities), size)
+
+    def test_deep_copy(self):
+        wallet_1 = WalletData()
+        size = 10
+        id_list = list()
+        for i in range(size):
+            rand_id = str(randint(0, 1000000000))
+            identity = Identity(ont_id=rand_id)
+            wallet_1.add_identity(identity)
+            id_list.append(rand_id)
+            self.assertEqual(len(wallet_1.get_identities()), i + 1)
+        wallet_2 = copy.deepcopy(wallet_1)
+        self.assertNotEqual(id(wallet_1), id(wallet_2))
+        self.assertEqual(wallet_1.name, wallet_2.name)
+        wallet_2.name = 'newWallet'
+        self.assertNotEqual(id(wallet_1.name), id(wallet_2.name))
+        for i in range(size):
+            self.assertEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
+            rand_id = str(randint(0, 1000000000))
+            wallet_1.identities[i].ont_id = rand_id
+            self.assertNotEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
+            self.assertNotEqual(id(wallet_1.identities[i]), id(wallet_2.identities[i]))
 
 
 if __name__ == '__main__':
