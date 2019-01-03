@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import copy
 import json
 import uuid
 import base64
@@ -84,7 +85,7 @@ class WalletManager(object):
         return self.wallet_file
 
     def reset_wallet(self):
-        self.wallet_in_mem = self.wallet_file.clone()
+        self.wallet_in_mem = copy.deepcopy(self.wallet_file)
         return self.wallet_in_mem
 
     def get_signature_scheme(self):
@@ -259,7 +260,7 @@ class WalletManager(object):
         :return:
         """
         if not ont_id.startswith(DID_ONT):
-            raise SDKException(ErrorCode.other_error('Invalid OntId.'))
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
         for identity in self.wallet_in_mem.identities:
             if identity.ont_id == ont_id:
                 addr = identity.ont_id.replace(DID_ONT, "")
@@ -272,6 +273,35 @@ class WalletManager(object):
 
     def get_identity_by_ont_id(self, ont_id: str) -> Identity:
         return self.wallet_in_mem.get_identity_by_ont_id(ont_id)
+
+    def get_control_account_by_index(self, ont_id: str, index: int, password: str) -> Account:
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        identity = self.get_identity_by_ont_id(ont_id)
+        try:
+            ctrl = identity.controls[index]
+        except IndexError:
+            raise SDKException(ErrorCode.other_error(f'Get {ont_id}\'s control account failed.'))
+        salt = base64.b64decode(ctrl.salt)
+        key = ctrl.key
+        b58_address = ctrl.b58_address
+        n = self.wallet_in_mem.scrypt.n
+        private_key = Account.get_gcm_decoded_private_key(key, password, b58_address, salt, n, self.scheme)
+        return Account(private_key, self.scheme)
+
+    def get_control_account_by_b58_address(self, ont_id: str, b58_address: str, password: str) -> Account:
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        identity = self.get_identity_by_ont_id(ont_id)
+        for ctrl in identity.controls:
+            if ctrl.b58_address == b58_address:
+                salt = base64.b64decode(ctrl.salt)
+                key = ctrl.key
+                b58_address = ctrl.b58_address
+                n = self.wallet_in_mem.scrypt.n
+                private_key = Account.get_gcm_decoded_private_key(key, password, b58_address, salt, n, self.scheme)
+                return Account(private_key, self.scheme)
+        raise SDKException(ErrorCode.other_error(f'Get account {b58_address} failed.'))
 
     def get_account_by_b58_address(self, b58_address: str, password: str) -> Account:
         """
