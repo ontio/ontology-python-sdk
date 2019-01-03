@@ -46,5 +46,5 @@ class Identity(object):
 
     def add_control(self, ctrl: Control):
         if not isinstance(ctrl, Control):
-            raise SDKException(ErrorCode.params_type_error('control object is required.'))
+            raise SDKException(ErrorCode.require_control_params)
         self.__controls.append(ctrl)
