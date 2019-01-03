@@ -224,8 +224,9 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            msg = 'balance insufficient'
-            self.assertIn(msg, e.args[1])
+            msg1 = 'balance insufficient'
+            msg2 = 'already in the tx pool'
+            self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
             return
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))

@@ -48,7 +48,7 @@ class TestOntId(unittest.TestCase):
         ont_id = sdk.native_vm.ont_id()
         hex_public_key = '035384561673e76c7e3003e705e4aa7aee67714c8b68d62dd1fb3221f48c5d3da0'
         acct_did = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        parsed_ddo = ont_id.send_get_ddo(acct_did)
+        parsed_ddo = ont_id.get_ddo(acct_did)
         print(json.dumps(parsed_ddo, indent=4))
         self.assertIn(acct_did, parsed_ddo['Owners'][0]['PubKeyId'])
         self.assertEqual('ECDSA', parsed_ddo['Owners'][0]['Type'])
