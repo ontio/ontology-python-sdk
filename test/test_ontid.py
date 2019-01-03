@@ -70,10 +70,7 @@ class TestOntId(unittest.TestCase):
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
             self.assertEqual(59000, e.args[0])
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] ' \
-                  'service execute error!: [Invoke] Native serivce function execute error!: ' \
-                  'register ONT ID error: already registered'
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('already registered', e.args[1])
 
     def test_send_registry(self):
         ont_id = sdk.native_vm.ont_id()
@@ -91,10 +88,7 @@ class TestOntId(unittest.TestCase):
             ont_id.send_registry_ont_id_transaction(identity, password, acct2, gas_limit, gas_price)
         except SDKException as e:
             self.assertEqual(59000, e.args[0])
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] ' \
-                  'service execute error!: [Invoke] Native serivce function execute error!: ' \
-                  'register ONT ID error: already registered'
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('already registered', e.args[1])
 
     def test_new_add_attribute_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -131,11 +125,8 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(acct_did, notify[0]['States'][2])
             self.assertEqual('try', bytes.fromhex(notify[0]['States'][3]).decode())
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: ' \
-                  '[SystemCall] service execute error!: [Invoke] Native serivce function execute error!: ' \
-                  'remove attribute failed: attribute not exist'
             self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('attribute not exist', e.args[1])
 
     def test_send_add_attributes(self):
         ont_id = sdk.native_vm.ont_id()
@@ -147,7 +138,7 @@ class TestOntId(unittest.TestCase):
         try:
             identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
         except SDKException as e:
-            self.assertIn('Wallet identity exists', e.args[1])
+            self.assertIn('identity exists', e.args[1])
             return
         gas_limit = 20000
         gas_price = 500
@@ -178,11 +169,8 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(identity.ont_id, notify[0]['States'][2])
             self.assertEqual('try', bytes.fromhex(notify[0]['States'][3]).decode())
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: ' \
-                  '[SystemCall] service execute error!: [Invoke] Native serivce function execute error!: ' \
-                  'remove attribute failed: attribute not exist'
             self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('attribute not exist', e.args[1])
 
     def test_new_add_remove_public_key_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -209,10 +197,8 @@ class TestOntId(unittest.TestCase):
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute error!:' \
-                  ' [Invoke] Native serivce function execute error!: add key failed: already exists'
             self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('already exists', e.args[1])
 
         tx = ont_id.new_remove_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address,
                                                       gas_limit, gas_price)
@@ -227,11 +213,8 @@ class TestOntId(unittest.TestCase):
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute ' \
-                  'error!: [Invoke] Native serivce function execute error!: remove key failed: ' \
-                  'public key has already been revoked'
             self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('already been revoked', e.args[1])
 
     def test_send_add_remove_public_key_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -298,11 +281,8 @@ class TestOntId(unittest.TestCase):
         try:
             sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] service execute ' \
-                  'error!: [Invoke] Native serivce function execute error!: add recovery failed: already ' \
-                  'set recovery'
             self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('already set recovery', e.args[1])
 
     def test_send_add_recovery_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -324,11 +304,8 @@ class TestOntId(unittest.TestCase):
         try:
             ont_id.send_add_recovery_transaction(identity, password, b58_recovery_address, acct, gas_limit, gas_price)
         except SDKException as e:
-            msg = 'Other Error, [NeoVmService] service system call error!: [SystemCall] ' \
-                  'service execute error!: [Invoke] Native serivce function execute error!: ' \
-                  'add recovery failed: already set recovery'
             self.assertEqual(59000, e.args[0])
-            self.assertEqual(msg, e.args[1])
+            self.assertIn('already set recovery', e.args[1])
 
     # TODO: test_send_add_public_key_by_recovery
 
