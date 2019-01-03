@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import copy
 from typing import List
 
 from ontology.crypto.scrypt import Scrypt
@@ -32,16 +33,22 @@ class WalletData(object):
         for dict_identity in identities:
             if isinstance(dict_identity, dict):
                 list_controls = list()
+                is_default = dict_identity.get('isDefault', False)
+                for ctrl_data in dict_identity['controls']:
+                    hash_value = ctrl_data.get('hash', 'sha256')
+                    public_key = ctrl_data.get('publicKey', '')
+                    try:
+                        ctrl = Control(kid=ctrl_data['id'], address=ctrl_data['address'], enc_alg=ctrl_data['enc-alg'],
+                                       key=ctrl_data['key'], algorithm=ctrl_data['algorithm'], salt=ctrl_data['salt'],
+                                       param=ctrl_data['parameters'], hash_value=hash_value, public_key=public_key)
+                    except KeyError:
+                        raise SDKException(ErrorCode.other_error('invalid parameters.'))
+                    list_controls.append(ctrl)
                 try:
-
-                    is_default = dict_identity.get('isDefault', False)
-                    for control_data in dict_identity['controls']:
-                        list_controls.append(Control.dict2obj(control_data))
                     identity = Identity(ont_id=dict_identity['ontid'], label=dict_identity['label'],
-                                        lock=dict_identity['lock'], controls=list_controls,
-                                        is_default=is_default)
+                                        lock=dict_identity['lock'], controls=list_controls, is_default=is_default)
                 except KeyError:
-                    raise SDKException(ErrorCode.param_error)
+                    raise SDKException(ErrorCode.other_error('invalid parameters.'))
                 self.identities.append(identity)
             else:
                 self.identities = identities
@@ -78,18 +85,6 @@ class WalletData(object):
         data['accounts'] = self.accounts
         for key, value in data.items():
             yield (key, value)
-
-    def clone(self):
-        wallet = WalletData()
-        wallet.name = self.name
-        wallet.version = self.version
-        wallet.create_time = self.create_time
-        wallet.default_ont_id = self.default_ont_id
-        wallet.default_account_address = self.default_account_address
-        wallet.scrypt = self.scrypt
-        wallet.accounts = self.accounts
-        wallet.set_identities(self.identities)
-        return wallet
 
     def add_account(self, acct: AccountData):
         """

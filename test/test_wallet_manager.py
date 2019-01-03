@@ -52,7 +52,7 @@ class TestWalletManager(unittest.TestCase):
 
     def test_wallet_data(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'wallet.dat')
+        path = os.path.join(os.path.dirname(__file__), 'wallet.json')
         self.assertRaises(SDKException, wm.create_wallet, path)
         wm.open_wallet(path)
         self.assertTrue(isinstance(wm, WalletManager))

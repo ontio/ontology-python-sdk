@@ -29,7 +29,6 @@ class ErrorCode:
     require_dict_params = get_error.__func__(20009, 'Interface Error, the type of parameter should be dict.')
     require_control_params = get_error.__func__(20009, 'Interface Error, a Control object is required.')
 
-
     @staticmethod
     def invalid_ont_id_format(ont_id: str):
         return ErrorCode.get_error(30001, f'Identity Error, invalid OntId: {ont_id}')

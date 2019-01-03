@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import copy
 import random
 import unittest
 
 from Cryptodome.Random.random import randint, choice
 
+from ontology.common.define import DID_ONT
 from ontology.wallet.wallet import WalletData
 from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
+from ontology.exception.exception import SDKException
 
 
 class TestWalletData(unittest.TestCase):
@@ -36,7 +38,6 @@ class TestWalletData(unittest.TestCase):
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
-
         for i in range(size):
             rand_address = choice(address_list)
             wallet.remove_account(rand_address)
@@ -82,7 +83,7 @@ class TestWalletData(unittest.TestCase):
         wallet = WalletData(default_id=test_id)
         size = 10
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             self.assertEqual(len(wallet.get_identities()), i + 1)
@@ -93,7 +94,12 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            try:
+                rand_id = str(randint(0, 1000000000))
+                Identity(ont_id=rand_id)
+            except SDKException as e:
+                self.assertTrue(isinstance(e, SDKException))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
@@ -111,13 +117,39 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
             self.assertEqual(len(wallet.get_identities()), i + 1)
         identities = wallet.get_identities()
         self.assertEqual(len(identities), size)
+
+    def test_deep_copy(self):
+        wallet_1 = WalletData()
+        size = 10
+        id_list = list()
+        for i in range(size):
+            rand_id = DID_ONT + str(randint(0, 1000000000))
+            identity = Identity(ont_id=rand_id)
+            wallet_1.add_identity(identity)
+            id_list.append(rand_id)
+            self.assertEqual(len(wallet_1.get_identities()), i + 1)
+        wallet_2 = copy.deepcopy(wallet_1)
+        self.assertNotEqual(id(wallet_1), id(wallet_2))
+        self.assertEqual(wallet_1.name, wallet_2.name)
+        wallet_2.name = 'newWallet'
+        self.assertNotEqual(id(wallet_1.name), id(wallet_2.name))
+        for i in range(size):
+            self.assertEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
+            rand_id = DID_ONT + str(randint(0, 1000000000))
+            wallet_1.identities[i].ont_id = rand_id
+            try:
+                wallet_1.identities[i].ont_id = str(randint(0, 1000000000))
+            except SDKException as e:
+                self.assertTrue(isinstance(e, SDKException))
+            self.assertNotEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
+            self.assertNotEqual(id(wallet_1.identities[i]), id(wallet_2.identities[i]))
 
 
 if __name__ == '__main__':

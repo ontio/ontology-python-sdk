@@ -3,6 +3,7 @@
 
 from typing import List
 
+from ontology.common.define import DID_ONT
 from ontology.wallet.control import Control
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -14,8 +15,10 @@ class Identity(object):
         if controls is None:
             controls = list()
         if not isinstance(ont_id, str):
-            raise SDKException(ErrorCode.invalid_ont_id_type)
-        self.ont_id = ont_id
+            raise SDKException(ErrorCode.require_str_params)
+        if len(ont_id) != 0 and not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        self.__ont_id = ont_id
         self.label = label
         self.lock = lock
         self.__controls = controls
@@ -23,13 +26,25 @@ class Identity(object):
 
     def __iter__(self):
         data = dict()
-        data['ontid'] = self.ont_id
+        data['ontid'] = self.__ont_id
         data['label'] = self.label
         data['lock'] = self.lock
         data['controls'] = self.__controls
         data['isDefault'] = self.is_default
         for key, value in data.items():
             yield (key, value)
+
+    @property
+    def ont_id(self):
+        return self.__ont_id
+
+    @ont_id.setter
+    def ont_id(self, ont_id: str):
+        if not isinstance(ont_id, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if len(ont_id) != 0 and not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        self.__ont_id = ont_id
 
     @property
     def controls(self):
@@ -46,5 +61,5 @@ class Identity(object):
 
     def add_control(self, ctrl: Control):
         if not isinstance(ctrl, Control):
-            raise SDKException(ErrorCode.params_type_error('control object is required.'))
+            raise SDKException(ErrorCode.require_control_params)
         self.__controls.append(ctrl)
