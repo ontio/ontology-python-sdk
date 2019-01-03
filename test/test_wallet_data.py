@@ -6,6 +6,7 @@ import unittest
 
 from Cryptodome.Random.random import randint, choice
 
+from ontology.common.define import DID_ONT
 from ontology.wallet.wallet import WalletData
 from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
@@ -81,7 +82,7 @@ class TestWalletData(unittest.TestCase):
         wallet = WalletData(default_id=test_id)
         size = 10
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             self.assertEqual(len(wallet.get_identities()), i + 1)
@@ -92,7 +93,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
@@ -110,7 +111,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet.add_identity(identity)
             id_list.append(rand_id)
@@ -123,7 +124,7 @@ class TestWalletData(unittest.TestCase):
         size = 10
         id_list = list()
         for i in range(size):
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             identity = Identity(ont_id=rand_id)
             wallet_1.add_identity(identity)
             id_list.append(rand_id)
@@ -135,7 +136,7 @@ class TestWalletData(unittest.TestCase):
         self.assertNotEqual(id(wallet_1.name), id(wallet_2.name))
         for i in range(size):
             self.assertEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
-            rand_id = str(randint(0, 1000000000))
+            rand_id = DID_ONT + str(randint(0, 1000000000))
             wallet_1.identities[i].ont_id = rand_id
             self.assertNotEqual(wallet_1.identities[i].ont_id, wallet_2.identities[i].ont_id)
             self.assertNotEqual(id(wallet_1.identities[i]), id(wallet_2.identities[i]))
