@@ -16,12 +16,6 @@ class TestAccount(unittest.TestCase):
         data = AccountData()
         self.assertEqual(data.algorithm, 'ECDSA')
 
-    def test_wallet_data_clone(self):
-        ont_id = 'test_ont_id'
-        w = WalletData(default_id=ont_id)
-        clone_wallet = w.clone()
-        self.assertEqual(clone_wallet.__dict__['default_ont_id'], ont_id)
-
     def test_export_gcm_encrypted_private_key(self):
         private_key = utils.get_random_bytes(32).hex()
         account = Account(private_key, SignatureScheme.SHA256withECDSA)
