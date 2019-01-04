@@ -68,10 +68,6 @@ def uint256_from_hex_string(s: str) -> bytearray:
     return uint256_parse_from_bytes(to_array_reverse(hx))
 
 
-def is_file_exist(file_path: str) -> bool:
-    return os.path.isfile(file_path)
-
-
 def parse_pre_exec_result(return_value, return_type):
     if isinstance(return_type, int) and return_type >= 1 and return_type <= 4:
         res = parse_neo_vm_contract_return_type(return_value, return_type)
