@@ -197,6 +197,14 @@ class Account(object):
         """
         return self.__public_key
 
+    def get_public_key_bytearray(self) -> bytearray:
+        """
+        This interface is used to get the public key in the form of bytearray.
+
+        :return: the public key in the form of bytearray.
+        """
+        return bytearray(self.__public_key)
+
     def get_public_key_hex(self) -> str:
         """
         This interface is used to get the account's hexadecimal public key in the form of string.
