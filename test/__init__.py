@@ -15,5 +15,7 @@ acct1 = wallet_manager.get_account_by_b58_address('ANDfjwrUroaVtvBguDtrWKRMyxFwv
 acct2 = wallet_manager.get_account_by_b58_address('Af1n2cZHhMZumNqKgw9sfCNoTWu9de4NDn', password)
 acct3 = wallet_manager.get_account_by_b58_address('AXJZrP1jBRo398ebfyemsDxDaThsxcXGMk', password)
 acct4 = wallet_manager.get_account_by_b58_address('APvHaLmJUMdAHiVbFHGi11gnFpuK6ozD5j', password)
-identity1 = wallet_manager.get_identity_by_ont_id('did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD')
+ont_id_1 = 'did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD'
+identity1 = wallet_manager.get_identity_by_ont_id(ont_id_1)
+identity1_ctrl_acct = wallet_manager.get_control_account_by_index(ont_id_1, 0, password)
 wallet_manager.save()
