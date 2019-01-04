@@ -12,13 +12,13 @@ from random import choice
 from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
+from ontology.smart_contract.neo_vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
-from ontology.smart_contract.neo_vm import NeoVm
 
 TEST_RPC_ADDRESS = ['http://polaris1.ont.io:20336', 'http://polaris2.ont.io:20336', 'http://polaris3.ont.io:20336']
 MAIN_RPC_ADDRESS = ['http://dappnode1.ont.io:20336', 'http://dappnode2.ont.io:20336']
@@ -88,6 +88,8 @@ class RpcClient(object):
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url]))) from None
         except requests.exceptions.ConnectionError:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from None
+        except requests.exceptions.ReadTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ReadTimeout: ', url]))) from None
         try:
             content = response.content.decode('utf-8')
         except Exception as e:

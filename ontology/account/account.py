@@ -104,7 +104,7 @@ class Account(object):
         """
         return self.__signature_scheme
 
-    def export_gcm_encrypted_private_key(self, password: str, salt: str, n: int) -> str:
+    def export_gcm_encrypted_private_key(self, password: str, salt: str, n: int = 16384) -> str:
         """
         This interface is used to export an AES algorithm encrypted private key with the mode of GCM.
 
