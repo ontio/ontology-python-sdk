@@ -35,6 +35,10 @@ class ErrorCode:
 
     invalid_ont_id_type = get_error.__func__(30002, 'Identity Error, invalid type of OntId')
 
+    @staticmethod
+    def invalid_wallet_path(path: str):
+        return ErrorCode.get_error(40001, f'WalletManager Error, invalid path: {path}')
+
     # account error
     invalid_acct_params = get_error.__func__(51001, "Account Error, invalid params")
     unsupported_key_type = get_error.__func__(51002, "Account Error,unsupported key type")
