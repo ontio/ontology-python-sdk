@@ -38,7 +38,7 @@ class WalletManager(object):
         if not is_file_exist(wallet_path):
             raise SDKException(ErrorCode.other_error('Wallet file not found.'))
         self.wallet_file = self.load_file()
-        self.wallet_in_mem = self.wallet_file
+        self.wallet_in_mem = copy.deepcopy(self.wallet_file)
         return self.wallet_file
 
     def create_wallet(self, wallet_path: str):
@@ -159,18 +159,16 @@ class WalletManager(object):
 
     def __create_account(self, label: str, pwd: str, salt: str, private_key: str, account_flag: bool) -> Account:
         account = Account(private_key, self.scheme)
-        # initialization
         if self.scheme == SignatureScheme.SHA256withECDSA:
-            acct = AccountData()
+            acct_data = AccountData()
         else:
             raise SDKException(ErrorCode.other_error('Scheme type is error.'))
-        # set key
         if pwd is not None:
-            acct.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().n)
+            acct_data.key = account.export_gcm_encrypted_private_key(pwd, salt, Scrypt().n)
         else:
-            acct.key = account.get_private_key_hex()
+            acct_data.key = account.get_private_key_hex()
 
-        acct.b58_address = account.get_address_base58()
+        acct_data.b58_address = account.get_address_base58()
         # set label
         if label is None or label == '':
             label = uuid.uuid4().hex[0:8]
@@ -179,26 +177,58 @@ class WalletManager(object):
                 if memory_acct.b58_address == account.get_address_base58():
                     raise SDKException(ErrorCode.other_error('Wallet account exists.'))
             if len(self.wallet_in_mem.accounts) == 0:
-                acct.is_default = True
-                self.wallet_in_mem.default_account_address = acct.b58_address
-            acct.label = label
-            acct.salt = base64.b64encode(salt.encode('latin-1')).decode('ascii')
-            acct.public_key = account.get_public_key_hex()
-            self.wallet_in_mem.accounts.append(acct)
+                acct_data.is_default = True
+                self.wallet_in_mem.default_account_address = acct_data.b58_address
+            acct_data.label = label
+            acct_data.salt = base64.b64encode(salt.encode('latin-1')).decode('ascii')
+            acct_data.public_key = account.get_public_key_hex()
+            self.wallet_in_mem.accounts.append(acct_data)
         else:
             for identity in self.wallet_in_mem.identities:
-                if identity.ont_id == DID_ONT + acct.b58_address:
+                if identity.ont_id == DID_ONT + acct_data.b58_address:
                     raise SDKException(ErrorCode.other_error('Wallet identity exists.'))
             idt = Identity()
-            idt.ont_id = DID_ONT + acct.b58_address
+            idt.ont_id = DID_ONT + acct_data.b58_address
             idt.label = label
             if len(self.wallet_in_mem.identities) == 0:
                 idt.is_default = True
                 self.wallet_in_mem.default_ont_id = idt.ont_id
-            ctl = Control(kid='keys-1', key=acct.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
-                          address=acct.b58_address, public_key=account.get_public_key_hex())
+            ctl = Control(kid='keys-1', key=acct_data.key, salt=base64.b64encode(salt.encode()).decode('ascii'),
+                          address=acct_data.b58_address, public_key=account.get_public_key_hex())
             idt.controls.append(ctl)
             self.wallet_in_mem.identities.append(idt)
+        return account
+
+    def add_control(self, ont_id: str, password: str):
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        if not isinstance(password, str):
+            raise SDKException(ErrorCode.require_str_params)
+        private_key = get_random_bytes(32)
+        salt = get_random_hex_str(16)
+        b64_salt = base64.b64encode(salt.encode('utf-8')).decode('ascii')
+        account = Account(private_key, self.scheme)
+        key = account.export_gcm_encrypted_private_key(password, salt, Scrypt().n)
+        b58_address = account.get_address_base58()
+        public_key = account.get_public_key_hex()
+        ctrl = Control(kid='', key=key, salt=b64_salt, address=b58_address, public_key=public_key)
+        identity = self.get_identity_by_ont_id(ont_id)
+        identity.add_control(ctrl)
+
+    def add_control_by_private_key(self, ont_id: str, password: str, private_key: str) -> Account:
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        if not isinstance(password, str):
+            raise SDKException(ErrorCode.require_str_params)
+        salt = get_random_hex_str(16)
+        b64_salt = base64.b64encode(salt.encode('utf-8')).decode('ascii')
+        account = Account(private_key, self.scheme)
+        key = account.export_gcm_encrypted_private_key(password, salt, Scrypt().n)
+        b58_address = account.get_address_base58()
+        public_key = account.get_public_key_hex()
+        ctrl = Control(kid='', key=key, salt=b64_salt, address=b58_address, public_key=public_key)
+        identity = self.get_identity_by_ont_id(ont_id)
+        identity.add_control(ctrl)
         return account
 
     def import_account(self, label: str, encrypted_pri_key: str, pwd: str, base58_address: str,
