@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
 import binascii
 import unittest
 
 from time import sleep
-from test import acct1, acct2, acct3, acct4
+from test import acct1, acct2, acct4
 
 from ontology.ont_sdk import OntologySdk
-from ontology.common.address import Address
 from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
