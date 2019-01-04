@@ -79,6 +79,10 @@ class ContractDataParser(object):
         return utf8_str
 
     @staticmethod
+    def to_hex_str(bytes_str: str) -> str:
+        return binascii.b2a_hex(bytes_str).decode('ascii')
+
+    @staticmethod
     def to_utf8_str_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):

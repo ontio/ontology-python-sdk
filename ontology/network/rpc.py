@@ -88,6 +88,8 @@ class RpcClient(object):
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url]))) from None
         except requests.exceptions.ConnectionError:
             raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from None
+        except requests.exceptions.ReadTimeout:
+            raise SDKException(ErrorCode.other_error(''.join(['ReadTimeout: ', url]))) from None
         try:
             content = response.content.decode('utf-8')
         except Exception as e:
