@@ -26,7 +26,7 @@ class Address(object):
         self.ZERO = script_hash
 
     @staticmethod
-    def to_script_hash(byte_script):
+    def to_script_hash(byte_script) -> bytes:
         return a2b_hex(Digest.hash160(msg=byte_script, is_hex=True))
 
     @staticmethod
@@ -52,7 +52,8 @@ class Address(object):
         :param code: str
         :return: Address
         """
-        return Address(Address.to_script_hash(bytearray.fromhex(code)))
+        script_hash = Address.to_script_hash(bytearray.fromhex(code))[::-1]
+        return Address(script_hash)
 
     def b58encode(self):
         script_builder = Address.__COIN_VERSION + self.ZERO

@@ -23,7 +23,7 @@ class NeoVm(object):
 
     @staticmethod
     def avm_code_to_hex_contract_address(avm_code: str):
-        hex_contract_address = Address.address_from_vm_code(avm_code).to_reverse_hex_str()
+        hex_contract_address = Address.address_from_vm_code(avm_code).to_hex_str()
         return hex_contract_address
 
     @staticmethod

@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
 class Control(object):
-    def __init__(self, kid='', address='', enc_alg="aes-256-gcm", key='', algorithm='ECDSA', salt="", param=None,
-                 hash_value="sha256", public_key=""):
+    def __init__(self, kid: str = '', address='', enc_alg="aes-256-gcm", key='', algorithm='ECDSA', salt='', param=None,
+                 hash_value='sha256', public_key=''):
         if param is None:
-            param = {"curve": "P-256"}
+            param = dict(curve='P-256')
+        if not isinstance(kid, str):
+            raise SDKException(ErrorCode.require_str_params)
         self.__address = address
         self.algorithm = algorithm
         self.enc_alg = enc_alg
         self.hash = hash_value
-        self.kid = kid
+        self.__kid = kid
         self.__key = key
         self.parameters = param
         self.__salt = salt
@@ -25,13 +28,23 @@ class Control(object):
         data['algorithm'] = self.algorithm
         data['enc-alg'] = self.enc_alg
         data['hash'] = self.hash
-        data['id'] = self.kid
+        data['id'] = self.__kid
         data['key'] = self.key
         data['parameters'] = self.parameters
         data['salt'] = self.__salt
         data['publicKey'] = self.__public_key
         for key, value in data.items():
             yield (key, value)
+
+    @property
+    def kid(self):
+        return self.__kid
+
+    @kid.setter
+    def kid(self, kid: str):
+        if not isinstance(kid, str):
+            raise SDKException(ErrorCode.require_str_params)
+        self.__kid = kid
 
     @property
     def key(self):
