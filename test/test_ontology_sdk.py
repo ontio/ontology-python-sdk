@@ -20,7 +20,7 @@ class TestOntologySdk(unittest.TestCase):
     def test_open_wallet(self):
         path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, sdk.wallet_manager.open_wallet, path)
-        sdk.wallet_manager.create_wallet(path)
+        sdk.wallet_manager.create_wallet_file(path)
         wallet = sdk.wallet_manager.open_wallet(path)
         self.assertTrue(wallet, isinstance(wallet, WalletData))
         os.remove(path)
