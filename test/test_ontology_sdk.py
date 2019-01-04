@@ -19,11 +19,13 @@ sdk.rpc.connect_to_test_net()
 class TestOntologySdk(unittest.TestCase):
     def test_open_wallet(self):
         path = os.path.join(os.path.dirname(__file__), 'test.json')
-        self.assertRaises(SDKException, sdk.wallet_manager.open_wallet, path)
+        self.assertRaises(SDKException, sdk.wallet_manager.open_wallet)
         sdk.wallet_manager.create_wallet_file(path)
-        wallet = sdk.wallet_manager.open_wallet(path)
-        self.assertTrue(wallet, isinstance(wallet, WalletData))
-        os.remove(path)
+        try:
+            wallet = sdk.wallet_manager.open_wallet(path)
+            self.assertTrue(wallet, isinstance(wallet, WalletData))
+        finally:
+            sdk.wallet_manager.del_wallet_file()
 
     def test_add_multi_sign_transaction(self):
         asset = sdk.native_vm.asset()
