@@ -5,6 +5,7 @@ import copy
 from typing import List
 
 from ontology.crypto.scrypt import Scrypt
+from ontology.common.define import DID_ONT
 from ontology.wallet.control import Control
 from ontology.wallet.identity import Identity
 from ontology.wallet.account import AccountData
@@ -190,7 +191,15 @@ class WalletData(object):
         self.identities.append(identity)
         return identity
 
-    def add_controller(self, ont_id, key: str, kid: int, pub_key: str):
+    def add_controller(self, ont_id: str, key: str, kid: int, pub_key: str):
+        if not isinstance(ont_id, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        if not isinstance(kid, int):
+            raise SDKException(ErrorCode.require_int_params)
+        if not isinstance(pub_key, str):
+            raise SDKException(ErrorCode.require_str_params)
         try:
             identity = self.get_identity_by_ont_id(ont_id)
         except SDKException:
@@ -198,7 +207,7 @@ class WalletData(object):
         for ctrl in identity.controls:
             if ctrl.key == key:
                 return identity
-        ctrl = Control(key=key, kid=kid, public_key=pub_key)
+        ctrl = Control(key=key, kid=f'keys-{kid}', public_key=pub_key)
         identity.add_control(ctrl)
         return identity
 
