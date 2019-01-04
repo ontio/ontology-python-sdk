@@ -62,4 +62,7 @@ class Identity(object):
     def add_control(self, ctrl: Control):
         if not isinstance(ctrl, Control):
             raise SDKException(ErrorCode.require_control_params)
+        index = int(self.__controls[-1].kid.split('-')[1])
+        index += 1
+        ctrl.kid = f'keys-{index}'
         self.__controls.append(ctrl)
