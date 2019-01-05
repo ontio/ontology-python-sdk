@@ -123,7 +123,7 @@ This is an API set that allows you to generate **Ontology Digital Identity.**
 |  11   | send_add_attribute_transaction()     |
 |  12   | send_add_public_key_transaction()    |
 |  13   | send_registry_ont_id_transaction()   |
-|  14   | send_remove_public_key_transaction() |
+|  14   | remove_public_key() |
 |  15   | send_remove_attribute_transaction()  |
 |  16   | send_add_public_key_by_recovery()    |
 |  17   | sign_transaction()                   |
