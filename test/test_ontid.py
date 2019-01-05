@@ -181,7 +181,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual('Attribute', notify['States'][0])
         self.assertEqual('remove', notify['States'][1])
         self.assertEqual(identity.ont_id, notify['States'][2])
-        self.assertEqual('hello', ContractDataParser.to_utf8_str(notify['States'][3][0]))
+        self.assertEqual('hello', ContractDataParser.to_utf8_str(notify['States'][3]))
         try:
             ont_id.remove_attribute(identity.ont_id, ctrl_acct, attrib_key, acct3, gas_limit, gas_price)
         except SDKException as e:
