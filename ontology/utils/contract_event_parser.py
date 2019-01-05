@@ -11,7 +11,7 @@ class ContractEventParser(object):
     @staticmethod
     def __check_event(event: dict):
         if not isinstance(event, dict):
-            raise SDKException(ErrorCode.other_error('The type of event should be dict'))
+            raise SDKException(ErrorCode.require_dict_params)
 
     @staticmethod
     def get_tx_hash(event: dict):
