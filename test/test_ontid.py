@@ -93,7 +93,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertIn('already registered', e.args[1])
 
-    def test_add_remove_public_key(self):
+    def test_add_and_remove_public_key(self):
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
@@ -144,7 +144,7 @@ class TestOntId(unittest.TestCase):
         except SDKException as e:
             self.assertIn('public key has already been revoked', e.args[1])
 
-    def test_add_remove_attribute(self):
+    def test_add_and_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
