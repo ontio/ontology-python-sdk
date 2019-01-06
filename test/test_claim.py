@@ -70,7 +70,7 @@ class TestClaim(unittest.TestCase):
         gas_limit = 20000
         gas_price = 500
         try:
-            sdk.native_vm.ont_id().send_registry_ont_id_transaction(identity, password, acct1, gas_limit, gas_price)
+            sdk.native_vm.ont_id().registry_ont_id(identity, password, acct1, gas_limit, gas_price)
         except SDKException as e:
             self.assertIn('already registered', e.args[1])
         tx_hash = '982aaa5c639a0a097373c8b585ebf1a69572c50a6a7c339cc45b3a1233f0600d'

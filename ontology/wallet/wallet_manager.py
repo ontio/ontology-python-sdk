@@ -34,6 +34,13 @@ class WalletManager(object):
         self.wallet_in_mem = WalletData()
         self.__wallet_path = ''
 
+    @staticmethod
+    def __check_ont_id(ont_id: str):
+        if not isinstance(ont_id, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if not ont_id.startswith(DID_ONT):
+            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+
     def open_wallet(self, wallet_path: str = '', is_create: bool = True):
         if not isinstance(wallet_path, str):
             raise SDKException(ErrorCode.require_str_params)
@@ -120,8 +127,7 @@ class WalletManager(object):
     def set_signature_scheme(self, scheme):
         self.scheme = scheme
 
-    def import_identity(self, label: str, encrypted_pri_key: str, pwd: str, salt: str,
-                        b58_address: str) -> Identity or None:
+    def import_identity(self, label: str, encrypted_pri_key: str, pwd: str, salt: str, b58_address: str) -> Identity:
         """
         This interface is used to import identity by providing encrypted private key, password, salt and
         base58 encode address which should be correspond to the encrypted private key provided.
@@ -226,12 +232,7 @@ class WalletManager(object):
         return account
 
     def add_control(self, ont_id: str, password: str):
-        if not isinstance(ont_id, str):
-            raise SDKException(ErrorCode.require_str_params)
-        if not ont_id.startswith(DID_ONT):
-            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
-        if not isinstance(password, str):
-            raise SDKException(ErrorCode.require_str_params)
+        WalletManager.__check_ont_id(ont_id)
         private_key = get_random_hex_str(64)
         salt = get_random_hex_str(16)
         b64_salt = base64.b64encode(salt.encode('utf-8')).decode('ascii')
@@ -244,10 +245,7 @@ class WalletManager(object):
         identity.add_control(ctrl)
 
     def add_control_by_hex_private_key(self, ont_id: str, password: str, hex_private_key: str) -> Account:
-        if not isinstance(ont_id, str):
-            raise SDKException(ErrorCode.require_str_params)
-        if not ont_id.startswith(DID_ONT):
-            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        WalletManager.__check_ont_id(ont_id)
         if not isinstance(password, str):
             raise SDKException(ErrorCode.require_str_params)
         if not isinstance(hex_private_key, str):
@@ -264,6 +262,7 @@ class WalletManager(object):
         return account
 
     def add_control_by_bytes_private_key(self, ont_id: str, password: str, bytes_private_key: bytes) -> Account:
+        WalletManager.__check_ont_id(ont_id)
         hex_private_key = bytes_private_key.hex()
         return self.add_control_by_hex_private_key(ont_id, password, hex_private_key)
 
@@ -325,10 +324,7 @@ class WalletManager(object):
         :param password: a password which is used to decrypt the encrypted private key.
         :return:
         """
-        if not isinstance(ont_id, str):
-            raise SDKException(ErrorCode.require_str_params)
-        if not ont_id.startswith(DID_ONT):
-            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        WalletManager.__check_ont_id(ont_id)
         for identity in self.wallet_in_mem.identities:
             if identity.ont_id == ont_id:
                 addr = identity.ont_id.replace(DID_ONT, "")
@@ -366,10 +362,7 @@ class WalletManager(object):
         return Account(private_key, self.scheme)
 
     def get_control_info_by_b58_address(self, ont_id: str, b58_address: str) -> Control:
-        if not isinstance(ont_id, str):
-            raise SDKException(ErrorCode.require_str_params)
-        if not ont_id.startswith(DID_ONT):
-            raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+        WalletManager.__check_ont_id(ont_id)
         identity = self.get_identity_by_ont_id(ont_id)
         for ctrl in identity.controls:
             if ctrl.b58_address == b58_address:
@@ -377,6 +370,7 @@ class WalletManager(object):
         raise SDKException(ErrorCode.other_error(f'Get account {b58_address} failed.'))
 
     def get_control_account_by_b58_address(self, ont_id: str, b58_address: str, password: str) -> Account:
+        WalletManager.__check_ont_id(ont_id)
         ctrl = self.get_control_info_by_b58_address(ont_id, b58_address)
         salt = base64.b64decode(ctrl.salt)
         key = ctrl.key

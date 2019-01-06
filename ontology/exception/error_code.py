@@ -27,7 +27,8 @@ class ErrorCode:
     require_tuple_params = get_error.__func__(20007, 'Interface Error, the type of parameter should be tuple.')
     require_set_params = get_error.__func__(20008, 'Interface Error, the type of parameter should be set.')
     require_dict_params = get_error.__func__(20009, 'Interface Error, the type of parameter should be dict.')
-    require_control_params = get_error.__func__(20009, 'Interface Error, a Control object is required.')
+    require_control_params = get_error.__func__(20010, 'Interface Error, a Control object is required.')
+    require_acct_params = get_error.__func__(20011, 'Interface Error, a Account object is required.')
 
     @staticmethod
     def invalid_ont_id_format(ont_id: str):

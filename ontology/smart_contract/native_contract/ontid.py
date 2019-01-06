@@ -2,6 +2,7 @@
 # # -*- coding: utf-8 -*-
 
 import json
+import binascii
 
 from time import time
 
@@ -17,6 +18,31 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.exception.error_code import ErrorCode
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.exception import SDKException
+
+
+class Attribute(object):
+    def __init__(self, attrib_key: str = '', attrib_type: str = '', attrib_value: str = ''):
+        self.__attribute_list = list()
+        self.add_attribute(attrib_key, attrib_type, attrib_value)
+
+    @property
+    def attribute_list(self):
+        return self.__attribute_list
+
+    def add_attribute(self, attrib_key, attrib_type, attrib_value):
+        if not isinstance(attrib_key, str) or not isinstance(attrib_type, str) or not isinstance(attrib_value, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if len(attrib_key) != 0 and len(attrib_type) != 0 and len(attrib_value) != 0:
+            attrib = dict(key=attrib_key, type=attrib_type, value=attrib_value)
+            self.__attribute_list.append(attrib)
+
+    def to_dict(self):
+        attrib_dict = dict(length=len(self.__attribute_list))
+        for index, attrib in enumerate(self.__attribute_list):
+            attrib_dict[f'key{index}'] = attrib['key'].encode('utf-8')
+            attrib_dict[f'type{index}'] = attrib['type'].encode('utf-8')
+            attrib_dict[f'value{index}'] = attrib['value'].encode('utf-8')
+        return attrib_dict
 
 
 class OntId(object):
@@ -115,9 +141,15 @@ class OntId(object):
         ddo = dict(Owners=pub_keys, Attributes=attribute_list, Recovery=b58_recovery, OntId=ont_id)
         return ddo
 
-    def get_public_keys(self, ont_id: str):
+    @staticmethod
+    def __check_ont_id(ont_id: str):
+        if not isinstance(ont_id, str):
+            raise SDKException(ErrorCode.require_str_params)
         if not ont_id.startswith(DID_ONT):
             raise SDKException(ErrorCode.invalid_ont_id_format(ont_id))
+
+    def get_public_keys(self, ont_id: str):
+        OntId.__check_ont_id(ont_id)
         args = dict(ontid=ont_id.encode('utf-8'))
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'getPublicKeys', args)
         unix_time_now = int(time())
@@ -133,6 +165,7 @@ class OntId(object):
         :param ont_id: the unique ID for identity.
         :return: a description object of ONT ID in the from of dict.
         """
+        OntId.__check_ont_id(ont_id)
         args = dict(ontid=ont_id.encode('utf-8'))
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'getDDO', args)
         unix_time_now = int(time())
@@ -156,6 +189,143 @@ class OntId(object):
         merkle_proof = dict(Type='MerkleProof', TxHash=tx_hash, BlockHeight=height, MerkleRoot=merkle_root)
         print(json.dumps(proof, indent=4))
 
+    def registry_ont_id(self, ont_id: str, ctrl_acct: Account, payer: Account, gas_limit: int, gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to registry ontid.
+
+        :param ont_id: OntId.
+        :param ctrl_acct: an Account object which indicate who will sign for the transaction.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a hexadecimal transaction hash value.
+        """
+        OntId.__check_ont_id(ont_id)
+        if not isinstance(ctrl_acct, Account) or not isinstance(payer, Account):
+            raise SDKException(ErrorCode.require_acct_params)
+        b58_payer_address = payer.get_address_base58()
+        bytes_ctrl_pub_key = ctrl_acct.get_public_key_bytes()
+        args = dict(ontid=ont_id.encode('utf-8'), pubkey=bytes_ctrl_pub_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'regIDWithPublicKey',
+                                                        args)
+        unix_time_now = int(time())
+        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
+                         [])
+        tx.sign_transaction(ctrl_acct)
+        tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
+
+    def add_public_key(self, ont_id: str, ctrl_acct: Account, hex_new_public_key: str, payer: Account, gas_limit: int,
+                       gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to add public key.
+
+        :param ont_id: OntId.
+        :param ctrl_acct: an Account object which indicate who will sign for the transaction.
+        :param hex_new_public_key: the new hexadecimal public key in the form of string.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return:  a hexadecimal transaction hash value.
+        """
+        OntId.__check_ont_id(ont_id)
+        if not isinstance(ctrl_acct, Account) or not isinstance(payer, Account):
+            raise SDKException(ErrorCode.require_acct_params)
+        bytes_ctrl_pub_key = ctrl_acct.get_public_key_bytes()
+        bytes_new_pub_key = binascii.a2b_hex(hex_new_public_key)
+        args = dict(ontid=ont_id, pubkey=bytes_new_pub_key, pubkey_or_recovery=bytes_ctrl_pub_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addKey', args)
+        unix_time_now = int(time())
+        bytes_payer_address = payer.get_address().to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
+                         [])
+        self.__sdk.sign_transaction(tx, ctrl_acct)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
+
+    def remove_public_key(self, ont_id: str, ctrl_acct: Account, hex_remove_public_key: str, payer: Account,
+                          gas_limit: int, gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to remove public key.
+
+        :param ont_id: OntId.
+        :param ctrl_acct: an Account object which indicate who will sign for the transaction.
+        :param hex_remove_public_key: a hexadecimal public key string which will be removed.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a hexadecimal transaction hash value.
+        """
+        OntId.__check_ont_id(ont_id)
+        if not isinstance(ctrl_acct, Account) or not isinstance(payer, Account):
+            raise SDKException(ErrorCode.require_acct_params)
+        b58_payer_address = payer.get_address_base58()
+        bytes_public_key = ctrl_acct.get_public_key_bytes()
+        bytes_remove_public_key = binascii.a2b_hex(hex_remove_public_key)
+        bytes_ont_id = ont_id.encode('utf-8')
+        args = dict(ontid=bytes_ont_id, pubkey=bytes_remove_public_key, pubkey_or_recovery=bytes_public_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'removeKey', args)
+        unix_time_now = int(time())
+        payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        self.__sdk.sign_transaction(tx, ctrl_acct)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
+
+    def add_attribute(self, ont_id: str, ctrl_acct: Account, attributes: Attribute, payer: Account, gas_limit: int,
+                      gas_price: int) -> str:
+        """
+        This interface is used to send a Transaction object which is used to add attribute.
+
+        :param ont_id: OntId.
+        :param ctrl_acct: an Account object which indicate who will sign for the transaction.
+        :param attributes: a list of attributes we want to add.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a hexadecimal transaction hash value.
+        """
+        OntId.__check_ont_id(ont_id)
+        if not isinstance(ctrl_acct, Account) or not isinstance(payer, Account):
+            raise SDKException(ErrorCode.require_acct_params)
+        bytes_ont_id = ont_id.encode('utf-8')
+        args = dict(ontid=bytes_ont_id)
+        attrib_dict = attributes.to_dict()
+        args = dict(**args, **attrib_dict)
+        args['pubkey'] = ctrl_acct.get_public_key_bytes()
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addAttributes', args)
+        bytes_payer_address = payer.get_address_bytes()
+        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(), [])
+        self.__sdk.sign_transaction(tx, ctrl_acct)
+        self.__sdk.add_sign_transaction(tx, payer)
+        tx_hash = self.__sdk.get_network().send_raw_transaction(tx)
+        return tx_hash
+
+    def remove_attribute(self, ont_id: str, ctrl_acct: Account, attrib_key: str, payer: Account, gas_limit: int,
+                         gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to remove attribute.
+
+        :param ont_id: OntId.
+        :param ctrl_acct: an Account object which indicate who will sign for the transaction.
+        :param attrib_key: a string which is used to indicate which attribute we want to remove.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a hexadecimal transaction hash value.
+        """
+        bytes_pub_key = ctrl_acct.get_public_key_bytes()
+        args = dict(ontid=ont_id.encode('utf-8'), key=attrib_key.encode('utf-8'), pubkey=bytes_pub_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, "removeAttribute",
+                                                        args)
+        unix_time_now = int(time())
+        payer_address = payer.get_address_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        self.__sdk.sign_transaction(tx, ctrl_acct)
+        self.__sdk.add_sign_transaction(tx, payer)
+        return self.__sdk.rpc.send_raw_transaction(tx)
+
     def new_add_public_key_transaction(self, ont_id: str, hex_public_key_or_recovery: str, hex_new_public_key: str,
                                        payer: str, gas_limit: int, gas_price: int):
         """
@@ -178,32 +348,6 @@ class OntId(object):
                          invoke_code, bytearray(), [])
         return tx
 
-    def add_public_key(self, identity: Identity, password: str, hex_new_public_key: str,
-                       payer: Account, gas_limit: int, gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to add public key.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param hex_new_public_key: the new hexadecimal public key in the form of string.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return:  a hexadecimal transaction hash value.
-        """
-        ont_id = identity.ont_id.encode('utf-8')
-        hex_public_key = identity.controls[0].public_key
-        args = dict(ontid=ont_id, pubkey=bytearray.fromhex(hex_new_public_key),
-                    pubkey_or_recovery=bytearray.fromhex(hex_public_key))
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addKey', args)
-        unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(),
-                         invoke_code, bytearray(), [])
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
-
     def new_registry_ont_id_transaction(self, ont_id: str, hex_public_key: str, b58_payer_address: str, gas_limit: int,
                                         gas_price: int):
         """
@@ -224,26 +368,6 @@ class OntId(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
                          [])
         return tx
-
-    def send_registry_ont_id_transaction(self, identity: Identity, password: str, payer: Account, gas_limit: int,
-                                         gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to registry ontid.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return: a hexadecimal transaction hash value.
-        """
-        b58_payer_address = payer.get_address_base58()
-        hex_pub_key = identity.controls[0].public_key
-        tx = self.new_registry_ont_id_transaction(identity.ont_id, hex_pub_key, b58_payer_address, gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        tx.sign_transaction(account)
-        tx.add_sign_transaction(payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
 
     def new_add_attribute_transaction(self, ont_id: str, hex_public_key: str, attribute_list: list,
                                       b58_payer_address: str,
@@ -273,27 +397,6 @@ class OntId(object):
                          [])
         return tx
 
-    def send_add_attribute_transaction(self, identity: Identity, password: str, attribute_list: list, payer: Account,
-                                       gas_limit: int, gas_price: int) -> str:
-        """
-        This interface is used to send a Transaction object which is used to add attribute.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param attribute_list: a list of attributes we want to add.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return: a hexadecimal transaction hash value.
-        """
-        tx = self.new_add_attribute_transaction(identity.ont_id, identity.controls[0].public_key, attribute_list,
-                                                payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
-        return tx_hash
-
     def new_remove_attribute_transaction(self, ont_id: str, hex_public_key: str, path: str, b58_payer_address: str,
                                          gas_limit: int, gas_price: int):
         """
@@ -314,26 +417,6 @@ class OntId(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
                          invoke_code, bytearray(), [])
         return tx
-
-    def send_remove_attribute_transaction(self, identity: Identity, password: str, path: str, payer: Account,
-                                          gas_limit: int, gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to remove attribute.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param path: a string which is used to indicate which attribute we want to remove.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return: a hexadecimal transaction hash value.
-        """
-        tx = self.new_remove_attribute_transaction(identity.ont_id, identity.controls[0].public_key, path,
-                                                   payer.get_address_base58(), gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
 
     def send_add_public_key_by_recovery(self, ont_id: str, recovery: Account, hex_new_public_key: str, payer: Account,
                                         gas_limit: int, gas_price: int):
@@ -359,8 +442,8 @@ class OntId(object):
         return tx_hash
 
     def new_remove_public_key_transaction(self, ont_id: str, hex_public_key_or_recovery: str,
-                                          hex_remove_public_key: str,
-                                          b58_payer_address: str, gas_limit: int, gas_price: int):
+                                          hex_remove_public_key: str, b58_payer_address: str, gas_limit: int,
+                                          gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to remove public key.
 
@@ -384,27 +467,6 @@ class OntId(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
                          [])
         return tx
-
-    def send_remove_public_key_transaction(self, identity: Identity, password: str, hex_remove_public_key: str,
-                                           payer: Account, gas_limit: int, gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to remove public key.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param hex_remove_public_key: a hexadecimal public key string which will be removed.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return: a hexadecimal transaction hash value.
-        """
-        b58_payer_address = payer.get_address_base58()
-        tx = self.new_remove_public_key_transaction(identity.ont_id, identity.controls[0].public_key,
-                                                    hex_remove_public_key, b58_payer_address, gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
 
     def send_remove_public_key_transaction_by_recovery(self, ont_id: str, recovery: Account, hex_remove_public_key: str,
                                                        payer: Account,
