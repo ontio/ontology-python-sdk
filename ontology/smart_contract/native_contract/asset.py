@@ -3,8 +3,6 @@
 
 from time import time
 
-from ontology.utils import utils
-from ontology.common.define import *
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
@@ -17,6 +15,7 @@ from ontology.vm.build_vm import build_native_invoke_code
 class Asset(object):
     def __init__(self, sdk):
         self.__sdk = sdk
+        self.__version = b'\x00'
         self.__ong_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
         self.__ont_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
 
@@ -46,14 +45,13 @@ class Asset(object):
         contract_address = self.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "balanceOf", raw_address)
         unix_time_now = int(time())
-        payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
         tx_type = 0xd1
         gas_price = 0
         gas_limit = 0
         attributes = bytearray()
         signers = list()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, None, invoke_code, attributes, signers)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
             balance = ContractDataParser.to_int(response['Result'])
@@ -75,14 +73,13 @@ class Asset(object):
         args = {"from": raw_from, "to": raw_to}
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "allowance", args)
         unix_time_now = int(time())
-        payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
         tx_type = 0xd1
         gas_price = 0
         gas_limit = 0
         attributes = bytearray()
         signers = list()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, None, invoke_code, attributes, signers)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
             allowance = ContractDataParser.to_int(response['Result'])
@@ -112,7 +109,6 @@ class Asset(object):
         method = 'name'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
-        payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
         tx_type = 0xd1
         gas_price = 0
@@ -120,7 +116,7 @@ class Asset(object):
         attributes = bytearray()
         signers = list()
         hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, None, invoke_code, attributes, signers)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         name = response['Result']
         name = ContractDataParser.to_utf8_str(name)
@@ -137,7 +133,6 @@ class Asset(object):
         method = 'symbol'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
-        payer = Address(ZERO_ADDRESS).to_bytes()
         version = 0
         tx_type = 0xd1
         gas_price = 0
@@ -145,7 +140,7 @@ class Asset(object):
         attributes = bytearray()
         signers = list()
         hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, None, invoke_code, attributes, signers)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         symbol = ContractDataParser.to_utf8_str(response['Result'])
         return symbol
@@ -158,18 +153,8 @@ class Asset(object):
         :return: asset's decimals in the form of int
         """
         contract_address = self.get_asset_address(asset)
-        method = 'decimals'
-        invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
-        unix_time_now = int(time())
-        payer = Address(ZERO_ADDRESS).to_bytes()
-        version = 0
-        tx_type = 0xd1
-        gas_price = 0
-        gas_limit = 0
-        attributes = bytearray()
-        signers = list()
-        hash_value = bytearray()
-        tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, payer, invoke_code, attributes, signers)
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', 'decimals', bytearray())
+        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), list())
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
             decimal = ContractDataParser.to_int(response['Result'])
@@ -177,8 +162,7 @@ class Asset(object):
         except SDKException:
             return 0
 
-    @staticmethod
-    def new_transfer_transaction(asset: str, b58_from_address: str, b58_to_address: str, amount: int,
+    def new_transfer_transaction(self, asset: str, b58_from_address: str, b58_to_address: str, amount: int,
                                  b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
         """
         This interface is used to generate a Transaction object for transfer.
@@ -217,8 +201,7 @@ class Asset(object):
         return Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, attributes,
                            signers)
 
-    @staticmethod
-    def new_approve_transaction(asset: str, b58_send_address: str, b58_recv_address: str, amount: int,
+    def new_approve_transaction(self, asset: str, b58_send_address: str, b58_recv_address: str, amount: int,
                                 b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
         """
         This interface is used to generate a Transaction object for approve.
@@ -247,13 +230,11 @@ class Asset(object):
         raw_recv = Address.b58decode(b58_recv_address).to_bytes()
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
         args = {"from": raw_send, "to": raw_recv, "amount": amount}
-        invoke_code = build_native_invoke_code(contract_address, b'\x00', "approve", args)
-        unix_time_now = int(time())
-        return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
+        invoke_code = build_native_invoke_code(contract_address, b'\x00', 'approve', args)
+        return Transaction(0, 0xd1, int(time()), gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
 
-    @staticmethod
-    def new_transfer_from_transaction(asset: str, b58_send_address: str, b58_from_address: str, b58_recv_address: str,
-                                      amount: int, b58_payer_address: str, gas_limit: int,
+    def new_transfer_from_transaction(self, asset: str, b58_send_address: str, b58_from_address: str,
+                                      b58_recv_address: str, amount: int, b58_payer_address: str, gas_limit: int,
                                       gas_price: int) -> Transaction:
         """
         This interface is used to generate a Transaction object that allow one account to transfer
@@ -279,8 +260,7 @@ class Asset(object):
         unix_time_now = int(time())
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
 
-    @staticmethod
-    def new_withdraw_ong_transaction(b58_claimer_address: str, b58_recv_address: str, amount: int,
+    def new_withdraw_ong_transaction(self, b58_claimer_address: str, b58_recv_address: str, amount: int,
                                      b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
         """
         This interface is used to generate a Transaction object that
@@ -328,8 +308,8 @@ class Asset(object):
         :param gas_price: an int value that indicate the gas price.
         :return: hexadecimal transaction hash value.
         """
-        tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), b58_to_address, amount,
-                                            payer.get_address_base58(), gas_limit, gas_price)
+        tx = self.new_transfer_transaction(asset, from_acct.get_address_base58(), b58_to_address, amount,
+                                           payer.get_address_base58(), gas_limit, gas_price)
         tx.sign_transaction(from_acct)
         if from_acct.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(payer)
@@ -360,7 +340,7 @@ class Asset(object):
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         b58_claimer = claimer.get_address_base58()
         b58_payer = payer.get_address_base58()
-        tx = Asset.new_withdraw_ong_transaction(b58_claimer, b58_recv_address, amount, b58_payer, gas_limit, gas_price)
+        tx = self.new_withdraw_ong_transaction(b58_claimer, b58_recv_address, amount, b58_payer, gas_limit, gas_price)
         tx = tx.sign_transaction(claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
             tx = tx.add_sign_transaction(payer)
@@ -394,8 +374,8 @@ class Asset(object):
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         b58_sender_address = sender.get_address_base58()
         b58_payer_address = payer.get_address_base58()
-        tx = Asset.new_approve_transaction(asset, b58_sender_address, b58_recv_address, amount, b58_payer_address,
-                                           gas_limit, gas_price)
+        tx = self.new_approve_transaction(asset, b58_sender_address, b58_recv_address, amount, b58_payer_address,
+                                          gas_limit, gas_price)
         tx = tx.sign_transaction(sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = tx.add_sign_transaction(payer)
@@ -431,8 +411,8 @@ class Asset(object):
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         b58_payer_address = payer.get_address_base58()
         b58_sender_address = sender.get_address_base58()
-        tx = Asset.new_transfer_from_transaction(asset, b58_sender_address, b58_from_address, b58_recv_address, amount,
-                                                 b58_payer_address, gas_limit, gas_price)
+        tx = self.new_transfer_from_transaction(asset, b58_sender_address, b58_from_address, b58_recv_address, amount,
+                                                b58_payer_address, gas_limit, gas_price)
         tx = tx.sign_transaction(sender)
         if b58_sender_address != b58_payer_address:
             tx = tx.add_sign_transaction(payer)

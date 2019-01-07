@@ -2,8 +2,6 @@ from binascii import a2b_hex
 from time import time
 
 from ontology.account.account import Account
-from ontology.common.address import Address
-from ontology.common.define import ZERO_ADDRESS
 from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
@@ -48,7 +46,7 @@ class Auth(object):
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00', "verifyToken",
                                                param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, Address(ZERO_ADDRESS).to_bytes(), invoke_code, bytearray(), [])
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, None, invoke_code, bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         tx.sign_transaction(account)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
