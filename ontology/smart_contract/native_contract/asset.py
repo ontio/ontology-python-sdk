@@ -16,8 +16,8 @@ class Asset(object):
     def __init__(self, sdk):
         self.__sdk = sdk
         self.__version = b'\x00'
-        self.__ong_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
         self.__ont_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
+        self.__ong_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
 
     def get_asset_address(self, asset: str) -> bytes:
         """
@@ -27,9 +27,9 @@ class Asset(object):
         :return: the contract address of asset in the form of bytearray.
         """
         if asset.upper() == 'ONT':
-            return self.__ong_contract
-        elif asset.upper() == 'ONG':
             return self.__ont_contract
+        elif asset.upper() == 'ONG':
+            return self.__ong_contract
         else:
             raise SDKException(ErrorCode.other_error('asset is not equal to ONT or ONG.'))
 
