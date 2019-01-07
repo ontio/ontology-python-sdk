@@ -75,7 +75,7 @@ class TestClaim(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
         tx_hash = '982aaa5c639a0a097373c8b585ebf1a69572c50a6a7c339cc45b3a1233f0600d'
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('Register', notify['States'])
         self.assertIn(identity.ont_id, notify['States'])
@@ -92,7 +92,7 @@ class TestClaim(unittest.TestCase):
     #     print(json.dumps(pub_keys, indent=4))
     #     tx_hash = '2840976d7f0976c1e0ccc5040f4965524e5eb20f592d185225ef6579b0600e9f'
     #     event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-    #     hex_contract_address = '0300000000000000000000000000000000000000'
+    #     hex_contract_address = sdk.native_vm.ont_id().contract_address
     #     notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
     #     print(json.dumps(notify, indent=4))
     #     self.assertIn('PublicKey', notify['notify'])

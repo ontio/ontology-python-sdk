@@ -103,7 +103,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Register', notify['States'][0])
@@ -118,7 +118,7 @@ class TestOntId(unittest.TestCase):
                                                         gas_price)
         time.sleep(randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
         self.assertIn('add', notify['States'])
@@ -155,7 +155,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Register', notify['States'][0])
@@ -238,7 +238,6 @@ class TestOntId(unittest.TestCase):
 
     def test_add_recovery(self):
         label = 'label'
-        global password
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
@@ -247,7 +246,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Register', notify['States'][0])
@@ -256,15 +255,55 @@ class TestOntId(unittest.TestCase):
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
-        password = 'password'
         gas_limit = 20000
         gas_price = 500
-        try:
-            sdk.native_vm.ont_id().add_recovery(identity.ont_id, password, b58_recovery_address, acct, gas_limit,
-                                                gas_price)
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('already set recovery', e.args[1])
+        tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
+                                                      gas_limit, gas_price)
+        time.sleep(randint(6, 10))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(ctrl_acct.get_address_hex_reverse(), notify['States'][3])
+        ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
+        self.assertIn(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertEqual(0, len(ddo['Attributes']))
+        self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
+        self.assertEqual(identity.ont_id, ddo['OntId'])
+
+        private_key = utils.get_random_bytes(32)
+        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+        hex_new_public_key = public_key.hex()
+        tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key,
+                                                        acct2, gas_limit, gas_price, True)
+        time.sleep(randint(6, 10))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('PublicKey', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(2, notify['States'][3])
+        self.assertEqual(hex_new_public_key, notify['States'][4])
+
+        ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
+        self.assertIn(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertIn(recovery.get_public_key_hex(), ddo['Owners'][1]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(recovery.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertEqual(0, len(ddo['Attributes']))
+        self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
+        self.assertEqual(identity.ont_id, ddo['OntId'])
+        self.assertEqual(b58_recovery_address, ContractDataParser.to_b58_address(notify['States'][3][::-1]))
 
     def test_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
