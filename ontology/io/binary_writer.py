@@ -8,6 +8,7 @@ Ontology Binary Writer
 import struct
 import binascii
 
+from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
@@ -24,7 +25,7 @@ def swap32(i):
     return struct.unpack("<I", struct.pack(">I", i))[0]
 
 
-class BinaryWriter(object):
+class BinaryWriter(StreamManager):
     """
     Description:
     Binary Writer
@@ -40,7 +41,7 @@ class BinaryWriter(object):
         Args:
             stream (BytesIO): a stream to operate on. i.e. a neo.IO.MemoryStream or raw BytesIO.
         """
-        super(BinaryWriter, self).__init__()
+        super().__init__()
         self.stream = stream
 
     def write_byte(self, value):
