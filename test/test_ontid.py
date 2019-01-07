@@ -276,11 +276,20 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
         self.assertEqual(identity.ont_id, ddo['OntId'])
 
+        rand_private_key = utils.get_random_bytes(32).hex()
+        new_recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_new_recovery_address = new_recovery.get_address_base58()
+        try:
+            sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_new_recovery_address, acct2, gas_limit,
+                                                gas_price)
+        except SDKException as e:
+            self.assertIn('already set recovery', e.args[1])
+
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
         hex_new_public_key = public_key.hex()
-        tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key,
-                                                        acct2, gas_limit, gas_price, True)
+        tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key, acct2, gas_limit,
+                                                        gas_price, True)
         time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -304,6 +313,15 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
         self.assertEqual(identity.ont_id, ddo['OntId'])
         self.assertEqual(b58_recovery_address, ddo['Recovery'])
+
+        private_key = utils.get_random_bytes(32)
+        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+        hex_new_public_key = public_key.hex()
+        try:
+            sdk.native_vm.ont_id().add_public_key(identity.ont_id, new_recovery, hex_new_public_key, acct2, gas_limit,
+                                                  gas_price, True)
+        except SDKException as e:
+            self.assertIn('no authorization', e.args[1])
 
     def test_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
