@@ -47,8 +47,8 @@ class TestErrorCode(unittest.TestCase):
 
     def test_invalid_acct_params(self):
         code = 51001
-        desc = "Account Error, invalid params"
-        value = ErrorCode.invalid_acct_params
+        desc = "Account Error, invalid private key."
+        value = ErrorCode.invalid_private_key
         self.assertEqual(type(value), dict)
         self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
