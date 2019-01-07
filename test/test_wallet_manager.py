@@ -384,19 +384,29 @@ class TestWalletManager(unittest.TestCase):
             wm.del_wallet_file()
 
     def test_add_control_by_private_key(self):
-        private_key = utils.get_random_bytes(32)
-        hex_private_key = private_key.hex()
-        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
-        hex_public_key = public_key.hex()
-        sdk.wallet_manager.add_control_by_hex_private_key(identity1.ont_id, password, hex_private_key)
-        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity1.ont_id, 1, password)
-        acct_private_key = ctrl_acct.get_private_key_hex()
-        acct_public_key = ctrl_acct.get_public_key_hex()
-        self.assertEqual(hex_public_key, acct_public_key)
-        self.assertEqual(hex_private_key, acct_private_key)
-        ctrl_len_1 = len(sdk.wallet_manager.wallet_in_mem.identities[0].controls)
-        ctrl_len_2 = len(sdk.wallet_manager.wallet_file.identities[0].controls)
-        self.assertEqual(ctrl_len_1, ctrl_len_2 + 1)
+        wm = WalletManager()
+        path = os.path.join(os.path.dirname(__file__), 'test.json')
+        self.assertRaises(SDKException, wm.open_wallet)
+        wm.create_wallet_file(path)
+        try:
+            wm.open_wallet(path)
+            private_key = utils.get_random_bytes(32)
+            hex_private_key = private_key.hex()
+            public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+            hex_public_key = public_key.hex()
+            identity = wm.create_identity('label', password)
+            wm.write_wallet()
+            wm.add_control_by_hex_private_key(identity.ont_id, password, hex_private_key)
+            ctrl_acct = wm.get_control_account_by_index(identity.ont_id, 1, password)
+            acct_private_key = ctrl_acct.get_private_key_hex()
+            acct_public_key = ctrl_acct.get_public_key_hex()
+            self.assertEqual(hex_public_key, acct_public_key)
+            self.assertEqual(hex_private_key, acct_private_key)
+            ctrl_len_1 = len(wm.wallet_in_mem.identities[0].controls)
+            ctrl_len_2 = len(wm.wallet_file.identities[0].controls)
+            self.assertEqual(ctrl_len_1, ctrl_len_2 + 1)
+        finally:
+            wm.del_wallet_file()
 
 
 if __name__ == '__main__':
