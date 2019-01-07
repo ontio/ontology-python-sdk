@@ -299,16 +299,12 @@ class OntId(object):
         :param gas_price: an int value that indicate the gas price.
         :return: a hexadecimal transaction hash value.
         """
-        bytes_pub_key = operator.get_public_key_bytes()
-        args = dict(ontid=ont_id.encode('utf-8'), key=attrib_key.encode('utf-8'), pubkey=bytes_pub_key)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, "removeAttribute",
-                                                        args)
-        unix_time_now = int(time())
-        payer_address = payer.get_address_bytes()
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        pub_key = operator.get_public_key_bytes()
+        b58_payer_address = payer.get_address_base58()
+        tx = self.new_remove_attribute_transaction(ont_id, pub_key, attrib_key, b58_payer_address, gas_limit, gas_price)
         tx.sign_transaction(operator)
         tx.add_sign_transaction(payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     @check_ont_id
     def add_recovery(self, ont_id: str, ctrl_acct: Account, b58_recovery_address: str, payer: Account, gas_limit: int,
@@ -325,17 +321,12 @@ class OntId(object):
         :return: a Transaction object which is used to add the recovery.
         """
         b58_payer_address = payer.get_address_base58()
-        bytes_pub_key = ctrl_acct.get_public_key_bytes()
-        bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
-        args = dict(ontid=ont_id.encode('utf-8'), recovery=bytes_recovery_address, pubkey=bytes_pub_key)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addRecovery', args)
-        unix_time_now = int(time())
-        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
-                         [])
+        pub_key = ctrl_acct.get_public_key_bytes()
+        tx = self.new_add_recovery_transaction(ont_id, pub_key, b58_recovery_address, b58_payer_address, gas_limit,
+                                               gas_price)
         tx.sign_transaction(ctrl_acct)
         tx.add_sign_transaction(payer)
-        tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
+        tx_hash = self.__sdk.get_network().send_raw_transaction(tx)
         return tx_hash
 
     @check_ont_id
@@ -453,45 +444,55 @@ class OntId(object):
         return tx
 
     @check_ont_id
-    def new_remove_attribute_transaction(self, ont_id: str, hex_public_key: str, path: str, b58_payer_address: str,
-                                         gas_limit: int, gas_price: int):
+    def new_remove_attribute_transaction(self, ont_id: str, pub_key: str or bytes, attrib_key: str,
+                                         b58_payer_address: str, gas_limit: int, gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to remove attribute.
 
         :param ont_id: OntId.
-        :param hex_public_key: the hexadecimal public key in the form of string.
-        :param path: a string which is used to indicate which attribute we want to remove.
+        :param pub_key: the hexadecimal public key in the form of string.
+        :param attrib_key: a string which is used to indicate which attribute we want to remove.
         :param b58_payer_address: a base58 encode address which indicate who will pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
         :return: a Transaction object which is used to remove attribute.
         """
-        args = {"ontid": ont_id.encode(), "key": bytes(path.encode()), "pubkey": bytearray.fromhex(hex_public_key)}
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, "removeAttribute",
+        if isinstance(pub_key, str):
+            bytes_pub_key = binascii.a2b_hex(pub_key)
+        elif isinstance(pub_key, bytes):
+            bytes_pub_key = pub_key
+        else:
+            raise SDKException(ErrorCode.params_type_error('a bytes or str type of public key is required.'))
+        args = dict(ontid=ont_id.encode('utf-8'), key=attrib_key.encode('utf-8'), pubkey=bytes_pub_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'removeAttribute',
                                                         args)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, Address.b58decode(b58_payer_address).to_bytes(),
-                         invoke_code, bytearray(), [])
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, b58_payer_address, invoke_code, bytearray(), [])
         return tx
 
     @check_ont_id
-    def new_add_recovery_transaction(self, ont_id: str, hex_public_key: str, b58_recovery_address: str,
+    def new_add_recovery_transaction(self, ont_id: str, pub_key: str or bytes, b58_recovery_address: str,
                                      b58_payer_address: str, gas_limit: int, gas_price: int):
         """
         This interface is used to generate a Transaction object which is used to add the recovery.
 
         :param ont_id: OntId.
-        :param hex_public_key: the hexadecimal public key in the form of string.
+        :param pub_key: the hexadecimal public key in the form of string.
         :param b58_recovery_address: a base58 encode address which indicate who is the recovery.
         :param b58_payer_address: a base58 encode address which indicate who will pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
         :return:
         """
+        if isinstance(pub_key, str):
+            bytes_pub_key = binascii.a2b_hex(pub_key)
+        elif isinstance(pub_key, bytes):
+            bytes_pub_key = pub_key
+        else:
+            raise SDKException(ErrorCode.params_type_error('a bytes or str type of public key is required.'))
         bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
-        bytearray_public_key = bytearray.fromhex(hex_public_key)
-        args = {"ontid": ont_id.encode(), "recovery": bytes_recovery_address, "pubkey": bytearray_public_key}
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, "addRecovery", args)
+        args = dict(ontid=ont_id.encode('utf-8'), recovery=bytes_recovery_address, pubkey=bytes_pub_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addRecovery', args)
         unix_time_now = int(time())
         bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
