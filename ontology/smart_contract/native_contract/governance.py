@@ -39,11 +39,11 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         ontid_acc = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.add_sign_transaction(tx, ontid_acc)
+        tx.add_sign_transaction(ontid_acc)
         if account.get_address_base58() is not payer:
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -54,9 +54,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -67,9 +67,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -80,9 +80,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -101,9 +101,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -122,9 +122,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -143,9 +143,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -156,9 +156,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -171,9 +171,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -185,9 +185,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -199,9 +199,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -213,9 +213,9 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 

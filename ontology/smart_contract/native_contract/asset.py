@@ -330,9 +330,9 @@ class Asset(object):
         """
         tx = Asset.new_transfer_transaction(asset, from_acct.get_address_base58(), b58_to_address, amount,
                                             payer.get_address_base58(), gas_limit, gas_price)
-        self.__sdk.sign_transaction(tx, from_acct)
+        tx.sign_transaction(from_acct)
         if from_acct.get_address_base58() != payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
 
     def send_withdraw_ong_transaction(self, claimer: Account, b58_recv_address: str, amount: int, payer: Account,
@@ -361,9 +361,9 @@ class Asset(object):
         b58_claimer = claimer.get_address_base58()
         b58_payer = payer.get_address_base58()
         tx = Asset.new_withdraw_ong_transaction(b58_claimer, b58_recv_address, amount, b58_payer, gas_limit, gas_price)
-        tx = self.__sdk.sign_transaction(tx, claimer)
+        tx = tx.sign_transaction(claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
-            tx = self.__sdk.add_sign_transaction(tx, payer)
+            tx = tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -396,9 +396,9 @@ class Asset(object):
         b58_payer_address = payer.get_address_base58()
         tx = Asset.new_approve_transaction(asset, b58_sender_address, b58_recv_address, amount, b58_payer_address,
                                            gas_limit, gas_price)
-        tx = self.__sdk.sign_transaction(tx, sender)
+        tx = tx.sign_transaction(sender)
         if sender.get_address_base58() != payer.get_address_base58():
-            tx = self.__sdk.add_sign_transaction(tx, payer)
+            tx = tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -433,8 +433,8 @@ class Asset(object):
         b58_sender_address = sender.get_address_base58()
         tx = Asset.new_transfer_from_transaction(asset, b58_sender_address, b58_from_address, b58_recv_address, amount,
                                                  b58_payer_address, gas_limit, gas_price)
-        tx = self.__sdk.sign_transaction(tx, sender)
+        tx = tx.sign_transaction(sender)
         if b58_sender_address != b58_payer_address:
-            tx = self.__sdk.add_sign_transaction(tx, payer)
+            tx = tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()

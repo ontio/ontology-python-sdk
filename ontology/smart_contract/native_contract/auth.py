@@ -25,9 +25,9 @@ class Auth(object):
             raise SDKException(ErrorCode.param_err('key_no or gas_limit or gas_price should not less than 0'))
         tx = self.make_transfer(contract_address, new_admin_ont_id, key_no, payer, gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.rpc.send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -50,7 +50,7 @@ class Auth(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, 0, 0, Address(ZERO_ADDRESS).to_bytes(), invoke_code, bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
@@ -70,8 +70,8 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return res
 
@@ -91,8 +91,8 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return res
 
@@ -108,8 +108,8 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return res
 
@@ -124,7 +124,7 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(initiator_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
         res = self.__sdk.rpc.send_raw_transaction(tx)
         return res

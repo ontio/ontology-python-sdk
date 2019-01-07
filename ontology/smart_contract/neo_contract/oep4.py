@@ -205,7 +205,7 @@ class Oep4(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, params,
                          bytearray(), [])
         for signer in signers:
-            self.__sdk.add_sign_transaction(tx, signer)
+            tx.add_sign_transaction(signer)
         tx_hash = self.__network.send_raw_transaction(tx)
         return tx_hash
 
@@ -296,8 +296,8 @@ class Oep4(object):
         payer_address_array = payer_acct.get_address().to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address_array, params,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, spender_acct)
+        tx.sign_transaction(spender_acct)
         if spender_acct.get_address_base58() != payer_acct.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer_acct)
+            tx.add_sign_transaction(payer_acct)
         tx_hash = self.__network.send_raw_transaction(tx)
         return tx_hash
