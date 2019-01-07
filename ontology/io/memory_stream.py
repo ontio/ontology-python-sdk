@@ -47,7 +47,7 @@ class StreamManager:
         mstream = __mstreams_available__.pop()
 
         if data is not None and len(data):
-            mstream.Cleanup()
+            mstream.clean_up()
             mstream.write(data)
 
         mstream.seek(0)
@@ -61,7 +61,7 @@ class StreamManager:
         Args:
             mstream (MemoryStream): instance.
         """
-        mstream.Cleanup()
+        mstream.clean_up()
         __mstreams_available__.append(mstream)
 
 
@@ -82,9 +82,9 @@ class MemoryStream(BytesIO):
             *args:
             **kwargs:
         """
-        super(MemoryStream, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-    def canRead(self):
+    def readable(self):
         """
         Get readable status.
 
@@ -93,7 +93,7 @@ class MemoryStream(BytesIO):
         """
         return self.readable()
 
-    def canSeek(self):
+    def seekable(self):
         """
         Get random access support status.
 
@@ -102,7 +102,7 @@ class MemoryStream(BytesIO):
         """
         return self.seekable
 
-    def canWrite(self):
+    def writable(self):
         """
         Get writeable status.
 
@@ -120,9 +120,9 @@ class MemoryStream(BytesIO):
         """
         return hexlify(self.getvalue())
 
-    def Cleanup(self):
+    def clean_up(self):
         """
-        Cleanup the stream by truncating it to size 0.
+        clean_up the stream by truncating it to size 0.
         """
         self.seek(0)
         self.truncate(0)
