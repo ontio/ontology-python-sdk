@@ -131,7 +131,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already exists', e.args[1])
         tx_hash = sdk.native_vm.ont_id().remove_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
@@ -215,27 +215,6 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertIn('attribute not exist', e.args[1])
 
-    def test_add_attributes(self):
-        ont_id = sdk.native_vm.ont_id()
-        attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
-        attribute_list = [attribute]
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        try:
-            identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
-        except SDKException as e:
-            self.assertIn('identity exists', e.args[1])
-            return
-        gas_limit = 20000
-        gas_price = 500
-        tx_hash = ont_id.add_attribute(identity.ont_id, password, attribute_list, acct, gas_limit, gas_price)
-        time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-        self.assertEqual('Attribute', notify[0]['States'][0])
-        self.assertEqual('add', notify[0]['States'][1])
-        self.assertEqual(identity.ont_id, notify[0]['States'][2])
-        self.assertEqual('try', bytes.fromhex(notify[0]['States'][3][0]).decode())
-
     def test_add_recovery(self):
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
@@ -314,6 +293,21 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(identity.ont_id, ddo['OntId'])
         self.assertEqual(b58_recovery_address, ddo['Recovery'])
 
+        tx_hash = sdk.native_vm.ont_id().remove_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
+                                                           gas_limit, gas_price, True)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('remove', notify['States'])
+        self.assertIn(identity.ont_id, notify['States'])
+        self.assertIn(hex_new_public_key, notify['States'])
+        try:
+            sdk.native_vm.ont_id().remove_public_key(identity.ont_id, recovery, hex_new_public_key, acct3, gas_limit,
+                                                     gas_price, True)
+        except SDKException as e:
+            self.assertIn('public key has already been revoked', e.args[1])
+
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
         hex_new_public_key = public_key.hex()
@@ -322,26 +316,6 @@ class TestOntId(unittest.TestCase):
                                                   gas_price, True)
         except SDKException as e:
             self.assertIn('no authorization', e.args[1])
-
-    def test_remove_attribute(self):
-        ont_id = sdk.native_vm.ont_id()
-        label = 'label'
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
-        gas_limit = 20000
-        gas_price = 500
-        path = 'try'
-        try:
-            tx_hash = ont_id.remove_attribute(identity, password, path, acct2, gas_limit, gas_price)
-            time.sleep(randint(6, 10))
-            notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-            self.assertEqual('Attribute', notify[0]['States'][0])
-            self.assertEqual('remove', notify[0]['States'][1])
-            self.assertEqual(identity.ont_id, notify[0]['States'][2])
-            self.assertEqual('try', bytes.fromhex(notify[0]['States'][3]).decode())
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('attribute not exist', e.args[1])
 
     def test_new_add_remove_public_key_transaction(self):
         ont_id = sdk.native_vm.ont_id()
