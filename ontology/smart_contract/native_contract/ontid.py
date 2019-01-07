@@ -57,9 +57,9 @@ class OntId(object):
     @staticmethod
     def parse_pub_keys(ont_id: str, raw_pub_keys: str or bytes) -> list:
         if isinstance(raw_pub_keys, str):
-            stream = StreamManager.GetStream(bytearray.fromhex(raw_pub_keys))
+            stream = StreamManager.get_stream(bytearray.fromhex(raw_pub_keys))
         elif isinstance(raw_pub_keys, bytes):
-            stream = StreamManager.GetStream(raw_pub_keys)
+            stream = StreamManager.get_stream(raw_pub_keys)
         else:
             raise SDKException(ErrorCode.params_type_error('bytes or str parameter is required.'))
         reader = BinaryReader(stream)
@@ -86,9 +86,9 @@ class OntId(object):
         if len(serialized_attributes) == 0:
             return list()
         if isinstance(serialized_attributes, str):
-            stream = StreamManager.GetStream(bytearray.fromhex(serialized_attributes))
+            stream = StreamManager.get_stream(bytearray.fromhex(serialized_attributes))
         elif isinstance(serialized_attributes, bytes):
-            stream = StreamManager.GetStream(serialized_attributes)
+            stream = StreamManager.get_stream(serialized_attributes)
         else:
             raise SDKException(ErrorCode.params_type_error('bytes or str parameter is required.'))
         reader = BinaryReader(stream)
@@ -117,9 +117,9 @@ class OntId(object):
         if len(serialized_ddo) == 0:
             return dict()
         if isinstance(serialized_ddo, str):
-            stream = StreamManager.GetStream(bytearray.fromhex(serialized_ddo))
+            stream = StreamManager.get_stream(bytearray.fromhex(serialized_ddo))
         elif isinstance(serialized_ddo, bytes):
-            stream = StreamManager.GetStream(serialized_ddo)
+            stream = StreamManager.get_stream(serialized_ddo)
         else:
             raise SDKException(ErrorCode.params_type_error('bytes or str parameter is required.'))
         reader = BinaryReader(stream)

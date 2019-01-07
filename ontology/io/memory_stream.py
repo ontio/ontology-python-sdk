@@ -25,7 +25,7 @@ class StreamManager:
         return len(__mstreams__)
 
     @staticmethod
-    def GetStream(data=None):
+    def get_stream(data=None):
         """
         Get a MemoryStream instance.
 
@@ -55,7 +55,7 @@ class StreamManager:
         return mstream
 
     @staticmethod
-    def ReleaseStream(mstream):
+    def release_stream(mstream):
         """
         Release the memory stream
         Args:

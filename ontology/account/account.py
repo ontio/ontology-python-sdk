@@ -164,7 +164,7 @@ class Account(object):
         return private_key
 
     def get_public_key_serialize(self):
-        stream = StreamManager.GetStream()
+        stream = StreamManager.get_stream()
         writer = BinaryWriter(stream)
         if self.__key_type == KeyType.ECDSA:
             writer.write_var_bytes(self.__public_key)
@@ -172,7 +172,7 @@ class Account(object):
             raise SDKException(ErrorCode.unknown_asymmetric_key_type)
         stream.flush()
         bytes_stream = stream.to_bytes()
-        StreamManager.ReleaseStream(stream)
+        StreamManager.release_stream(stream)
         return bytes_stream
 
     def get_private_key_bytes(self) -> bytes:

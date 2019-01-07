@@ -135,7 +135,7 @@ class ContractDataParser(object):
 
     @staticmethod
     def to_dict(item_serialize: str):
-        stream = StreamManager.GetStream(bytearray.fromhex(item_serialize))
+        stream = StreamManager.get_stream(bytearray.fromhex(item_serialize))
         reader = BinaryReader(stream)
         return ContractDataParser.__deserialize_stack_item(reader)
 

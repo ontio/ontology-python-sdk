@@ -63,7 +63,7 @@ class Transaction(object):
             yield (key, value)
 
     def serialize_unsigned(self) -> bytes:
-        ms = StreamManager.GetStream()
+        ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
         writer.write_uint8(self.version)
         writer.write_uint8(self.tx_type)
@@ -77,7 +77,7 @@ class Transaction(object):
         writer.write_var_int(len(self.attributes))
         ms.flush()
         res = ms.to_bytes()
-        StreamManager.ReleaseStream(ms)
+        StreamManager.release_stream(ms)
         return res
 
     def serialize_exclusive_data(self, writer):
@@ -111,7 +111,7 @@ class Transaction(object):
             raise RuntimeError
 
     def serialize(self, is_hex: bool = False) -> bytes:
-        ms = StreamManager.GetStream()
+        ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
         writer.write_bytes(self.serialize_unsigned())
         writer.write_var_int(len(self.sigs))
@@ -119,7 +119,7 @@ class Transaction(object):
             writer.write_bytes(sig.serialize())
         ms.flush()
         bytes_tx = ms.to_bytes()
-        StreamManager.ReleaseStream(ms)
+        StreamManager.release_stream(ms)
         if is_hex:
             return bytes_tx
         else:
@@ -127,7 +127,7 @@ class Transaction(object):
 
     @staticmethod
     def deserialize_from(bytes_tx: bytes):
-        ms = StreamManager.GetStream(bytes_tx)
+        ms = StreamManager.get_stream(bytes_tx)
         reader = BinaryReader(ms)
         tx = Transaction()
         tx.version = reader.read_uint8()

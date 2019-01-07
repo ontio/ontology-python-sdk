@@ -46,19 +46,19 @@ class Sig(object):
             verification_script = ProgramBuilder.program_from_pubkey(self.public_keys[0])
         else:
             verification_script = ProgramBuilder.program_from_multi_pubkey(self.m, self.public_keys)
-        ms = StreamManager.GetStream()
+        ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
         writer.write_var_bytes(invoke_script)
         writer.write_var_bytes(verification_script)
         ms.flush()
         res = ms.to_bytes()
         res = bytes_reader(res)
-        StreamManager.ReleaseStream(ms)
+        StreamManager.release_stream(ms)
         return res
 
     @staticmethod
     def deserialize_from(sig_bytes: bytes):
-        ms = StreamManager.GetStream(sig_bytes)
+        ms = StreamManager.get_stream(sig_bytes)
         reader = BinaryReader(ms)
         return Sig.deserialize(reader)
 

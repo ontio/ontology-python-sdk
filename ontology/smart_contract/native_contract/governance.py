@@ -265,7 +265,7 @@ class Governance(object):
         res = self.__sdk.rpc.get_storage(contract_address.hex(), key.hex())
         if res is None or res == '':
             return None
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         total_stake = TotalStake()
         total_stake.deserialize(reader)
@@ -282,7 +282,7 @@ class Governance(object):
         if res is None or res == '':
             return None
         peer_attributes = PeerAttributes()
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         peer_attributes.deserialize(reader)
         stream.close()
@@ -298,7 +298,7 @@ class Governance(object):
         if res is None or res == '':
             return None
         split_fee_address = SplitFeeAddress()
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         split_fee_address.deserialize(reader)
         stream.close()
@@ -316,12 +316,12 @@ class Governance(object):
         view = self.__sdk.rpc.get_storage(contract_address.hex(), self.GOVERNANCE_VIEW.encode().hex())
         if view is None or view == '':
             return None
-        stream = StreamManager.GetStream(bytearray.fromhex(view))
+        stream = StreamManager.get_stream(bytearray.fromhex(view))
         reader = BinaryReader(stream)
         governance_view = GovernanceView()
         governance_view.deserialize(reader)
         stream.close()
-        stream2 = StreamManager.GetStream()
+        stream2 = StreamManager.get_stream()
         writer = BinaryWriter(stream2)
         writer.write_int32(governance_view.view)
         view_bytes = stream2.to_bytes()
@@ -330,7 +330,7 @@ class Governance(object):
         value = self.__sdk.rpc.get_storage(contract_address.hex(), key_bytes.hex())
         if value is None or value == '':
             return None
-        stream3 = StreamManager.GetStream(bytearray.fromhex(value))
+        stream3 = StreamManager.get_stream(bytearray.fromhex(value))
         reader2 = BinaryReader(stream3)
         length = reader2.read_int32()
         peer_pool_map = {}
@@ -354,7 +354,7 @@ class Governance(object):
         res = self.__sdk.rpc.get_storage(contract_address.hex(), key.hex())
         if res is None or res == '':
             return None
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         authorize_info = AuthorizeInfo()
         authorize_info.deserialize(reader)

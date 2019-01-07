@@ -11,10 +11,10 @@ from ontology.io.memory_stream import StreamManager
 class TestBinaryReader(unittest.TestCase):
     def test_read_var_int(self):
         value = 123
-        writer_stream = StreamManager.GetStream()
+        writer_stream = StreamManager.get_stream()
         writer = BinaryWriter(writer_stream)
         writer.write_var_int(value)
-        reader_stream = StreamManager.GetStream(writer_stream.getbuffer())
+        reader_stream = StreamManager.get_stream(writer_stream.getbuffer())
         reader = BinaryReader(reader_stream)
         self.assertEqual(reader.read_var_int(), value)
 

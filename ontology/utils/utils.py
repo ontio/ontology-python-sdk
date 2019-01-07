@@ -137,7 +137,7 @@ def bytes_reader(b):
 
 
 def deserialize_hex(item_serialize: str):
-    stream = StreamManager.GetStream(bytearray.fromhex(item_serialize))
+    stream = StreamManager.get_stream(bytearray.fromhex(item_serialize))
     reader = BinaryReader(stream)
     return deserialize_stack_item(reader)
 
