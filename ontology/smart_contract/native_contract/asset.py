@@ -341,9 +341,9 @@ class Asset(object):
         b58_claimer = claimer.get_address_base58()
         b58_payer = payer.get_address_base58()
         tx = self.new_withdraw_ong_transaction(b58_claimer, b58_recv_address, amount, b58_payer, gas_limit, gas_price)
-        tx = tx.sign_transaction(claimer)
+        tx.sign_transaction(claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
-            tx = tx.add_sign_transaction(payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -376,9 +376,9 @@ class Asset(object):
         b58_payer_address = payer.get_address_base58()
         tx = self.new_approve_transaction(asset, b58_sender_address, b58_recv_address, amount, b58_payer_address,
                                           gas_limit, gas_price)
-        tx = tx.sign_transaction(sender)
+        tx.sign_transaction(sender)
         if sender.get_address_base58() != payer.get_address_base58():
-            tx = tx.add_sign_transaction(payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
@@ -413,8 +413,8 @@ class Asset(object):
         b58_sender_address = sender.get_address_base58()
         tx = self.new_transfer_from_transaction(asset, b58_sender_address, b58_from_address, b58_recv_address, amount,
                                                 b58_payer_address, gas_limit, gas_price)
-        tx = tx.sign_transaction(sender)
+        tx.sign_transaction(sender)
         if b58_sender_address != b58_payer_address:
-            tx = tx.add_sign_transaction(payer)
+            tx.add_sign_transaction(payer)
         self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
