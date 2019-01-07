@@ -129,7 +129,7 @@ class TestOntId(unittest.TestCase):
                                                   gas_price)
         except SDKException as e:
             self.assertIn('already exists', e.args[1])
-        tx_hash = sdk.native_vm.ont_id().remove_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
+        tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            gas_limit, gas_price)
         time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -139,7 +139,7 @@ class TestOntId(unittest.TestCase):
         self.assertIn(identity.ont_id, notify['States'])
         self.assertIn(hex_new_public_key, notify['States'])
         try:
-            sdk.native_vm.ont_id().remove_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3, gas_limit,
+            sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3, gas_limit,
                                                      gas_price)
         except SDKException as e:
             self.assertIn('public key has already been revoked', e.args[1])
@@ -293,7 +293,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(identity.ont_id, ddo['OntId'])
         self.assertEqual(b58_recovery_address, ddo['Recovery'])
 
-        tx_hash = sdk.native_vm.ont_id().remove_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
+        tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
                                                            gas_limit, gas_price, True)
         time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -303,7 +303,7 @@ class TestOntId(unittest.TestCase):
         self.assertIn(identity.ont_id, notify['States'])
         self.assertIn(hex_new_public_key, notify['States'])
         try:
-            sdk.native_vm.ont_id().remove_public_key(identity.ont_id, recovery, hex_new_public_key, acct3, gas_limit,
+            sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3, gas_limit,
                                                      gas_price, True)
         except SDKException as e:
             self.assertIn('public key has already been revoked', e.args[1])
@@ -345,7 +345,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertIn('already exists', e.args[1])
 
-        tx = ont_id.new_remove_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address,
+        tx = ont_id.new_revoke_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address,
                                                       gas_limit, gas_price)
         tx.sign_transaction(acct)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
