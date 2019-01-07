@@ -189,7 +189,7 @@ class Account(object):
 
         :return: the hexadecimal public key in the form of string.
         """
-        return binascii.binascii.b2a_hex(self.__private_key).decode('ascii')
+        return binascii.b2a_hex(self.__private_key).decode('ascii')
 
     def get_public_key_bytes(self) -> bytes:
         """
