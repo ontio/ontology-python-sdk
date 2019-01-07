@@ -2,8 +2,6 @@ from binascii import a2b_hex
 from time import time
 
 from ontology.account.account import Account
-from ontology.common.address import Address
-from ontology.common.define import ZERO_ADDRESS
 from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
@@ -25,11 +23,10 @@ class Auth(object):
             raise SDKException(ErrorCode.param_err('key_no or gas_limit or gas_price should not less than 0'))
         tx = self.make_transfer(contract_address, new_admin_ont_id, key_no, payer, gas_limit, gas_price)
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def make_transfer(self, contract_address: str, new_admin_ont_id: str, key_no: str, payer: Account, gas_limit: str,
                       gas_price: str):
@@ -48,9 +45,9 @@ class Auth(object):
         invoke_code = build_native_invoke_code(bytearray.fromhex(self.contract_address), b'\x00', "verifyToken",
                                                param)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, Address(ZERO_ADDRESS).to_bytes(), invoke_code, bytearray(), [])
+        tx = Transaction(0, 0xd1, unix_time_now, 0, 0, None, invoke_code, bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         res = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         return res
 
@@ -70,9 +67,9 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res
 
     def assign_ont_ids_to_role(self, admin_identity: Identity, password: str, key_no: int, contract_address: str,
@@ -91,9 +88,9 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res
 
     def delegate(self, identity: Identity, password: str, key_no: int, contract_address: str, to_ont_id: str, role: str,
@@ -108,9 +105,9 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res
 
     def withdraw(self, initiator_identity: Identity, password: str, key_no: int, contract_address: str, delegate: str,
@@ -124,7 +121,7 @@ class Auth(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
         account = self.__sdk.wallet_manager.get_account_by_ont_id(initiator_identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        tx.sign_transaction(account)
+        tx.add_sign_transaction(payer)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res

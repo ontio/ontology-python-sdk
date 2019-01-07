@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import base64
-import binascii
-
 import base58
-from binascii import b2a_hex, a2b_hex
+import binascii
 
 from ontology.crypto.curve import Curve
 from ontology.crypto.digest import Digest
@@ -24,7 +22,7 @@ from ontology.crypto.signature_handler import SignatureHandler
 
 
 class Account(object):
-    def __init__(self, private_key: str, scheme=SignatureScheme.SHA256withECDSA):
+    def __init__(self, private_key: str or bytes, scheme=SignatureScheme.SHA256withECDSA):
         self.__signature_scheme = scheme
         if scheme == SignatureScheme.SHA256withECDSA:
             self.__key_type = KeyType.ECDSA
@@ -38,16 +36,20 @@ class Account(object):
             self.__key_type = KeyType.ECDSA
         else:
             raise TypeError
-        self.__private_key = a2b_hex(private_key.encode())  # 32 bytes
+        if isinstance(private_key, bytes) and len(private_key) == 32:
+            self.__private_key = private_key
+        elif isinstance(private_key, str) and len(private_key) == 64:
+            self.__private_key = binascii.a2b_hex(private_key)
+        else:
+            raise SDKException(ErrorCode.invalid_private_key)
         self.__curve_name = Curve.P256
-        self.__public_key = Signature.ec_get_public_key_by_private_key(self.__private_key,
-                                                                       self.__curve_name)  # 33 bytes
-        self.__address = Address.address_from_bytes_pubkey(self.__public_key)  # address is a class type
+        self.__public_key = Signature.ec_get_public_key_by_private_key(self.__private_key, self.__curve_name)
+        self.__address = Address.address_from_bytes_pubkey(self.__public_key)
 
     def generate_signature(self, msg: bytes, signature_scheme: SignatureScheme):
         if signature_scheme == SignatureScheme.SHA256withECDSA:
             handler = SignatureHandler(self.__key_type, signature_scheme)
-            signature_value = handler.generate_signature(b2a_hex(self.__private_key), msg)
+            signature_value = handler.generate_signature(binascii.b2a_hex(self.__private_key), msg)
             byte_signature = Signature(signature_scheme, signature_value).to_byte()
         else:
             raise TypeError
@@ -124,8 +126,8 @@ class Account(object):
         key = derived_key[32:64]
         hdr = self.__address.b58encode().encode()
         mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__private_key, hdr, key, iv)
-        encrypted_key = b2a_hex(cipher_text) + b2a_hex(mac_tag)
-        encrypted_key_str = base64.b64encode(a2b_hex(encrypted_key))
+        encrypted_key = binascii.b2a_hex(cipher_text) + binascii.b2a_hex(mac_tag)
+        encrypted_key_str = base64.b64encode(binascii.a2b_hex(encrypted_key))
         return encrypted_key_str.decode()
 
     @staticmethod
@@ -150,19 +152,19 @@ class Account(object):
         iv = derived_key[0:12]
         key = derived_key[32:64]
         encrypted_key = base64.b64decode(encrypted_key_str).hex()
-        mac_tag = a2b_hex(encrypted_key[64:96])
-        cipher_text = a2b_hex(encrypted_key[0:64])
+        mac_tag = binascii.a2b_hex(encrypted_key[64:96])
+        cipher_text = binascii.a2b_hex(encrypted_key[0:64])
         private_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, b58_address.encode(), mac_tag, key, iv)
         if len(private_key) == 0:
             raise SDKException(ErrorCode.decrypt_encrypted_private_key_error)
-        private_key = b2a_hex(private_key).decode('ascii')
+        private_key = binascii.b2a_hex(private_key).decode('ascii')
         acct = Account(private_key, scheme)
         if acct.get_address().b58encode() != b58_address:
             raise SDKException(ErrorCode.other_error('Address error.'))
         return private_key
 
     def get_public_key_serialize(self):
-        stream = StreamManager.GetStream()
+        stream = StreamManager.get_stream()
         writer = BinaryWriter(stream)
         if self.__key_type == KeyType.ECDSA:
             writer.write_var_bytes(self.__public_key)
@@ -170,7 +172,7 @@ class Account(object):
             raise SDKException(ErrorCode.unknown_asymmetric_key_type)
         stream.flush()
         bytes_stream = stream.to_bytes()
-        StreamManager.ReleaseStream(stream)
+        StreamManager.release_stream(stream)
         return bytes_stream
 
     def get_private_key_bytes(self) -> bytes:
@@ -220,12 +222,9 @@ class Account(object):
 
         :return: a WIF encode private key.
         """
-        data = b'\x80'
-        data = data + self.get_private_key_bytes()
-        data += b'\01'
+        data = b''.join([b'\x80', self.__private_key, b'\01'])
         checksum = Digest.hash256(data[0:34])
-        data += checksum[0:4]
-        wif = base58.b58encode(data)
+        wif = base58.b58encode(b''.join([data, checksum[0:4]]))
         return wif.decode('ascii')
 
     @staticmethod

@@ -4,7 +4,6 @@
 from time import time
 
 from ontology.common.address import Address
-from ontology.common.define import ZERO_ADDRESS
 from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
@@ -73,5 +72,5 @@ class NeoVm(object):
         if isinstance(payer, bytes) and payer != b'':
             invoke_tx.payer = payer
         else:
-            invoke_tx.payer = Address(ZERO_ADDRESS).to_bytes()
+            invoke_tx.payer = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
         return invoke_tx

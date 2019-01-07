@@ -60,57 +60,6 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
         self.assertEqual(415, len(claim_payload.to_json_str()))
 
-    def test_signature_info(self):
-        pass
-
-    def test_ont_id_register(self):
-        private_key_hex = acct1.get_private_key_hex()
-        print(private_key_hex)
-        identity = sdk.wallet_manager.create_identity_from_private_key('NashMiao', password, private_key_hex)
-        gas_limit = 20000
-        gas_price = 500
-        try:
-            sdk.native_vm.ont_id().registry_ont_id(identity, password, acct1, gas_limit, gas_price)
-        except SDKException as e:
-            self.assertIn('already registered', e.args[1])
-        tx_hash = '982aaa5c639a0a097373c8b585ebf1a69572c50a6a7c339cc45b3a1233f0600d'
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
-        self.assertIn('Register', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-
-    # def test_add_public_key(self):
-    #     hex_public_key = '021bab110b458afaa2d65e0ac3f07fe488cbd034df6843a1ccd3f312d2bfaee443'
-    #     gas_limit = 20000
-    #     gas_price = 500
-    #     try:
-    #         sdk.native_vm.ont_id().add_public_key(identity1, password, hex_public_key, acct4, gas_limit, gas_price)
-    #     except SDKException as e:
-    #         self.assertIn('already exists', e.args[1])
-    #     pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
-    #     print(json.dumps(pub_keys, indent=4))
-    #     tx_hash = '2840976d7f0976c1e0ccc5040f4965524e5eb20f592d185225ef6579b0600e9f'
-    #     event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-    #     hex_contract_address = '0300000000000000000000000000000000000000'
-    #     notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
-    #     print(json.dumps(notify, indent=4))
-    #     self.assertIn('PublicKey', notify['notify'])
-    #     self.assertIn('add', notify['notify'])
-    #     self.assertIn(identity1.ont_id, notify['notify'])
-    #     self.assertIn(hex_public_key, notify['notify'])
-
-    # def test_generate_blockchain_proof(self):
-    #     tx_hash = 'd7a81db41b2608f2c5da4a4d84b266a8e8f86c244781287c183ee1129e37a9cd'
-    #     hex_contract_address = '8055b362904715fd84536e754868f4c8d27ca3f6'
-    #     merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
-    #     print(json.dumps(merkle_proof, indent=4))
-    #     current_block_height = merkle_proof['CurBlockHeight']
-    #     merkle_root = merkle_proof['CurBlockRoot']
-    #     proof = Claim.generate_blockchain_proof(tx_hash, hex_contract_address, current_block_height,
-    #                                             merkle_root)
-    #     print(proof)
-
 
 if __name__ == '__main__':
     unittest.main()

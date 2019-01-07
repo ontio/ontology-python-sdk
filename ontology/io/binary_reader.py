@@ -10,11 +10,12 @@ import struct
 import binascii
 import importlib
 
+from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
-class BinaryReader(object):
+class BinaryReader(StreamManager):
     """
     Description:
     Binary Reader
@@ -30,7 +31,7 @@ class BinaryReader(object):
         Args:
             stream (BytesIO): a stream to operate on. i.e. a neo.IO.MemoryStream or raw BytesIO.
         """
-        super(BinaryReader, self).__init__()
+        super().__init__()
         self.stream = stream
 
     def unpack(self, fmt, length=1):
@@ -62,9 +63,10 @@ class BinaryReader(object):
         try:
             if do_ord:
                 return ord(self.stream.read(1))
-            return self.stream.read(1)
+            else:
+                return self.stream.read(1)
         except Exception as e:
-            raise SDKException(ErrorCode.param_err(e.args[0]))
+            raise SDKException(ErrorCode.read_byte_error(e.args[0]))
 
     def read_bytes(self, length):
         """

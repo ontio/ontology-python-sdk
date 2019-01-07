@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os.path
 from Cryptodome import Random
 
 from ontology.common.define import *
@@ -11,22 +10,6 @@ from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 from ontology.smart_contract.neo_contract.abi.struct_type import Struct
-
-
-def get_asset_address(asset: str) -> bytearray:
-    """
-    This interface is used to get the smart contract address of ONT otr ONG.
-
-    :param asset: a string which is used to indicate which asset's contract address we want to get.
-    :return: the contract address of asset in the form of bytearray.
-    """
-    if asset.upper() == 'ONT':
-        contract_address = ONT_CONTRACT_ADDRESS
-    elif asset.upper() == 'ONG':
-        contract_address = ONG_CONTRACT_ADDRESS
-    else:
-        raise ValueError("asset is not equal to ONT or ONG")
-    return contract_address  # [20]byte
 
 
 def get_random_bytes(length: int) -> bytes:
@@ -137,7 +120,7 @@ def bytes_reader(b):
 
 
 def deserialize_hex(item_serialize: str):
-    stream = StreamManager.GetStream(bytearray.fromhex(item_serialize))
+    stream = StreamManager.get_stream(bytearray.fromhex(item_serialize))
     reader = BinaryReader(stream)
     return deserialize_stack_item(reader)
 

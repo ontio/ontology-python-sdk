@@ -39,13 +39,12 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         ontid_acc = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.add_sign_transaction(tx, ontid_acc)
+        tx.add_sign_transaction(ontid_acc)
         if account.get_address_base58() is not payer:
-            self.__sdk.add_sign_transaction(tx, payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def unregister_candidate(self, account: Account, peer_pubkey: str, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
@@ -54,11 +53,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def withdraw_ong(self, account: Account, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
@@ -67,11 +65,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def withdraw_fee(self, account: Account, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
@@ -80,11 +77,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def authorize_for_peer(self, account: Account, peer_publickeys: list, pos_lists: list, payer: Account,
                            gas_limit: int, gas_price: int):
@@ -101,11 +97,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def unauthorize_for_peer(self, account: Account, peer_publickeys: [], pos_lists: [], payer: Account, gas_limit: int,
                              gas_price: int):
@@ -122,11 +117,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def withdraw(self, account: Account, peer_publickeys: list, withdraw_list: list, payer: Account, gas_limit: int,
                  gas_price: int):
@@ -143,11 +137,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def quit_node(self, account: Account, peer_publickey: str, payer: Account, gas_limit: int, gas_price: int):
         contract_address = bytearray.fromhex(self.CONTRACT_ADDRESS)
@@ -156,11 +149,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def change_max_authorization(self, account: Account, peer_publickey: str, max_authorize: int, payer: Account,
                                  gas_limit: int, gas_price: int):
@@ -171,11 +163,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def add_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int,
                      gas_price: int):
@@ -185,11 +176,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def reduce_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int,
                         gas_price: int):
@@ -199,11 +189,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def set_peer_cost(self, account: Account, peer_publickey: str, peer_cost: int, payer: Account, gas_limit: int,
                       gas_price: int):
@@ -213,11 +202,10 @@ class Governance(object):
         unix_time_now = int(time())
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer.get_address().to_bytes(), invoke_code,
                          bytearray(), [])
-        self.__sdk.sign_transaction(tx, account)
+        tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
-            self.__sdk.add_sign_transaction(tx, payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
-        return tx.hash256_explorer()
+            tx.add_sign_transaction(payer)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def get_peer_unbind_ong(self, address: str):
         timestamp0 = 1530316800
@@ -265,7 +253,7 @@ class Governance(object):
         res = self.__sdk.rpc.get_storage(contract_address.hex(), key.hex())
         if res is None or res == '':
             return None
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         total_stake = TotalStake()
         total_stake.deserialize(reader)
@@ -282,7 +270,7 @@ class Governance(object):
         if res is None or res == '':
             return None
         peer_attributes = PeerAttributes()
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         peer_attributes.deserialize(reader)
         stream.close()
@@ -298,7 +286,7 @@ class Governance(object):
         if res is None or res == '':
             return None
         split_fee_address = SplitFeeAddress()
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         split_fee_address.deserialize(reader)
         stream.close()
@@ -316,12 +304,12 @@ class Governance(object):
         view = self.__sdk.rpc.get_storage(contract_address.hex(), self.GOVERNANCE_VIEW.encode().hex())
         if view is None or view == '':
             return None
-        stream = StreamManager.GetStream(bytearray.fromhex(view))
+        stream = StreamManager.get_stream(bytearray.fromhex(view))
         reader = BinaryReader(stream)
         governance_view = GovernanceView()
         governance_view.deserialize(reader)
         stream.close()
-        stream2 = StreamManager.GetStream()
+        stream2 = StreamManager.get_stream()
         writer = BinaryWriter(stream2)
         writer.write_int32(governance_view.view)
         view_bytes = stream2.to_bytes()
@@ -330,7 +318,7 @@ class Governance(object):
         value = self.__sdk.rpc.get_storage(contract_address.hex(), key_bytes.hex())
         if value is None or value == '':
             return None
-        stream3 = StreamManager.GetStream(bytearray.fromhex(value))
+        stream3 = StreamManager.get_stream(bytearray.fromhex(value))
         reader2 = BinaryReader(stream3)
         length = reader2.read_int32()
         peer_pool_map = {}
@@ -354,7 +342,7 @@ class Governance(object):
         res = self.__sdk.rpc.get_storage(contract_address.hex(), key.hex())
         if res is None or res == '':
             return None
-        stream = StreamManager.GetStream(bytearray.fromhex(res))
+        stream = StreamManager.get_stream(bytearray.fromhex(res))
         reader = BinaryReader(stream)
         authorize_info = AuthorizeInfo()
         authorize_info.deserialize(reader)

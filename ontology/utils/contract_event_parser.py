@@ -56,6 +56,8 @@ class ContractEventParser(object):
 
     @staticmethod
     def __get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
+        if not isinstance(hex_contract_address, str):
+            raise SDKException(ErrorCode.require_str_params)
         ContractEventParser.__check_event(event)
         notify_list = ContractEventParser.get_notify_list(event)
         specify_notify_list = list()
@@ -66,6 +68,8 @@ class ContractEventParser(object):
 
     @staticmethod
     def get_event_from_event_list_by_contract_address(event_list: list, hex_contract_address: str) -> List[dict]:
+        if not isinstance(hex_contract_address, str):
+            raise SDKException(ErrorCode.require_str_params)
         specify_event_list = list()
         for event in event_list:
             if event['ContractAddress'] == hex_contract_address:
@@ -74,6 +78,8 @@ class ContractEventParser(object):
 
     @staticmethod
     def get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list or dict:
+        if not isinstance(hex_contract_address, str):
+            raise SDKException(ErrorCode.require_str_params)
         ContractEventParser.__check_event(event)
         notify_list = ContractEventParser.get_notify_list(event)
         specify_notify_list = list()
@@ -86,6 +92,8 @@ class ContractEventParser(object):
 
     @staticmethod
     def get_states_by_contract_address(event: dict, hex_contract_address: str):
+        if not isinstance(hex_contract_address, str):
+            raise SDKException(ErrorCode.require_str_params)
         notify_list = ContractEventParser.__get_notify_list_by_contract_address(event, hex_contract_address)
         states_list = list()
         for notify in notify_list:

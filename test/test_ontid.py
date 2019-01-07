@@ -33,6 +33,7 @@ class TestOntId(unittest.TestCase):
         ont_id.get_merkle_proof(tx_hash)
 
     def test_get_public_keys(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = 'did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR'
         pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
         for pk in pub_keys:
@@ -49,6 +50,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(66, len(pk['Value']))
 
     def test_get_ddo(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         ddo = sdk.native_vm.ont_id().get_ddo(ont_id)
         for pk in ddo['Owners']:
@@ -60,6 +62,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(ont_id, ddo['OntId'])
 
     def test_new_registry_ont_id_transaction(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         hex_public_key = acct2.get_public_key_hex()
         b58_address = acct2.get_address_base58()
@@ -77,6 +80,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
 
     def test_registry_ont_id(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         try:
@@ -94,6 +98,8 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
 
     def test_add_and_remove_public_key(self):
+        sdk.rpc.connect_to_test_net()
+        sdk.restful.connect_to_test_net()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
@@ -103,7 +109,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Register', notify['States'][0])
@@ -118,7 +124,7 @@ class TestOntId(unittest.TestCase):
                                                         gas_price)
         time.sleep(randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
         self.assertIn('add', notify['States'])
@@ -129,9 +135,9 @@ class TestOntId(unittest.TestCase):
                                                   gas_price)
         except SDKException as e:
             self.assertIn('already exists', e.args[1])
-        tx_hash = sdk.native_vm.ont_id().remove_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
+        tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
@@ -139,12 +145,14 @@ class TestOntId(unittest.TestCase):
         self.assertIn(identity.ont_id, notify['States'])
         self.assertIn(hex_new_public_key, notify['States'])
         try:
-            sdk.native_vm.ont_id().remove_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3, gas_limit,
+            sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3, gas_limit,
                                                      gas_price)
         except SDKException as e:
             self.assertIn('public key has already been revoked', e.args[1])
 
     def test_add_and_remove_attribute(self):
+        sdk.rpc.connect_to_test_net()
+        sdk.restful.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
@@ -155,7 +163,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = '0300000000000000000000000000000000000000'
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Register', notify['States'][0])
@@ -215,138 +223,172 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertIn('attribute not exist', e.args[1])
 
-    def test_add_attributes(self):
-        ont_id = sdk.native_vm.ont_id()
-        attribute = {'key': 'try', 'type': 'string', 'value': 'attribute'}
-        attribute_list = [attribute]
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        password = 'password'
-        try:
-            identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
-        except SDKException as e:
-            self.assertIn('identity exists', e.args[1])
-            return
-        gas_limit = 20000
-        gas_price = 500
-        tx_hash = ont_id.add_attribute(identity.ont_id, password, attribute_list, acct, gas_limit, gas_price)
-        time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-        self.assertEqual('Attribute', notify[0]['States'][0])
-        self.assertEqual('add', notify[0]['States'][1])
-        self.assertEqual(identity.ont_id, notify[0]['States'][2])
-        self.assertEqual('try', bytes.fromhex(notify[0]['States'][3][0]).decode())
-
-    def test_remove_attribute(self):
-        ont_id = sdk.native_vm.ont_id()
+    def test_add_recovery(self):
+        sdk.rpc.connect_to_test_net()
+        sdk.restful.connect_to_test_net()
         label = 'label'
-        password = 'password'
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
+        identity = sdk.wallet_manager.create_identity(label, password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
-        path = 'try'
-        try:
-            tx_hash = ont_id.remove_attribute(identity, password, path, acct2, gas_limit, gas_price)
-            time.sleep(randint(6, 10))
-            notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-            self.assertEqual('Attribute', notify[0]['States'][0])
-            self.assertEqual('remove', notify[0]['States'][1])
-            self.assertEqual(identity.ont_id, notify[0]['States'][2])
-            self.assertEqual('try', bytes.fromhex(notify[0]['States'][3]).decode())
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('attribute not exist', e.args[1])
+        tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(5)
+        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Register', notify['States'][0])
+        self.assertEqual(identity.ont_id, notify['States'][1])
 
-    def test_new_add_remove_public_key_transaction(self):
-        ont_id = sdk.native_vm.ont_id()
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        hex_public_key = acct.get_public_key_hex()
         rand_private_key = utils.get_random_bytes(32).hex()
-        rand_acct = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
-        hex_new_public_key = rand_acct.get_public_key_hex()
-        b58_address = acct.get_address_base58()
-        acct_did = "did:ont:" + b58_address
+        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_recovery_address = recovery.get_address_base58()
         gas_limit = 20000
         gas_price = 500
-        tx = ont_id.new_add_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address, gas_limit,
-                                                   gas_price)
-        tx.sign_transaction(acct)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
-        time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-        self.assertEqual('PublicKey', notify[0]['States'][0])
-        self.assertEqual('add', notify[0]['States'][1])
-        self.assertEqual(acct_did, notify[0]['States'][2])
-        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
-        try:
-            sdk.rpc.send_raw_transaction(tx)
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('already exists', e.args[1])
-
-        tx = ont_id.new_remove_public_key_transaction(acct_did, hex_public_key, hex_new_public_key, b58_address,
+        tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
-        tx.sign_transaction(acct)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
-        time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
-        self.assertEqual('PublicKey', notify[0]['States'][0])
-        self.assertEqual('remove', notify[0]['States'][1])
-        self.assertEqual(acct_did, notify[0]['States'][2])
-        self.assertEqual(hex_new_public_key, notify[0]['States'][4])
-        try:
-            sdk.rpc.send_raw_transaction(tx)
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('already been revoked', e.args[1])
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(recovery.get_address_hex_reverse(), notify['States'][3])
+        ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
+        self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertEqual(0, len(ddo['Attributes']))
+        self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
+        self.assertEqual(identity.ont_id, ddo['OntId'])
 
-    def test_new_add_recovery_transaction(self):
-        ont_id = sdk.native_vm.ont_id()
-        gas_limit = 20000
-        gas_price = 500
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        b58_address = acct.get_address_base58()
-        acct_did = "did:ont:" + b58_address
-        hex_public_key = acct.get_public_key_hex()
         rand_private_key = utils.get_random_bytes(32).hex()
-        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
-        b58_recovery_address = recovery.get_address_base58()
-        tx = ont_id.new_add_recovery_transaction(acct_did, hex_public_key, b58_recovery_address, b58_address, gas_limit,
-                                                 gas_price)
-        tx.sign_transaction(acct)
+        new_recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_new_recovery_address = new_recovery.get_address_base58()
         try:
-            sdk.rpc.send_raw_transaction(tx)
+            sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_new_recovery_address, acct2, gas_limit,
+                                                gas_price)
         except SDKException as e:
-            self.assertEqual(59000, e.args[0])
             self.assertIn('already set recovery', e.args[1])
 
-    def test_send_add_recovery_transaction(self):
-        ont_id = sdk.native_vm.ont_id()
+        private_key = utils.get_random_bytes(32)
+        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+        hex_new_public_key = public_key.hex()
+        tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key, acct2, gas_limit,
+                                                        gas_price, True)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('PublicKey', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(2, notify['States'][3])
+        self.assertEqual(hex_new_public_key, notify['States'][4])
+
+        ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
+        self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][1]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][1]['Type'])
+        self.assertEqual('P256', ddo['Owners'][1]['Curve'])
+        self.assertEqual(hex_new_public_key, ddo['Owners'][1]['Value'])
+        self.assertEqual(0, len(ddo['Attributes']))
+        self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
+        self.assertEqual(identity.ont_id, ddo['OntId'])
+        self.assertEqual(b58_recovery_address, ddo['Recovery'])
+
+        tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
+                                                           gas_limit, gas_price, True)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('remove', notify['States'])
+        self.assertIn(identity.ont_id, notify['States'])
+        self.assertIn(hex_new_public_key, notify['States'])
+        try:
+            sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3, gas_limit,
+                                                     gas_price, True)
+        except SDKException as e:
+            self.assertIn('public key has already been revoked', e.args[1])
+
+        private_key = utils.get_random_bytes(32)
+        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+        hex_new_public_key = public_key.hex()
+        try:
+            sdk.native_vm.ont_id().add_public_key(identity.ont_id, new_recovery, hex_new_public_key, acct2, gas_limit,
+                                                  gas_price, True)
+        except SDKException as e:
+            self.assertIn('no authorization', e.args[1])
+
+    def test_change_recovery(self):
+        sdk.rpc.connect_to_test_net()
+        sdk.restful.connect_to_test_net()
         label = 'label'
-        password = 'password'
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        try:
-            identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
-        except SDKException as e:
-            self.assertIn('Wallet identity exists', e.args[1])
-            return
+        identity = sdk.wallet_manager.create_identity(label, password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(5)
+        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Register', notify['States'][0])
+        self.assertEqual(identity.ont_id, notify['States'][1])
+
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
-        password = 'password'
         gas_limit = 20000
         gas_price = 500
-        try:
-            ont_id.send_add_recovery_transaction(identity, password, b58_recovery_address, acct, gas_limit, gas_price)
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('already set recovery', e.args[1])
+        tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
+                                                      gas_limit, gas_price)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(recovery.get_address_hex_reverse(), notify['States'][3])
+        ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
+        self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertEqual(0, len(ddo['Attributes']))
+        self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
+        self.assertEqual(identity.ont_id, ddo['OntId'])
 
-    # TODO: test_send_add_public_key_by_recovery
+        rand_private_key = utils.get_random_bytes(32).hex()
+        new_recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_new_recovery_address = new_recovery.get_address_base58()
+
+        try:
+            sdk.native_vm.ont_id().change_recovery(identity.ont_id, b58_new_recovery_address, ctrl_acct, acct2,
+                                                   gas_limit, gas_price)
+        except SDKException as e:
+            self.assertIn('operator is not the recovery', e.args[1])
+        tx_hash = sdk.native_vm.ont_id().change_recovery(identity.ont_id, b58_new_recovery_address, recovery, acct2,
+                                                         gas_limit, gas_price)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('change', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(new_recovery.get_address_hex_reverse(), notify['States'][3])
 
 
 if __name__ == '__main__':

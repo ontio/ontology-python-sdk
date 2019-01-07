@@ -35,7 +35,7 @@ class ProgramBuilder(object):
 
     @staticmethod
     def push_bytes(data):
-        ms = StreamManager.GetStream()
+        ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
         if len(data) == 0:
             raise ValueError("push data error: data is null")
@@ -54,7 +54,7 @@ class ProgramBuilder(object):
         writer.write_bytes(data)
         ms.flush()
         res = ms.to_bytes()
-        StreamManager.ReleaseStream(ms)
+        StreamManager.release_stream(ms)
         res = bytes_reader(res)
         return res
 
@@ -120,7 +120,7 @@ class ProgramBuilder(object):
 
     @staticmethod
     def get_param_info(program: bytes):
-        ms = StreamManager.GetStream(program)
+        ms = StreamManager.get_stream(program)
         reader = BinaryReader(ms)
         param_info = []
         while True:
@@ -136,7 +136,7 @@ class ProgramBuilder(object):
         length = len(program)
         end = program[length - 1]
         temp = program[:length - 1]
-        ms = StreamManager.GetStream(temp)
+        ms = StreamManager.get_stream(temp)
         reader = BinaryReader(ms)
         info = ProgramInfo()
         if end == int.from_bytes(CHECKSIG, 'little'):
