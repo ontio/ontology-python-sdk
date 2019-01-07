@@ -40,9 +40,9 @@ class ErrorCode:
     def invalid_wallet_path(path: str):
         return ErrorCode.get_error(40001, f'WalletManager Error, invalid path: {path}')
 
-    # account error
-    invalid_acct_params = get_error.__func__(51001, "Account Error, invalid params")
-    unsupported_key_type = get_error.__func__(51002, "Account Error,unsupported key type")
+    invalid_private_key = get_error.__func__(51001, 'Account Error, invalid private key.')
+    unsupported_key_type = get_error.__func__(51002, 'Account Error, unsupported key type.')
+
     invalid_message = get_error.__func__(51003, "Account Error, invalid message")
     without_private = get_error.__func__(51004, "Account Error, account without private key cannot generate signature")
     invalid_sm2_signature = get_error.__func__(51005,
@@ -50,7 +50,6 @@ class ErrorCode:
     account_invalid_input = get_error.__func__(51006, "Account Error, account invalid input")
     account_without_public_key = get_error.__func__(51007,
                                                     "Account Error, account without public key cannot verify signature")
-    unknown_key_type = get_error.__func__(51008, "Account Error, unknown key type")
     null_input = get_error.__func__(51009, "Account Error, null input")
     invalid_data = get_error.__func__(51010, "Account Error, invalid data")
     decoded_3bytes_error = get_error.__func__(51011, "Account Error, decoded 3 bytes error")
