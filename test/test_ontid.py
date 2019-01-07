@@ -244,7 +244,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(6, 10))
+        time.sleep(5)
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -259,7 +259,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -281,7 +281,7 @@ class TestOntId(unittest.TestCase):
         hex_new_public_key = public_key.hex()
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key,
                                                         acct2, gas_limit, gas_price, True)
-        time.sleep(randint(6, 10))
+        time.sleep(5)
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -303,7 +303,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(0, len(ddo['Attributes']))
         self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
         self.assertEqual(identity.ont_id, ddo['OntId'])
-        self.assertEqual(b58_recovery_address, ContractDataParser.to_b58_address(ddo['Recovery']))
+        self.assertEqual(b58_recovery_address, ddo['Recovery'])
 
     def test_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
