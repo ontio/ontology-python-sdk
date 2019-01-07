@@ -326,6 +326,33 @@ class OntId(object):
         self.__sdk.add_sign_transaction(tx, payer)
         return self.__sdk.rpc.send_raw_transaction(tx)
 
+    def add_recovery(self, ont_id: str, ctrl_acct: Account, b58_recovery_address: str, payer: Account, gas_limit: int,
+                     gas_price: int):
+        """
+        This interface is used to send a Transaction object which is used to add the recovery.
+
+        :param ont_id: OntId.
+        :param ctrl_acct: an Account object which indicate who will sign for the transaction.
+        :param b58_recovery_address: a base58 encode address which indicate who is the recovery.
+        :param payer: an Account object which indicate who will pay for the transaction.
+        :param gas_limit: an int value that indicate the gas limit.
+        :param gas_price: an int value that indicate the gas price.
+        :return: a Transaction object which is used to add the recovery.
+        """
+        b58_payer_address = payer.get_address_base58()
+        bytes_pub_key = ctrl_acct.get_public_key_bytes()
+        bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
+        args = dict(ontid=ont_id.encode('utf-8'), recovery=bytes_recovery_address, pubkey=bytes_pub_key)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addRecovery', args)
+        unix_time_now = int(time())
+        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
+                         [])
+        self.__sdk.sign_transaction(tx, ctrl_acct)
+        self.__sdk.add_sign_transaction(tx, payer)
+        tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
+        return tx_hash
+
     def new_add_public_key_transaction(self, ont_id: str, hex_public_key_or_recovery: str, hex_new_public_key: str,
                                        payer: str, gas_limit: int, gas_price: int):
         """
@@ -503,25 +530,3 @@ class OntId(object):
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
                          [])
         return tx
-
-    def send_add_recovery_transaction(self, identity: Identity, password: str, b58_recovery_address: str,
-                                      payer: Account, gas_limit: int, gas_price: int):
-        """
-        This interface is used to send a Transaction object which is used to add the recovery.
-
-        :param identity: an Identity object.
-        :param password: a password which is used to decrypt the encrypted private key.
-        :param b58_recovery_address: a base58 encode address which indicate who is the recovery.
-        :param payer: an Account object which indicate who will pay for the transaction.
-        :param gas_limit: an int value that indicate the gas limit.
-        :param gas_price: an int value that indicate the gas price.
-        :return: a Transaction object which is used to add the recovery.
-        """
-        b58_payer_address = payer.get_address_base58()
-        tx = self.new_add_recovery_transaction(identity.ont_id, identity.controls[0].public_key, b58_recovery_address,
-                                               b58_payer_address, gas_limit, gas_price)
-        account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
-        self.__sdk.sign_transaction(tx, account)
-        self.__sdk.add_sign_transaction(tx, payer)
-        tx_hash = self.__sdk.rpc.send_raw_transaction(tx)
-        return tx_hash
