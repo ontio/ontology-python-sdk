@@ -28,7 +28,7 @@ class Auth(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def make_transfer(self, contract_address: str, new_admin_ont_id: str, key_no: str, payer: Account, gas_limit: str,
@@ -72,7 +72,7 @@ class Auth(object):
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
         tx.sign_transaction(account)
         tx.add_sign_transaction(payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res
 
     def assign_ont_ids_to_role(self, admin_identity: Identity, password: str, key_no: int, contract_address: str,
@@ -93,7 +93,7 @@ class Auth(object):
         account = self.__sdk.wallet_manager.get_account_by_ont_id(admin_identity.ont_id, password)
         tx.sign_transaction(account)
         tx.add_sign_transaction(payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res
 
     def delegate(self, identity: Identity, password: str, key_no: int, contract_address: str, to_ont_id: str, role: str,
@@ -110,7 +110,7 @@ class Auth(object):
         account = self.__sdk.wallet_manager.get_account_by_ont_id(identity.ont_id, password)
         tx.sign_transaction(account)
         tx.add_sign_transaction(payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res
 
     def withdraw(self, initiator_identity: Identity, password: str, key_no: int, contract_address: str, delegate: str,
@@ -126,5 +126,5 @@ class Auth(object):
         account = self.__sdk.wallet_manager.get_account_by_ont_id(initiator_identity.ont_id, password)
         tx.sign_transaction(account)
         tx.add_sign_transaction(payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return res

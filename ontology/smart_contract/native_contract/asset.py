@@ -333,7 +333,7 @@ class Asset(object):
         tx.sign_transaction(from_acct)
         if from_acct.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        return self.__sdk.rpc.send_raw_transaction(tx)
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def send_withdraw_ong_transaction(self, claimer: Account, b58_recv_address: str, amount: int, payer: Account,
                                       gas_limit: int, gas_price: int) -> str:
@@ -364,7 +364,7 @@ class Asset(object):
         tx = tx.sign_transaction(claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
             tx = tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def send_approve(self, asset, sender: Account, b58_recv_address: str, amount: int, payer: Account, gas_limit: int,
@@ -399,7 +399,7 @@ class Asset(object):
         tx = tx.sign_transaction(sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx = tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def send_transfer_from(self, asset: str, sender: Account, b58_from_address: str, b58_recv_address: str, amount: int,
@@ -436,5 +436,5 @@ class Asset(object):
         tx = tx.sign_transaction(sender)
         if b58_sender_address != b58_payer_address:
             tx = tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()

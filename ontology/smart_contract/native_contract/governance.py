@@ -44,7 +44,7 @@ class Governance(object):
         tx.add_sign_transaction(ontid_acc)
         if account.get_address_base58() is not payer:
             tx.add_sign_transaction(payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def unregister_candidate(self, account: Account, peer_pubkey: str, payer: Account, gas_limit: int, gas_price: int):
@@ -57,7 +57,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def withdraw_ong(self, account: Account, payer: Account, gas_limit: int, gas_price: int):
@@ -70,7 +70,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def withdraw_fee(self, account: Account, payer: Account, gas_limit: int, gas_price: int):
@@ -83,7 +83,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def authorize_for_peer(self, account: Account, peer_publickeys: list, pos_lists: list, payer: Account,
@@ -104,7 +104,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        res = self.__sdk.rpc.send_raw_transaction(tx)
+        res = self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def unauthorize_for_peer(self, account: Account, peer_publickeys: [], pos_lists: [], payer: Account, gas_limit: int,
@@ -125,7 +125,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def withdraw(self, account: Account, peer_publickeys: list, withdraw_list: list, payer: Account, gas_limit: int,
@@ -146,7 +146,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def quit_node(self, account: Account, peer_publickey: str, payer: Account, gas_limit: int, gas_price: int):
@@ -159,7 +159,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def change_max_authorization(self, account: Account, peer_publickey: str, max_authorize: int, payer: Account,
@@ -174,7 +174,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def add_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int,
@@ -188,7 +188,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def reduce_init_pos(self, account: Account, peer_publickey: str, pos: int, payer: Account, gas_limit: int,
@@ -202,7 +202,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def set_peer_cost(self, account: Account, peer_publickey: str, peer_cost: int, payer: Account, gas_limit: int,
@@ -216,7 +216,7 @@ class Governance(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.rpc.send_raw_transaction(tx)
+        self.__sdk.get_network().send_raw_transaction(tx)
         return tx.hash256_explorer()
 
     def get_peer_unbind_ong(self, address: str):
