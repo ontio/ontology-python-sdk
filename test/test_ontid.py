@@ -120,8 +120,7 @@ class TestOntId(unittest.TestCase):
         hex_new_public_key = public_key.hex()
 
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
-                                                        gas_limit,
-                                                        gas_price)
+                                                        gas_limit, gas_price)
         time.sleep(randint(6, 10))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
@@ -389,6 +388,48 @@ class TestOntId(unittest.TestCase):
         self.assertEqual('change', notify['States'][1])
         self.assertEqual(identity.ont_id, notify['States'][2])
         self.assertEqual(new_recovery.get_address_hex_reverse(), notify['States'][3])
+
+    def test_verify_signature(self):
+        sdk.rpc.connect_to_test_net()
+        sdk.restful.connect_to_test_net()
+        label = 'label'
+        identity = sdk.wallet_manager.create_identity(label, password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(randint(6, 10))
+        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Register', notify['States'][0])
+        self.assertEqual(identity.ont_id, notify['States'][1])
+
+        private_key = utils.get_random_bytes(32)
+        public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
+        new_ctrl_acct = Account(private_key)
+        hex_new_public_key = public_key.hex()
+
+        tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
+                                                        gas_limit, gas_price)
+        time.sleep(randint(6, 10))
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('add', notify['States'])
+        self.assertIn(identity.ont_id, notify['States'])
+        self.assertIn(hex_new_public_key, notify['States'])
+        result = sdk.native_vm.ont_id().verify_signature(identity.ont_id, 1, ctrl_acct)
+        self.assertTrue(result)
+        result = sdk.native_vm.ont_id().verify_signature(identity.ont_id, 2, ctrl_acct)
+        self.assertFalse(result)
+        result = sdk.native_vm.ont_id().verify_signature(identity.ont_id, 1, new_ctrl_acct)
+        self.assertFalse(result)
+        result = sdk.native_vm.ont_id().verify_signature(identity.ont_id, 2, new_ctrl_acct)
+        self.assertTrue(result)
 
 
 if __name__ == '__main__':
