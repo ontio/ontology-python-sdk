@@ -69,16 +69,16 @@ class TestClaim(unittest.TestCase):
         identity = sdk.wallet_manager.create_identity_from_private_key('NashMiao', password, private_key_hex)
         gas_limit = 20000
         gas_price = 500
-        try:
-            sdk.native_vm.ont_id().registry_ont_id(identity, password, acct1, gas_limit, gas_price)
-        except SDKException as e:
-            self.assertIn('already registered', e.args[1])
-        tx_hash = '982aaa5c639a0a097373c8b585ebf1a69572c50a6a7c339cc45b3a1233f0600d'
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.ont_id().contract_address
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
-        self.assertIn('Register', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
+        # try:
+        #     sdk.native_vm.ont_id().registry_ont_id(identity, password, acct1, gas_limit, gas_price)
+        # except SDKException as e:
+        #     self.assertIn('already registered', e.args[1])
+        # tx_hash = '982aaa5c639a0a097373c8b585ebf1a69572c50a6a7c339cc45b3a1233f0600d'
+        # event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        # hex_contract_address = sdk.native_vm.ont_id().contract_address
+        # notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        # self.assertIn('Register', notify['States'])
+        # self.assertIn(identity.ont_id, notify['States'])
 
     # def test_add_public_key(self):
     #     hex_public_key = '021bab110b458afaa2d65e0ac3f07fe488cbd034df6843a1ccd3f312d2bfaee443'
