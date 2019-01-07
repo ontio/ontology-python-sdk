@@ -34,7 +34,7 @@ class Signature(object):
         elif curve_name == Curve.P521:
             raise SDKException(ErrorCode.unsupported_key_type)
         else:
-            raise SDKException(ErrorCode.unknown_key_type)
+            raise SDKException(ErrorCode.unsupported_key_type)
         return point_str
 
     def to_byte(self):
