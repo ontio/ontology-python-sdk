@@ -50,6 +50,10 @@ class OntId(object):
         self.__version = b'\x00'
         self.__contract_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03'
 
+    @property
+    def contract_address(self):
+        return binascii.b2a_hex(self.__contract_address[::-1]).decode('ascii')
+
     @staticmethod
     def parse_pub_keys(ont_id: str, raw_pub_keys: str or bytes) -> list:
         if isinstance(raw_pub_keys, str):
@@ -97,7 +101,7 @@ class OntId(object):
                 attr = dict(Key=attr_key, Type=attr_type, Value=attr_value)
                 attributes_list.append(attr)
             except SDKException as e:
-                assert e.args[0] == 10001
+                assert 10000 < e.args[0] < 20000
                 break
         return attributes_list
 
@@ -210,7 +214,7 @@ class OntId(object):
 
     @check_ont_id
     def add_public_key(self, ont_id: str, ctrl_acct: Account, hex_new_public_key: str, payer: Account, gas_limit: int,
-                       gas_price: int):
+                       gas_price: int, is_recovery: bool = False):
         """
         This interface is used to send a Transaction object which is used to add public key.
 
@@ -220,13 +224,18 @@ class OntId(object):
         :param payer: an Account object which indicate who will pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
+        :param is_recovery: indicate whether ctrl account is a recovery account.
         :return:  a hexadecimal transaction hash value.
         """
         if not isinstance(ctrl_acct, Account) or not isinstance(payer, Account):
             raise SDKException(ErrorCode.require_acct_params)
-        bytes_ctrl_pub_key = ctrl_acct.get_public_key_bytes()
         bytes_new_pub_key = binascii.a2b_hex(hex_new_public_key)
-        args = dict(ontid=ont_id, pubkey=bytes_new_pub_key, pubkey_or_recovery=bytes_ctrl_pub_key)
+        if is_recovery:
+            bytes_address = ctrl_acct.get_address_bytes()
+            args = dict(ontid=ont_id, pubkey=bytes_new_pub_key, pubkey_or_recovery=bytes_address)
+        else:
+            bytes_ctrl_pub_key = ctrl_acct.get_public_key_bytes()
+            args = dict(ontid=ont_id, pubkey=bytes_new_pub_key, pubkey_or_recovery=bytes_ctrl_pub_key)
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addKey', args)
         unix_time_now = int(time())
         bytes_payer_address = payer.get_address().to_bytes()
