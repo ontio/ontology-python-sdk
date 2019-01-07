@@ -26,8 +26,7 @@ class Auth(object):
         tx.sign_transaction(account)
         if payer is not None and account.get_address_base58() is not payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.get_network().send_raw_transaction(tx)
-        return tx.hash256_explorer()
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def make_transfer(self, contract_address: str, new_admin_ont_id: str, key_no: str, payer: Account, gas_limit: str,
                       gas_price: str):

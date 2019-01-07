@@ -115,7 +115,6 @@ class Asset(object):
         gas_limit = 0
         attributes = bytearray()
         signers = list()
-        hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, None, invoke_code, attributes, signers)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         name = response['Result']
@@ -139,7 +138,6 @@ class Asset(object):
         gas_limit = 0
         attributes = bytearray()
         signers = list()
-        hash_value = bytearray()
         tx = Transaction(version, tx_type, unix_time_now, gas_price, gas_limit, None, invoke_code, attributes, signers)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         symbol = ContractDataParser.to_utf8_str(response['Result'])
@@ -344,8 +342,7 @@ class Asset(object):
         tx.sign_transaction(claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.get_network().send_raw_transaction(tx)
-        return tx.hash256_explorer()
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def send_approve(self, asset, sender: Account, b58_recv_address: str, amount: int, payer: Account, gas_limit: int,
                      gas_price: int) -> str:
@@ -379,8 +376,7 @@ class Asset(object):
         tx.sign_transaction(sender)
         if sender.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        self.__sdk.get_network().send_raw_transaction(tx)
-        return tx.hash256_explorer()
+        return self.__sdk.get_network().send_raw_transaction(tx)
 
     def send_transfer_from(self, asset: str, sender: Account, b58_from_address: str, b58_recv_address: str, amount: int,
                            payer: Account, gas_limit: int, gas_price: int) -> str:
@@ -416,5 +412,4 @@ class Asset(object):
         tx.sign_transaction(sender)
         if b58_sender_address != b58_payer_address:
             tx.add_sign_transaction(payer)
-        self.__sdk.get_network().send_raw_transaction(tx)
-        return tx.hash256_explorer()
+        return self.__sdk.get_network().send_raw_transaction(tx)
