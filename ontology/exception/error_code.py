@@ -12,7 +12,11 @@ class ErrorCode:
 
     @staticmethod
     def unpack_error(msg: str) -> dict:
-        return ErrorCode.get_error(10001, 'Unpack Error, ' + msg)
+        return ErrorCode.get_error(10001, f'Binary Reader Error, {msg}')
+
+    @staticmethod
+    def read_byte_error(msg: str) -> dict:
+        return ErrorCode.get_error(10002, f'Binary Reader Error, {msg}')
 
     @staticmethod
     def params_type_error(msg: str) -> dict:
