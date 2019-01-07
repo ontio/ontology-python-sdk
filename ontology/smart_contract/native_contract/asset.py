@@ -17,22 +17,22 @@ from ontology.vm.build_vm import build_native_invoke_code
 class Asset(object):
     def __init__(self, sdk):
         self.__sdk = sdk
+        self.__ong_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
+        self.__ont_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
 
-    @staticmethod
-    def get_asset_address(asset: str) -> bytearray:
+    def get_asset_address(self, asset: str) -> bytes:
         """
-        This interface is used to get the ONT or ONG asset's address.
+        This interface is used to get the smart contract address of ONT otr ONG.
 
-        :param asset: a string which is used to indicate which asset's address we want to get.
-        :return: asset's address in the form of bytearray.
+        :param asset: a string which is used to indicate which asset's contract address we want to get.
+        :return: the contract address of asset in the form of bytearray.
         """
         if asset.upper() == 'ONT':
-            contract_address = ONT_CONTRACT_ADDRESS
+            return self.__ong_contract
         elif asset.upper() == 'ONG':
-            contract_address = ONG_CONTRACT_ADDRESS
+            return self.__ont_contract
         else:
-            raise ValueError("asset is not equal to ONT or ONG")
-        return contract_address
+            raise SDKException(ErrorCode.other_error('asset is not equal to ONT or ONG.'))
 
     def query_balance(self, asset: str, b58_address: str) -> int:
         """
@@ -43,7 +43,7 @@ class Asset(object):
         :return: account balance.
         """
         raw_address = Address.b58decode(b58_address).to_bytes()
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "balanceOf", raw_address)
         unix_time_now = int(time())
         payer = Address(ZERO_ADDRESS).to_bytes()
@@ -69,7 +69,7 @@ class Asset(object):
         :param b58_to_address: a base58 encode address which indicate where the allowance to.
         :return: the amount of allowance in the from of int.
         """
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         raw_from = Address.b58decode(b58_from_address).to_bytes()
         raw_to = Address.b58decode(b58_to_address).to_bytes()
         args = {"from": raw_from, "to": raw_to}
@@ -97,7 +97,7 @@ class Asset(object):
         :param base58_address: a base58 encode address which indicate which account's unbound ong we want to query.
         :return: the amount of unbound ong in the form of int.
         """
-        contract_address = utils.get_asset_address('ont')
+        contract_address = self.get_asset_address('ont')
         unbound_ong = self.__sdk.rpc.get_allowance("ong", Address(contract_address).b58encode(), base58_address)
         return int(unbound_ong)
 
@@ -108,7 +108,7 @@ class Asset(object):
         :param asset: a string which is used to indicate which asset's name we want to get.
         :return: asset's name in the form of string.
         """
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         method = 'name'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
@@ -133,7 +133,7 @@ class Asset(object):
         :param asset: a string which is used to indicate which asset's symbol we want to get.
         :return: asset's symbol in the form of string.
         """
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         method = 'symbol'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
@@ -157,7 +157,7 @@ class Asset(object):
         :param asset: a string which is used to indicate which asset's decimals we want to get
         :return: asset's decimals in the form of int
         """
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         method = 'decimals'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
         unix_time_now = int(time())
@@ -203,7 +203,7 @@ class Asset(object):
             raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         raw_from = Address.b58decode(b58_from_address).to_bytes()
         raw_to = Address.b58decode(b58_to_address).to_bytes()
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
@@ -242,7 +242,7 @@ class Asset(object):
             raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         raw_send = Address.b58decode(b58_send_address).to_bytes()
         raw_recv = Address.b58decode(b58_recv_address).to_bytes()
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
@@ -273,7 +273,7 @@ class Asset(object):
         raw_from = Address.b58decode(b58_from_address).to_bytes()
         raw_to = Address.b58decode(b58_recv_address).to_bytes()
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
-        contract_address = utils.get_asset_address(asset)
+        contract_address = self.get_asset_address(asset)
         args = {"sender": raw_sender, "from": raw_from, "to": raw_to, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "transferFrom", args)
         unix_time_now = int(time())
@@ -305,8 +305,8 @@ class Asset(object):
             raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
-        ont_contract_address = utils.get_asset_address('ont')
-        ong_contract_address = utils.get_asset_address("ong")
+        ont_contract_address = self.get_asset_address('ont')
+        ong_contract_address = self.get_asset_address("ong")
         args = {"sender": Address.b58decode(b58_claimer_address).to_bytes(), "from": ont_contract_address,
                 "to": Address.b58decode(b58_recv_address).to_bytes(), "value": amount}
         invoke_code = build_native_invoke_code(ong_contract_address, b'\x00', "transferFrom", args)
