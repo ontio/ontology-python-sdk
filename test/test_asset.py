@@ -6,7 +6,7 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from test import acct1, acct2, acct3, acct4
+from test import sdk, acct1, acct2, acct3, acct4
 
 from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
@@ -19,7 +19,6 @@ from ontology.utils.contract_event_parser import ContractEventParser
 
 class TestAsset(unittest.TestCase):
     def test_get_asset_address(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         ont_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
@@ -28,7 +27,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(ong_address, asset.get_asset_address('ong'))
 
     def test_query_name(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         token_name = asset.query_name('ont')
@@ -37,7 +35,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('ONG Token', token_name)
 
     def test_query_symbol(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         try:
@@ -52,7 +49,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_decimals(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         decimals = asset.query_decimals('ong')
@@ -90,7 +86,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_balance(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         private_key = utils.get_random_hex_str(64)
@@ -117,7 +112,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_allowance(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
@@ -128,7 +122,6 @@ class TestAsset(unittest.TestCase):
         self.assertGreaterEqual(allowance, 0)
 
     def test_new_approve_transaction(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         sender = acct2
         b58_send_address = sender.get_address_base58()
@@ -138,8 +131,9 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         try:
-            tx = Asset.new_approve_transaction('ont', b58_send_address, b58_recv_address, amount, b58_payer_address,
-                                               gas_limit, gas_price)
+            tx = sdk.native_vm.asset().new_approve_transaction('ont', b58_send_address, b58_recv_address, amount,
+                                                               b58_payer_address,
+                                                               gas_limit, gas_price)
             tx.sign_transaction(sender)
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
@@ -147,7 +141,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('balance insufficient', e.args[1])
 
     def test_new_transfer_transaction(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         from_acct = acct1
@@ -161,8 +154,9 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
 
-        tx = asset.new_transfer_transaction('ont', b58_from_address, b58_to_address, amount, b58_payer_address,
-                                            gas_limit, gas_price)
+        tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, amount,
+                                                            b58_payer_address,
+                                                            gas_limit, gas_price)
         tx.sign_transaction(from_acct)
         tx.add_sign_transaction(to_acct)
         try:
@@ -188,7 +182,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
     def test_send_transfer(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         from_acct = acct2
@@ -208,7 +201,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_transfer_from_transaction(self):
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         sender = acct2
         b58_sender_address = sender.get_address_base58()
@@ -218,8 +210,9 @@ class TestAsset(unittest.TestCase):
         amount = 1
         gas_limit = 20000
         gas_price = 500
-        tx = Asset.new_transfer_from_transaction('ont', b58_sender_address, b58_from_address, b58_recv_address, amount,
-                                                 b58_payer_address, gas_limit, gas_price)
+        tx = sdk.native_vm.asset().new_transfer_from_transaction('ont', b58_sender_address, b58_from_address,
+                                                                 b58_recv_address, amount,
+                                                                 b58_payer_address, gas_limit, gas_price)
         sdk.add_sign_transaction(tx, sender)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
@@ -242,9 +235,9 @@ class TestAsset(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = Asset.new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount, b58_payer_address,
-                                                gas_limit, gas_price)
-        sdk = OntologySdk()
+        tx = sdk.native_vm.asset().new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount,
+                                                                b58_payer_address,
+                                                                gas_limit, gas_price)
         sdk.rpc.connect_to_test_net()
         sdk.add_sign_transaction(tx, claimer)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
@@ -253,7 +246,6 @@ class TestAsset(unittest.TestCase):
     def test_send_withdraw_ong_transaction(self):
         claimer = acct1
         payer = acct2
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
@@ -270,7 +262,6 @@ class TestAsset(unittest.TestCase):
     def test_send_approve(self):
         sender = acct1
         payer = acct2
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_recv_address = acct2.get_address_base58()
@@ -295,7 +286,6 @@ class TestAsset(unittest.TestCase):
     def test_send_transfer_from(self):
         sender = acct2
         payer = sender
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_from_address = acct1.get_address_base58()

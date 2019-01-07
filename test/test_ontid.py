@@ -33,6 +33,7 @@ class TestOntId(unittest.TestCase):
         ont_id.get_merkle_proof(tx_hash)
 
     def test_get_public_keys(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = 'did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR'
         pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
         for pk in pub_keys:
@@ -49,6 +50,7 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(66, len(pk['Value']))
 
     def test_get_ddo(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         ddo = sdk.native_vm.ont_id().get_ddo(ont_id)
         for pk in ddo['Owners']:
@@ -60,6 +62,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(ont_id, ddo['OntId'])
 
     def test_new_registry_ont_id_transaction(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         hex_public_key = acct2.get_public_key_hex()
         b58_address = acct2.get_address_base58()
@@ -77,6 +80,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
 
     def test_registry_ont_id(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         try:
@@ -94,6 +98,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
 
     def test_add_and_remove_public_key(self):
+        sdk.rpc.connect_to_test_net()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
@@ -145,6 +150,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('public key has already been revoked', e.args[1])
 
     def test_add_and_remove_attribute(self):
+        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)

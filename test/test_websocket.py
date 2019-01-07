@@ -269,7 +269,7 @@ class TestWebsocketClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = Asset.new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
                                             gas_limit, gas_price)
         sdk = OntologySdk()
         tx.sign_transaction(acct)
@@ -288,7 +288,7 @@ class TestWebsocketClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = Asset.new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
                                             gas_limit, gas_price)
         tx.sign_transaction(acct)
         event_loop = asyncio.get_event_loop()
