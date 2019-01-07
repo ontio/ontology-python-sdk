@@ -213,7 +213,7 @@ class Account(object):
 
         :return: the hexadecimal public key in the form of string.
         """
-        return binascii.binascii.b2a_hex(self.__public_key).decode('ascii')
+        return binascii.b2a_hex(self.__public_key).decode('ascii')
 
     def export_wif(self) -> str:
         """
@@ -222,12 +222,9 @@ class Account(object):
 
         :return: a WIF encode private key.
         """
-        data = b'\x80'
-        data = data + self.get_private_key_bytes()
-        data += b'\01'
+        data = b''.join([b'\x80', self.__private_key, b'\01'])
         checksum = Digest.hash256(data[0:34])
-        data += checksum[0:4]
-        wif = base58.b58encode(data)
+        wif = base58.b58encode(b''.join([data, checksum[0:4]]))
         return wif.decode('ascii')
 
     @staticmethod
