@@ -327,6 +327,69 @@ class TestOntId(unittest.TestCase):
         except SDKException as e:
             self.assertIn('no authorization', e.args[1])
 
+    def test_change_recovery(self):
+        sdk.rpc.connect_to_test_net()
+        sdk.restful.connect_to_test_net()
+        label = 'label'
+        identity = sdk.wallet_manager.create_identity(label, password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(5)
+        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.ont_id().contract_address
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Register', notify['States'][0])
+        self.assertEqual(identity.ont_id, notify['States'][1])
+
+        rand_private_key = utils.get_random_bytes(32).hex()
+        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_recovery_address = recovery.get_address_base58()
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
+                                                      gas_limit, gas_price)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(recovery.get_address_hex_reverse(), notify['States'][3])
+        ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
+        self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
+        self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
+        self.assertEqual('P256', ddo['Owners'][0]['Curve'])
+        self.assertEqual(ctrl_acct.get_public_key_hex(), ddo['Owners'][0]['Value'])
+        self.assertEqual(0, len(ddo['Attributes']))
+        self.assertEqual(recovery.get_address_base58(), ddo['Recovery'])
+        self.assertEqual(identity.ont_id, ddo['OntId'])
+
+        rand_private_key = utils.get_random_bytes(32).hex()
+        new_recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_new_recovery_address = new_recovery.get_address_base58()
+
+        try:
+            sdk.native_vm.ont_id().change_recovery(identity.ont_id, b58_new_recovery_address, ctrl_acct, acct2,
+                                                   gas_limit, gas_price)
+        except SDKException as e:
+            self.assertIn('operator is not the recovery', e.args[1])
+        tx_hash = sdk.native_vm.ont_id().change_recovery(identity.ont_id, b58_new_recovery_address, recovery, acct2,
+                                                         gas_limit, gas_price)
+        time.sleep(5)
+        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('change', notify['States'][1])
+        self.assertEqual(identity.ont_id, notify['States'][2])
+        self.assertEqual(new_recovery.get_address_hex_reverse(), notify['States'][3])
+
 
 if __name__ == '__main__':
     unittest.main()
