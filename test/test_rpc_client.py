@@ -257,8 +257,9 @@ class TestRpcClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
-                                            gas_limit, gas_price)
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
+                                                            b58_from_address,
+                                                            gas_limit, gas_price)
         tx.sign_transaction(acct2)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
@@ -270,7 +271,8 @@ class TestRpcClient(unittest.TestCase):
         random_acct = Account(random_pk)
         b58_address_1 = acct2.get_address_base58()
         random_b58_address = random_acct.get_address_base58()
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_address_1, random_b58_address, 2, b58_address_1, 20000, 500)
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_address_1, random_b58_address, 2, b58_address_1,
+                                                            20000, 500)
         tx.sign_transaction(acct2)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(result['Result'], '01')
@@ -303,10 +305,9 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         try:
             tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)
-            self.assertTrue(isinstance(tx_state[0]['Type'], int))
-            self.assertTrue(isinstance(tx_state[1]['Type'], int))
+            self.assertTrue(isinstance(tx_state, list))
         except SDKException as e:
-            self.assertIn('unknown transaction', e.args[1])
+            self.assertEqual(59000, e.args[0])
 
 
 if __name__ == '__main__':
