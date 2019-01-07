@@ -221,7 +221,6 @@ class TestOntId(unittest.TestCase):
         attribute_list = [attribute]
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        password = 'password'
         try:
             identity = sdk.wallet_manager.create_identity_from_private_key('label', password, private_key)
         except SDKException as e:
@@ -237,10 +236,39 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(identity.ont_id, notify[0]['States'][2])
         self.assertEqual('try', bytes.fromhex(notify[0]['States'][3][0]).decode())
 
+    def test_add_recovery(self):
+        label = 'label'
+        global password
+        identity = sdk.wallet_manager.create_identity(label, password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(randint(6, 10))
+        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = '0300000000000000000000000000000000000000'
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
+        self.assertEqual(hex_contract_address, notify['ContractAddress'])
+        self.assertEqual('Register', notify['States'][0])
+        self.assertEqual(identity.ont_id, notify['States'][1])
+
+        rand_private_key = utils.get_random_bytes(32).hex()
+        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
+        b58_recovery_address = recovery.get_address_base58()
+        password = 'password'
+        gas_limit = 20000
+        gas_price = 500
+        try:
+            sdk.native_vm.ont_id().add_recovery(identity.ont_id, password, b58_recovery_address, acct, gas_limit,
+                                                gas_price)
+        except SDKException as e:
+            self.assertEqual(59000, e.args[0])
+            self.assertIn('already set recovery', e.args[1])
+
     def test_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
-        password = 'password'
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
         gas_limit = 20000
@@ -257,6 +285,8 @@ class TestOntId(unittest.TestCase):
         except SDKException as e:
             self.assertEqual(59000, e.args[0])
             self.assertIn('attribute not exist', e.args[1])
+
+    # TODO: test_send_add_public_key_by_recovery
 
     def test_new_add_remove_public_key_transaction(self):
         ont_id = sdk.native_vm.ont_id()
@@ -322,31 +352,6 @@ class TestOntId(unittest.TestCase):
         except SDKException as e:
             self.assertEqual(59000, e.args[0])
             self.assertIn('already set recovery', e.args[1])
-
-    def test_send_add_recovery_transaction(self):
-        ont_id = sdk.native_vm.ont_id()
-        label = 'label'
-        password = 'password'
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        try:
-            identity = sdk.wallet_manager.create_identity_from_private_key(label, password, private_key)
-        except SDKException as e:
-            self.assertIn('Wallet identity exists', e.args[1])
-            return
-        rand_private_key = utils.get_random_bytes(32).hex()
-        recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
-        b58_recovery_address = recovery.get_address_base58()
-        password = 'password'
-        gas_limit = 20000
-        gas_price = 500
-        try:
-            ont_id.send_add_recovery_transaction(identity, password, b58_recovery_address, acct, gas_limit, gas_price)
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('already set recovery', e.args[1])
-
-    # TODO: test_send_add_public_key_by_recovery
 
 
 if __name__ == '__main__':
