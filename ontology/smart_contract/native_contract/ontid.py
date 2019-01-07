@@ -223,12 +223,13 @@ class OntId(object):
         """
         if not isinstance(operator, Account) or not isinstance(payer, Account):
             raise SDKException(ErrorCode.require_acct_params)
-        bytes_new_pub_key = binascii.a2b_hex(hex_new_public_key)
         if is_recovery:
             bytes_operator = operator.get_address_bytes()
         else:
             bytes_operator = operator.get_public_key_bytes()
-        tx = self.new_add_public_key_transaction(ont_id, bytes_operator, hex_new_public_key)
+        b58_payer_address = payer.get_address_base58()
+        tx = self.new_add_public_key_transaction(ont_id, bytes_operator, hex_new_public_key, b58_payer_address,
+                                                 gas_limit, gas_price, is_recovery)
         tx.sign_transaction(operator)
         tx.add_sign_transaction(payer)
         return self.__sdk.get_network().send_raw_transaction(tx)
@@ -358,14 +359,15 @@ class OntId(object):
 
     @check_ont_id
     def new_add_public_key_transaction(self, ont_id: str, bytes_operator: bytes, new_pub_key: str or bytes,
-                                       payer: str, gas_limit: int, gas_price: int, is_recovery: bool = False):
+                                       b58_payer_address: str, gas_limit: int, gas_price: int,
+                                       is_recovery: bool = False):
         """
         This interface is used to send a Transaction object which is used to add public key.
 
         :param ont_id: OntId.
         :param bytes_operator: operator args in from of bytes.
         :param new_pub_key: the new hexadecimal public key in the form of string.
-        :param payer: an Account object which indicate who will pay for the transaction.
+        :param b58_payer_address: a base58 encode address which indicate who will pay for the transaction.
         :param gas_limit: an int value that indicate the gas limit.
         :param gas_price: an int value that indicate the gas price.
         :param is_recovery: indicate whether ctrl account is a recovery account.
@@ -382,8 +384,8 @@ class OntId(object):
         else:
             args = dict(ontid=ont_id, pubkey=bytes_new_pub_key, pubkey_or_recovery=bytes_operator)
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addKey', args)
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, Address.b58decode(payer).to_bytes(), invoke_code,
-                         bytearray(), [])
+        payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
         return tx
 
     @check_ont_id
@@ -467,7 +469,8 @@ class OntId(object):
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'removeAttribute',
                                                         args)
         unix_time_now = int(time())
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, b58_payer_address, invoke_code, bytearray(), [])
+        payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
         return tx
 
     @check_ont_id
@@ -494,7 +497,6 @@ class OntId(object):
         args = dict(ontid=ont_id.encode('utf-8'), recovery=bytes_recovery_address, pubkey=bytes_pub_key)
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addRecovery', args)
         unix_time_now = int(time())
-        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
-                         [])
+        payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
         return tx
