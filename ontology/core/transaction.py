@@ -70,7 +70,7 @@ class Transaction(object):
         writer.write_uint32(self.nonce)
         writer.write_uint64(self.gas_price)
         writer.write_uint64(self.gas_limit)
-        writer.write_bytes(bytes(self.payer))
+        writer.write_bytes(self.payer)
         self.serialize_exclusive_data(writer)
         if self.payload is not None:
             writer.write_var_bytes(bytes(self.payload))
