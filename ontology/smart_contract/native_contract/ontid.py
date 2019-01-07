@@ -343,6 +343,31 @@ class OntId(object):
         return tx_hash
 
     @check_ont_id
+    def verify_signature(self, ont_id: str, key_index: int, sign_acct: Account) -> bool:
+        if key_index < 1:
+            raise SDKException(ErrorCode.param_err('Invalid key index.'))
+        tx = self.new_verify_signature_transaction(ont_id, key_index)
+        tx.sign_transaction(sign_acct)
+        try:
+            self.__sdk.get_network().send_raw_transaction_pre_exec(tx)
+        except SDKException as e:
+            if 'verify signature failed' in e.args[1]:
+                return False
+            else:
+                raise e
+        return True
+
+    @check_ont_id
+    def new_verify_signature_transaction(self, ont_id: str, key_index: int):
+        if key_index < 1:
+            raise SDKException(ErrorCode.param_err('Invalid key index.'))
+        args = dict(ontid=ont_id.encode('utf-8'), index=key_index)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'verifySignature',
+                                                        args)
+        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), [])
+        return tx
+
+    @check_ont_id
     def new_change_recovery_transaction(self, ont_id: str, b58_new_recovery_address: str, b58_recovery_address: str,
                                         b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
         """
