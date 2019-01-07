@@ -90,7 +90,7 @@ class BinaryWriter(StreamManager):
         """
         return self.write_bytes(struct.pack(fmt, data), unhex=False)
 
-    def WriteChar(self, value):
+    def write_char(self, value):
         """
         Write a 1 byte character value to the stream.
 
