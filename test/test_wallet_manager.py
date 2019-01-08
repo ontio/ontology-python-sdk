@@ -36,12 +36,24 @@ class TestWalletManager(unittest.TestCase):
             default_identity = wm.get_default_identity()
             self.assertEqual(label, default_identity.label)
             wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
+        finally:
+            wm.del_wallet_file()
+
+    def test_deep_copy(self):
+        wm = WalletManager()
+        self.assertRaises(SDKException, wm.open_wallet)
+        wm.create_wallet_file(path)
+        try:
+            wm.open_wallet(path)
+            for index in range(5):
+                wm.create_account(f'label{index}', password)
+                wm.write_wallet()
+                self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
+                self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
+                self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
+                self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
+                self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
+                self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -52,13 +64,6 @@ class TestWalletManager(unittest.TestCase):
         try:
             wm.open_wallet(path)
             self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -147,13 +152,6 @@ class TestWalletManager(unittest.TestCase):
                 wm.create_account('', password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -174,13 +172,6 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_identity_by_index(index)
                 default_identity = wm.get_default_identity()
                 self.assertEqual(identities[index], default_identity)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -205,13 +196,6 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
                 default_identity = wm.get_default_identity()
                 self.assertEqual(rand_ont_id, default_identity.ont_id)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -231,13 +215,6 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_account_by_index(index)
                 default_address = wm.get_wallet().get_default_account_address()
                 self.assertEqual(accounts[index].b58_address, default_address)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -257,13 +234,6 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_account_by_address(acct.b58_address)
                 default_address = wm.get_wallet().get_default_account_address()
                 self.assertEqual(default_address, acct.b58_address)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -282,13 +252,6 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_account_by_address(acct.b58_address)
                 default_account = wm.get_default_account_data()
                 self.assertEqual(default_account.b58_address, acct.b58_address)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -308,13 +271,6 @@ class TestWalletManager(unittest.TestCase):
             wm.import_identity(label, encrypted_private_key, password, salt, b58_address)
             identity = wm.get_default_identity()
             self.assertEqual(label, identity.label)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
@@ -328,13 +284,6 @@ class TestWalletManager(unittest.TestCase):
             ide = wm.create_identity_from_private_key("ide", "1", private_key)
             self.assertEqual(ide.label, 'ide')
             self.assertEqual(ide.ont_id, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
