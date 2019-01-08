@@ -31,6 +31,8 @@ class ClmType(Enum):
 
 class Header(object):
     def __init__(self, kid: str, alg: ClmAlg = ClmAlg.ES256, claim_type: ClmType = ClmType.witness_claim):
+        if not isinstance(kid, str):
+            raise SDKException(ErrorCode.require_str_params)
         if not isinstance(alg, ClmAlg):
             raise SDKException(ErrorCode.other_error('Invalid signature algorithm.'))
         self.__alg = alg
@@ -84,4 +86,4 @@ class Header(object):
         return self.to_json_str().encode('utf-8')
 
     def to_base64(self):
-        return base64.b64encode(self.to_json_str())
+        return base64.b64encode(self.to_bytes()).decode('ascii')
