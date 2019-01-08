@@ -6,8 +6,7 @@ from time import time, sleep
 
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
-from ontology.merkle.merkle_verifier import MerkleVerifier
-from test import sdk, acct1, identity1, sdk, identity2, identity2_ctrl_acct
+from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct
 
 
 class TestClaim(unittest.TestCase):
