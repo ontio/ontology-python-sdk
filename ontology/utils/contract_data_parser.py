@@ -70,17 +70,18 @@ class ContractDataParser(object):
         return hex_str
 
     @staticmethod
-    def to_utf8_str(hex_str: str) -> str:
+    def to_utf8_str(ascii_str: str) -> str:
         try:
-            utf8_str = binascii.a2b_hex(hex_str)
+            utf8_str = binascii.a2b_hex(ascii_str)
             utf8_str = utf8_str.decode('utf-8')
         except (ValueError, binascii.Error)as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return utf8_str
 
     @staticmethod
-    def to_hex_str(bytes_str: str) -> str:
-        return binascii.b2a_hex(bytes_str).decode('ascii')
+    def to_hex_str(ascii_str: str) -> str:
+        hex_str = binascii.a2b_hex(ascii_str)
+        return hex_str.decode('ascii')
 
     @staticmethod
     def to_utf8_str_list(hex_str_list: list) -> List[bytes]:

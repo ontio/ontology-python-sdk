@@ -40,7 +40,7 @@ class TestWebsocketClient(unittest.TestCase):
     async def oep4_transfer(hex_contract_address, from_acct, b58_to_address, value):
         sdk.rpc.connect_to_test_net()
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(hex_contract_address)
+        oep4.hex_contract_address = hex_contract_address
         gas_limit = 20000000
         gas_price = 500
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, acct3, gas_limit, gas_price)
@@ -268,8 +268,9 @@ class TestWebsocketClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
-                                            gas_limit, gas_price)
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
+                                                            b58_from_address,
+                                                            gas_limit, gas_price)
         tx.sign_transaction(acct)
         event_loop = asyncio.get_event_loop()
         tx_hash, event = event_loop.run_until_complete(TestWebsocketClient.send_raw_transaction_and_query_tx_case(tx))
@@ -286,8 +287,9 @@ class TestWebsocketClient(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount, b58_from_address,
-                                            gas_limit, gas_price)
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
+                                                            b58_from_address,
+                                                            gas_limit, gas_price)
         tx.sign_transaction(acct)
         event_loop = asyncio.get_event_loop()
         response = event_loop.run_until_complete(websocket_client.send_raw_transaction_pre_exec(tx))

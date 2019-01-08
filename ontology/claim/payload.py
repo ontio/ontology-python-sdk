@@ -10,13 +10,25 @@ from ontology.exception.exception import SDKException
 
 
 class Payload(object):
-    def __init__(self, ver: str, iss: str, sub: str, iat: int, exp: int, context: str, clm: dict,
+    def __init__(self, ver: str, iss_ont_id: str, sub_ont_id: str, iat: int, exp: int, context: str, clm: dict,
                  clm_rev: dict, jti: str = ''):
+        if not isinstance(ver, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if not isinstance(iss_ont_id, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if not isinstance(sub_ont_id, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if not isinstance(iat, int):
+            raise SDKException(ErrorCode.require_int_params)
+        if not isinstance(clm, dict):
+            raise SDKException(ErrorCode.require_dict_params)
+        if not isinstance(clm_rev, dict):
+            raise SDKException(ErrorCode.require_dict_params)
         if not isinstance(jti, str):
-            raise (SDKException(ErrorCode.other_error('Invalid jti')))
+            raise SDKException(ErrorCode.require_str_params)
         self.__version = ver
-        self.__issuer = iss
-        self.__subject = sub
+        self.__issuer_ont_id = iss_ont_id
+        self.__subject = sub_ont_id
         self.__issued_at = iat
         self.__exp = exp
         self.__context = context
@@ -27,8 +39,8 @@ class Payload(object):
             self.__jwt_id = Digest.sha256(json.dumps(dict(self)).encode('utf-8'), is_hex=True)
 
     def __iter__(self):
-        payload = dict(ver=self.__version, iss=self.__issuer, sub=self.__subject, iat=self.__issued_at, exp=self.__exp,
-                       jti=self.__jwt_id)
+        payload = dict(ver=self.__version, iss=self.__issuer_ont_id, sub=self.__subject, iat=self.__issued_at,
+                       exp=self.__exp, jti=self.__jwt_id)
         payload['@context'] = self.__context
         payload['clm'] = self.__claim
         payload['clm-rev'] = self.__claim_revoke
@@ -41,7 +53,7 @@ class Payload(object):
 
     @property
     def iss(self):
-        return self.__issuer
+        return self.__issuer_ont_id
 
     @property
     def sub(self):
@@ -78,4 +90,4 @@ class Payload(object):
         return self.to_json_str().encode('utf-8')
 
     def to_base64(self):
-        return base64.b64encode(self.to_json_str())
+        return base64.b64encode(self.to_bytes()).decode('ascii')

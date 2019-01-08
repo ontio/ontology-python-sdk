@@ -27,11 +27,6 @@ sdk.restful.connect_to_test_net()
 
 
 class TestOntId(unittest.TestCase):
-    def test_get_merkle_proof(self):
-        ont_id = sdk.native_vm.ont_id()
-        tx_hash = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
-        ont_id.get_merkle_proof(tx_hash)
-
     def test_get_public_keys(self):
         sdk.rpc.connect_to_test_net()
         ont_id = 'did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR'

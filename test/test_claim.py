@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
 import unittest
+from time import time, sleep
 
-from ontology.utils import utils
-from ontology.claim.claim import Claim
-from ontology.crypto.curve import Curve
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
-from ontology.crypto.signature import Signature
-from ontology.exception.exception import SDKException
-from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct1, password, identity1, acct4, sdk
+from ontology.merkle.merkle_verifier import MerkleVerifier
+from test import sdk, acct1, identity1, sdk, identity2, identity2_ctrl_acct
 
 
 class TestClaim(unittest.TestCase):
@@ -59,6 +54,60 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
         self.assertEqual(415, len(claim_payload.to_json_str()))
+
+    def test_signature_info(self):
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
+        pk = pub_keys[0]
+        kid = pk['PubKeyId']
+        iss_ont_id = identity2.ont_id
+        sub_ont_id = identity1.ont_id
+        exp = int(time())
+        context = 'https://example.com/template/v1'
+        clm = dict(Name='NashMiao', JobTitle='SoftwareEngineer', HireData=str(time()))
+        clm_rev = dict(type='AttestContract', addr='8055b362904715fd84536e754868f4c8d27ca3f6')
+
+        claim = sdk.service.claim()
+        claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
+        claim.generate_signature(identity2_ctrl_acct)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
+                                                   gas_limit, gas_price)
+        sleep(6)
+        event = sdk.neo_vm.claim_record().query_commit_event(tx_hash)
+        self.assertEqual('Push', event['States'][0])
+        self.assertEqual(identity2_ctrl_acct.get_address_base58(), event['States'][1])
+        self.assertEqual(' create new claim: ', event['States'][2])
+        self.assertEqual(claim.claim_id, event['States'][3])
+
+    def test_claim_demo(self):
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
+        pk = pub_keys[0]
+        kid = pk['PubKeyId']
+        iss_ont_id = identity2.ont_id
+        sub_ont_id = identity1.ont_id
+        exp = int(time())
+        context = 'https://example.com/template/v1'
+        clm = dict(Name='NashMiao', JobTitle='SoftwareEngineer', HireData=str(time()))
+        clm_rev = dict(type='AttestContract', addr='8055b362904715fd84536e754868f4c8d27ca3f6')
+
+        claim = sdk.service.claim()
+        claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
+        claim.generate_signature(identity2_ctrl_acct)
+        gas_limit = 20000
+        gas_price = 500
+        blockchain_proof = claim.generate_blockchain_proof(identity2_ctrl_acct, acct1, gas_limit, gas_price)
+        self.assertTrue(claim.validate_blockchain_proof(blockchain_proof))
+        if blockchain_proof['Nodes'][0]['Direction'] == 'Right':
+            blockchain_proof['Nodes'][0]['Direction'] = 'Left'
+        else:
+            blockchain_proof['Nodes'][0]['Direction'] = 'Right'
+        self.assertFalse(claim.validate_blockchain_proof(blockchain_proof))
+        self.assertTrue(isinstance(claim.to_bytes_blockchain_proof(), bytes))
+        self.assertTrue(isinstance(claim.to_str_blockchain_proof(), str))
+        b64_claim = claim.generate_b64_claim()
+        claim_list = b64_claim.split('.')
+        self.assertEqual(4, len(claim_list))
 
 
 if __name__ == '__main__':

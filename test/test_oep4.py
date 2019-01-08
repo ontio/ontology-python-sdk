@@ -22,15 +22,15 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '85848b5ec3b15617e396bdd62cb49575738dd413'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
-        self.assertEqual(contract_address, oep4.get_contract_address(is_hex=True))
+        oep4.hex_contract_address = contract_address
+        self.assertEqual(contract_address, oep4.hex_contract_address)
 
     def test_get_name(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         self.assertEqual('DXToken', oep4.get_name())
 
     def test_get_symbol(self):
@@ -38,7 +38,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         self.assertEqual('DX', oep4.get_symbol())
 
     def test_get_decimal(self):
@@ -46,13 +46,13 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address1 = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address1)
+        oep4.hex_contract_address = contract_address1
         self.assertEqual(10, oep4.get_decimal())
         contract_address2 = '165b1227311d47c22cd073ef8f285d3bddc858ca'
-        oep4.set_contract_address(contract_address2)
+        oep4.hex_contract_address = contract_address2
         self.assertEqual(32, oep4.get_decimal())
         contract_address3 = '8fecd2740b10a7410026774cc1f99fe14860873b'
-        oep4.set_contract_address(contract_address3)
+        oep4.hex_contract_address = contract_address3
         self.assertEqual(255, oep4.get_decimal())
 
     def test_init(self):
@@ -60,7 +60,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         gas_limit = 20000000
@@ -76,7 +76,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         self.assertEqual(10000000000000000000, oep4.get_total_supply())
 
     def test_transfer(self):
@@ -84,7 +84,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         from_acct = acct1
         gas_limit = 20000000
         gas_price = 500
@@ -92,13 +92,19 @@ class TestOep4(unittest.TestCase):
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
+        time.sleep(6)
+        notify = oep4.query_transfer_event(tx_hash)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(from_acct.get_address_base58(), notify['States'][1])
+        self.assertEqual(b58_to_address, notify['States'][2])
+        self.assertEqual(value, notify['States'][3])
 
     def test_balance_of(self):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         b58_address1 = acct3.get_address_base58()
         b58_address2 = acct4.get_address_base58()
         balance = oep4.balance_of(b58_address1)
@@ -111,7 +117,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         transfer_list = list()
 
         b58_from_address1 = acct1.get_address_base58()
@@ -162,7 +168,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         owner_acct = acct1
         hex_owner_address = owner_acct.get_address_hex()
         spender = acct2
@@ -200,7 +206,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         b58_owner_address = acct1.get_address_base58()
         b58_spender_address = acct2.get_address_base58()
         allowance = oep4.allowance(b58_owner_address, b58_spender_address)
@@ -211,7 +217,7 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         spender_acct = acct2
 
         from_acct = acct1

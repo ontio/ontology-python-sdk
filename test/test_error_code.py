@@ -15,50 +15,38 @@ class TestErrorCode(unittest.TestCase):
         self.assertEqual(error_code["desc"], msg)
 
     def test_constructed_root_hash_err(self):
-        code = 54003
         msg = 'TEST'
         desc = "Other Error, " + msg
         value = ErrorCode.constructed_root_hash_err(msg)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
 
     def test_connect_url_err(self):
-        code = 58403
         msg = 'TEST'
         desc = "connect error: " + msg
         value = ErrorCode.connect_err(msg)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
 
     def test_other_error(self):
-        code = 59000
         msg = 'TEST'
         desc = "Other Error, " + msg
         value = ErrorCode.other_error(msg)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
 
     def test_param_err(self):
-        code = 58005
         msg = 'TEST'
         value = ErrorCode.param_err(msg)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], msg)
 
     def test_invalid_acct_params(self):
-        code = 51001
         desc = "Account Error, invalid private key."
         value = ErrorCode.invalid_private_key
         self.assertEqual(type(value), dict)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
 
     def test_param_length_not_same(self):
-        code = 58105
         desc = "OntAsset Error, param length is not the same"
         value = ErrorCode.param_length_not_same
         self.assertEqual(type(value), dict)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
 
 

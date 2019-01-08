@@ -31,6 +31,27 @@
                 }
             ],
             "isDefault": true
+        },
+        {
+            "ontid": "did:ont:AP8XfCUo7w3qM4b5gyQU8AEyRSwgtDFSzp",
+            "label": "claimIss",
+            "lock": false,
+            "controls": [
+                {
+                    "address": "AP8XfCUo7w3qM4b5gyQU8AEyRSwgtDFSzp",
+                    "algorithm": "ECDSA",
+                    "enc-alg": "aes-256-gcm",
+                    "hash": "sha256",
+                    "id": "keys-1",
+                    "key": "W6F8Tez++TianDvYL6u1bPb6Sn+z8FhtsGzP3M7Gxfd9gmIf0Fx4Oarkd5mM2Vrr",
+                    "parameters": {
+                        "curve": "P-256"
+                    },
+                    "salt": "NTU3MDMxYjJjOTc2ZGIxYw==",
+                    "publicKey": "03eca83d4e4a0ed1e96d87942f76275c49a2f61a6b1e0f33be5a65f9beae71cd3f"
+                }
+            ],
+            "isDefault": false
         }
     ],
     "accounts": [

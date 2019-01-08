@@ -44,7 +44,7 @@ class TestOntologySdk(unittest.TestCase):
         self.assertEqual('ATyGGJBnANKFbf2tQMp4muUEZK7KuZ52k4', b58_multi_address)
         tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_acct1_address, b58_multi_address, amount, b58_acct1_address,
                                             gas_limit, gas_price)
-        sdk.add_sign_transaction(tx, acct1)
+        tx.add_sign_transaction(acct1)
 
         tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_multi_address, b58_acct2_address, amount, b58_acct1_address,
                                             gas_limit, gas_price)
