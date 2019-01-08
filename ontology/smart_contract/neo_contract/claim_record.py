@@ -1,20 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_event_parser import ContractEventParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
 class ClaimRecord(object):
-    def __init__(self, sdk, hex_contract_address: str = '', is_rpc: bool = True):
+    def __init__(self, sdk, hex_contract_address: str = ''):
         self.__sdk = sdk
         if isinstance(hex_contract_address, str) and len(hex_contract_address) == 40:
             self.__hex_contract_address = hex_contract_address
         else:
             self.__hex_contract_address = '36bb5c053b6b839c8f6b923fe852f91239b9fccc'
-        if is_rpc:
-            self.__network = sdk.rpc
-        else:
-            self.__network = sdk.restful
 
     @property
     def hex_contract_address(self):
@@ -33,8 +34,8 @@ class ClaimRecord(object):
             raise SDKException(ErrorCode.other_error('Gas price less than 0.'))
         func = InvokeFunction('Commit')
         func.set_params_value(claim_id, issuer_acct.get_address_bytes(), owner_ont_id)
-        tx_hash = self.__network.send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
-                                                         gas_limit, gas_price, func, False)
+        tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
+                                                                   gas_limit, gas_price, func, False)
         return tx_hash
 
     def revoke(self, claim_id: str, issuer_acct: Account, payer_acct: Account, gas_limit: int, gas_price: int):
@@ -44,12 +45,23 @@ class ClaimRecord(object):
             raise SDKException(ErrorCode.other_error('Gas price less than 0.'))
         func = InvokeFunction('Revoke')
         func.set_params_value(claim_id, issuer_acct.get_address_bytes())
-        tx_hash = self.__network.send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
+        tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
                                                          gas_limit, gas_price, func, False)
         return tx_hash
 
     def get_status(self, claim_id: str):
         func = InvokeFunction('Revoke')
         func.set_params_value(claim_id)
-        status = self.__network.send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func, True)
+        status = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func, True)
         return status
+
+    def query_commit_event(self, tx_hash: str):
+        event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
+        if len(notify) == 0:
+            return notify
+        notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+        notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
+        notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
+        notify['States'][3] = ContractDataParser.to_hex_str(notify['States'][3])
+        return notify
