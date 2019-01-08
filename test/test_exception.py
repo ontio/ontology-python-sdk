@@ -18,7 +18,6 @@ class TestSDKException(unittest.TestCase):
         try:
             raise SDKException(ErrorCode.asset_name_error)
         except SDKException as e:
-            self.assertEqual(58101, e.args[0])
             self.assertEqual('OntAsset Error, asset name error', e.args[1])
 
     def test_sdk_runtime_exception(self):

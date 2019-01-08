@@ -15,11 +15,9 @@ class TestErrorCode(unittest.TestCase):
         self.assertEqual(error_code["desc"], msg)
 
     def test_constructed_root_hash_err(self):
-        code = 54003
         msg = 'TEST'
         desc = "Other Error, " + msg
         value = ErrorCode.constructed_root_hash_err(msg)
-        self.assertEqual(value["error"], code)
         self.assertEqual(value["desc"], desc)
 
     def test_connect_url_err(self):
