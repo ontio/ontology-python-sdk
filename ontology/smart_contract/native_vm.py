@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-from ontology.smart_contract.native_contract.asset import Asset
 from ontology.smart_contract.native_contract.auth import Auth
-from ontology.smart_contract.native_contract.governance import Governance
+from ontology.smart_contract.native_contract.asset import Asset
 from ontology.smart_contract.native_contract.ontid import OntId
+from ontology.smart_contract.native_contract.governance import Governance
 
 
 class NativeVm(object):
