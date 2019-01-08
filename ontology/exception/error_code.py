@@ -161,4 +161,4 @@ class ErrorCode:
 
     @staticmethod
     def other_error(msg: str) -> dict:
-        return ErrorCode.get_error(900000, "Other Error, " + msg)
+        return ErrorCode.get_error(59000, "Other Error, " + msg)
