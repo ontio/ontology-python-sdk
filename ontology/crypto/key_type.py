@@ -38,6 +38,19 @@ class KeyType(Enum):
             return KeyType.from_label(pubkey[0])
 
     @staticmethod
+    def from_str_type(str_type: str):
+        if not isinstance(str_type, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if str_type == 'ECDSA':
+            return KeyType.ECDSA
+        elif str_type == 'SM2':
+            return KeyType.SM2
+        elif str_type == 'EDDSA':
+            return KeyType.ECDSA
+        else:
+            raise SDKException(ErrorCode.unknown_asymmetric_key_type)
+
+    @staticmethod
     def from_signature_scheme(scheme: SignatureScheme):
         if scheme == SignatureScheme.SHA224withECDSA:
             return KeyType.ECDSA
