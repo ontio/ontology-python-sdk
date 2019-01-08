@@ -17,11 +17,12 @@ from ontology.exception.exception import SDKException
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 
+path = os.path.join(os.path.dirname(__file__), 'test.json')
+
 
 class TestWalletManager(unittest.TestCase):
     def test_create_write(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -35,46 +36,50 @@ class TestWalletManager(unittest.TestCase):
             default_identity = wm.get_default_identity()
             self.assertEqual(label, default_identity.label)
             wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
+        finally:
+            wm.del_wallet_file()
+
+    def test_deep_copy(self):
+        wm = WalletManager()
+        self.assertRaises(SDKException, wm.open_wallet)
+        wm.create_wallet_file(path)
+        try:
+            wm.open_wallet(path)
+            for index in range(5):
+                wm.create_account(f'label{index}', password)
+                wm.write_wallet()
+                self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
+                self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
+                self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
+                self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
+                self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
+                self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_open_wallet(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_open_cyano_wallet(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'cyano_wallet.json')
-        wm.open_wallet(path)
+        cyano_path = os.path.join(os.path.dirname(__file__), 'cyano_wallet.json')
+        wm.open_wallet(cyano_path)
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         account = wm.get_account_by_b58_address('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', '1234567890')
         self.assertTrue(isinstance(account, Account))
 
     def test_wallet_data(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'wallet.json')
-        self.assertRaises(SDKException, wm.create_wallet_file, path)
-        wm.open_wallet(path)
+        ont_path = os.path.join(os.path.dirname(__file__), 'wallet.json')
+        self.assertRaises(SDKException, wm.create_wallet_file, ont_path)
+        wm.open_wallet(ont_path)
         self.assertTrue(isinstance(wm, WalletManager))
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
 
@@ -138,7 +143,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_accounts(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -148,19 +152,11 @@ class TestWalletManager(unittest.TestCase):
                 wm.create_account('', password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_set_default_identity_by_index(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -176,19 +172,11 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_identity_by_index(index)
                 default_identity = wm.get_default_identity()
                 self.assertEqual(identities[index], default_identity)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_set_default_identity_by_ont_id(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -208,19 +196,11 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
                 default_identity = wm.get_default_identity()
                 self.assertEqual(rand_ont_id, default_identity.ont_id)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_set_default_account_by_index(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -235,19 +215,11 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_account_by_index(index)
                 default_address = wm.get_wallet().get_default_account_address()
                 self.assertEqual(accounts[index].b58_address, default_address)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_set_default_account_by_address(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -262,19 +234,11 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_account_by_address(acct.b58_address)
                 default_address = wm.get_wallet().get_default_account_address()
                 self.assertEqual(default_address, acct.b58_address)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_get_default_account(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -288,19 +252,11 @@ class TestWalletManager(unittest.TestCase):
                 wm.get_wallet().set_default_account_by_address(acct.b58_address)
                 default_account = wm.get_default_account_data()
                 self.assertEqual(default_account.b58_address, acct.b58_address)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_import_identity(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         wm.open_wallet(path)
@@ -315,19 +271,11 @@ class TestWalletManager(unittest.TestCase):
             wm.import_identity(label, encrypted_private_key, password, salt, b58_address)
             identity = wm.get_default_identity()
             self.assertEqual(label, identity.label)
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_create_identity_from_pri_key(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -336,19 +284,11 @@ class TestWalletManager(unittest.TestCase):
             ide = wm.create_identity_from_private_key("ide", "1", private_key)
             self.assertEqual(ide.label, 'ide')
             self.assertEqual(ide.ont_id, 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve')
-            wm.write_wallet()
-            self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
-            self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file), id(wm.wallet_in_mem))
-            self.assertNotEqual(id(wm.wallet_file.identities), id(wm.wallet_in_mem.identities))
-            self.assertNotEqual(id(wm.wallet_file.accounts), id(wm.wallet_in_mem.accounts))
-            self.assertNotEqual(id(wm.wallet_file.scrypt), id(wm.wallet_in_mem.scrypt))
         finally:
             wm.del_wallet_file()
 
     def test_import_account(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.wallet_path = path
         self.assertEqual(path, wm.wallet_path)
@@ -369,7 +309,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_account_from_private_key(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
