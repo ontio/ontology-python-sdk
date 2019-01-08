@@ -46,13 +46,13 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         contract_address1 = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address1)
+        oep4.hex_contract_address = contract_address1
         self.assertEqual(10, oep4.get_decimal())
         contract_address2 = '165b1227311d47c22cd073ef8f285d3bddc858ca'
-        oep4.set_contract_address(contract_address2)
+        oep4.hex_contract_address = contract_address2
         self.assertEqual(32, oep4.get_decimal())
         contract_address3 = '8fecd2740b10a7410026774cc1f99fe14860873b'
-        oep4.set_contract_address(contract_address3)
+        oep4.hex_contract_address = contract_address3
         self.assertEqual(255, oep4.get_decimal())
 
     def test_init(self):

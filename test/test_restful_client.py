@@ -217,7 +217,7 @@ class TestRestfulClient(unittest.TestCase):
         rpc_address = choice(TEST_RPC_ADDRESS)
         sdk.rpc.set_address(rpc_address)
         oep4 = sdk.neo_vm.oep4()
-        oep4.set_contract_address(contract_address)
+        oep4.hex_contract_address = contract_address
         from_acct = acct4
         gas_limit = 20000000
         gas_price = 500

@@ -192,7 +192,7 @@ class Oep4(object):
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in self.__hex_contract_address:
+        for i in bytearray.fromhex(self.__hex_contract_address):
             params.append(i)
         if len(signers) == 0:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
@@ -285,13 +285,14 @@ class Oep4(object):
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in self.__hex_contract_address:
+        for i in bytearray.fromhex(self.__hex_contract_address):
             params.append(i)
         if payer_acct is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
         payer_address_array = payer_acct.get_address().to_bytes()
         tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address_array, params,
                          bytearray(), [])
+
         tx.sign_transaction(spender_acct)
         if spender_acct.get_address_base58() != payer_acct.get_address_base58():
             tx.add_sign_transaction(payer_acct)
