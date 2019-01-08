@@ -21,7 +21,7 @@ class TestSignatureHandler(unittest.TestCase):
 
     def testTx(self):
         tx = sdk.native_vm.asset().new_transfer_transaction("ont",acc.get_address_base58(),acc.get_address_base58(),10,acc.get_address_base58(),20000,0)
-        sdk.add_sign_transaction(tx, acc)
+        tx.add_sign_transaction(acc)
         self.assertTrue(sdk.verify_signature(tx.sigs[0].public_keys[0], tx.hash256_bytes(), tx.sigs[0].sig_data[0]))
 
     def test_generate_signature(self):
