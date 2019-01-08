@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import threading
-from random import choice
+
+from Cryptodome.Random.random import choice
 
 from ontology.crypto.key_type import KeyType
 from ontology.account.account import Account
