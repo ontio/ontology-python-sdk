@@ -6,7 +6,7 @@ import unittest
 
 from Cryptodome.Random.random import choice
 
-from test import sdk, identity1, password
+from test import password
 
 from ontology.utils import utils
 from ontology.crypto.curve import Curve
