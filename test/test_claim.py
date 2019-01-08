@@ -3,16 +3,14 @@
 
 import json
 import unittest
+from time import time, sleep
 
-from ontology.utils import utils
-from ontology.claim.claim import Claim
-from ontology.crypto.curve import Curve
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
-from ontology.crypto.signature import Signature
-from ontology.exception.exception import SDKException
+from ontology.merkle.merkle_verifier import MerkleVerifier
+from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct1, password, identity1, acct4, sdk
+from test import acct1, password, identity1, acct4, sdk, identity2, identity2_ctrl_acct
 
 
 class TestClaim(unittest.TestCase):
@@ -59,6 +57,75 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
         self.assertEqual(415, len(claim_payload.to_json_str()))
+
+    def test_generate_blockchain_proof(self):
+        tx_hash = 'd7a81db41b2608f2c5da4a4d84b266a8e8f86c244781287c183ee1129e37a9cd'
+        hex_contract_address = '8055b362904715fd84536e754868f4c8d27ca3f6'
+        sdk.rpc.connect_to_main_net()
+        merkle_proof = sdk.get_network().get_merkle_proof(tx_hash)
+        current_block_height = merkle_proof['CurBlockHeight']
+        target_hash = merkle_proof['TransactionsRoot']
+        proof = sdk.service.claim().generate_blockchain_proof(tx_hash, hex_contract_address)
+        self.assertEqual('MerkleProof', proof['Type'])
+        self.assertEqual(tx_hash, proof['TxnHash'])
+        self.assertEqual(hex_contract_address, proof['ContractAddr'])
+        self.assertGreaterEqual(proof['BlockHeight'], current_block_height)
+        proof_node = proof['Nodes']
+        merkle_root = proof['MerkleRoot']
+        result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root)
+        self.assertEqual(True, result)
+
+    def test_signature_info(self):
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
+        pk = pub_keys[0]
+        kid = pk['PubKeyId']
+        iss_ont_id = identity2.ont_id
+        sub_ont_id = identity1.ont_id
+        exp = int(time())
+        context = 'https://example.com/template/v1'
+        clm = dict(Name='NashMiao', JobTitle='SoftwareEngineer', HireData=str(time()))
+        clm_rev = dict(type='AttestContract', addr='8055b362904715fd84536e754868f4c8d27ca3f6')
+
+        claim = sdk.service.claim()
+        claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
+        claim.generate_signature(identity2_ctrl_acct)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
+                                                   gas_limit, gas_price)
+        sleep(6)
+        event = sdk.neo_vm.claim_record().query_commit_event(tx_hash)
+        self.assertEqual('Push', event['States'][0])
+        self.assertEqual(identity2_ctrl_acct.get_address_base58(), event['States'][1])
+        self.assertEqual(' create new claim: ', event['States'][2])
+        self.assertEqual(claim.claim_id, event['States'][3])
+
+    def test_claim_demo(self):
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
+        pk = pub_keys[0]
+        kid = pk['PubKeyId']
+        iss_ont_id = identity2.ont_id
+        sub_ont_id = identity1.ont_id
+        exp = int(time())
+        context = 'https://example.com/template/v1'
+        clm = dict(Name='NashMiao', JobTitle='SoftwareEngineer', HireData=str(time()))
+        clm_rev = dict(type='AttestContract', addr='8055b362904715fd84536e754868f4c8d27ca3f6')
+
+        claim = sdk.service.claim()
+        claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
+        claim.generate_signature(identity2_ctrl_acct)
+        gas_limit = 20000
+        gas_price = 500
+        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
+                                                   gas_limit, gas_price)
+        sleep(6)
+        event = sdk.neo_vm.claim_record().query_commit_event(tx_hash)
+        import json
+        print(json.dumps(event, indent=4))
+        self.assertEqual('Push', event['States'][0])
+        self.assertEqual(identity2_ctrl_acct.get_address_base58(), event['States'][1])
+        self.assertEqual(' create new claim: ', event['States'][2])
+        self.assertEqual(claim.claim_id, event['States'][3])
 
 
 if __name__ == '__main__':
