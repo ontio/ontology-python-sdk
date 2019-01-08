@@ -147,9 +147,14 @@ class OntId(object):
 
     def __generate_transaction(self, method: str, args: dict, b58_payer_address: str or None, gas_limit: int,
                                gas_price: int):
-        payer_address = Address.b58decode(b58_payer_address).to_bytes()
+        if isinstance(b58_payer_address, str):
+            payer = Address.b58decode(b58_payer_address).to_bytes()
+        elif b58_payer_address is None:
+            payer = None
+        else:
+            raise SDKException(ErrorCode.require_str_params)
         invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, method, args)
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer, invoke_code, bytearray(), [])
         return tx
 
     @check_ont_id
