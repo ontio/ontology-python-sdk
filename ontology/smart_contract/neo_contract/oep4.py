@@ -192,7 +192,9 @@ class Oep4(object):
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in bytearray.fromhex(self.__hex_contract_address):
+        bytearray_contract_address = bytearray.fromhex(self.__hex_contract_address)
+        bytearray_contract_address.reverse()
+        for i in bytearray_contract_address:
             params.append(i)
         if len(signers) == 0:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
@@ -285,7 +287,9 @@ class Oep4(object):
         params = func.create_invoke_code()
         unix_time_now = int(time.time())
         params.append(0x67)
-        for i in bytearray.fromhex(self.__hex_contract_address):
+        bytearray_contract_address = bytearray.fromhex(self.__hex_contract_address)
+        bytearray_contract_address.reverse()
+        for i in bytearray_contract_address:
             params.append(i)
         if payer_acct is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
