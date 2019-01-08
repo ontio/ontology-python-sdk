@@ -170,21 +170,6 @@ class OntId(object):
         ddo = OntId.parse_ddo(ont_id, response['Result'])
         return ddo
 
-    def get_merkle_proof(self, tx_hash: str):
-        if not isinstance(tx_hash, str):
-            raise SDKException(ErrorCode.other_error('Invalid TxHash type.'))
-        if len(tx_hash) != 64:
-            raise SDKException(ErrorCode.other_error('Invalid TxHash.'))
-        network = self.__sdk.get_network()
-        proof = network.get_merkle_proof(tx_hash)
-        height = network.get_block_height_by_tx_hash(tx_hash)
-        try:
-            merkle_root = proof['TransactionsRoot']
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('Invalid TxHash')) from None
-        merkle_proof = dict(Type='MerkleProof', TxHash=tx_hash, BlockHeight=height, MerkleRoot=merkle_root)
-        print(json.dumps(proof, indent=4))
-
     @check_ont_id
     def registry_ont_id(self, ont_id: str, ctrl_acct: Account, payer: Account, gas_limit: int, gas_price: int):
         """
