@@ -116,16 +116,18 @@ class TestClaim(unittest.TestCase):
         claim.generate_signature(identity2_ctrl_acct)
         gas_limit = 20000
         gas_price = 500
-        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
-                                                   gas_limit, gas_price)
-        sleep(6)
-        event = sdk.neo_vm.claim_record().query_commit_event(tx_hash)
-        import json
-        print(json.dumps(event, indent=4))
-        self.assertEqual('Push', event['States'][0])
-        self.assertEqual(identity2_ctrl_acct.get_address_base58(), event['States'][1])
-        self.assertEqual(' create new claim: ', event['States'][2])
-        self.assertEqual(claim.claim_id, event['States'][3])
+        blockchain_proof = claim.generate_blockchain_proof(identity2_ctrl_acct, acct1, gas_limit, gas_price)
+        self.assertTrue(claim.validate_blockchain_proof(blockchain_proof))
+        if blockchain_proof['Nodes'][0]['Direction'] == 'Right':
+            blockchain_proof['Nodes'][0]['Direction'] = 'Left'
+        else:
+            blockchain_proof['Nodes'][0]['Direction'] = 'Right'
+        self.assertFalse(claim.validate_blockchain_proof(blockchain_proof))
+        self.assertTrue(isinstance(claim.to_bytes_blockchain_proof(), bytes))
+        self.assertTrue(isinstance(claim.to_str_blockchain_proof(), str))
+        b64_claim = claim.generate_b64_claim()
+        claim_list = b64_claim.split('.')
+        self.assertEqual(4, len(claim_list))
 
 
 if __name__ == '__main__':
