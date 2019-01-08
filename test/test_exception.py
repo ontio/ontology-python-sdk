@@ -13,7 +13,6 @@ class TestSDKException(unittest.TestCase):
         try:
             raise SDKException(ErrorCode.param_error)
         except SDKException as e:
-            self.assertEqual(58004, e.args[0])
             self.assertEqual('param error', e.args[1])
 
         try:
@@ -26,13 +25,11 @@ class TestSDKException(unittest.TestCase):
         try:
             raise SDKRuntimeException(ErrorCode.encrypted_pri_key_error)
         except SDKRuntimeException as e:
-            self.assertEqual(51014, e.args[0])
             self.assertEqual("Account Error, Prikey length error", e.args[1])
 
         try:
             raise SDKRuntimeException(ErrorCode.left_tree_full)
         except SDKRuntimeException as e:
-            self.assertEqual(54005, e.args[0])
             self.assertEqual("left tree always full", e.args[1])
 
 

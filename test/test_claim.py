@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
 import unittest
 from time import time, sleep
 
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
 from ontology.merkle.merkle_verifier import MerkleVerifier
-from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.contract_event_parser import ContractEventParser
-from test import acct1, password, identity1, acct4, sdk, identity2, identity2_ctrl_acct
+from test import sdk, acct1, identity1, sdk, identity2, identity2_ctrl_acct
 
 
 class TestClaim(unittest.TestCase):
@@ -57,23 +54,6 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
         self.assertEqual(415, len(claim_payload.to_json_str()))
-
-    def test_generate_blockchain_proof(self):
-        tx_hash = 'd7a81db41b2608f2c5da4a4d84b266a8e8f86c244781287c183ee1129e37a9cd'
-        hex_contract_address = '8055b362904715fd84536e754868f4c8d27ca3f6'
-        sdk.rpc.connect_to_main_net()
-        merkle_proof = sdk.get_network().get_merkle_proof(tx_hash)
-        current_block_height = merkle_proof['CurBlockHeight']
-        target_hash = merkle_proof['TransactionsRoot']
-        proof = sdk.service.claim().generate_blockchain_proof(tx_hash, hex_contract_address)
-        self.assertEqual('MerkleProof', proof['Type'])
-        self.assertEqual(tx_hash, proof['TxnHash'])
-        self.assertEqual(hex_contract_address, proof['ContractAddr'])
-        self.assertGreaterEqual(proof['BlockHeight'], current_block_height)
-        proof_node = proof['Nodes']
-        merkle_root = proof['MerkleRoot']
-        result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root)
-        self.assertEqual(True, result)
 
     def test_signature_info(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
