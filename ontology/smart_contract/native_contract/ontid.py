@@ -76,7 +76,7 @@ class OntId(object):
                     key_info = dict(PubKeyId=kid, Type=key_type, Curve=curve, Value=hex_pub_key)
                 pub_keys.append(key_info)
             except SDKException as e:
-                if e.args[0] != 1001:
+                if e.args[0] != 10001:
                     raise e
                 else:
                     break
