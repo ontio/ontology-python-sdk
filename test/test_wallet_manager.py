@@ -6,7 +6,7 @@ import unittest
 
 from Cryptodome.Random.random import choice
 
-from test import sdk, identity1, password
+from test import password
 
 from ontology.utils import utils
 from ontology.crypto.curve import Curve
@@ -203,7 +203,7 @@ class TestWalletManager(unittest.TestCase):
             ont_id_list = list()
             for identity in wm.get_wallet().identities:
                 ont_id_list.append(identity.ont_id)
-            for index in range(size * 5):
+            for _ in range(size * 5):
                 rand_ont_id = choice(ont_id_list)
                 wm.get_wallet().set_default_identity_by_ont_id(rand_ont_id)
                 default_identity = wm.get_default_identity()
@@ -253,7 +253,7 @@ class TestWalletManager(unittest.TestCase):
         try:
             wm.open_wallet(path)
             size = 3
-            for i in range(size):
+            for _ in range(size):
                 wm.create_account('', password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-import binascii
 
 from ontology.common.address import Address
 from ontology.account.account import Account
