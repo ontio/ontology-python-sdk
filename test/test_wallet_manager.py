@@ -17,11 +17,12 @@ from ontology.exception.exception import SDKException
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 
+path = os.path.join(os.path.dirname(__file__), 'test.json')
+
 
 class TestWalletManager(unittest.TestCase):
     def test_create_write(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -46,7 +47,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_open_wallet(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -64,17 +64,17 @@ class TestWalletManager(unittest.TestCase):
 
     def test_open_cyano_wallet(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'cyano_wallet.json')
-        wm.open_wallet(path)
+        cyano_path = os.path.join(os.path.dirname(__file__), 'cyano_wallet.json')
+        wm.open_wallet(cyano_path)
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         account = wm.get_account_by_b58_address('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', '1234567890')
         self.assertTrue(isinstance(account, Account))
 
     def test_wallet_data(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'wallet.json')
-        self.assertRaises(SDKException, wm.create_wallet_file, path)
-        wm.open_wallet(path)
+        ont_path = os.path.join(os.path.dirname(__file__), 'wallet.json')
+        self.assertRaises(SDKException, wm.create_wallet_file, ont_path)
+        wm.open_wallet(ont_path)
         self.assertTrue(isinstance(wm, WalletManager))
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
 
@@ -138,7 +138,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_accounts(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -160,7 +159,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_identity_by_index(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -188,7 +186,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_identity_by_ont_id(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -220,7 +217,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_account_by_index(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -247,7 +243,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_account_by_address(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -274,7 +269,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_default_account(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -300,7 +294,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_import_identity(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         wm.open_wallet(path)
@@ -327,7 +320,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_identity_from_pri_key(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
@@ -348,7 +340,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_import_account(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.wallet_path = path
         self.assertEqual(path, wm.wallet_path)
@@ -369,7 +360,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_account_from_private_key(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
