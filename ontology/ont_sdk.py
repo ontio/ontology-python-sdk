@@ -4,14 +4,10 @@
 import threading
 from random import choice
 
-from ontology.core.sig import Sig
-from ontology.common import define
 from ontology.crypto.key_type import KeyType
 from ontology.account.account import Account
 from ontology.service.service import Service
 from ontology.smart_contract.neo_vm import NeoVm
-from ontology.core.program import ProgramBuilder
-from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.native_vm import NativeVm
