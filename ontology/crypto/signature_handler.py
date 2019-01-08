@@ -23,7 +23,7 @@ class SignatureHandler(object):
         self.__type = key_type
         self.__scheme = scheme
 
-    def generate_signature(self, pri_key: bytes, msg: bytes) -> str:
+    def generate_signature(self, pri_key: str, msg: bytes) -> str:
         if self.__scheme == SignatureScheme.SHA224withECDSA:
             private_key = ec.derive_private_key(int(pri_key, 16), ec.SECP224R1(), default_backend())
             signature = private_key.sign(
