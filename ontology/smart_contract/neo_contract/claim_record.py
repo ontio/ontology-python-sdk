@@ -25,6 +25,8 @@ class ClaimRecord(object):
     def hex_contract_address(self, hex_contract_address):
         if isinstance(hex_contract_address, str) and len(hex_contract_address) == 40:
             self.__hex_contract_address = hex_contract_address
+        else:
+            raise SDKException(ErrorCode.invalid_contract_address(hex_contract_address))
 
     def commit(self, claim_id: str, issuer_acct: Account, owner_ont_id: str, payer_acct: Account, gas_limit: int,
                gas_price: int):
@@ -46,13 +48,14 @@ class ClaimRecord(object):
         func = InvokeFunction('Revoke')
         func.set_params_value(claim_id, issuer_acct.get_address_bytes())
         tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
-                                                         gas_limit, gas_price, func, False)
+                                                                   gas_limit, gas_price, func, False)
         return tx_hash
 
     def get_status(self, claim_id: str):
         func = InvokeFunction('Revoke')
         func.set_params_value(claim_id)
-        status = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func, True)
+        status = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func,
+                                                                  True)
         return status
 
     def query_commit_event(self, tx_hash: str):
