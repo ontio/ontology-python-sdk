@@ -6,8 +6,7 @@ from time import time, sleep
 
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
-from ontology.merkle.merkle_verifier import MerkleVerifier
-from test import sdk, acct1, identity1, sdk, identity2, identity2_ctrl_acct
+from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct
 
 
 class TestClaim(unittest.TestCase):
@@ -38,22 +37,10 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(iat, claim_payload_dict['iat'])
         self.assertEqual(exp, claim_payload_dict['exp'])
         self.assertEqual(jti, claim_payload_dict['jti'])
-        self.assertEqual(context, claim_payload_dict['@context'])
-        self.assertEqual(clm, claim_payload_dict['clm'])
-        self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
-        claim_payload = Payload(ver, iss, sub, iat, exp, context, clm, clm_rev)
-        self.assertEqual(415, len(claim_payload.to_json_str()))
-        claim_payload_dict = dict(claim_payload)
-        self.assertEqual(ver, claim_payload_dict['ver'])
-        self.assertEqual(iss, claim_payload_dict['iss'])
-        self.assertEqual(sub, claim_payload_dict['sub'])
-        self.assertEqual(iat, claim_payload_dict['iat'])
-        self.assertEqual(exp, claim_payload_dict['exp'])
         self.assertEqual(64, len(claim_payload_dict['jti']))
         self.assertEqual(context, claim_payload_dict['@context'])
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
-        self.assertEqual(415, len(claim_payload.to_json_str()))
 
     def test_signature_info(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)

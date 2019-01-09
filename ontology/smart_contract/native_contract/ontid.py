@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # # -*- coding: utf-8 -*-
 
-import json
 import binascii
 
 from time import time
@@ -77,8 +76,10 @@ class OntId(object):
                     key_info = dict(PubKeyId=kid, Type=key_type, Curve=curve, Value=hex_pub_key)
                 pub_keys.append(key_info)
             except SDKException as e:
-                assert e.args[0] == 10001
-                break
+                if e.args[0] != 10001:
+                    raise e
+                else:
+                    break
         return pub_keys
 
     @staticmethod
@@ -143,6 +144,18 @@ class OntId(object):
         attribute_list = OntId.parse_attributes(attribute_bytes)
         ddo = dict(Owners=pub_keys, Attributes=attribute_list, Recovery=b58_recovery, OntId=ont_id)
         return ddo
+
+    def __generate_transaction(self, method: str, args: dict, b58_payer_address: str or None, gas_limit: int,
+                               gas_price: int):
+        if isinstance(b58_payer_address, str):
+            payer = Address.b58decode(b58_payer_address).to_bytes()
+        elif b58_payer_address is None:
+            payer = None
+        else:
+            raise SDKException(ErrorCode.require_str_params)
+        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, method, args)
+        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer, invoke_code, bytearray(), [])
+        return tx
 
     @check_ont_id
     def get_public_keys(self, ont_id: str):
@@ -347,9 +360,7 @@ class OntId(object):
         if key_index < 1:
             raise SDKException(ErrorCode.param_err('Invalid key index.'))
         args = dict(ontid=ont_id.encode('utf-8'), index=key_index)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'verifySignature',
-                                                        args)
-        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), [])
+        tx = self.__generate_transaction('verifySignature', args, None, 0, 0)
         return tx
 
     @check_ont_id
@@ -368,10 +379,7 @@ class OntId(object):
         bytes_new_recovery = Address.b58decode(b58_new_recovery_address).to_bytes()
         bytes_recovery = Address.b58decode(b58_recovery_address).to_bytes()
         args = dict(ontid=ont_id.encode('utf-8'), new_recovery=bytes_new_recovery, recovery=bytes_recovery)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'changeRecovery', args)
-        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
-                         [])
+        tx = self.__generate_transaction('changeRecovery', args, b58_payer_address, gas_limit, gas_price)
         return tx
 
     @check_ont_id
@@ -394,11 +402,7 @@ class OntId(object):
         else:
             raise SDKException(ErrorCode.param_err('a bytes or str type of public key is required.'))
         args = dict(ontid=ont_id.encode('utf-8'), ctrl_pk=bytes_ctrl_pub_key)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'regIDWithPublicKey',
-                                                        args)
-        bytes_payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, bytes_payer_address, invoke_code, bytearray(),
-                         [])
+        tx = self.__generate_transaction('regIDWithPublicKey', args, b58_payer_address, gas_limit, gas_price)
         return tx
 
     @check_ont_id
@@ -427,9 +431,7 @@ class OntId(object):
             args = dict(ontid=ont_id, pk=bytes_new_pub_key, operator=bytes_operator)
         else:
             args = dict(ontid=ont_id, pk=bytes_new_pub_key, operator=bytes_operator)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addKey', args)
-        payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        tx = self.__generate_transaction('addKey', args, b58_payer_address, gas_limit, gas_price)
         return tx
 
     @check_ont_id
@@ -454,9 +456,7 @@ class OntId(object):
             raise SDKException(ErrorCode.params_type_error('a bytes or str type of public key is required.'))
         bytes_ont_id = ont_id.encode('utf-8')
         args = dict(ontid=bytes_ont_id, pk=bytes_revoked_pub_key, operator=bytes_operator)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'removeKey', args)
-        payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        tx = self.__generate_transaction('removeKey', args, b58_payer_address, gas_limit, gas_price)
         return tx
 
     @check_ont_id
@@ -484,9 +484,7 @@ class OntId(object):
         attrib_dict = attributes.to_dict()
         args = dict(**args, **attrib_dict)
         args['pubkey'] = bytes_pub_key
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addAttributes', args)
-        payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        tx = self.__generate_transaction('addAttributes', args, b58_payer_address, gas_limit, gas_price)
         return tx
 
     @check_ont_id
@@ -510,11 +508,7 @@ class OntId(object):
         else:
             raise SDKException(ErrorCode.params_type_error('a bytes or str type of public key is required.'))
         args = dict(ontid=ont_id.encode('utf-8'), attrib_key=attrib_key.encode('utf-8'), pk=bytes_pub_key)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'removeAttribute',
-                                                        args)
-        unix_time_now = int(time())
-        payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        tx = self.__generate_transaction('removeAttribute', args, b58_payer_address, gas_limit, gas_price)
         return tx
 
     @check_ont_id
@@ -539,8 +533,5 @@ class OntId(object):
             raise SDKException(ErrorCode.params_type_error('a bytes or str type of public key is required.'))
         bytes_recovery_address = Address.b58decode(b58_recovery_address).to_bytes()
         args = dict(ontid=ont_id.encode('utf-8'), recovery=bytes_recovery_address, pk=bytes_pub_key)
-        invoke_code = build_vm.build_native_invoke_code(self.__contract_address, self.__version, 'addRecovery', args)
-        unix_time_now = int(time())
-        payer_address = Address.b58decode(b58_payer_address).to_bytes()
-        tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_address, invoke_code, bytearray(), [])
+        tx = self.__generate_transaction('addRecovery', args, b58_payer_address, gas_limit, gas_price)
         return tx
