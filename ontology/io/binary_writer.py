@@ -299,11 +299,6 @@ class BinaryWriter(StreamManager):
         Returns:
             int: the number of bytes written.
         """
-        if little_endian:
-            endian = "<"
-        else:
-            endian = ">"
-
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('%s not int type.' % value))
 
