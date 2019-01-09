@@ -4,7 +4,7 @@
 import unittest
 from time import time, sleep
 
-from test import sdk, identity1, identity2, identity2_ctrl_acct
+from test import sdk, identity1, identity2, identity2_ctrl_acct, acct1
 
 gas_limit = 20000
 gas_price = 500
