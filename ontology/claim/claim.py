@@ -17,7 +17,6 @@ from ontology.claim.proof import BlockchainProof
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.merkle.merkle_verifier import MerkleVerifier
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler
 
 

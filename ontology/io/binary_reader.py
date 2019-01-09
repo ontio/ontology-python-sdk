@@ -344,18 +344,17 @@ class BinaryReader(StreamManager):
             list: list of `class_name` objects deserialized from the stream.
         """
         module = '.'.join(class_name.split('.')[:-1])
-        klassname = class_name.split('.')[-1]
-        klass = getattr(importlib.import_module(module), klassname)
+        class_name = class_name.split('.')[-1]
+        class_attr = getattr(importlib.import_module(module), class_name)
         length = self.read_var_int(max_size=max_size)
         items = []
         try:
-            for i in range(0, length):
-                item = klass()
+            for _ in range(0, length):
+                item = class_attr()
                 item.Deserialize(self)
                 items.append(item)
         except Exception as e:
             raise SDKException(ErrorCode.param_err("Couldn't deserialize %s" % e))
-
         return items
 
     def read_2000256_list(self):
@@ -366,7 +365,7 @@ class BinaryReader(StreamManager):
             list: a list containing 2000 64 byte values in reversed form.
         """
         items = []
-        for i in range(0, 2000):
+        for _ in range(0, 2000):
             data = self.read_bytes(64)
             ba = bytearray(binascii.unhexlify(data))
             ba.reverse()
@@ -382,7 +381,7 @@ class BinaryReader(StreamManager):
         """
         len = self.read_var_int()
         items = []
-        for i in range(0, len):
+        for _ in range(0, len):
             ba = bytearray(self.read_bytes(32))
             ba.reverse()
             items.append(ba.hex())

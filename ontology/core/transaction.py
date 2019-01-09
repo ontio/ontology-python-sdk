@@ -142,7 +142,7 @@ class Transaction(object):
             tx.attributes = bytearray()
         sigs_len = reader.read_var_int()
         tx.sigs = []
-        for i in range(0, sigs_len):
+        for _ in range(0, sigs_len):
             tx.sigs.append(Sig.deserialize(reader))
         return tx
 
