@@ -52,6 +52,16 @@ class BlockchainProof(object):
             raise SDKException(ErrorCode.invalid_merkle_root)
         self.__blk_proof['MerkleRoot'] = merkle_root
 
+    @property
+    def proof_node(self):
+        return self.__blk_proof.get('Nodes', list())
+
+    @proof_node.setter
+    def proof_node(self, proof_node: list):
+        if not isinstance(proof_node, list):
+            raise SDKException(ErrorCode.require_list_params)
+        self.__blk_proof['Nodes'] = proof_node
+
     def validate_blk_proof(self) -> bool:
         if self.__blk_proof.get('Type', '') != 'MerkleProof':
             return False
