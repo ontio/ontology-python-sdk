@@ -24,7 +24,8 @@ class TestClaim(unittest.TestCase):
         self.assertEqual('ONT-ES256', claim_header_dict['alg'])
         self.assertEqual(96, len(claim_header.to_json()))
         b64_head = claim_header.to_base64()
-        print(Header.from_base64(b64_head))
+        claim_header_recv = Header.from_base64(b64_head)
+        self.assertEqual(dict(claim_header), dict(claim_header_recv))
 
     def test_payload(self):
         ver = '0.7.0'
@@ -48,6 +49,9 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(context, claim_payload_dict['@context'])
         self.assertEqual(clm, claim_payload_dict['clm'])
         self.assertEqual(clm_rev, claim_payload_dict['clm-rev'])
+        b64_payload = claim_payload.to_base64()
+        claim_payload_recv = Payload.from_base64(b64_payload)
+        self.assertEqual(dict(claim_payload), dict(claim_payload_recv))
 
     def test_proof(self):
         proof_node = [
