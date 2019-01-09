@@ -34,6 +34,10 @@ class ErrorCode:
     require_control_params = get_error.__func__(20010, 'Interface Error, a Control object is required.')
     require_acct_params = get_error.__func__(20011, 'Interface Error, a Account object is required.')
 
+    invalid_b64_claim_data = get_error.__func__(21001, 'Interface Error, invalid base64 encode claim.')
+    invalid_blk_proof = get_error.__func__(21002, 'Interface Error, invalid blockchain proof.')
+    invalid_merkle_root = get_error.__func__(21003, 'Interface Error, invalid merkle root.')
+
     @staticmethod
     def invalid_ont_id_format(ont_id: str):
         return ErrorCode.get_error(30001, f'Identity Error, invalid OntId: {ont_id}')
