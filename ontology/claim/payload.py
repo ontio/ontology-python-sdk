@@ -91,3 +91,15 @@ class Payload(object):
 
     def to_base64(self):
         return base64.b64encode(self.to_bytes()).decode('ascii')
+
+    @staticmethod
+    def from_base64(b64_payload: str):
+        json_payload = base64.b64decode(b64_payload).decode('utf-8')
+        dict_payload = json.loads(json_payload)
+        try:
+            payload = Payload(dict_payload['ver'], dict_payload['iss'], dict_payload['sub'], dict_payload['iat'],
+                              dict_payload['exp'], dict_payload['@context'], dict_payload['clm'],
+                              dict_payload['clm-rev'], dict_payload['jti'])
+        except KeyError:
+            raise SDKException(ErrorCode.invalid_b64_claim_data)
+        return payload
