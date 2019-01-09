@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import copy
 from typing import List
 
 from ontology.crypto.scrypt import Scrypt
