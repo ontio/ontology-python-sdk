@@ -142,7 +142,6 @@ class TestAsset(unittest.TestCase):
 
     def test_new_transfer_transaction(self):
         sdk.rpc.connect_to_test_net()
-        asset = sdk.native_vm.asset()
         from_acct = acct1
         to_acct = acct2
 
