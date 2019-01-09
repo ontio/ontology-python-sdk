@@ -244,7 +244,7 @@ class TestWalletManager(unittest.TestCase):
         try:
             wm.open_wallet(path)
             size = 3
-            for i in range(size):
+            for _ in range(size):
                 wm.create_account('', password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
