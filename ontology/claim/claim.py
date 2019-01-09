@@ -114,10 +114,10 @@ class Claim(object):
         return result
 
     def to_bytes_signature(self):
-        return self.__signature.encode('utf-8')
+        return self.__signature
 
     def to_b64_signature(self):
-        return base64.b64encode(binascii.a2b_hex(self.__signature)).decode('ascii')
+        return base64.b64encode(self.to_bytes_signature()).decode('ascii')
 
     @staticmethod
     def from_base64_signature(b64_signature: str):
