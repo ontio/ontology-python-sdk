@@ -6,7 +6,6 @@ import unittest
 
 from ontology.utils import utils
 from ontology.account.account import Account
-from ontology.wallet.wallet import WalletData
 from ontology.wallet.account import AccountData
 from ontology.crypto.signature_scheme import SignatureScheme
 
@@ -53,7 +52,7 @@ class TestAccount(unittest.TestCase):
         raw_hex_data = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         account = Account(raw_hex_data, SignatureScheme.SHA256withECDSA)
         msg = 'test'.encode('utf-8')
-        signature = account.generate_signature(msg, SignatureScheme.SHA256withECDSA)
+        signature = account.generate_signature(msg)
         result = account.verify_signature(msg, signature)
         self.assertEqual(True, result)
 
