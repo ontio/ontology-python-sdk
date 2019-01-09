@@ -22,7 +22,7 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(kid, claim_header_dict['kid'])
         self.assertTrue(isinstance(claim_header_dict, dict))
         self.assertEqual('ONT-ES256', claim_header_dict['alg'])
-        self.assertEqual(92, len(claim_header.to_json()))
+        self.assertEqual(96, len(claim_header.to_json()))
         b64_head = claim_header.to_base64()
         print(Header.from_base64(b64_head))
 
