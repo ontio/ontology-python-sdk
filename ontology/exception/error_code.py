@@ -37,6 +37,9 @@ class ErrorCode:
     invalid_b64_claim_data = get_error.__func__(21001, 'Interface Error, invalid base64 encode claim.')
     invalid_blk_proof = get_error.__func__(21002, 'Interface Error, invalid blockchain proof.')
     invalid_merkle_root = get_error.__func__(21003, 'Interface Error, invalid merkle root.')
+    invalid_claim_type = get_error.__func__(21004, 'Interface Error, invalid claim type.')
+    invalid_claim_alg = get_error.__func__(21004, 'Interface Error, invalid claim algorithm.')
+    invalid_claim_head_params = get_error.__func__(21005, 'Interface Error, invalid claim head parameter.')
 
     @staticmethod
     def invalid_ont_id_format(ont_id: str):
