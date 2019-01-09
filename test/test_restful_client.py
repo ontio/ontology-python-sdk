@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from random import choice
+
+from Cryptodome.Random.random import choice
 
 from ontology.common.address import Address
 from ontology.account.account import Account

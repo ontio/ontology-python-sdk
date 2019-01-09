@@ -7,7 +7,8 @@ import requests
 
 from time import time
 from typing import List
-from random import choice
+
+from Cryptodome.Random.random import choice
 
 from ontology.account.account import Account
 from ontology.smart_contract.neo_vm import NeoVm
