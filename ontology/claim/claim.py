@@ -26,12 +26,12 @@ class Claim(object):
         self.__sdk = sdk
         self.__head = None
         self.__payload = None
-        self.__signature = ''
+        self.__signature = b''
         self.__blk_proof = BlockchainProof()
 
     def __iter__(self):
-        data = dict(Header=dict(self.__head), Payload=dict(self.__payload), Signature=self.__signature,
-                    Proof=self.__blk_proof)
+        data = dict(Header=dict(self.__head), Payload=dict(self.__payload), Signature=self.to_str_signature(),
+                    Proof=dict(self.__blk_proof))
         for key, value in data.items():
             yield (key, value)
 
@@ -115,6 +115,9 @@ class Claim(object):
 
     def to_bytes_signature(self):
         return self.__signature
+
+    def to_str_signature(self):
+        return self.__signature.decode('latin-1')
 
     def to_b64_signature(self):
         return base64.b64encode(self.to_bytes_signature()).decode('ascii')
