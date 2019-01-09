@@ -49,8 +49,11 @@ class Account(object):
     def generate_signature(self, msg: bytes):
         handler = SignatureHandler(self.__key_type, self.__signature_scheme)
         signature_value = handler.generate_signature(binascii.b2a_hex(self.__private_key), msg)
-        byte_signature = Signature(self.__signature_scheme, signature_value).to_byte()
-        return byte_signature
+        bytes_signature = Signature(self.__signature_scheme, signature_value).to_bytes()
+        result = handler.verify_signature(self.__public_key, msg, bytes_signature)
+        if not result:
+            raise SDKException(ErrorCode.invalid_signature_data)
+        return bytes_signature
 
     def verify_signature(self, msg: bytes, signature: bytes):
         if msg is None or signature is None:
