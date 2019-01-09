@@ -37,10 +37,7 @@ class Signature(object):
             raise SDKException(ErrorCode.unsupported_key_type)
         return point_str
 
-    def to_byte(self):
+    def to_bytes(self):
         if self.__scheme == SignatureScheme.SM3withSM2:
-            raise TypeError
-        bs = bytearray()
-        bs.append(self.__scheme.value)
-        bs += bytearray.fromhex(self.__value)
-        return bs
+            raise SDKException(ErrorCode.unsupported_signature_scheme)
+        return b''.join([int.to_bytes(int(self.__scheme.value), 1, 'little'), bytes.fromhex(self.__value)])
