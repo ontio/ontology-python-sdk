@@ -187,23 +187,3 @@ class OntologySdk(object):
         if not isinstance(self.__websocket, WebsocketClient):
             return ''
         return self.__websocket.get_address()
-
-    @staticmethod
-    def signature_data(acct: Account, data: bytearray or bytes):
-        return acct.generate_signature(data, acct.get_signature_scheme())
-
-    @staticmethod
-    def verify_signature(public_key: bytes, data: bytes, signature: bytes):
-        if len(public_key) == 33:
-            key_type = KeyType.ECDSA
-        elif len(public_key) == 35:
-            key_type = KeyType.from_label(public_key[0])
-        else:
-            raise SDKException(ErrorCode.other_error('Unsupported key type'))
-        if key_type == KeyType.ECDSA:
-            handler = SignatureHandler(key_type, SignatureScheme.SHA256withECDSA)
-        elif key_type == KeyType.SM2:
-            handler = SignatureHandler(key_type, SignatureScheme.SM3withSM2)
-        else:
-            raise SDKException(ErrorCode.other_error('Unsupported key type'))
-        return handler.verify_signature(public_key, data, signature)
