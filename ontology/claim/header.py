@@ -48,7 +48,7 @@ class ClmAlg(Enum):
         elif str_alg == 'EDS512' or str_alg == 'ONT-EDS512':
             return ClmAlg.EDS512
         else:
-            raise SDKException(ErrorCode.unknown_asymmetric_key_type)
+            raise SDKException(ErrorCode.invalid_claim_alg)
 
 
 class ClmType(Enum):
@@ -64,18 +64,22 @@ class ClmType(Enum):
         elif str_type == 'JWT-X':
             return ClmType.witness_claim
         else:
-            raise SDKException(ErrorCode.param_err('Invalid claim type.'))
+            raise SDKException(ErrorCode.invalid_claim_type)
 
 
 class Header(object):
-    def __init__(self, kid: str, alg: ClmAlg = ClmAlg.ES256, claim_type: ClmType = ClmType.witness_claim):
+    def __init__(self, kid: str, alg: ClmAlg or str = ClmAlg.ES256, claim_type: ClmType = ClmType.witness_claim):
         if not isinstance(kid, str):
             raise SDKException(ErrorCode.require_str_params)
+        if isinstance(claim_type, str):
+            claim_type = ClmType.from_str_type(claim_type)
+        if isinstance(alg, str):
+            alg = ClmAlg.from_str_alg(alg)
         if not isinstance(alg, ClmAlg):
-            raise SDKException(ErrorCode.other_error('Invalid signature algorithm.'))
-        self.__alg = alg
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         if not isinstance(claim_type, ClmType):
-            raise SDKException(ErrorCode.other_error('Invalid claim type.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
+        self.__alg = alg
         self.__type = claim_type
         self.__kid = kid
 
@@ -91,7 +95,7 @@ class Header(object):
     @alg.setter
     def alg(self, alg: ClmAlg):
         if not isinstance(alg, ClmAlg):
-            raise SDKException(ErrorCode.other_error('Invalid signature algorithm.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         self.__alg = alg
 
     @property
@@ -101,7 +105,7 @@ class Header(object):
     @type.setter
     def type(self, claim_type: ClmType):
         if not isinstance(claim_type, ClmType):
-            raise SDKException(ErrorCode.other_error('Invalid claim type.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         self.__type = claim_type
 
     @property
@@ -111,24 +115,20 @@ class Header(object):
     @kid.setter
     def kid(self, kid: str):
         if not isinstance(kid, str):
-            raise SDKException(ErrorCode.other_error('Invalid kid type.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         if 'did:ont:' not in kid:
-            raise SDKException(ErrorCode.other_error('Invalid kid, OntId is incomplete.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         if '#keys-' not in kid:
-            raise SDKException(ErrorCode.other_error('Invalid kid, public key is empty.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
+        self.__kid = kid
 
-    def to_json_str(self):
+    def to_json(self):
         return json.dumps(dict(self))
 
-    def to_bytes(self):
-        return self.to_json_str().encode('utf-8')
-
-    def to_base64(self):
-        return base64.b64encode(self.to_bytes()).decode('ascii')
-
     @staticmethod
-    def from_base64(b64_head: str):
-        json_head = base64.b64decode(b64_head).decode('utf-8')
+    def from_json(json_head: str):
+        if not isinstance(json_head, str):
+            raise SDKException(ErrorCode.require_str_params)
         dict_head = json.loads(json_head)
         try:
             alg = ClmAlg.from_str_alg(dict_head['alg'])
@@ -137,3 +137,21 @@ class Header(object):
         except KeyError:
             raise SDKException(ErrorCode.invalid_b64_claim_data)
         return head
+
+    def to_bytes(self):
+        return self.to_json().encode('utf-8')
+
+    @staticmethod
+    def from_bytes(bytes_head: bytes):
+        if not isinstance(bytes_head, bytes):
+            raise SDKException(ErrorCode.require_bytes_params)
+        return Header.from_json(bytes_head.decode('utf-8'))
+
+    def to_base64(self):
+        return base64.b64encode(self.to_bytes()).decode('ascii')
+
+    @staticmethod
+    def from_base64(b64_head: str):
+        if not isinstance(b64_head, str):
+            raise SDKException(ErrorCode.require_str_params)
+        return Header.from_bytes(base64.b64decode(b64_head))
