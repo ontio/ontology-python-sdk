@@ -5,8 +5,6 @@ import threading
 
 from Cryptodome.Random.random import choice
 
-from ontology.crypto.key_type import KeyType
-from ontology.account.account import Account
 from ontology.service.service import Service
 from ontology.smart_contract.neo_vm import NeoVm
 from ontology.exception.error_code import ErrorCode
@@ -15,7 +13,6 @@ from ontology.smart_contract.native_vm import NativeVm
 from ontology.network.websocket import WebsocketClient
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.crypto.signature_handler import SignatureHandler
 from ontology.network.rpc import RpcClient, TEST_RPC_ADDRESS, MAIN_RPC_ADDRESS
 from ontology.network.restful import RestfulClient, TEST_RESTFUL_ADDRESS, MAIN_RESTFUL_ADDRESS
 
