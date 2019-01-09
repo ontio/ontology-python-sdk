@@ -193,7 +193,7 @@ class OntologySdk(object):
         return acct.generate_signature(data, acct.get_signature_scheme())
 
     @staticmethod
-    def verify_signature(public_key: bytearray, data: bytearray, signature: bytearray):
+    def verify_signature(public_key: bytes, data: bytes, signature: bytes):
         if len(public_key) == 33:
             key_type = KeyType.ECDSA
         elif len(public_key) == 35:
