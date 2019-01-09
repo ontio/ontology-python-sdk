@@ -46,13 +46,10 @@ class Account(object):
         self.__public_key = Signature.ec_get_public_key_by_private_key(self.__private_key, self.__curve_name)
         self.__address = Address.address_from_bytes_pubkey(self.__public_key)
 
-    def generate_signature(self, msg: bytes, signature_scheme: SignatureScheme):
-        if signature_scheme == SignatureScheme.SHA256withECDSA:
-            handler = SignatureHandler(self.__key_type, signature_scheme)
-            signature_value = handler.generate_signature(binascii.b2a_hex(self.__private_key), msg)
-            byte_signature = Signature(signature_scheme, signature_value).to_byte()
-        else:
-            raise TypeError
+    def generate_signature(self, msg: bytes):
+        handler = SignatureHandler(self.__key_type, self.__signature_scheme)
+        signature_value = handler.generate_signature(binascii.b2a_hex(self.__private_key), msg)
+        byte_signature = Signature(self.__signature_scheme, signature_value).to_byte()
         return byte_signature
 
     def verify_signature(self, msg: bytes, signature: bytes):
