@@ -113,6 +113,9 @@ class Claim(object):
                 break
         return result
 
+    def validate_blk_proof(self):
+        return self.blk_proof.validate_blk_proof()
+
     def to_bytes_signature(self):
         return self.__signature
 
