@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
+
 import unittest
 
 from ontology.ont_sdk import OntologySdk
