@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from enum import Enum, unique
+from enum import IntEnum, unique
 
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
 @unique
-class SignatureScheme(Enum):
+class SignatureScheme(IntEnum):
     SHA224withECDSA = 0
     SHA256withECDSA = 1
     SHA384withECDSA = 2

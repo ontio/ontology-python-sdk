@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ecdsa import util, NIST256p, SigningKey
+from ecdsa import util, curves, SigningKey
 
 from ontology.crypto.curve import Curve
 from ontology.exception.error_code import ErrorCode
@@ -17,7 +17,7 @@ class Signature(object):
     @staticmethod
     def ec_get_public_key_by_private_key(private_key: bytes, curve_name) -> bytes:
         if curve_name == Curve.P256:
-            private_key = SigningKey.from_string(string=private_key, curve=NIST256p)
+            private_key = SigningKey.from_string(string=private_key, curve=curves.NIST256p)
             verifying_key = private_key.get_verifying_key()
             order = verifying_key.pubkey.order
             x_int = verifying_key.pubkey.point.x()
@@ -37,10 +37,7 @@ class Signature(object):
             raise SDKException(ErrorCode.unsupported_key_type)
         return point_str
 
-    def to_byte(self):
+    def to_bytes(self):
         if self.__scheme == SignatureScheme.SM3withSM2:
-            raise TypeError
-        bs = bytearray()
-        bs.append(self.__scheme.value)
-        bs += bytearray.fromhex(self.__value)
-        return bs
+            raise SDKException(ErrorCode.unsupported_signature_scheme)
+        return b''.join([int.to_bytes(int(self.__scheme.value), 1, 'little'), bytes.fromhex(self.__value)])

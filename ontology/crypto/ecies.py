@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import binascii
 
 from ecdsa.curves import NIST256p

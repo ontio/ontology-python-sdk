@@ -11,33 +11,75 @@ from ontology.exception.exception import SDKException
 
 
 class ClmAlg(Enum):
-    ES224 = 'ES224'
-    ES256 = 'ES256'
-    ES384 = 'ES384'
-    ES512 = 'ES512'
-    ES3_224 = 'ES3-224'
-    ES3_256 = 'ES3-256'
-    ES3_384 = 'ES3-384'
-    ES3_512 = 'ES3-512'
-    ER160 = 'ER160'
-    SM = 'SM'
-    EDS512 = 'EDS512'
+    ES224 = 'ONT-ES224'
+    ES256 = 'ONT-ES256'
+    ES384 = 'ONT-ES384'
+    ES512 = 'ONT-ES512'
+    ES3_224 = 'ONT-ES3-224'
+    ES3_256 = 'ONT-ES3-256'
+    ES3_384 = 'ONT-ES3-384'
+    ES3_512 = 'ONT-ES3-512'
+    ER160 = 'ONT-ER160'
+    SM = 'ONT-SM'
+    EDS512 = 'ONT-EDS512'
+
+    @staticmethod
+    def from_str_alg(str_alg: str):
+        if not isinstance(str_alg, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if str_alg == 'ES224' or str_alg == 'ONT-ES224':
+            return ClmAlg.ES224
+        elif str_alg == 'ES256' or str_alg == 'ONT-ES256':
+            return ClmAlg.ES256
+        elif str_alg == 'ES384' or str_alg == 'ONT-ES384':
+            return ClmAlg.ES384
+        elif str_alg == 'ES512' or str_alg == 'ONT-ES512':
+            return ClmAlg.ES512
+        elif str_alg == 'ES3-224' or str_alg == 'ONT-ES3-224':
+            return ClmAlg.ES3_224
+        elif str_alg == 'ES3-256' or str_alg == 'ONT-ES3-256':
+            return ClmAlg.ES3_256
+        elif str_alg == 'ES3-384' or str_alg == 'ONT-ES3-384':
+            return ClmAlg.ES3_384
+        elif str_alg == 'ER160' or str_alg == 'ONT-ER160':
+            return ClmAlg.ER160
+        elif str_alg == 'SM' or str_alg == 'ONT-SM':
+            return ClmAlg.SM
+        elif str_alg == 'EDS512' or str_alg == 'ONT-EDS512':
+            return ClmAlg.EDS512
+        else:
+            raise SDKException(ErrorCode.invalid_claim_alg)
 
 
 class ClmType(Enum):
     raw_claim = 'JWT'
     witness_claim = 'JWT-X'
 
+    @staticmethod
+    def from_str_type(str_type: str):
+        if not isinstance(str_type, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if str_type == 'JWT':
+            return ClmType.raw_claim
+        elif str_type == 'JWT-X':
+            return ClmType.witness_claim
+        else:
+            raise SDKException(ErrorCode.invalid_claim_type)
+
 
 class Header(object):
-    def __init__(self, kid: str, alg: ClmAlg = ClmAlg.ES256, claim_type: ClmType = ClmType.witness_claim):
+    def __init__(self, kid: str, alg: ClmAlg or str = ClmAlg.ES256, claim_type: ClmType = ClmType.witness_claim):
         if not isinstance(kid, str):
             raise SDKException(ErrorCode.require_str_params)
+        if isinstance(claim_type, str):
+            claim_type = ClmType.from_str_type(claim_type)
+        if isinstance(alg, str):
+            alg = ClmAlg.from_str_alg(alg)
         if not isinstance(alg, ClmAlg):
-            raise SDKException(ErrorCode.other_error('Invalid signature algorithm.'))
-        self.__alg = alg
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         if not isinstance(claim_type, ClmType):
-            raise SDKException(ErrorCode.other_error('Invalid claim type.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
+        self.__alg = alg
         self.__type = claim_type
         self.__kid = kid
 
@@ -53,7 +95,7 @@ class Header(object):
     @alg.setter
     def alg(self, alg: ClmAlg):
         if not isinstance(alg, ClmAlg):
-            raise SDKException(ErrorCode.other_error('Invalid signature algorithm.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         self.__alg = alg
 
     @property
@@ -63,7 +105,7 @@ class Header(object):
     @type.setter
     def type(self, claim_type: ClmType):
         if not isinstance(claim_type, ClmType):
-            raise SDKException(ErrorCode.other_error('Invalid claim type.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         self.__type = claim_type
 
     @property
@@ -73,17 +115,43 @@ class Header(object):
     @kid.setter
     def kid(self, kid: str):
         if not isinstance(kid, str):
-            raise SDKException(ErrorCode.other_error('Invalid kid type.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         if 'did:ont:' not in kid:
-            raise SDKException(ErrorCode.other_error('Invalid kid, OntId is incomplete.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
         if '#keys-' not in kid:
-            raise SDKException(ErrorCode.other_error('Invalid kid, public key is empty.'))
+            raise SDKException(ErrorCode.invalid_claim_head_params)
+        self.__kid = kid
 
-    def to_json_str(self):
+    def to_json(self):
         return json.dumps(dict(self))
 
+    @staticmethod
+    def from_json(json_head: str):
+        if not isinstance(json_head, str):
+            raise SDKException(ErrorCode.require_str_params)
+        dict_head = json.loads(json_head)
+        try:
+            alg = ClmAlg.from_str_alg(dict_head['alg'])
+            typ = ClmType.from_str_type(dict_head['typ'])
+            head = Header(dict_head['kid'], alg, typ)
+        except KeyError:
+            raise SDKException(ErrorCode.invalid_b64_claim_data)
+        return head
+
     def to_bytes(self):
-        return self.to_json_str().encode('utf-8')
+        return self.to_json().encode('utf-8')
+
+    @staticmethod
+    def from_bytes(bytes_head: bytes):
+        if not isinstance(bytes_head, bytes):
+            raise SDKException(ErrorCode.require_bytes_params)
+        return Header.from_json(bytes_head.decode('utf-8'))
 
     def to_base64(self):
         return base64.b64encode(self.to_bytes()).decode('ascii')
+
+    @staticmethod
+    def from_base64(b64_head: str):
+        if not isinstance(b64_head, str):
+            raise SDKException(ErrorCode.require_str_params)
+        return Header.from_bytes(base64.b64decode(b64_head))
