@@ -154,7 +154,7 @@ class Transaction(object):
         :return: a Transaction object which has been signed.
         """
         tx_hash = self.hash256_bytes()
-        sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
+        sig_data = signer.generate_signature(tx_hash)
         sig = [Sig([signer.get_public_key_bytes()], 1, [sig_data])]
         self.sigs = sig
 
@@ -170,7 +170,7 @@ class Transaction(object):
         elif len(self.sigs) >= define.TX_MAX_SIG_SIZE:
             raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         tx_hash = self.hash256_bytes()
-        sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
+        sig_data = signer.generate_signature(tx_hash)
         sig = Sig([signer.get_public_key_bytes()], 1, [sig_data])
         self.sigs.append(sig)
 
@@ -189,7 +189,7 @@ class Transaction(object):
                 pub_keys[index] = pk.encode('ascii')
         pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
         tx_hash = self.hash256_bytes()
-        sig_data = signer.generate_signature(tx_hash, signer.get_signature_scheme())
+        sig_data = signer.generate_signature(tx_hash)
         if self.sigs is None or len(self.sigs) == 0:
             self.sigs = []
         elif len(self.sigs) >= define.TX_MAX_SIG_SIZE:
