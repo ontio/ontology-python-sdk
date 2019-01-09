@@ -139,7 +139,7 @@ def deserialize_stack_item(reader: BinaryReader) -> dict:
         count = reader.read_var_int()
         # TODO
         item_list = list()
-        for i in range(count):
+        for _ in range(count):
             item = deserialize_stack_item(reader)
             item_list.append(item)
         if t == t == BuildParams.Type.struct_type.value:
@@ -148,7 +148,7 @@ def deserialize_stack_item(reader: BinaryReader) -> dict:
     elif t == BuildParams.Type.dict_type.value:
         count = reader.read_var_int()
         item_dict = dict()
-        for i in range(count):
+        for _ in range(count):
             key = deserialize_stack_item(reader)
             value = deserialize_stack_item(reader)
             item_dict[key] = value

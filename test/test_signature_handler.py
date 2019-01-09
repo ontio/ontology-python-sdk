@@ -3,7 +3,6 @@
 
 import unittest
 
-from ontology.crypto.signature_scheme import SignatureScheme
 from test import sdk, acct1, acct2
 
 

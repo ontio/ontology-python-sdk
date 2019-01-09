@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from time import time, sleep
+
+from time import time
 
 from ontology.claim.claim import Claim
 from ontology.claim.header import Header

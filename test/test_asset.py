@@ -13,7 +13,6 @@ from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.smart_contract.native_contract.asset import Asset
 from ontology.utils.contract_event_parser import ContractEventParser
 
 

@@ -17,7 +17,6 @@ from ontology.claim.proof import BlockchainProof
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.merkle.merkle_verifier import MerkleVerifier
-from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler
 
 
@@ -91,7 +90,7 @@ class Claim(object):
 
     def validate_signature(self, b64_claim: str):
         try:
-            b64_head, b64_payload, b64_signature, b64_blk_proof = b64_claim.split('.')
+            b64_head, b64_payload, b64_signature, _ = b64_claim.split('.')
         except ValueError:
             raise SDKException(ErrorCode.invalid_b64_claim_data)
         head = Header.from_base64(b64_head)
