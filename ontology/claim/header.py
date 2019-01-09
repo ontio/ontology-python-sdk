@@ -11,22 +11,60 @@ from ontology.exception.exception import SDKException
 
 
 class ClmAlg(Enum):
-    ES224 = 'ES224'
-    ES256 = 'ES256'
-    ES384 = 'ES384'
-    ES512 = 'ES512'
-    ES3_224 = 'ES3-224'
-    ES3_256 = 'ES3-256'
-    ES3_384 = 'ES3-384'
-    ES3_512 = 'ES3-512'
-    ER160 = 'ER160'
-    SM = 'SM'
-    EDS512 = 'EDS512'
+    ES224 = 'ONT-ES224'
+    ES256 = 'ONT-ES256'
+    ES384 = 'ONT-ES384'
+    ES512 = 'ONT-ES512'
+    ES3_224 = 'ONT-ES3-224'
+    ES3_256 = 'ONT-ES3-256'
+    ES3_384 = 'ONT-ES3-384'
+    ES3_512 = 'ONT-ES3-512'
+    ER160 = 'ONT-ER160'
+    SM = 'ONT-SM'
+    EDS512 = 'ONT-EDS512'
+
+    @staticmethod
+    def from_str_alg(str_alg: str):
+        if not isinstance(str_alg, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if str_alg == 'ES224' or str_alg == 'ONT-ES224':
+            return ClmAlg.ES224
+        elif str_alg == 'ES256' or str_alg == 'ONT-ES256':
+            return ClmAlg.ES256
+        elif str_alg == 'ES384' or str_alg == 'ONT-ES384':
+            return ClmAlg.ES384
+        elif str_alg == 'ES512' or str_alg == 'ONT-ES512':
+            return ClmAlg.ES512
+        elif str_alg == 'ES3-224' or str_alg == 'ONT-ES3-224':
+            return ClmAlg.ES3_224
+        elif str_alg == 'ES3-256' or str_alg == 'ONT-ES3-256':
+            return ClmAlg.ES3_256
+        elif str_alg == 'ES3-384' or str_alg == 'ONT-ES3-384':
+            return ClmAlg.ES3_384
+        elif str_alg == 'ER160' or str_alg == 'ONT-ER160':
+            return ClmAlg.ER160
+        elif str_alg == 'SM' or str_alg == 'ONT-SM':
+            return ClmAlg.SM
+        elif str_alg == 'EDS512' or str_alg == 'ONT-EDS512':
+            return ClmAlg.EDS512
+        else:
+            raise SDKException(ErrorCode.unknown_asymmetric_key_type)
 
 
 class ClmType(Enum):
     raw_claim = 'JWT'
     witness_claim = 'JWT-X'
+
+    @staticmethod
+    def from_str_type(str_type: str):
+        if not isinstance(str_type, str):
+            raise SDKException(ErrorCode.require_str_params)
+        if str_type == 'JWT':
+            return ClmType.raw_claim
+        elif str_type == 'JWT-X':
+            return ClmType.witness_claim
+        else:
+            raise SDKException(ErrorCode.param_err('Invalid claim type.'))
 
 
 class Header(object):
@@ -87,3 +125,15 @@ class Header(object):
 
     def to_base64(self):
         return base64.b64encode(self.to_bytes()).decode('ascii')
+
+    @staticmethod
+    def from_base64(b64_head: str):
+        json_head = base64.b64decode(b64_head).decode('utf-8')
+        dict_head = json.loads(json_head)
+        try:
+            alg = ClmAlg.from_str_alg(dict_head['alg'])
+            typ = ClmType.from_str_type(dict_head['typ'])
+            head = Header(dict_head['kid'], alg, typ)
+        except KeyError:
+            raise SDKException(ErrorCode.invalid_b64_claim_data)
+        return head
