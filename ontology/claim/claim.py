@@ -76,7 +76,7 @@ class Claim(object):
         self.__head = Header(kid)
         self.__payload = Payload(ver, iss_ont_id, sub_ont_id, int(time()), exp, context, clm, clm_rev, jti)
 
-    def generate_signature(self, iss: Account, scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
+    def generate_signature(self, iss: Account):
         if not isinstance(self.__head, Header) or not isinstance(self.__payload, Payload):
             raise SDKException(ErrorCode.other_error('Please set claim parameters first.'))
         key_index = int(self.__head.kid.split('-')[1])
@@ -86,8 +86,8 @@ class Claim(object):
         b64_head = self.__head.to_base64()
         b64_payload = self.__payload.to_base64()
         msg = f'{b64_head}.{b64_payload}'.encode('utf-8')
-        handler = SignatureHandler(KeyType.from_signature_scheme(scheme), scheme)
-        self.__signature = handler.generate_signature(iss.get_private_key_hex(), msg)
+        self.__signature = iss.generate_signature(msg)
+        return self.__signature
 
     def validate_signature(self, b64_claim: str):
         try:
