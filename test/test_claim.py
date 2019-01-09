@@ -101,7 +101,7 @@ class TestClaim(unittest.TestCase):
         claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
         claim.generate_signature(identity2_ctrl_acct)
         blockchain_proof = claim.generate_blk_proof(identity2_ctrl_acct, acct1, gas_limit, gas_price)
-        self.assertTrue(claim.blk_proof.validate_blk_proof())
+        self.assertTrue(claim.validate_blk_proof())
         b64_claim = claim.to_base64()
         claim_list = b64_claim.split('.')
         self.assertEqual(4, len(claim_list))
@@ -114,7 +114,7 @@ class TestClaim(unittest.TestCase):
         else:
             proof_node[0]['Direction'] = 'Right'
         claim.blk_proof.proof_node = proof_node
-        self.assertFalse(claim.validate_blk_proof(blockchain_proof))
+        self.assertFalse(claim.validate_blk_proof())
 
     def test_compatibility(self):
         b64_claim = ('eyJraWQiOiJkaWQ6b250OkFUWmhhVmlyZEVZa3BzSFFEbjlQTXQ1a0RDcTFWUEhjVHIja2V5cy0xIiwidHlwIjoiSldULVgiL'
