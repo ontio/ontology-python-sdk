@@ -147,7 +147,7 @@ class ProgramBuilder(object):
             length = program[len(program) - 2] - int.from_bytes(PUSH1, 'little') + 1
             m = reader.read_byte() - int.from_bytes(PUSH1, 'little') + 1
             pub = []
-            for i in range(length):
+            for _ in range(length):
                 pub.append(reader.read_var_bytes())
             info.set_pubkey(pub)
             info.set_m(m)

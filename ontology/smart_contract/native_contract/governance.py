@@ -322,7 +322,7 @@ class Governance(object):
         reader2 = BinaryReader(stream3)
         length = reader2.read_int32()
         peer_pool_map = {}
-        for i in range(length):
+        for _ in range(length):
             item = PeerPoolItem()
             item.deserialize(reader2)
             peer_pool_map[item.peer_pubkey] = item.to_json()
