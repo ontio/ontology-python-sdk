@@ -80,9 +80,13 @@ class WalletData(object):
         data['createTime'] = self.create_time
         data['defaultOntid'] = self.default_ont_id
         data['defaultAccountAddress'] = self.default_account_address
-        data['scrypt'] = self.scrypt
-        data['identities'] = self.identities
-        data['accounts'] = self.accounts
+        data['scrypt'] = dict(self.scrypt)
+        data['identities'] = list()
+        for identity in self.identities:
+            data['identities'].append(dict(identity))
+        data['accounts'] = list()
+        for acct in self.accounts:
+            data['accounts'].append(dict(acct))
         for key, value in data.items():
             yield (key, value)
 

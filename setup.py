@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from codecs import open
+import codecs
+
 from os import path, getcwd
 from setuptools import setup, find_packages
 
-with open(path.join(getcwd(), 'description.md')) as f:
+with codecs.open(path.join(getcwd(), 'description.md')) as f:
     long_description = f.read()
 
 setup(

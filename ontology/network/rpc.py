@@ -8,8 +8,8 @@ import binascii
 from time import time
 from typing import List
 from sys import maxsize
-from random import choice
-from Cryptodome.Random.random import randint
+
+from Cryptodome.Random.random import randint, choice
 
 from ontology.account.account import Account
 from ontology.smart_contract.neo_vm import NeoVm
