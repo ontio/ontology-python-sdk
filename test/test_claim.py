@@ -77,7 +77,7 @@ class TestClaim(unittest.TestCase):
         self.assertFalse(proof.validate_blk_proof())
 
     def test_signature_info(self):
-        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(identity2.ont_id)
         pk = pub_keys[0]
         kid = pk['PubKeyId']
         iss_ont_id = identity2.ont_id
@@ -90,7 +90,7 @@ class TestClaim(unittest.TestCase):
         claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
         claim.generate_signature(identity2_ctrl_acct)
         b64_claim = claim.to_base64()
-        claim.validate_signature(b64_claim)
+        self.assertTrue(claim.validate_signature(b64_claim))
 
     def test_claim_demo(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
