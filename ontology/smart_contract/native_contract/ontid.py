@@ -102,8 +102,10 @@ class OntId(object):
                 attr = dict(Key=attr_key, Type=attr_type, Value=attr_value)
                 attributes_list.append(attr)
             except SDKException as e:
-                assert 10000 < e.args[0] < 20000
-                break
+                if 10000 < e.args[0] < 20000:
+                    break
+                else:
+                    raise e
         return attributes_list
 
     @staticmethod
