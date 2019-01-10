@@ -5,15 +5,16 @@ import unittest
 
 from Cryptodome.Random.random import choice
 
+from test import acct4, acct3
+
+from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.exception.exception import SDKException
-from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.restful import TEST_RESTFUL_ADDRESS
 from ontology.network.rpc import TEST_RPC_ADDRESS
-from ontology.ont_sdk import OntologySdk
+from ontology.exception.exception import SDKException
+from ontology.network.restful import TEST_RESTFUL_ADDRESS
+from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_data_parser import ContractDataParser
-from test import acct4, acct3
 
 restful_address = choice(TEST_RESTFUL_ADDRESS)
 sdk = OntologySdk(restful_address=restful_address)
