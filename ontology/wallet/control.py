@@ -64,6 +64,7 @@ class Control(object):
     def b58_address(self, b58_address: str):
         if not isinstance(b58_address, str):
             raise SDKException(ErrorCode.require_str_params)
+        self.__address = b58_address
 
     @property
     def public_key(self):
