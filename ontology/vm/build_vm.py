@@ -37,7 +37,7 @@ def build_neo_vm_param(builder, params):
     elif isinstance(params, int):
         builder.emit_push_integer(params)
     elif isinstance(params, list):
-        for i in range(len(params)):
-            build_neo_vm_param(builder, params[i])
+        for p in params:
+            build_neo_vm_param(builder, p)
         builder.emit_push_integer(len(params))
         builder.emit(PACK)

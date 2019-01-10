@@ -379,9 +379,9 @@ class BinaryReader(StreamManager):
         Returns:
             list: a list of hash values. Each value is of the bytearray type.
         """
-        len = self.read_var_int()
+        var_len = self.read_var_int()
         items = []
-        for _ in range(0, len):
+        for _ in range(0, var_len):
             ba = bytearray(self.read_bytes(32))
             ba.reverse()
             items.append(ba.hex())

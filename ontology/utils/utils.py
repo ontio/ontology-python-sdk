@@ -8,8 +8,8 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 from ontology.smart_contract.neo_contract.abi.struct_type import Struct
+from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 
 
 def get_random_bytes(length: int) -> bytes:

@@ -1,5 +1,5 @@
-import json
-from ontology.smart_contract.neo_contract.abi.struct_type import Struct
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
 class Parameter(object):
