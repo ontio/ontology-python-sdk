@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import copy
-import random
 import unittest
 
 from Cryptodome.Random.random import randint, choice
@@ -56,8 +56,8 @@ class TestWalletData(unittest.TestCase):
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
 
-        for i in range(size * 2):
-            index = random.choice(range(size))
+        for _ in range(size * 2):
+            index = choice(range(size))
             acct = wallet.get_account_by_index(index)
             self.assertEqual(address_list[index], acct.b58_address)
 
@@ -74,7 +74,7 @@ class TestWalletData(unittest.TestCase):
             self.assertEqual(len(wallet.accounts), i + 1)
 
         for i in range(size * 2):
-            rand_address = random.choice(address_list)
+            rand_address = choice(address_list)
             acct = wallet.get_account_by_b58_address(rand_address)
             self.assertEqual(rand_address, acct.b58_address)
 
@@ -106,7 +106,7 @@ class TestWalletData(unittest.TestCase):
             self.assertEqual(len(wallet.get_identities()), i + 1)
 
         for i in range(size):
-            rand_id = random.choice(id_list)
+            rand_id = choice(id_list)
             wallet.remove_identity(rand_id)
             id_list.remove(rand_id)
             self.assertEqual(len(wallet.get_identities()), size - i - 1)
