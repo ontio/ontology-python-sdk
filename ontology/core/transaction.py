@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
 import binascii
 
 from typing import List
@@ -13,11 +12,11 @@ from ontology.crypto.digest import Digest
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.core.program import ProgramBuilder
-from ontology.exception.error_code import ErrorCode
-from ontology.exception.exception import SDKException
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 
 
 class TransactionType(Enum):
