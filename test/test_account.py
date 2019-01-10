@@ -4,6 +4,8 @@
 import base64
 import unittest
 
+from test import password
+
 from ontology.utils import utils
 from ontology.account.account import Account
 from ontology.wallet.account import AccountData
@@ -20,7 +22,6 @@ class TestAccount(unittest.TestCase):
         account = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_address = account.get_address_base58()
         salt = utils.get_random_hex_str(16)
-        password = 'password'
         enc_private_key = account.export_gcm_encrypted_private_key(password, salt, 16384)
         decoded_private_key = account.get_gcm_decoded_private_key(enc_private_key, password, b58_address, salt, 16384,
                                                                   SignatureScheme.SHA256withECDSA)
@@ -39,14 +40,15 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(private_key, decoded_private_key)
 
     def test_get_gcm_decoded_private_key(self):
-        encrypted_key_str = '2WMxsxp7+365+i9Rzq1UdXmlX1XzrOu0r9ntNVNZ1XeC3EU3PNNg7XiGCcfP3ReO'
-        password = '88882668'
+        encrypted_key_str = 'hhWuyE1jjKjBOT7T5Rlrea3ewJIR8i6UjTv67bnkHz5YsqgeCfXjrHJTBGQtE0bG'
         b58_address = 'AMeJEzSMSNMZThqGoxBVVFwKsGXpAdVriS'
         salt = base64.b64decode('GXIs0bRy50tEfFuCF/h/yA==')
         n = 4096
         private_key = Account.get_gcm_decoded_private_key(encrypted_key_str, password, b58_address, salt, n,
                                                           SignatureScheme.SHA256withECDSA)
-        self.assertEqual('3708995d9be2c1f02a9bf9c9e38936b7367df715a1c7f65e89f3976480915f2e', private_key)
+        acct = Account(private_key)
+        export_key = acct.export_gcm_encrypted_private_key(password, salt, n)
+        self.assertEqual(encrypted_key_str, export_key)
 
     def test_generate_signature(self):
         raw_hex_data = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -99,9 +101,11 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(wif, account.export_wif())
 
     def test_get_private_key_from_wif(self):
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        wif = 'KyyZpJYXRfW8CXxH2B6FRq5AJsyTH7PjPACgBht4xRjstz4mxkeJ'
-        self.assertEqual(private_key, Account.get_private_key_from_wif(wif).hex())
+        hex_private_key = utils.get_random_bytes(32).hex()
+        acct = Account(hex_private_key)
+        wif = acct.export_wif()
+        import_key = Account.get_private_key_from_wif(wif)
+        self.assertEqual(hex_private_key, import_key.hex())
 
 
 if __name__ == '__main__':
