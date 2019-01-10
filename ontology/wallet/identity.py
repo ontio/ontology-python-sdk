@@ -29,7 +29,9 @@ class Identity(object):
         data['ontid'] = self.__ont_id
         data['label'] = self.label
         data['lock'] = self.lock
-        data['controls'] = self.__controls
+        data['controls'] = list()
+        for ctrl in self.__controls:
+            data['controls'].append(dict(ctrl))
         data['isDefault'] = self.is_default
         for key, value in data.items():
             yield (key, value)

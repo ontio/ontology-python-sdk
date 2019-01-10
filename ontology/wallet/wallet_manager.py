@@ -105,7 +105,7 @@ class WalletManager(object):
     def save(self):
         try:
             with open(self.__wallet_path, 'w') as f:
-                json.dump(self.wallet_in_mem, f, default=lambda obj: dict(obj), indent=4)
+                json.dump(dict(self.wallet_in_mem), f, indent=4)
         except FileNotFoundError as e:
             raise SDKException(ErrorCode.other_error(e.args[1])) from None
 
