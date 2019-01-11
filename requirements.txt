@@ -1,6 +1,6 @@
 websockets
-pycryptodomex>=3.6.6
-cryptography>=2.3.1
-ecdsa>=0.13
-base58>=1.0.0
-requests>=2.19.1
+pycryptodomex
+cryptography
+ecdsa
+base58
+requests

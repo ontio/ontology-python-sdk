@@ -61,7 +61,7 @@ class SignatureHandler(object):
             raise SDKException(ErrorCode.unknown_asymmetric_key_type)
         vk = VerifyingKey.from_string(public_key, curve=NIST256p)
         try:
-            return vk.verify(signature[1:], msg, hashfunc=sha256)
+            return vk.verify(signature, msg, hashfunc=sha256)
         except (AssertionError, keys.BadSignatureError, keys.BadDigestError):
             return False
 
