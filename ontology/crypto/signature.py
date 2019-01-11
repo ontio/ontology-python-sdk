@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import binascii
+
 from ecdsa import util, curves, SigningKey
 
 from ontology.crypto.curve import Curve
@@ -38,6 +40,6 @@ class Signature(object):
         return point_str
 
     def to_bytes(self):
-        if self.__scheme == SignatureScheme.SM3withSM2:
+        if self.__scheme != SignatureScheme.SHA256withECDSA:
             raise SDKException(ErrorCode.unsupported_signature_scheme)
-        return b''.join([int.to_bytes(int(self.__scheme.value), 1, 'little'), bytes.fromhex(self.__value)])
+        return binascii.a2b_hex(self.__value)
