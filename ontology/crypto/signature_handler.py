@@ -59,6 +59,8 @@ class SignatureHandler(object):
             pass
         else:
             raise SDKException(ErrorCode.unknown_asymmetric_key_type)
+        if len(signature) == 65:
+            signature = signature[1:]
         vk = VerifyingKey.from_string(public_key, curve=NIST256p)
         try:
             return vk.verify(signature, msg, hashfunc=sha256)
