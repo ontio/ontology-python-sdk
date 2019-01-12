@@ -33,9 +33,14 @@ class TestSignatureHandler(unittest.TestCase):
 
     def test_verify_cyano_signature(self):
         msg = b'123'
+        sign = '0b6912568942a1e646b3a532dc904e965eb1085bab877bc34fe06768257f07b3' \
+               '079af3fa69fc759b51fa2bf894a7fd748ab5bc326c8663a01f90dcc518184e65'
+        pk = '03036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be889'
+        handler = SignatureHandler(KeyType.ECDSA, SignatureScheme.SHA256withECDSA)
+        result = handler.verify_signature(binascii.a2b_hex(pk), msg, binascii.a2b_hex(sign))
+        self.assertTrue(result)
         sign = '010b6912568942a1e646b3a532dc904e965eb1085bab877bc34fe06768257f07b' \
                '3079af3fa69fc759b51fa2bf894a7fd748ab5bc326c8663a01f90dcc518184e65'
-        pk = '03036c12be3726eb283d078dff481175e96224f0b0c632c7a37e10eb40fe6be889'
         handler = SignatureHandler(KeyType.ECDSA, SignatureScheme.SHA256withECDSA)
         result = handler.verify_signature(binascii.a2b_hex(pk), msg, binascii.a2b_hex(sign))
         self.assertTrue(result)
