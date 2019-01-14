@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from ontology.claim.claim import Claim
+from ontology.claim.proof import BlockchainProof
 
 
 class Service(object):
     def __init__(self, sdk):
         self.__sdk = sdk
+
+    def blockchain_proof(self):
+        return BlockchainProof(self.__sdk)
 
     def claim(self):
         return Claim(self.__sdk)
