@@ -32,14 +32,12 @@ class MerkleVerifier(object):
 
     @staticmethod
     def validate_proof(proof: List[dict], hex_target_hash: str, hex_merkle_root: str):
-        hex_merkle_root = ContractDataParser.to_reserve_hex_str(hex_merkle_root)
-        hex_target_hash = ContractDataParser.to_reserve_hex_str(hex_target_hash)
         if len(proof) == 0:
             return hex_target_hash == hex_merkle_root
         else:
             hex_proof_hash = hex_target_hash
             for node in proof:
-                sibling = ContractDataParser.to_reserve_hex_str(node['TargetHash'])
+                sibling = node['TargetHash']
                 try:
                     direction = node['Direction'].lower()
                 except KeyError:

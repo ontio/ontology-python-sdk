@@ -38,7 +38,27 @@ class TestMerkleVerifier(unittest.TestCase):
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root)
         self.assertEqual(True, result)
 
-    def test_get_proof(self):
+    def test_get_proof_local(self):
+        tx_block_height = 2
+        leaf_0 = 'c7ac8087b4ce292d654001b1ab1bfe5e68fa6f7b8492a5b2f83560f8ac28f5fa'
+        leaf_1 = '5205a22b07c6072d60d28b41f1321ab993799d70693a3bb70bab7e58b49acc30'
+        leaf_2 = 'c0de7f3035a7960450ec9a64e7835b958b0fec1ddb90cbeb0779073c0a9a8f53'
+        target_hash_list = [leaf_0, leaf_1, leaf_2]
+        current_block_height = 6
+        proof_node = MerkleVerifier.get_proof(tx_block_height, target_hash_list, current_block_height)
+        self.assertEqual(3, len(proof_node))
+        self.assertEqual('Right', proof_node[0]['Direction'])
+        self.assertEqual(leaf_0, proof_node[0]['TargetHash'])
+        self.assertEqual('Left', proof_node[1]['Direction'])
+        self.assertEqual(leaf_1, proof_node[1]['TargetHash'])
+        self.assertEqual('Right', proof_node[2]['Direction'])
+        self.assertEqual(leaf_2, proof_node[2]['TargetHash'])
+        target_hash = '4b74e15973ce3964ba4a33ddaf92efbff922ea2225bca7676f62eab05829f11f'
+        current_block_root = 'a5094c1daeeceab46319ce62b600c68a7accc806bd9fe2fdb869560bf66b5251'
+        result = MerkleVerifier.validate_proof(proof_node, target_hash, current_block_root)
+        self.assertTrue(result)
+
+    def test_get_proof_remote(self):
         tx_hash = 'bf74e9208c0a20ec417de458ab6c9d29c12c614e77fb943be4566c95fab61454'
         merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
         tx_block_height = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
