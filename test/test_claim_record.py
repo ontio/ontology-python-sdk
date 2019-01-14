@@ -4,6 +4,7 @@
 import unittest
 from time import time, sleep
 
+from ontology.exception.exception import SDKException
 from test import sdk, identity1, identity2, identity2_ctrl_acct, acct1
 
 gas_limit = 20000
@@ -13,8 +14,11 @@ gas_price = 500
 class TestClaimRecord(unittest.TestCase):
     def test_commit(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
-        pk = pub_keys[0]
-        kid = pk['PubKeyId']
+        try:
+            pk = pub_keys[0]
+            kid = pk['PubKeyId']
+        except IndexError:
+            kid = '03d0fdb54acba3f81db3a6e16fa02e7ea3678bd205eb4ed2f1cfa8ab5e5d45633e#keys-1'
         iss_ont_id = identity2.ont_id
         sub_ont_id = identity1.ont_id
         exp = int(time()) + 100
@@ -24,7 +28,12 @@ class TestClaimRecord(unittest.TestCase):
 
         claim = sdk.service.claim()
         claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
-        claim.generate_signature(identity2_ctrl_acct)
+        try:
+            claim.generate_signature(identity2_ctrl_acct)
+        except SDKException as e:
+            msg = 'get key failed'
+            self.assertTrue(msg in e.args[1])
+            claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
         tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
                                                    gas_limit, gas_price)
         sleep(6)
