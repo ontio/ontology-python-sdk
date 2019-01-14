@@ -109,8 +109,11 @@ class TestClaim(unittest.TestCase):
 
     def test_claim_demo(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
-        pk = pub_keys[0]
-        kid = pk['PubKeyId']
+        try:
+            pk = pub_keys[0]
+            kid = pk['PubKeyId']
+        except IndexError:
+            kid = '03d0fdb54acba3f81db3a6e16fa02e7ea3678bd205eb4ed2f1cfa8ab5e5d45633e#keys-1'
         iss_ont_id = identity2.ont_id
         sub_ont_id = identity1.ont_id
         exp = int(time()) + 1000
@@ -119,7 +122,12 @@ class TestClaim(unittest.TestCase):
         clm_rev = dict(type='AttestContract', addr='8055b362904715fd84536e754868f4c8d27ca3f6')
         claim = sdk.service.claim()
         claim.set_claim(kid, iss_ont_id, sub_ont_id, exp, context, clm, clm_rev)
-        claim.generate_signature(identity2_ctrl_acct)
+        try:
+            claim.generate_signature(identity2_ctrl_acct)
+        except SDKException as e:
+            msg = 'get key failed'
+            self.assertTrue(msg in e.args[1])
+            claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
         blockchain_proof = claim.generate_blk_proof(identity2_ctrl_acct, acct1, gas_limit, gas_price)
         self.assertTrue(claim.validate_blk_proof())
         b64_claim = claim.to_base64()
