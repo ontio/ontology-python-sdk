@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import binascii
 
 from ecdsa import (
     NIST256p,
@@ -11,20 +12,19 @@ from ecdsa import (
 )
 
 from hashlib import sha256
+
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import utils
 
-from ontology.crypto.key_type import KeyType
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class SignatureHandler(object):
-    def __init__(self, key_type: KeyType, scheme: SignatureScheme):
-        self.__type = key_type
+    def __init__(self, scheme: SignatureScheme):
         self.__scheme = scheme
 
     def generate_signature(self, pri_key: str, msg: bytes) -> str:
@@ -52,7 +52,9 @@ class SignatureHandler(object):
         return sign
 
     @staticmethod
-    def verify_signature(public_key: bytes, msg: bytes, signature: bytes):
+    def verify_signature(public_key: bytes or str, msg: bytes, signature: bytes):
+        if isinstance(public_key, str):
+            public_key = binascii.a2b_hex(public_key)
         if public_key.startswith(b'\x02') or public_key.startswith(b'\x03'):
             public_key = SignatureHandler.uncompress_public_key(public_key)
         elif public_key.startswith(b'\x04'):

@@ -75,20 +75,21 @@ class Claim(object):
         self.__head = Header(kid)
         self.__payload = Payload(ver, iss_ont_id, sub_ont_id, int(time()), exp, context, clm, clm_rev, jti)
 
-    def generate_signature(self, iss: Account):
+    def generate_signature(self, iss: Account, verify_kid: bool = True):
         if not isinstance(self.__head, Header) or not isinstance(self.__payload, Payload):
             raise SDKException(ErrorCode.other_error('Please set claim parameters first.'))
-        key_index = int(self.__head.kid.split('-')[1])
-        result = self.__sdk.native_vm.ont_id().verify_signature(iss.get_ont_id(), key_index, iss)
-        if not result:
-            raise SDKException(ErrorCode.other_error('Issuer account error.'))
+        if verify_kid:
+            key_index = int(self.__head.kid.split('-')[1])
+            result = self.__sdk.native_vm.ont_id().verify_signature(iss.get_ont_id(), key_index, iss)
+            if not result:
+                raise SDKException(ErrorCode.other_error('Issuer account error.'))
         b64_head = self.__head.to_base64()
         b64_payload = self.__payload.to_base64()
         msg = f'{b64_head}.{b64_payload}'.encode('utf-8')
         self.__signature = iss.generate_signature(msg)
         return self.__signature
 
-    def validate_signature(self, b64_claim: str):
+    def validate_signature(self, b64_claim: str, verify_kid: bool = True):
         try:
             b64_head, b64_payload, b64_signature, _ = b64_claim.split('.')
         except ValueError:
@@ -98,22 +99,26 @@ class Claim(object):
         signature = base64.b64decode(b64_signature)
         kid = head.kid
         iss_ont_id = payload.iss
-        pub_keys = self.__sdk.native_vm.ont_id().get_public_keys(iss_ont_id)
-        if len(pub_keys) == 0:
-            return False
         msg = f'{b64_head}.{b64_payload}'.encode('ascii')
-        result = False
-        for pk_info in pub_keys:
-            if kid == pk_info.get('PubKeyId', ''):
-                key_type = KeyType.from_str_type(pk_info.get('Type', ''))
-                pk = binascii.a2b_hex(pk_info.get('Value', ''))
-                handler = SignatureHandler(key_type, head.alg)
-                result = handler.verify_signature(pk, msg, signature)
-                break
+        pk = ''
+        if verify_kid:
+            pub_keys = self.__sdk.native_vm.ont_id().get_public_keys(iss_ont_id)
+            if len(pub_keys) == 0:
+                raise SDKException(ErrorCode.invalid_claim_head_params)
+            for pk_info in pub_keys:
+                if kid == pk_info.get('PubKeyId', ''):
+                    pk = pk_info.get('Value', '')
+                    break
+        else:
+            pk = kid.split('#')[0]
+        if pk == '':
+            raise SDKException(ErrorCode.invalid_b64_claim_data)
+        handler = SignatureHandler(head.alg)
+        result = handler.verify_signature(pk, msg, signature)
         return result
 
-    def validate_blk_proof(self):
-        return self.blk_proof.validate_blk_proof()
+    def validate_blk_proof(self, is_big_endian: bool = True):
+        return self.blk_proof.validate_blk_proof(is_big_endian)
 
     def to_bytes_signature(self):
         return self.__signature
@@ -129,7 +134,7 @@ class Claim(object):
         return binascii.b2a_hex(base64.b64decode(b64_signature)).decode('ascii')
 
     def generate_blk_proof(self, iss_acct: Account, payer: Account, gas_limit: int, gas_price: int,
-                           hex_contract_address: str = ''):
+                           is_big_endian: bool = True, hex_contract_address: str = ''):
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.require_str_params)
         if len(hex_contract_address) != 0 and len(hex_contract_address) == 40:
@@ -145,7 +150,7 @@ class Claim(object):
         tx_block_height = self.__sdk.get_network().get_block_height_by_tx_hash(tx_hash)
         target_hash_list = merkle_proof['TargetHashes']
         proof_node = MerkleVerifier.get_proof(tx_block_height, target_hash_list, current_block_height)
-        result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root)
+        result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, is_big_endian)
         if not result:
             raise SDKException(ErrorCode.other_error('Invalid merkle proof'))
         self.__blk_proof = BlockchainProof(tx_hash, hex_contract_address, current_block_height, merkle_root, proof_node)
@@ -158,7 +163,7 @@ class Claim(object):
         b64_blockchain_proof = self.__blk_proof.to_base64()
         return f'{b64_head}.{b64_payload}.{b64_signature}.{b64_blockchain_proof}'
 
-    def from_base64(self, b64_claim: str):
+    def from_base64(self, b64_claim: str, is_big_endian: bool = True):
         try:
             b64_head, b64_payload, b64_signature, b64_blk_proof = b64_claim.split('.')
         except ValueError:
@@ -166,4 +171,4 @@ class Claim(object):
         self.__head = Header.from_base64(b64_head)
         self.__payload = Payload.from_base64(b64_payload)
         self.__signature = base64.b64decode(b64_signature)
-        self.__blk_proof = BlockchainProof.from_base64(b64_blk_proof)
+        self.__blk_proof = BlockchainProof.from_base64(b64_blk_proof, is_big_endian)

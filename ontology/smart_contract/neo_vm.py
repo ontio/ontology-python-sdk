@@ -62,7 +62,7 @@ class NeoVm(object):
         params += code_address
         invoke_tx = InvokeTransaction()
         invoke_tx.version = 0
-        invoke_tx.sigs = bytearray()
+        invoke_tx.sig_list = bytearray()
         invoke_tx.attributes = bytearray()
         unix_time_now = int(time())
         invoke_tx.nonce = unix_time_now

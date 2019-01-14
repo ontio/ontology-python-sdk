@@ -47,7 +47,7 @@ class Account(object):
         self.__address = Address.address_from_bytes_pubkey(self.__public_key)
 
     def generate_signature(self, msg: bytes):
-        handler = SignatureHandler(self.__key_type, self.__signature_scheme)
+        handler = SignatureHandler(self.__signature_scheme)
         signature_value = handler.generate_signature(binascii.b2a_hex(self.__private_key), msg)
         bytes_signature = Signature(self.__signature_scheme, signature_value).to_bytes()
         result = handler.verify_signature(self.__public_key, msg, bytes_signature)
@@ -58,7 +58,7 @@ class Account(object):
     def verify_signature(self, msg: bytes, signature: bytes):
         if msg is None or signature is None:
             raise Exception(ErrorCode.param_err("param should not be None"))
-        handler = SignatureHandler(self.__key_type, self.__signature_scheme)
+        handler = SignatureHandler(self.__signature_scheme)
         return handler.verify_signature(self.get_public_key_bytes(), msg, signature)
 
     def get_ont_id(self):
@@ -171,7 +171,7 @@ class Account(object):
         else:
             raise SDKException(ErrorCode.unknown_asymmetric_key_type)
         stream.flush()
-        bytes_stream = stream.to_bytes()
+        bytes_stream = stream.hexlify()
         StreamManager.release_stream(stream)
         return bytes_stream
 

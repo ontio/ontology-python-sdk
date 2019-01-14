@@ -112,13 +112,17 @@ class MemoryStream(BytesIO):
         return self.writable()
 
     def to_bytes(self):
+        return self.getvalue()
+
+    def hexlify(self):
         """
         Hexlify the stream data.
 
         Returns:
             bytes: b"" object containing the data.
         """
-        return hexlify(self.getvalue())
+        data = self.to_bytes()
+        return hexlify(data)
 
     def clean_up(self):
         """

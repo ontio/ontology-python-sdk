@@ -226,6 +226,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
+        sdk.rpc.connect_to_test_net()
         claimer = acct1
         b58_claimer_address = claimer.get_address_base58()
         b58_recv_address = claimer.get_address_base58()
@@ -233,13 +234,18 @@ class TestAsset(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx = sdk.native_vm.asset().new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount,
-                                                                b58_payer_address,
-                                                                gas_limit, gas_price)
-        sdk.rpc.connect_to_test_net()
-        tx.add_sign_transaction(claimer)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(64, len(tx_hash))
+        for _ in range(3):
+            tx = sdk.native_vm.asset().new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount,
+                                                                    b58_payer_address,
+                                                                    gas_limit, gas_price)
+            tx.add_sign_transaction(claimer)
+            try:
+                tx_hash = sdk.rpc.send_raw_transaction(tx)
+                self.assertEqual(64, len(tx_hash))
+                time.sleep(1)
+            except SDKException as e:
+                msg = 'already in the tx pool'
+                self.assertTrue(msg in e.args[1])
 
     def test_send_withdraw_ong_transaction(self):
         claimer = acct1
@@ -249,13 +255,15 @@ class TestAsset(unittest.TestCase):
         b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         gas_limit = 20000
         gas_price = 500
-        try:
-            tx_hash = asset.send_withdraw_ong_transaction(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            msg = 'no balance enough'
-            self.assertEqual(59000, e.args[0])
-            self.assertIn(msg, e.args[1])
+        for _ in range(5):
+            try:
+                tx_hash = asset.send_withdraw_ong_transaction(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
+                time.sleep(1)
+                self.assertEqual(64, len(tx_hash))
+            except SDKException as e:
+                msg1 = 'no balance enough'
+                msg2 = 'ConnectTimeout'
+                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
 
     def test_send_approve(self):
         sender = acct1
@@ -266,20 +274,15 @@ class TestAsset(unittest.TestCase):
         amount = 10
         gas_limit = 20000
         gas_price = 500
-        try:
-            tx_hash = asset.send_approve('ont', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
-            self.assertEqual(len(tx_hash), 64)
-        except SDKException as e:
-            msg = 'no balance enough'
-            self.assertEqual(59000, e.args[0])
-            self.assertIn(msg, e.args[1])
-        try:
-            tx_hash = asset.send_approve('ong', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
-            self.assertEqual(len(tx_hash), 64)
-        except SDKException as e:
-            msg = 'no balance enough'
-            self.assertEqual(59000, e.args[0])
-            self.assertIn(msg, e.args[1])
+        for _ in range(3):
+            try:
+                tx_hash = asset.send_approve('ont', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
+                time.sleep(1)
+                self.assertEqual(len(tx_hash), 64)
+            except SDKException as e:
+                msg1 = 'no balance enough'
+                msg2 = 'ConnectTimeout'
+                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
 
     def test_send_transfer_from(self):
         sender = acct2
@@ -291,16 +294,20 @@ class TestAsset(unittest.TestCase):
         amount = 1
         gas_limit = 20000
         gas_price = 500
-        try:
-            tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
-                                               gas_limit, gas_price)
-            self.assertEqual(64, len(tx_hash))
-            time.sleep(randint(6, 10))
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-            self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
-            self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
-        except SDKException as e:
-            self.assertIn('balance insufficient', e.args[1])
+        for _ in range(3):
+            try:
+                tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
+                                                   gas_limit, gas_price)
+                self.assertEqual(64, len(tx_hash))
+                time.sleep(1)
+                time.sleep(randint(6, 10))
+                event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+                self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
+                self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+            except SDKException as e:
+                msg1 = 'balance insufficient'
+                msg2 = 'ConnectTimeout'
+                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
 
 
 if __name__ == '__main__':
