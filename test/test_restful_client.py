@@ -5,7 +5,7 @@ import unittest
 
 from Cryptodome.Random.random import choice
 
-from test import acct4, acct3
+from test import sdk, acct4, acct3
 
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
@@ -16,15 +16,16 @@ from ontology.network.restful import TEST_RESTFUL_ADDRESS
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_data_parser import ContractDataParser
 
-restful_address = choice(TEST_RESTFUL_ADDRESS)
-sdk = OntologySdk(restful_address=restful_address)
+sdk.restful.connect_to_test_net()
 restful_client = sdk.restful
 
 
 class TestRestfulClient(unittest.TestCase):
     def test_get_version(self):
         version = restful_client.get_version()
-        self.assertIn('v', version)
+        self.assertTrue(isinstance(version, str))
+        if version != '':
+            self.assertIn('v', version)
 
     def test_get_connection_count(self):
         count = restful_client.get_connection_count()
