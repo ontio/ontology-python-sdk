@@ -69,15 +69,13 @@ class BlockchainProof(object):
 
     def validate_blk_proof(self, is_big_endian: bool = False) -> bool:
         if self.__blk_proof.get('Type', '') != 'MerkleProof':
-            return False
+            raise SDKException(ErrorCode.invalid_blk_proof)
         try:
             tx_hash = self.__blk_proof['TxnHash']
         except KeyError:
-            return False
+            raise SDKException(ErrorCode.invalid_blk_proof)
         proof_node = self.__blk_proof.get('Nodes', list())
         merkle_root = self.__blk_proof.get('MerkleRoot', '')
-        import json
-        print(json.dumps(dict(self.__blk_proof), indent=4))
         try:
             result = MerkleVerifier.validate_proof(proof_node, tx_hash, merkle_root, is_big_endian)
         except SDKException:
