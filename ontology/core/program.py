@@ -53,7 +53,7 @@ class ProgramBuilder(object):
             writer.write_uint32(len(data))
         writer.write_bytes(data)
         ms.flush()
-        res = ms.to_bytes()
+        res = ms.hexlify()
         StreamManager.release_stream(ms)
         res = bytes_reader(res)
         return res
