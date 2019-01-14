@@ -15,7 +15,7 @@ class MerkleVerifier(object):
     @staticmethod
     def get_proof(tx_block_height: int, target_hash_list: List[str], current_block_height: int):
         proof_node = list()
-        last_node = current_block_height + 1
+        last_node = current_block_height
         pos = 0
         while last_node > 0:
             if tx_block_height % 2 == 1:
