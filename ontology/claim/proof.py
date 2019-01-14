@@ -26,7 +26,12 @@ class BlockchainProof(object):
         return self.__blk_proof
 
     @proof.setter
-    def proof(self, blk_proof: dict):
+    def proof(self, args):
+        blk_proof = args[0]
+        try:
+            is_big_endian = args[1]
+        except IndexError:
+            is_big_endian = False
         if not isinstance(blk_proof, dict):
             raise SDKException(ErrorCode.require_dict_params)
         if blk_proof.get('Type', '') != 'MerkleProof':
@@ -36,7 +41,7 @@ class BlockchainProof(object):
                                     blk_proof['MerkleRoot'], blk_proof['Nodes'])
         except KeyError:
             raise SDKException(ErrorCode.invalid_blk_proof)
-        if not proof.validate_blk_proof():
+        if not proof.validate_blk_proof(is_big_endian):
             raise SDKException(ErrorCode.invalid_blk_proof)
         self.__blk_proof = blk_proof
 
@@ -62,7 +67,7 @@ class BlockchainProof(object):
             raise SDKException(ErrorCode.require_list_params)
         self.__blk_proof['Nodes'] = proof_node
 
-    def validate_blk_proof(self) -> bool:
+    def validate_blk_proof(self, is_big_endian: bool = False) -> bool:
         if self.__blk_proof.get('Type', '') != 'MerkleProof':
             return False
         try:
@@ -71,8 +76,10 @@ class BlockchainProof(object):
             return False
         proof_node = self.__blk_proof.get('Nodes', list())
         merkle_root = self.__blk_proof.get('MerkleRoot', '')
+        import json
+        print(json.dumps(dict(self.__blk_proof), indent=4))
         try:
-            result = MerkleVerifier.validate_proof(proof_node, tx_hash, merkle_root)
+            result = MerkleVerifier.validate_proof(proof_node, tx_hash, merkle_root, is_big_endian)
         except SDKException:
             result = False
         return result
@@ -81,7 +88,7 @@ class BlockchainProof(object):
         return json.dumps(self.__blk_proof)
 
     @staticmethod
-    def from_json(json_blk_proof: str):
+    def from_json(json_blk_proof: str, is_big_endian: bool = False):
         if not isinstance(json_blk_proof, str):
             raise SDKException(ErrorCode.require_str_params)
         try:
@@ -89,7 +96,7 @@ class BlockchainProof(object):
         except json.decoder.JSONDecodeError:
             raise SDKException(ErrorCode.invalid_b64_claim_data)
         proof = BlockchainProof()
-        proof.proof = dict_blk_proof
+        proof.proof = dict_blk_proof, is_big_endian
         return proof
 
     def to_bytes(self) -> bytes:
@@ -100,6 +107,6 @@ class BlockchainProof(object):
         return base64.b64encode(self.to_bytes()).decode('ascii')
 
     @staticmethod
-    def from_base64(b64_blk_proof: str):
+    def from_base64(b64_blk_proof: str, is_big_endian: bool = False):
         json_blk_proof = base64.b64decode(b64_blk_proof).decode('utf-8')
-        return BlockchainProof.from_json(json_blk_proof)
+        return BlockchainProof.from_json(json_blk_proof, is_big_endian)
