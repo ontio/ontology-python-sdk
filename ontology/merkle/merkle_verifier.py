@@ -15,7 +15,7 @@ class MerkleVerifier(object):
     @staticmethod
     def get_proof(tx_block_height: int, target_hash_list: List[str], current_block_height: int):
         proof_node = list()
-        last_node = current_block_height
+        last_node = current_block_height + 1
         pos = 0
         while last_node > 0:
             if tx_block_height % 2 == 1:
@@ -31,13 +31,19 @@ class MerkleVerifier(object):
         return proof_node
 
     @staticmethod
-    def validate_proof(proof: List[dict], hex_target_hash: str, hex_merkle_root: str):
+    def validate_proof(proof: List[dict], hex_target_hash: str, hex_merkle_root: str, is_big_endian: bool = False):
+        if is_big_endian:
+            hex_merkle_root = ContractDataParser.to_reserve_hex_str(hex_merkle_root)
+            hex_target_hash = ContractDataParser.to_reserve_hex_str(hex_target_hash)
         if len(proof) == 0:
             return hex_target_hash == hex_merkle_root
         else:
             hex_proof_hash = hex_target_hash
             for node in proof:
-                sibling = node['TargetHash']
+                if is_big_endian:
+                    sibling = ContractDataParser.to_reserve_hex_str(node['TargetHash'])
+                else:
+                    sibling = node['TargetHash']
                 try:
                     direction = node['Direction'].lower()
                 except KeyError:
