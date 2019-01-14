@@ -20,9 +20,9 @@ from ontology.common import define
 class ProgramBuilder(object):
 
     @staticmethod
-    def program_from_params(sigs):
+    def program_from_params(sig_list):
         code = bytearray()
-        for sig in sigs:
+        for sig in sig_list:
             code += ProgramBuilder.push_bytes(sig)
         return code
 
