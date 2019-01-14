@@ -132,9 +132,8 @@ class Claim(object):
                            hex_contract_address: str = ''):
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.require_str_params)
-        if len(hex_contract_address) != 0:
+        if len(hex_contract_address) != 0 and len(hex_contract_address) == 40:
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
-
         tx_hash = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, iss_acct, self.payload.sub, payer,
                                                           gas_limit, gas_price)
         sleep(12)
