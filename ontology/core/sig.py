@@ -51,7 +51,7 @@ class Sig(object):
         writer.write_var_bytes(invoke_script)
         writer.write_var_bytes(verification_script)
         ms.flush()
-        res = ms.to_bytes()
+        res = ms.hexlify()
         res = bytes_reader(res)
         StreamManager.release_stream(ms)
         return res
