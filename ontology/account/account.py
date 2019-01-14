@@ -171,7 +171,7 @@ class Account(object):
         else:
             raise SDKException(ErrorCode.unknown_asymmetric_key_type)
         stream.flush()
-        bytes_stream = stream.to_bytes()
+        bytes_stream = stream.hexlify()
         StreamManager.release_stream(stream)
         return bytes_stream
 
