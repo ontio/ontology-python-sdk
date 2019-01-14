@@ -22,7 +22,9 @@ class TestRpcClient(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         version = sdk.rpc.get_version()
-        self.assertIn('v', version)
+        self.assertTrue(isinstance(version, str))
+        if version != '':
+            self.assertIn('v', version)
 
     def test_get_connection_count(self):
         sdk = OntologySdk()
