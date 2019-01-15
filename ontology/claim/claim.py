@@ -12,7 +12,6 @@ from ontology.claim.header import Header
 from ontology.crypto.digest import Digest
 from ontology.claim.payload import Payload
 from ontology.account.account import Account
-from ontology.crypto.key_type import KeyType
 from ontology.claim.proof import BlockchainProof
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -26,7 +25,7 @@ class Claim(object):
         self.__head = None
         self.__payload = None
         self.__signature = b''
-        self.__blk_proof = BlockchainProof()
+        self.__blk_proof = BlockchainProof(sdk)
 
     def __iter__(self):
         data = dict(Header=dict(self.__head), Payload=dict(self.__payload), Signature=self.to_str_signature(),
@@ -117,9 +116,6 @@ class Claim(object):
         result = handler.verify_signature(pk, msg, signature)
         return result
 
-    def validate_blk_proof(self, is_big_endian: bool = True):
-        return self.blk_proof.validate_blk_proof(is_big_endian)
-
     def to_bytes_signature(self):
         return self.__signature
 
@@ -144,17 +140,20 @@ class Claim(object):
         sleep(12)
         hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
         merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
+        tx_block_height = merkle_proof['BlockHeight']
         current_block_height = merkle_proof['CurBlockHeight']
         target_hash = merkle_proof['TransactionsRoot']
         merkle_root = merkle_proof['CurBlockRoot']
-        tx_block_height = self.__sdk.get_network().get_block_height_by_tx_hash(tx_hash)
         target_hash_list = merkle_proof['TargetHashes']
         proof_node = MerkleVerifier.get_proof(tx_block_height, target_hash_list, current_block_height)
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, is_big_endian)
         if not result:
             raise SDKException(ErrorCode.other_error('Invalid merkle proof'))
-        self.__blk_proof = BlockchainProof(tx_hash, hex_contract_address, current_block_height, merkle_root, proof_node)
+        self.__blk_proof.set_proof(tx_hash, hex_contract_address, current_block_height, merkle_root, proof_node)
         return self.__blk_proof
+
+    def validate_blk_proof(self, is_big_endian: bool = True):
+        return self.blk_proof.validate_blk_proof(is_big_endian)
 
     def to_base64(self):
         b64_head = self.__head.to_base64()
@@ -171,4 +170,4 @@ class Claim(object):
         self.__head = Header.from_base64(b64_head)
         self.__payload = Payload.from_base64(b64_payload)
         self.__signature = base64.b64decode(b64_signature)
-        self.__blk_proof = BlockchainProof.from_base64(b64_blk_proof, is_big_endian)
+        self.__blk_proof = BlockchainProof(self.__sdk).from_base64(b64_blk_proof, is_big_endian)

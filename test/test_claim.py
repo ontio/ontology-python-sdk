@@ -69,7 +69,8 @@ class TestClaim(unittest.TestCase):
         hex_contract_address = '36bb5c053b6b839c8f6b923fe852f91239b9fccc'
         merkle_root = 'ed7f4d2e91925917d4242b3a59a3f47830d77bca383ffc78e078a1f93ddb62c4'
         blk_height = 705043
-        proof = BlockchainProof(tx_hash, hex_contract_address, blk_height, merkle_root, proof_node)
+        proof = sdk.service.blockchain_proof()
+        proof.set_proof(tx_hash, hex_contract_address, blk_height, merkle_root, proof_node)
         self.assertTrue(isinstance(proof, BlockchainProof))
         self.assertTrue(proof.validate_blk_proof(True))
         dict_proof = dict(proof)
@@ -108,6 +109,7 @@ class TestClaim(unittest.TestCase):
             self.assertTrue(claim.validate_signature(b64_claim, verify_kid=False))
 
     def test_claim_demo(self):
+        sdk.rpc.connect_to_test_net()
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
         try:
             pk = pub_keys[0]
@@ -175,11 +177,13 @@ class TestClaim(unittest.TestCase):
                      'yZjkxMjM5YjlmY2NjIn0=')
         claim = sdk.service.claim()
         sdk.rpc.connect_to_main_net()
-        self.assertTrue(claim.validate_signature(b64_claim))
-        sdk.rpc.connect_to_test_net()
-        claim.from_base64(b64_claim)
-        self.assertTrue(claim.validate_blk_proof())
-        self.assertTrue(isinstance(claim, Claim))
+        try:
+            self.assertTrue(claim.validate_signature(b64_claim))
+            claim.from_base64(b64_claim, True)
+            self.assertTrue(claim.validate_blk_proof())
+            self.assertTrue(isinstance(claim, Claim))
+        finally:
+            sdk.rpc.connect_to_test_net()
 
 
 if __name__ == '__main__':
