@@ -6,11 +6,11 @@ import unittest
 
 from test import acct1, acct2, acct3
 
-from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str
+from ontology.exception.exception import SDKException
 from ontology.utils.contract_data_parser import ContractDataParser
 
 pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
