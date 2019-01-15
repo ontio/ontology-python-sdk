@@ -137,7 +137,7 @@ class Claim(object):
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
         tx_hash = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, iss_acct, self.payload.sub, payer,
                                                           gas_limit, gas_price)
-        sleep(12)
+        sleep(10)
         hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
         merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
@@ -153,7 +153,7 @@ class Claim(object):
         return self.__blk_proof
 
     def validate_blk_proof(self, is_big_endian: bool = True):
-        return self.blk_proof.validate_blk_proof(is_big_endian)
+        return self.__blk_proof.validate_blk_proof(is_big_endian)
 
     def to_base64(self):
         b64_head = self.__head.to_base64()
