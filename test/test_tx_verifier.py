@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 
 from ontology.ont_sdk import OntologySdk
-from ontology.merkle.merkle_verifier import MerkleVerifier
 
 sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()
