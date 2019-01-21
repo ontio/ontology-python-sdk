@@ -72,18 +72,30 @@ class TestMerkleVerifier(unittest.TestCase):
         self.assertTrue(result)
 
     def test_get_proof_main_net(self):
-        tx_hash = 'c17e574dda17f268793757fab0c274d44427fa1b67d63113bd31e39b31d1a026'
         sdk.rpc.connect_to_main_net()
-        merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
-        tx_block_height = merkle_proof['BlockHeight']
-        current_block_height = merkle_proof['CurBlockHeight']
-        target_hash_list = merkle_proof['TargetHashes']
-        target_hash = merkle_proof['TransactionsRoot']
-        merkle_root = merkle_proof['CurBlockRoot']
-        proof_node = MerkleVerifier.get_proof(tx_block_height, target_hash_list, current_block_height)
-        result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, True)
-        self.assertTrue(result)
-        sdk.rpc.connect_to_test_net()
+        try:
+            tx_hash = 'c17e574dda17f268793757fab0c274d44427fa1b67d63113bd31e39b31d1a026'
+            merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
+            tx_block_height = merkle_proof['BlockHeight']
+            current_block_height = merkle_proof['CurBlockHeight']
+            target_hash_list = merkle_proof['TargetHashes']
+            target_hash = merkle_proof['TransactionsRoot']
+            merkle_root = merkle_proof['CurBlockRoot']
+            proof_node = MerkleVerifier.get_proof(tx_block_height, target_hash_list, current_block_height)
+            result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, True)
+            self.assertTrue(result)
+            tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
+            merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
+            tx_block_height = merkle_proof['BlockHeight']
+            current_block_height = merkle_proof['CurBlockHeight']
+            target_hash_list = merkle_proof['TargetHashes']
+            target_hash = merkle_proof['TransactionsRoot']
+            merkle_root = merkle_proof['CurBlockRoot']
+            proof_node = MerkleVerifier.get_proof(tx_block_height, target_hash_list, current_block_height)
+            result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, True)
+            self.assertTrue(result)
+        finally:
+            sdk.rpc.connect_to_test_net()
 
 
 if __name__ == '__main__':
