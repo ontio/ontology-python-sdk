@@ -3,7 +3,6 @@
 
 import base64
 import base58
-import binascii
 
 from ontology.crypto.curve import Curve
 from ontology.crypto.digest import Digest
@@ -39,7 +38,7 @@ class Account(object):
         if isinstance(private_key, bytes) and len(private_key) == 32:
             self.__private_key = private_key
         elif isinstance(private_key, str) and len(private_key) == 64:
-            self.__private_key = binascii.a2b_hex(private_key)
+            self.__private_key = bytes.fromhex(private_key)
         else:
             raise SDKException(ErrorCode.invalid_private_key)
         self.__curve_name = Curve.P256
@@ -48,7 +47,7 @@ class Account(object):
 
     def generate_signature(self, msg: bytes):
         handler = SignatureHandler(self.__signature_scheme)
-        signature_value = handler.generate_signature(binascii.b2a_hex(self.__private_key), msg)
+        signature_value = handler.generate_signature(bytes.hex(self.__private_key), msg)
         bytes_signature = Signature(self.__signature_scheme, signature_value).to_bytes()
         result = handler.verify_signature(self.__public_key, msg, bytes_signature)
         if not result:
@@ -126,8 +125,8 @@ class Account(object):
         key = derived_key[32:64]
         hdr = self.__address.b58encode().encode()
         mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__private_key, hdr, key, iv)
-        encrypted_key = binascii.b2a_hex(cipher_text) + binascii.b2a_hex(mac_tag)
-        encrypted_key_str = base64.b64encode(binascii.a2b_hex(encrypted_key))
+        encrypted_key = bytes.hex(cipher_text) + bytes.hex(mac_tag)
+        encrypted_key_str = base64.b64encode(bytes.fromhex(encrypted_key))
         return encrypted_key_str.decode()
 
     @staticmethod
@@ -152,12 +151,11 @@ class Account(object):
         iv = derived_key[0:12]
         key = derived_key[32:64]
         encrypted_key = base64.b64decode(encrypted_key_str).hex()
-        mac_tag = binascii.a2b_hex(encrypted_key[64:96])
-        cipher_text = binascii.a2b_hex(encrypted_key[0:64])
+        mac_tag = bytes.fromhex(encrypted_key[64:96])
+        cipher_text = bytes.fromhex(encrypted_key[0:64])
         private_key = AESHandler.aes_gcm_decrypt_with_iv(cipher_text, b58_address.encode(), mac_tag, key, iv)
         if len(private_key) == 0:
             raise SDKException(ErrorCode.decrypt_encrypted_private_key_error)
-        private_key = binascii.b2a_hex(private_key).decode('ascii')
         acct = Account(private_key, scheme)
         if acct.get_address().b58encode() != b58_address:
             raise SDKException(ErrorCode.other_error('Address error.'))
@@ -189,7 +187,7 @@ class Account(object):
 
         :return: the hexadecimal public key in the form of string.
         """
-        return binascii.b2a_hex(self.__private_key).decode('ascii')
+        return bytes.hex(self.__private_key)
 
     def get_public_key_bytes(self) -> bytes:
         """
@@ -213,7 +211,7 @@ class Account(object):
 
         :return: the hexadecimal public key in the form of string.
         """
-        return binascii.b2a_hex(self.__public_key).decode('ascii')
+        return bytes.hex(self.__public_key)
 
     def export_wif(self) -> str:
         """
