@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import uuid
-import json
 import base64
-import binascii
 
 from time import time, sleep
 
@@ -127,7 +125,7 @@ class Claim(object):
 
     @staticmethod
     def from_base64_signature(b64_signature: str):
-        return binascii.b2a_hex(base64.b64decode(b64_signature)).decode('ascii')
+        return bytes.hex(base64.b64decode(b64_signature))
 
     def generate_blk_proof(self, iss_acct: Account, payer: Account, gas_limit: int, gas_price: int,
                            is_big_endian: bool = True, hex_contract_address: str = ''):
