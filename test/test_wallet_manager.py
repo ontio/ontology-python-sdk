@@ -324,7 +324,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_add_control_by_private_key(self):
         wm = WalletManager()
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
         self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
