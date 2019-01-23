@@ -20,6 +20,7 @@ from ecdsa.keys import (
 )
 
 from ontology.crypto.kdf import pbkdf2
+from ontology.utils.arguments import type_assert
 from ontology.crypto.aes_handler import AESHandler
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -42,6 +43,7 @@ class ECIES:
         return point_str.hex()
 
     @staticmethod
+    @type_assert(bytes)
     def get_public_key_by_bytes_private_key(private_key: bytes):
         if not isinstance(private_key, bytes):
             raise SDKException(ErrorCode.other_error('The type of private key should be bytes.'))
@@ -60,6 +62,7 @@ class ECIES:
         return point_str
 
     @staticmethod
+    @type_assert(bytes)
     def __uncompress_public_key(public_key: bytes) -> bytes:
         """
         Uncompress the compressed public key.
@@ -82,6 +85,7 @@ class ECIES:
         return b''.join([number_to_string(point.x(), order), number_to_string(point.y(), order)])
 
     @staticmethod
+    @type_assert(bytes, bytes, bytes)
     def encrypt_with_cbc_mode(plain_text: bytes, public_key: bytes, iv: bytes = b'') -> (bytes, bytes, bytes):
         if not isinstance(public_key, bytes):
             raise SDKException(ErrorCode.other_error('the type of public key should be bytes.'))
@@ -103,6 +107,7 @@ class ECIES:
         return aes_iv, encode_g_tilde, cipher_text
 
     @staticmethod
+    @type_assert(bytes, bytes, bytes, bytes)
     def decrypt_with_cbc_mode(cipher_text: bytes, private_key: bytes, iv: bytes, encode_g_tilde: bytes) -> bytes:
         if not isinstance(private_key, bytes):
             raise SDKException(ErrorCode.other_error('the length of private key should be 32 bytes.'))
@@ -123,6 +128,7 @@ class ECIES:
         return plain_text
 
     @staticmethod
+    @type_assert(bytes, bytes, bytes, bytes)
     def encrypt_with_gcm_mode(plain_text: bytes, hdr: bytes, public_key: bytes):
         if not isinstance(public_key, bytes):
             raise SDKException(ErrorCode.other_error('the type of public key should be bytes.'))
@@ -144,6 +150,7 @@ class ECIES:
         return nonce, mac_tag, encode_g_tilde, cipher_text
 
     @staticmethod
+    @type_assert(bytes, bytes, bytes, bytes, bytes, bytes)
     def decrypt_with_gcm_mode(nonce: bytes, mac_tag: bytes, cipher_text: bytes, private_key: bytes, hdr: bytes,
                               encode_g_tilde: bytes):
         if not isinstance(private_key, bytes):
