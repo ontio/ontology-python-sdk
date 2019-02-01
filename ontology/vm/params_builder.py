@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from binascii import a2b_hex
-from ontology.utils import utils
 from ontology.io.memory_stream import MemoryStream
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -14,7 +12,7 @@ class ParamsBuilder:
         self.ms = MemoryStream()
 
     def emit(self, op):
-        self.write_byte(op)
+        self.write_bytes(op)
 
     def emit_push_bool(self, data: bool):
         if data:
@@ -22,59 +20,78 @@ class ParamsBuilder:
         else:
             return self.emit(PUSH0)
 
-    def emit_push_integer(self, num: int):
+    def emit_push_int(self, num: int):
         if num == -1:
             return self.emit(PUSHM1)
         elif num == 0:
             return self.emit(PUSH0)
         elif 0 < num < 16:
             return self.emit(int.from_bytes(PUSH1, 'little') - 1 + num)
-        # elif num < 0x10000:
-        #     return self.emit_push_byte_array(num.to_bytes(2, "little"))
-        # elif num.bit_length() < 32:
-        #     return self.emit_push_byte_array(num.to_bytes(4, "little"))
-        # elif num.bit_length() < 40:
-        #     return self.emit_push_byte_array(num.to_bytes(5, "little"))
-        # elif num.bit_length() < 48:
-        #     return self.emit_push_byte_array(num.to_bytes(6, "little"))
-        # elif num.bit_length() < 56:
-        #     return self.emit_push_byte_array(num.to_bytes(7, "little"))
-        # else:
-        #     return self.emit_push_byte_array(num.to_bytes(8, "little"))
-        bs = utils.bigint_to_neo_bytes(num)
-        return self.emit_push_byte_array(bs)
+        else:
+            bs = self.big_int_to_neo_bytearray(num)
+            return self.emit_push_bytearray(bs)
 
-    def emit_push_byte_array(self, data):
-        l = len(data)
-        if l < int.from_bytes(PUSHBYTES75, 'little'):
-            self.write_byte(bytearray([l]))
-        elif l < 0x100:
+    def emit_push_bytearray(self, data):
+        data_len = len(data)
+        if data_len < int.from_bytes(PUSHBYTES75, 'little'):
+            self.write_bytes(bytearray([data_len]))
+        elif data_len < 0x100:
             self.emit(PUSHDATA1)
-            self.write_byte(bytearray([l]))
-        elif l < 0x10000:
+            self.write_bytes(bytearray([data_len]))
+        elif data_len < 0x10000:
             self.emit(PUSHDATA2)
-            self.write_byte(len(data).to_bytes(2, "little"))
+            self.write_bytes(len(data).to_bytes(2, "little"))
         else:
             self.emit(PUSHDATA4)
-            self.write_byte(len(data).to_bytes(4, "little"))
-        self.write_byte(data)
+            self.write_bytes(len(data).to_bytes(4, "little"))
+        self.write_bytes(data)
 
     def emit_push_call(self, address):
         self.emit(APPCALL)
-        self.write_byte(address)
+        self.write_bytes(address)
 
-    def write_byte(self, value):
+    def write_bytes(self, value: bytearray or bytes or str or int):
         if isinstance(value, bytearray) or isinstance(value, bytes):
             self.ms.write(value)
         elif isinstance(value, str):
-            self.ms.write(value.encode())
+            self.ms.write(value.encode('utf-8'))
         elif isinstance(value, int):
             self.ms.write(bytes([value]))
         else:
             raise SDKException(ErrorCode.param_err('type error, write byte failed.'))
 
+    @staticmethod
+    def int_to_bytearray(data: int):
+        bit_length = data.bit_length() // 8
+        t = data.bit_length() / 8
+        if bit_length <= t:
+            bit_length += 1
+        return bytearray(data.to_bytes(bit_length, "big", signed=True))
+
+    def big_int_to_neo_bytearray(self, data: int) -> bytearray:
+        if data == 0:
+            return bytearray()
+        data_bytes = self.int_to_bytearray(data)
+        if len(data_bytes) == 0:
+            return bytearray()
+        if data < 0:
+            data_bytes2 = self.int_to_bytearray(-data)
+            b = data_bytes2[0]
+            data_bytes.reverse()
+            if b >> 7 == 1:
+                res = data_bytes[:] + bytearray([255])
+                return res
+            return data_bytes
+        else:
+            b = data_bytes[0]
+            data_bytes.reverse()
+            if b >> 7 == 1:
+                res = data_bytes[:] + bytearray([0])
+                return res
+            return data_bytes
+
     def to_bytes(self) -> bytes:
-        return a2b_hex(self.ms.hexlify())
+        return self.ms.to_bytes()
 
     def to_bytearray(self) -> bytearray:
-        return bytearray(a2b_hex(self.ms.hexlify()))
+        return bytearray(self.ms.to_bytes())
