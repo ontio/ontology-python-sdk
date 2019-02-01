@@ -79,7 +79,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx = ont_id.new_registry_ont_id_transaction(acct_did, hex_public_key, b58_address, gas_limit, gas_price)
         tx.sign_transaction(acct2)
-        self.assertEqual(64, len(tx.hash256_hex()))
+        self.assertEqual(64, len(tx.hash256(is_hex=True)))
         self.assertEqual(598, len(tx.serialize(is_hex=True)))
         try:
             sdk.rpc.send_raw_transaction(tx)
