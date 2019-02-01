@@ -215,8 +215,7 @@ class TestRestfulClient(unittest.TestCase):
             self.assertIn('UNKNOWN TRANSACTION', e.args[1])
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         sdk = OntologySdk()
-        rpc_address = choice(TEST_RPC_ADDRESS)
-        sdk.rpc.set_address(rpc_address)
+        sdk.rpc.connect_to_test_net()
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         from_acct = acct4

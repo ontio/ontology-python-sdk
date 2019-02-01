@@ -128,7 +128,7 @@ class ECIES:
         return plain_text
 
     @staticmethod
-    @type_assert(bytes, bytes, bytes, bytes)
+    @type_assert(bytes, bytes, bytes)
     def encrypt_with_gcm_mode(plain_text: bytes, hdr: bytes, public_key: bytes):
         if not isinstance(public_key, bytes):
             raise SDKException(ErrorCode.other_error('the type of public key should be bytes.'))

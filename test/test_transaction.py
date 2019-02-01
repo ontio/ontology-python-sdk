@@ -11,7 +11,7 @@ from ontology.utils import utils
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.core.transaction import Transaction
-from ontology.utils.contract_event_parser import ContractEventParser
+from ontology.utils.contract_event import ContractEventParser
 
 
 class TestTransaction(unittest.TestCase):

@@ -6,13 +6,13 @@ import unittest
 
 from test import acct1, acct2, acct3, acct4
 
-from ontology.exception.error_code import ErrorCode
-from ontology.exception.exception import SDKException
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
+from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.contract_event_parser import ContractEventParser
+from ontology.utils.contract_event import ContractEventParser
 
 sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()

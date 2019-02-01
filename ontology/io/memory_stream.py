@@ -111,10 +111,10 @@ class MemoryStream(BytesIO):
         """
         return self.writable()
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         return self.getvalue()
 
-    def hexlify(self):
+    def hexlify(self) -> bytes:
         """
         Hexlify the stream data.
 

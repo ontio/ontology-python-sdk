@@ -3,31 +3,26 @@
 
 import time
 import unittest
-import binascii
 
 from Cryptodome.Random.random import randint
 
-from test import acct1, acct2, acct3
+from test import acct1, acct2, acct3, sdk
 
-from ontology.ont_sdk import OntologySdk
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.contract_event_parser import ContractEventParser
+from ontology.utils.contract_data import ContractDataParser
+from ontology.utils.contract_event import ContractEventParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
 gas_limit = 20000000
 gas_price = 500
 
 
 class TestInvokeFunction(unittest.TestCase):
     def test_oep4_name(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        bytearray_contract_address = bytearray(binascii.a2b_hex(contract_address))
-        bytearray_contract_address.reverse()
+        hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('name')
-        result = sdk.rpc.send_neo_vm_transaction(bytearray_contract_address, None, None, 0, 0, func, True)
+        self.assertEqual(bytearray(b'\x00\xc1\x04name'), func.create_invoke_code())
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         name = result['Result']
         name = ContractDataParser.to_utf8_str(name)
         self.assertEqual('DXToken', name)
@@ -35,7 +30,8 @@ class TestInvokeFunction(unittest.TestCase):
     def test_oep4_symbol(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('symbol')
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        self.assertEqual(bytearray(b'\x00\xc1\x06symbol'), func.create_invoke_code())
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         symbol = result['Result']
         symbol = ContractDataParser.to_utf8_str(symbol)
         self.assertEqual('DX', symbol)
@@ -43,7 +39,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_oep4_decimal(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('decimals')
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         decimals = result['Result']
         decimals = ContractDataParser.to_int(decimals)
         self.assertEqual(10, decimals)
@@ -51,7 +47,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_oep4_total_supply(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('totalSupply')
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         total_supply = result['Result']
         total_supply = ContractDataParser.to_int(total_supply)
         self.assertEqual(10000000000000000000, total_supply)
@@ -59,9 +55,12 @@ class TestInvokeFunction(unittest.TestCase):
     def test_oep4_balance_of(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('balanceOf')
+        self.assertEqual(bytearray(b'\x00\xc1\tbalanceOf'), func.create_invoke_code())
         bytes_address = acct1.get_address().to_bytes()
         func.set_params_value(bytes_address)
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        target = bytearray(b'\x14F\xb1\xa1\x8a\xf6\xb7\xc9\xf8\xa4`/\x9fs\xee\xb3\x03\x0f\x0c)\xb7Q\xc1\tbalanceOf')
+        self.assertEqual(target, func.create_invoke_code())
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         balance = result['Result']
         balance = ContractDataParser.to_int(balance)
         self.assertGreater(balance, 100)
@@ -226,7 +225,7 @@ class TestInvokeFunction(unittest.TestCase):
         rpc_address = 'http://polaris5.ont.io:20336'
         sdk.set_rpc_address(rpc_address)
         try:
-            response = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, notify_args, True)
+            response = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, notify_args)
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
@@ -297,7 +296,7 @@ class TestInvokeFunction(unittest.TestCase):
         dict_msg = {'key': 'value'}
         func = InvokeFunction('testMap')
         func.set_params_value(dict_msg)
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         dict_value = result['Result']
         dict_value = ContractDataParser.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
@@ -305,7 +304,7 @@ class TestInvokeFunction(unittest.TestCase):
         dict_msg = {'key': list_value}
         func = InvokeFunction('testMap')
         func.set_params_value(dict_msg)
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         dict_value = result['Result']
         dict_value = ContractDataParser.to_int_list(dict_value)
         self.assertEqual(list_value, dict_value)
@@ -315,7 +314,7 @@ class TestInvokeFunction(unittest.TestCase):
         key = 'key'
         func = InvokeFunction('testGetMap')
         func.set_params_value(key)
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         dict_value = result['Result']
         dict_value = ContractDataParser.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
@@ -344,7 +343,7 @@ class TestInvokeFunction(unittest.TestCase):
         key = 'key'
         func = InvokeFunction('testGetMapInMap')
         func.set_params_value(key)
-        result = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, func, True)
+        result = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, func)
         value = result['Result']
         value = ContractDataParser.to_utf8_str(value)
         self.assertEqual('value', value)

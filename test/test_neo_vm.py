@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 import unittest
 
 from time import sleep
 from test import acct1, acct2, acct4
 
 from ontology.ont_sdk import OntologySdk
-from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_data import ContractDataParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 sdk = OntologySdk()
@@ -92,8 +91,8 @@ class TestNeoVm(unittest.TestCase):
         bytes_contract_address = sdk.neo_vm.avm_code_to_bytes_contract_address(avm_code)
         bytearray_contract_address = sdk.neo_vm.avm_code_to_bytearray_contract_address(avm_code)
         self.assertEqual('362cb5608b3eca61d4846591ebb49688900fedd0', hex_contract_address)
-        self.assertEqual(hex_contract_address, binascii.b2a_hex(bytes_contract_address).decode('ascii'))
-        self.assertEqual(hex_contract_address, binascii.b2a_hex(bytearray_contract_address).decode('ascii'))
+        self.assertEqual(hex_contract_address, bytes_contract_address.hex())
+        self.assertEqual(hex_contract_address, bytearray_contract_address.hex())
 
     def test_make_deploy_transaction(self):
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
@@ -116,14 +115,14 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual('39f3fb644842c808828817bd73da0946d99f237f', hex_contract_address)
         hello = InvokeFunction('Hello')
         hello.set_params_value('Ontology')
-        response = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, None, 0, 0, hello, True)
+        response = sdk.rpc.send_neo_vm_transaction_pre_exec(hex_contract_address, None, hello)
         self.assertEqual(1, response['State'])
         result = response['Result']
         result = ContractDataParser.to_bool(result)
         self.assertEqual(True, result)
         gas_limit = 20000
         gas_price = 500
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, hello, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, hello)
         sleep(6)
         response = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = response['Notify'][0]

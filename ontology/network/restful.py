@@ -312,7 +312,7 @@ class RestfulClient(object):
         return response['Result']
 
     def send_raw_transaction(self, tx: Transaction, is_full: bool = False):
-        hex_tx_data = tx.serialize(is_hex=True).decode('ascii')
+        hex_tx_data = tx.serialize(is_hex=True)
         data = f'{{"Action":"sendrawtransaction", "Version":"1.0.0","Data":"{hex_tx_data}"}}'
         url = RestfulMethod.send_transaction(self.__url)
         response = self.__post(url, data)
@@ -321,7 +321,7 @@ class RestfulClient(object):
         return response['Result']
 
     def send_raw_transaction_pre_exec(self, tx: Transaction, is_full: bool = False):
-        hex_tx_data = tx.serialize(is_hex=True).decode('ascii')
+        hex_tx_data = tx.serialize(is_hex=True)
         data = f'{{"Action":"sendrawtransaction", "Version":"1.0.0","Data":"{hex_tx_data}"}}'
         url = RestfulMethod.send_transaction_pre_exec(self.__url)
         response = self.__post(url, data)

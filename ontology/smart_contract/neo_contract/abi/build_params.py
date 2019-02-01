@@ -75,19 +75,19 @@ class BuildParams(object):
     @staticmethod
     def push_param(param, builder: ParamsBuilder):
         if isinstance(param, bytearray) or isinstance(param, bytes):
-            builder.emit_push_byte_array(param)
+            builder.emit_push_bytearray(param)
         elif isinstance(param, str):
-            builder.emit_push_byte_array(bytes(param.encode()))
+            builder.emit_push_bytearray(bytes(param.encode()))
         elif isinstance(param, bool):
             builder.emit_push_bool(param)
         elif isinstance(param, int):
-            builder.emit_push_integer(param)
+            builder.emit_push_int(param)
         elif isinstance(param, dict):
             # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param)))
             BuildParams.push_map(param, builder)
         elif isinstance(param, list):
             BuildParams.create_code_params_script_builder(param, builder)
-            builder.emit_push_integer(len(param))
+            builder.emit_push_int(len(param))
             builder.emit(PACK)
         elif isinstance(param, Struct):
             BuildParams.push_struct(param, builder)
@@ -107,7 +107,7 @@ class BuildParams(object):
 
     @staticmethod
     def push_struct(struct_param: Struct, builder: ParamsBuilder):
-        builder.emit_push_integer(0)
+        builder.emit_push_int(0)
         builder.emit(NEWSTRUCT)
         builder.emit(TOALTSTACK)
         for item in struct_param.param_list:
@@ -121,22 +121,22 @@ class BuildParams(object):
     def get_map_bytes(param_dict: dict):
         builder = ParamsBuilder()
         builder.emit(BuildParams.Type.dict_type.value)
-        builder.emit(utils.bigint_to_neo_bytes(len(param_dict)))
+        builder.emit(utils.big_int_to_neo_bytearray(len(param_dict)))
         for key, value in param_dict.items():
             builder.emit(BuildParams.Type.bytearray_type.value)
-            builder.emit_push_byte_array(str(key).encode())
+            builder.emit_push_bytearray(str(key).encode())
             if isinstance(value, bytearray) or isinstance(value, bytes):
                 builder.emit(BuildParams.Type.bytearray_type.value)
-                builder.emit_push_byte_array(bytearray(value))
+                builder.emit_push_bytearray(bytearray(value))
             elif isinstance(value, str):
                 builder.emit(BuildParams.Type.bytearray_type.value)
-                builder.emit_push_byte_array(value.encode())
+                builder.emit_push_bytearray(value.encode())
             elif isinstance(value, bool):
                 builder.emit(BuildParams.Type.bool_type.value)
                 builder.emit_push_bool(value)
             elif isinstance(value, int):
                 builder.emit(BuildParams.Type.int_type.value)
-                builder.emit_push_integer(int(value))
+                builder.emit_push_int(int(value))
             else:
                 raise Exception("param error")
         return builder.to_bytes()

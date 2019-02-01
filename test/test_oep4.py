@@ -11,7 +11,6 @@ from test import acct1, acct2, acct3, acct4
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
@@ -121,15 +120,11 @@ class TestOep4(unittest.TestCase):
 
         b58_from_address1 = acct1.get_address_base58()
         b58_from_address2 = acct2.get_address_base58()
-        hex_from_address1 = acct1.get_address_hex()
-        hex_from_address2 = acct2.get_address_hex()
-        from_address_list = [hex_from_address1, hex_from_address2]
+        from_address_list = [b58_from_address1, b58_from_address2]
 
         b58_to_address1 = acct2.get_address_base58()
         b58_to_address2 = acct3.get_address_base58()
-        hex_to_address1 = acct2.get_address_hex()
-        hex_to_address2 = acct3.get_address_hex()
-        to_address_list = [hex_to_address1, hex_to_address2]
+        to_address_list = [b58_to_address1, b58_to_address2]
 
         value_list = [1, 2]
 
@@ -148,16 +143,14 @@ class TestOep4(unittest.TestCase):
         sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         time.sleep(randint(6, 10))
+        notify_list = oep4.query_multi_transfer_event(tx_hash)
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-            notify_list = event['Notify'][:-1]
             self.assertEqual(len(transfer_list), len(notify_list))
             for index, notify in enumerate(notify_list):
-                self.assertEqual('transfer', ContractDataParser.to_utf8_str(notify['States'][0]))
+                self.assertEqual('transfer', notify['States'][0])
                 self.assertEqual(from_address_list[index], notify['States'][1])
                 self.assertEqual(to_address_list[index], notify['States'][2])
-                notify_value = ContractDataParser.to_int(notify['States'][3])
-                self.assertEqual(value_list[index], notify_value)
+                self.assertEqual(value_list[index], notify['States'][3])
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
@@ -169,10 +162,8 @@ class TestOep4(unittest.TestCase):
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         owner_acct = acct1
-        hex_owner_address = owner_acct.get_address_hex()
         spender = acct2
         b58_spender_address = spender.get_address_base58()
-        hex_spender_address = spender.get_address_hex()
         amount = 100
         gas_limit = 20000000
         gas_price = 500
@@ -186,16 +177,12 @@ class TestOep4(unittest.TestCase):
         sdk.rpc.connect_to_test_net()
         time.sleep(randint(6, 10))
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-            notify = event['Notify'][0]
-            states = notify['States']
-            self.assertEqual('approval', bytes.fromhex(states[0]).decode())
-            self.assertEqual(hex_owner_address, states[1])
-            self.assertEqual(hex_spender_address, states[2])
-            array = bytearray.fromhex(states[3].encode('ascii'))
-            array.reverse()
-            notify_value = int(bytes.hex(array), 16)
-            self.assertEqual(amount, notify_value)
+            event = oep4.query_approve_event(tx_hash)
+            states = event['States']
+            self.assertEqual('approval', states[0])
+            self.assertEqual(owner_acct.get_address_base58(), states[1])
+            self.assertEqual(b58_spender_address, states[2])
+            self.assertEqual(amount, states[3])
         except SDKException as e:
             raised = False
             self.assertTrue(raised, e)
@@ -243,9 +230,9 @@ class TestOep4(unittest.TestCase):
             self.assertEqual('transfer', bytes.fromhex(notify['States'][0]).decode())
             self.assertEqual(hex_from_address, notify['States'][1])
             self.assertEqual(hex_to_address, notify['States'][2])
-            array = bytearray.fromhex(notify['States'][3])
-            array.reverse()
-            notify_value = int(bytes.hex(array), 16)
+            bytearray_value = bytearray.fromhex(notify['States'][3])
+            bytearray_value.reverse()
+            notify_value = int(bytearray_value.hex(), 16)
             self.assertEqual(value, notify_value)
         except SDKException as e:
             raised = False

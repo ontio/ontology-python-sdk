@@ -23,9 +23,9 @@ class Sig(object):
     def __iter__(self):
         data = dict(M=self.m, publicKeys=list(), sigData=list())
         for key in self.public_keys:
-            data['publicKeys'].append(binascii.b2a_hex(key).decode('ascii'))
+            data['publicKeys'].append(bytes.hex(key))
         for s_data in self.__sig_data:
-            data['sigData'].append(binascii.b2a_hex(s_data).decode('ascii'))
+            data['sigData'].append(bytes.hex(s_data))
         for key, value in data.items():
             yield (key, value)
 

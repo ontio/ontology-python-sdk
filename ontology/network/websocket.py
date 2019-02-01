@@ -190,12 +190,12 @@ class WebsocketClient(object):
         return response.get('Result', dict())
 
     async def send_raw_transaction(self, tx: Transaction, is_full: bool = False):
-        tx_data = tx.serialize(is_hex=True).decode('ascii')
+        tx_data = tx.serialize(is_hex=True)
         msg = dict(Action='sendrawtransaction', Version='1.0.0', Id=self.__id, PreExec='0', Data=tx_data)
         return await self.__send_recv(msg, is_full)
 
     async def send_raw_transaction_pre_exec(self, tx: Transaction, is_full: bool = False):
-        tx_data = tx.serialize(is_hex=True).decode('ascii')
+        tx_data = tx.serialize(is_hex=True)
         msg = dict(Action='sendrawtransaction', Version='1.0.0', Id=self.__id, PreExec='1', Data=tx_data)
         return await self.__send_recv(msg, is_full)
 
