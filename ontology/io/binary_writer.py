@@ -331,12 +331,8 @@ class BinaryWriter(StreamManager):
         """
         if isinstance(value, str):
             value = value.encode(encoding)
-        length = len(value)
-        ba = bytearray(value)
-        byts = binascii.hexlify(ba)
-        string = byts.decode(encoding)
-        self.write_var_int(length)
-        self.write_bytes(string)
+        self.write_var_int(len(value))
+        self.write_bytes(value)
 
     def write_fixed_str(self, value, length):
         """
