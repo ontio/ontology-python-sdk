@@ -37,7 +37,7 @@ class TestMerkleVerifier(unittest.TestCase):
         merkle_root = 'fb778e1195d335ad962dbbef4cae34ac620d6521f0a3751a79c6f3efd4ab04ca'
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, True)
         self.assertEqual(True, result)
-
+        
     def test_get_proof_local(self):
         tx_block_height = 2
         leaf_0 = 'c7ac8087b4ce292d654001b1ab1bfe5e68fa6f7b8492a5b2f83560f8ac28f5fa'
