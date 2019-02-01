@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 import unittest
 
 from time import sleep
 from test import acct1, acct2, acct4
 
 from ontology.ont_sdk import OntologySdk
-from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_data import ContractDataParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 sdk = OntologySdk()
@@ -92,8 +91,8 @@ class TestNeoVm(unittest.TestCase):
         bytes_contract_address = sdk.neo_vm.avm_code_to_bytes_contract_address(avm_code)
         bytearray_contract_address = sdk.neo_vm.avm_code_to_bytearray_contract_address(avm_code)
         self.assertEqual('362cb5608b3eca61d4846591ebb49688900fedd0', hex_contract_address)
-        self.assertEqual(hex_contract_address, binascii.b2a_hex(bytes_contract_address).decode('ascii'))
-        self.assertEqual(hex_contract_address, binascii.b2a_hex(bytearray_contract_address).decode('ascii'))
+        self.assertEqual(hex_contract_address, bytes.hex(bytes_contract_address).decode('ascii'))
+        self.assertEqual(hex_contract_address, bytes.hex(bytearray_contract_address).decode('ascii'))
 
     def test_make_deploy_transaction(self):
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
