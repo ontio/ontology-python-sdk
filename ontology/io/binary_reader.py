@@ -68,7 +68,7 @@ class BinaryReader(StreamManager):
         except Exception as e:
             raise SDKException(ErrorCode.read_byte_error(e.args[0]))
 
-    def read_bytes(self, length):
+    def read_bytes(self, length) -> bytes:
         """
         Read the specified number of bytes from the stream.
 
@@ -285,7 +285,7 @@ class BinaryReader(StreamManager):
             raise SDKException(ErrorCode.param_err('Invalid format'))
         return int(value)
 
-    def read_var_bytes(self, max_size=sys.maxsize):
+    def read_var_bytes(self, max_size=sys.maxsize) -> bytes:
         """
         Read a variable length of bytes from the stream.
 
