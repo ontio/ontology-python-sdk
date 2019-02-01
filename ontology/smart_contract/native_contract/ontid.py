@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # # -*- coding: utf-8 -*-
 
-import binascii
-
 from time import time
 
 from ontology.vm import build_vm
@@ -10,11 +8,11 @@ from ontology.crypto.curve import Curve
 from ontology.common.address import Address
 from ontology.crypto.key_type import KeyType
 from ontology.account.account import Account
+from ontology.utils.arguments import check_ont_id
 from ontology.core.transaction import Transaction
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
-from ontology.utils.params_check import check_ont_id
 from ontology.exception.exception import SDKException
 
 
@@ -51,7 +49,7 @@ class OntId(object):
 
     @property
     def contract_address(self) -> str:
-        return binascii.b2a_hex(self.__contract_address[::-1]).decode('ascii')
+        return bytes.hex(self.__contract_address[::-1])
 
     @staticmethod
     def parse_pub_keys(ont_id: str, raw_pub_keys: str or bytes) -> list:
@@ -398,7 +396,7 @@ class OntId(object):
         :return: a Transaction object which is used to register ONT ID.
         """
         if isinstance(pub_key, str):
-            bytes_ctrl_pub_key = binascii.a2b_hex(pub_key)
+            bytes_ctrl_pub_key = bytes.fromhex(pub_key)
         elif isinstance(pub_key, bytes):
             bytes_ctrl_pub_key = pub_key
         else:
@@ -424,7 +422,7 @@ class OntId(object):
         :return: a Transaction object which is used to add public key.
         """
         if isinstance(new_pub_key, str):
-            bytes_new_pub_key = binascii.a2b_hex(new_pub_key)
+            bytes_new_pub_key = bytes.fromhex(new_pub_key)
         elif isinstance(new_pub_key, bytes):
             bytes_new_pub_key = new_pub_key
         else:
@@ -451,7 +449,7 @@ class OntId(object):
         :return: a Transaction object which is used to remove public key.
         """
         if isinstance(revoked_pub_key, str):
-            bytes_revoked_pub_key = binascii.a2b_hex(revoked_pub_key)
+            bytes_revoked_pub_key = bytes.fromhex(revoked_pub_key)
         elif isinstance(revoked_pub_key, bytes):
             bytes_revoked_pub_key = revoked_pub_key
         else:
@@ -476,7 +474,7 @@ class OntId(object):
         :return: a Transaction object which is used to add attribute.
         """
         if isinstance(pub_key, str):
-            bytes_pub_key = binascii.a2b_hex(pub_key)
+            bytes_pub_key = bytes.fromhex(pub_key)
         elif isinstance(pub_key, bytes):
             bytes_pub_key = pub_key
         else:
@@ -504,7 +502,7 @@ class OntId(object):
         :return: a Transaction object which is used to remove attribute.
         """
         if isinstance(pub_key, str):
-            bytes_pub_key = binascii.a2b_hex(pub_key)
+            bytes_pub_key = bytes.fromhex(pub_key)
         elif isinstance(pub_key, bytes):
             bytes_pub_key = pub_key
         else:
@@ -528,7 +526,7 @@ class OntId(object):
         :return:
         """
         if isinstance(pub_key, str):
-            bytes_pub_key = binascii.a2b_hex(pub_key)
+            bytes_pub_key = bytes.fromhex(pub_key)
         elif isinstance(pub_key, bytes):
             bytes_pub_key = pub_key
         else:
