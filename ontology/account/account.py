@@ -127,7 +127,7 @@ class Account(object):
         mac_tag, cipher_text = AESHandler.aes_gcm_encrypt_with_iv(self.__private_key, hdr, key, iv)
         encrypted_key = bytes.hex(cipher_text) + bytes.hex(mac_tag)
         encrypted_key_str = base64.b64encode(bytes.fromhex(encrypted_key))
-        return encrypted_key_str.decode()
+        return encrypted_key_str.decode('utf-8')
 
     @staticmethod
     def get_gcm_decoded_private_key(encrypted_key_str: str, password: str, b58_address: str, salt: str, n: int,
@@ -159,7 +159,7 @@ class Account(object):
         acct = Account(private_key, scheme)
         if acct.get_address().b58encode() != b58_address:
             raise SDKException(ErrorCode.other_error('Address error.'))
-        return private_key
+        return private_key.hex()
 
     def get_public_key_serialize(self):
         stream = StreamManager.get_stream()
