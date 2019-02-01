@@ -28,16 +28,15 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(private_key, decoded_private_key)
 
     def test_export_and_get_gcm_decoded_private_key(self):
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
+        hex_private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         salt = base64.b64decode('pwLIUKAf2bAbTseH/WYrfQ=='.encode('ascii')).decode('latin-1')
-        account = Account(private_key, SignatureScheme.SHA256withECDSA)
+        account = Account(hex_private_key, SignatureScheme.SHA256withECDSA)
         b58_address = account.get_address_base58()
         n = 16384
-        password = 'password'
         enc_private_key = account.export_gcm_encrypted_private_key(password, salt, n)
         decoded_private_key = Account.get_gcm_decoded_private_key(enc_private_key, password, b58_address, salt, n,
                                                                   SignatureScheme.SHA256withECDSA)
-        self.assertEqual(private_key, decoded_private_key)
+        self.assertEqual(hex_private_key, decoded_private_key)
 
     def test_get_gcm_decoded_private_key(self):
         encrypted_key_str = 'hhWuyE1jjKjBOT7T5Rlrea3ewJIR8i6UjTv67bnkHz5YsqgeCfXjrHJTBGQtE0bG'
