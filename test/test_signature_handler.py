@@ -16,10 +16,10 @@ class TestSignatureHandler(unittest.TestCase):
         tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, 10,
                                                             b58_from_address, 20000, 0)
         tx.sign_transaction(acct1)
-        self.assertTrue(acct1.verify_signature(tx.hash256_bytes(), tx.sig_list[0].sig_data[0]))
-        self.assertFalse(acct2.verify_signature(tx.hash256_bytes(), tx.sig_list[0].sig_data[0]))
+        self.assertTrue(acct1.verify_signature(tx.hash256(), tx.sig_list[0].sig_data[0]))
+        self.assertFalse(acct2.verify_signature(tx.hash256(), tx.sig_list[0].sig_data[0]))
         tx.add_sign_transaction(acct2)
-        self.assertTrue(acct2.verify_signature(tx.hash256_bytes(), tx.sig_list[1].sig_data[0]))
+        self.assertTrue(acct2.verify_signature(tx.hash256(), tx.sig_list[1].sig_data[0]))
 
     def test_generate_signature(self):
         msg = b'Attack!'
