@@ -87,7 +87,7 @@ class Transaction(object):
         pass
 
     def hash256_explorer(self) -> str:
-        tx_serial = self.serialize_unsigned(is_str=True)
+        tx_serial = self.serialize_unsigned()
         digest = Digest.hash256(tx_serial)
         if not isinstance(digest, bytes):
             raise SDKException(ErrorCode.require_bytes_params)
