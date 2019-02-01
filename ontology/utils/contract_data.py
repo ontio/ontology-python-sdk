@@ -27,7 +27,7 @@ class ContractDataParser(object):
             raise SDKException(ErrorCode.other_error(e.args[0]))
         array.reverse()
         try:
-            num = int(bytes.hex(array), 16)
+            num = int(bytearray.hex(array), 16)
         except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return num
