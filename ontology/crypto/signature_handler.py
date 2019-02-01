@@ -1,6 +1,5 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
 
 from ecdsa import (
     NIST256p,
@@ -54,7 +53,7 @@ class SignatureHandler(object):
     @staticmethod
     def verify_signature(public_key: bytes or str, msg: bytes, signature: bytes):
         if isinstance(public_key, str):
-            public_key = binascii.a2b_hex(public_key)
+            public_key = bytes.fromhex(public_key)
         if public_key.startswith(b'\x02') or public_key.startswith(b'\x03'):
             public_key = SignatureHandler.uncompress_public_key(public_key)
         elif public_key.startswith(b'\x04'):
