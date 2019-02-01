@@ -3,10 +3,10 @@
 
 import unittest
 
-from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_data import ContractDataParser
 
 
-class TestClaim(unittest.TestCase):
+class TestContractDataParser(unittest.TestCase):
     def test_bigint_to_neo_bytes(self):
         value_list = [9175052165852779861, -9175052165852779861, 9199634313818843819, -9199634313818843819, 8380656,
                       -8380656, 8446192, -8446192, 0]
