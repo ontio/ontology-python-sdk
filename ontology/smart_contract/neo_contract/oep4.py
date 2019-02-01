@@ -58,7 +58,6 @@ class Oep4(object):
         :return: a short string symbol of the oep4 token
         """
         symbol = self.__get_token_setting('symbol')
-        print(symbol)
         return ContractDataParser.to_utf8_str(symbol)
 
     def get_decimal(self) -> int:
