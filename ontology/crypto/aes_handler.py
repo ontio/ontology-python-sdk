@@ -8,7 +8,7 @@ from Cryptodome.Util.Padding import pad, unpad
 
 class AESHandler(object):
     @staticmethod
-    def __generate_iv():
+    def generate_iv() -> bytes:
         return Random.new().read(AES.block_size)
 
     @staticmethod
@@ -24,7 +24,7 @@ class AESHandler(object):
         return mac_tag, cipher_text
 
     @staticmethod
-    def aes_gcm_decrypt_with_iv(cipher_text: bytes, hdr: bytes, mac_tag: bytes, key: bytes, iv: bytes):
+    def aes_gcm_decrypt_with_iv(cipher_text: bytes, hdr: bytes, mac_tag: bytes, key: bytes, iv: bytes) -> bytes:
         cipher = AES.new(key=key, mode=AES.MODE_GCM, nonce=iv)
         cipher.update(hdr)
         try:
@@ -69,12 +69,13 @@ class AESHandler(object):
         return plain_text
 
     @staticmethod
-    def aes_cbc_encrypt(plain_text: bytes, key: bytes):
-        iv = AESHandler.__generate_iv()
+    def aes_cbc_encrypt(plain_text: bytes, key: bytes, iv: bytes = b''):
+        if len(iv) == 0:
+            iv = AESHandler.generate_iv()
         cipher = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
         return cipher.IV, cipher.encrypt(pad(plain_text, AES.block_size))
 
     @staticmethod
     def aes_cbc_decrypt(cipher_text: bytes, iv: bytes, key: bytes):
         cipher = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
-        return unpad(cipher.decrypt(cipher_text), AES.block_size)
+        return unpad(cipher.decrypt(cipher_text), AES.block_size, style='pkcs7')
