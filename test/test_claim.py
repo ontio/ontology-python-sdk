@@ -3,7 +3,7 @@
 
 import unittest
 
-from time import time
+from time import time, sleep
 
 from ontology.claim.claim import Claim
 from ontology.claim.header import Header

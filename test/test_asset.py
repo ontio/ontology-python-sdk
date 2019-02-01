@@ -13,7 +13,7 @@ from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.utils.contract_event_parser import ContractEventParser
+from ontology.utils.contract_event import ContractEventParser
 
 
 class TestAsset(unittest.TestCase):

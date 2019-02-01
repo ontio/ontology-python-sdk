@@ -139,14 +139,6 @@ class OntologySdk(object):
     def get_random_main_rpc_address():
         return choice(MAIN_RPC_ADDRESS)
 
-    @staticmethod
-    def get_test_net_rpc_address():
-        return TEST_RPC_ADDRESS
-
-    @staticmethod
-    def get_main_net_rpc_address():
-        return MAIN_RPC_ADDRESS
-
     def set_restful_address(self, restful_address: str):
         if isinstance(self.__restful, RestfulClient):
             self.__restful.set_address(restful_address)

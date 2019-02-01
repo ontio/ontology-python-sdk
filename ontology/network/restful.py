@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import json
-import binascii
 import requests
 
 from time import time
 from typing import List
 
-from Cryptodome.Random.random import choice
+from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
 from ontology.smart_contract.neo_vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
+from ontology.utils.transaction import ensure_bytearray_contract_address
 from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
@@ -123,12 +123,19 @@ class RestfulClient(object):
     def get_address(self):
         return self.__url
 
-    def connect_to_test_net(self):
-        restful_address = choice(TEST_RESTFUL_ADDRESS)
+    def connect_to_localhost(self):
+        self.set_address('http://localhost:20334')
+
+    def connect_to_test_net(self, index: int = 0):
+        if index == 0:
+            index = randint(1, 5)
+        restful_address = f'http://polaris{index}.ont.io:20334'
         self.set_address(restful_address)
 
-    def connect_to_main_net(self):
-        restful_address = choice(MAIN_RESTFUL_ADDRESS)
+    def connect_to_main_net(self, index: int = 0):
+        if index == 0:
+            index = randint(1, 3)
+        restful_address = f'http://dappnode{index}.ont.io:20334'
         self.set_address(restful_address)
 
     def __post(self, url: str, data: str):
@@ -343,38 +350,37 @@ class RestfulClient(object):
             return response
         return response['Result']['State']
 
-    def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, acct: Account, payer_acct: Account,
-                                gas_limit: int, gas_price: int, func: AbiFunction or InvokeFunction, pre_exec: bool,
-                                is_full: bool = False):
+    def send_neo_vm_transaction_pre_exec(self, contract_address: str or bytes or bytearray, signer: Account or None,
+                                         func: AbiFunction or InvokeFunction, is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
         elif isinstance(func, InvokeFunction):
             params = func.create_invoke_code()
         else:
             raise SDKException(ErrorCode.other_error('the type of func is error.'))
-        if isinstance(contract_address, str) and len(contract_address) == 40:
-            contract_address = bytearray(binascii.a2b_hex(contract_address))
-            contract_address.reverse()
-        if pre_exec:
-            if isinstance(contract_address, bytes):
-                tx = NeoVm.make_invoke_transaction(bytearray(contract_address), bytearray(params), b'', 0, 0)
-            elif isinstance(contract_address, bytearray):
-                tx = NeoVm.make_invoke_transaction(contract_address, bytearray(params), b'', 0, 0)
-            else:
-                raise SDKException(ErrorCode.param_err('the data type of contract address is incorrect.'))
-            if acct is not None:
-                tx.sign_transaction(acct)
-            return self.send_raw_transaction_pre_exec(tx, is_full)
+        contract_address = ensure_bytearray_contract_address(contract_address)
+        tx = NeoVm.make_invoke_transaction(contract_address, params, b'', 0, 0)
+        if signer is not None:
+            tx.sign_transaction(signer)
+        return self.send_raw_transaction_pre_exec(tx, is_full)
+
+    def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
+                                payer: Account or None, gas_limit: int, gas_price: int,
+                                func: AbiFunction or InvokeFunction, is_full: bool = False):
+        if isinstance(func, AbiFunction):
+            params = BuildParams.serialize_abi_function(func)
+        elif isinstance(func, InvokeFunction):
+            params = func.create_invoke_code()
         else:
-            unix_time_now = int(time())
-            params.append(0x67)
-            for i in contract_address:
-                params.append(i)
-            if payer_acct is None:
-                raise SDKException(ErrorCode.param_err('payer account is None.'))
-            tx = Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_acct.get_address().to_bytes(),
-                             params, bytearray(), [])
-            tx.sign_transaction(payer_acct)
-            if isinstance(acct, Account) and acct.get_address_base58() != payer_acct.get_address_base58():
-                tx.add_sign_transaction(acct)
-            return self.send_raw_transaction(tx, is_full)
+            raise SDKException(ErrorCode.other_error('the type of func is error.'))
+        contract_address = ensure_bytearray_contract_address(contract_address)
+        params.append(0x67)
+        for i in contract_address:
+            params.append(i)
+        if payer is None:
+            raise SDKException(ErrorCode.param_err('payer account is None.'))
+        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer.get_address_bytes(), params, bytearray(), [])
+        tx.sign_transaction(payer)
+        if isinstance(signer, Account) and signer.get_address_base58() != payer.get_address_base58():
+            tx.add_sign_transaction(signer)
+        return self.send_raw_transaction(tx, is_full)

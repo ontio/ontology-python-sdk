@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
-
 from typing import List
 
 from ontology.common.address import Address
@@ -24,13 +22,13 @@ class ContractDataParser(object):
     @staticmethod
     def to_int(hex_str: str) -> int:
         try:
-            array = bytearray(binascii.a2b_hex(hex_str.encode('ascii')))
-        except (binascii.Error, ValueError) as e:
+            array = bytearray.fromhex(hex_str)
+        except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         array.reverse()
         try:
-            num = int(binascii.b2a_hex(array).decode('ascii'), 16)
-        except (binascii.Error, ValueError) as e:
+            num = int(bytearray.hex(array), 16)
+        except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return num
 
@@ -48,8 +46,8 @@ class ContractDataParser(object):
     @staticmethod
     def to_bytes(hex_str: str) -> bytes:
         try:
-            bytes_str = binascii.a2b_hex(hex_str)
-        except binascii.Error as e:
+            bytes_str = bytes.fromhex(hex_str)
+        except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return bytes_str
 
@@ -72,15 +70,15 @@ class ContractDataParser(object):
     @staticmethod
     def to_utf8_str(ascii_str: str) -> str:
         try:
-            utf8_str = binascii.a2b_hex(ascii_str)
+            utf8_str = bytes.fromhex(ascii_str)
             utf8_str = utf8_str.decode('utf-8')
-        except (ValueError, binascii.Error)as e:
+        except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return utf8_str
 
     @staticmethod
     def to_hex_str(ascii_str: str) -> str:
-        hex_str = binascii.a2b_hex(ascii_str)
+        hex_str = bytes.fromhex(ascii_str)
         return hex_str.decode('ascii')
 
     @staticmethod
@@ -97,8 +95,8 @@ class ContractDataParser(object):
     @staticmethod
     def to_b58_address(hex_address: str) -> str:
         try:
-            bytes_address = binascii.a2b_hex(hex_address)
-        except binascii.Error as e:
+            bytes_address = bytes.fromhex(hex_address)
+        except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         address = Address(bytes_address)
         return address.b58encode()
@@ -117,8 +115,8 @@ class ContractDataParser(object):
     @staticmethod
     def to_bytes_address(hex_address: str) -> bytes:
         try:
-            bytes_address = binascii.a2b_hex(hex_address)
-        except binascii.Error as e:
+            bytes_address = bytes.fromhex(hex_address)
+        except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         address = Address(bytes_address)
         return address.to_bytes()
@@ -135,32 +133,32 @@ class ContractDataParser(object):
         return hex_str_list
 
     @staticmethod
-    def to_dict(item_serialize: str):
+    def to_dict(item_serialize: str) -> dict:
         stream = StreamManager.get_stream(bytearray.fromhex(item_serialize))
         reader = BinaryReader(stream)
         return ContractDataParser.__deserialize_stack_item(reader)
 
     @staticmethod
-    def __deserialize_stack_item(reader: BinaryReader):
-        t = reader.read_byte()
-        if t == BuildParams.Type.bytearray_type.value:
+    def __deserialize_stack_item(reader: BinaryReader) -> dict or bytearray:
+        param_type = reader.read_byte()
+        if param_type == BuildParams.Type.bytearray_type.value:
             b = reader.read_var_bytes()
             return b
-        elif t == BuildParams.Type.bool_type.value:
+        elif param_type == BuildParams.Type.bool_type.value:
             return reader.read_bool()
-        elif t == BuildParams.Type.int_type.value:
+        elif param_type == BuildParams.Type.int_type.value:
             b = reader.read_var_bytes()
             return ContractDataParser.__big_int_from_bytes(bytearray(b))
-        elif t == BuildParams.Type.struct_type.value or t == BuildParams.Type.array_type.value:
+        elif param_type == BuildParams.Type.struct_type.value or param_type == BuildParams.Type.array_type.value:
             count = reader.read_var_int()
             item_list = list()
             for _ in range(count):
                 item = ContractDataParser.__deserialize_stack_item(reader)
                 item_list.append(item)
-            if t == BuildParams.Type.struct_type.value:
+            if param_type == BuildParams.Type.struct_type.value:
                 return Struct(item_list)
             return item_list
-        elif t == BuildParams.Type.dict_type.value:
+        elif param_type == BuildParams.Type.dict_type.value:
             count = reader.read_var_int()
             item_dict = dict()
             for _ in range(count):
@@ -181,6 +179,48 @@ class ContractDataParser(object):
             res = int.from_bytes(ba_temp, 'big', signed=True)
             return res
         return int.from_bytes(ba_temp, 'big', signed=True)
+
+    @staticmethod
+    def neo_bytearray_to_big_int(value: bytearray) -> int:
+        if len(value) == 0:
+            return 0
+        ba_temp = value[:]
+        ba_temp.reverse()
+        if ba_temp[0] >> 7 == 1:
+            res = int.from_bytes(ba_temp, 'big', signed=True)
+            return res
+        return int.from_bytes(ba_temp, 'big', signed=True)
+
+    @staticmethod
+    def big_int_to_neo_bytearray(data: int) -> bytearray:
+        if data == 0:
+            return bytearray()
+        data_bytes = ContractDataParser.int_to_bytearray(data)
+        if len(data_bytes) == 0:
+            return bytearray()
+        if data < 0:
+            data_bytes2 = ContractDataParser.int_to_bytearray(-data)
+            b = data_bytes2[0]
+            data_bytes.reverse()
+            if b >> 7 == 1:
+                res = data_bytes[:] + bytearray([255])
+                return res
+            return data_bytes
+        else:
+            b = data_bytes[0]
+            data_bytes.reverse()
+            if b >> 7 == 1:
+                res = data_bytes[:] + bytearray([0])
+                return res
+            return data_bytes
+
+    @staticmethod
+    def int_to_bytearray(data: int):
+        bit_length = data.bit_length() // 8
+        t = data.bit_length() / 8
+        if bit_length <= t:
+            bit_length += 1
+        return bytearray(data.to_bytes(bit_length, "big", signed=True))
 
     @staticmethod
     def parser_oep4_transfer_notify(notify: dict):

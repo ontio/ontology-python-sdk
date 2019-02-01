@@ -4,10 +4,7 @@
 
 import unittest
 
-from ontology.ont_sdk import OntologySdk
-
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
+from test import sdk
 
 
 class TestMerkleVerifier(unittest.TestCase):

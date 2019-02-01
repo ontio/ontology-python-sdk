@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 import unittest
 
 from ontology.crypto.scrypt import Scrypt
@@ -38,7 +37,7 @@ class TestScrypt(unittest.TestCase):
         kd = scrypt.generate_kd('passwordtest', salt)
         target_kd = '9f0632e05eab137baae6e0a83300341531e8638612a08042d3a4074578869af1' \
                     'ccf5008e434d2cae9477f9e6e4c0571ab65a60e32e8c8fc356d95f64dd9717c9'
-        target_kd = binascii.a2b_hex(target_kd)
+        target_kd = bytes.fromhex(target_kd)
         self.assertEqual(target_kd, kd)
 
 

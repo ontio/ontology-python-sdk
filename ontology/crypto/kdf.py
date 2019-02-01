@@ -3,7 +3,7 @@
 
 
 from ontology.crypto.digest import Digest
-from ontology.utils.crypto_utils import str_to_bytes
+from ontology.utils.crypto import str_to_bytes
 
 
 def pbkdf2(seed: str or bytes, dk_len: int) -> bytes:

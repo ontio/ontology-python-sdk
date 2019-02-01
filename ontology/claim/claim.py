@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import uuid
-import json
 import base64
-import binascii
 
 from time import time, sleep
 
@@ -127,7 +125,7 @@ class Claim(object):
 
     @staticmethod
     def from_base64_signature(b64_signature: str):
-        return binascii.b2a_hex(base64.b64decode(b64_signature)).decode('ascii')
+        return bytes.hex(base64.b64decode(b64_signature))
 
     def generate_blk_proof(self, iss_acct: Account, payer: Account, gas_limit: int, gas_price: int,
                            is_big_endian: bool = True, hex_contract_address: str = ''):
@@ -137,7 +135,7 @@ class Claim(object):
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
         tx_hash = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, iss_acct, self.payload.sub, payer,
                                                           gas_limit, gas_price)
-        sleep(12)
+        sleep(10)
         hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
         merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
@@ -153,7 +151,7 @@ class Claim(object):
         return self.__blk_proof
 
     def validate_blk_proof(self, is_big_endian: bool = True):
-        return self.blk_proof.validate_blk_proof(is_big_endian)
+        return self.__blk_proof.validate_blk_proof(is_big_endian)
 
     def to_base64(self):
         b64_head = self.__head.to_base64()
