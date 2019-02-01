@@ -8,9 +8,9 @@ from test import password, acct2, acct3, acct4
 
 from ontology.crypto.curve import Curve
 from ontology.crypto.signature import Signature
-from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_data import ContractDataParser
+from ontology.utils.contract_event import ContractEventParser
 from ontology.smart_contract.native_contract.ontid import Attribute
-from ontology.utils.contract_event_parser import ContractEventParser
 
 from Cryptodome.Random.random import randint
 
