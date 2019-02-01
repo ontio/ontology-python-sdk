@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import binascii
+
 from typing import List
 
-from ontology.core.program_info import ProgramInfo
-from ontology.crypto.key_type import KeyType
-from ontology.exception.error_code import ErrorCode
-from ontology.exception.exception import SDKException
-from ontology.io.binary_reader import BinaryReader
-from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG, PUSH1
-from ontology.io.binary_writer import BinaryWriter
-from ontology.io.memory_stream import StreamManager
-from ontology.utils.utils import bytes_reader
-from ontology.vm.params_builder import ParamsBuilder
 from ecdsa import util
-from ontology.common import define
+from ontology.crypto.key_type import KeyType
+from ontology.utils.utils import bytes_reader
+from ontology.io.binary_reader import BinaryReader
+from ontology.io.binary_writer import BinaryWriter
+from ontology.core.program_info import ProgramInfo
+from ontology.io.memory_stream import StreamManager
+from ontology.exception.error_code import ErrorCode
+from ontology.vm.params_builder import ParamsBuilder
+from ontology.exception.exception import SDKException
+from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG, PUSH1
+
+MULTI_SIG_MAX_PUBKEY_SIZE = 16
 
 
 class ProgramBuilder(object):
@@ -29,7 +30,7 @@ class ProgramBuilder(object):
     @staticmethod
     def program_from_pubkey(public_key):
         builder = ParamsBuilder()
-        builder.emit_push_byte_array(public_key)
+        builder.emit_push_bytearray(public_key)
         builder.emit(CHECKSIG)
         return builder.to_bytes()
 
@@ -97,7 +98,7 @@ class ProgramBuilder(object):
         """
         for index, key in enumerate(pub_keys):
             if isinstance(key, str):
-                pub_keys[index] = binascii.a2b_hex(key)
+                pub_keys[index] = bytes.fromhex(key)
         return sorted(pub_keys, key=ProgramBuilder.compare_pubkey)
 
     @staticmethod
@@ -107,14 +108,14 @@ class ProgramBuilder(object):
             raise SDKException(ErrorCode.other_error(f'Param error: m == {m}'))
         if m > n:
             raise SDKException(ErrorCode.other_error(f'Param error: m == {m} n == {n}'))
-        if n > define.MULTI_SIG_MAX_PUBKEY_SIZE:
-            raise SDKException(ErrorCode.other_error(f'Param error: n == {n} > {define.MULTI_SIG_MAX_PUBKEY_SIZE}'))
+        if n > MULTI_SIG_MAX_PUBKEY_SIZE:
+            raise SDKException(ErrorCode.other_error(f'Param error: n == {n} > {MULTI_SIG_MAX_PUBKEY_SIZE}'))
         builder = ParamsBuilder()
-        builder.emit_push_integer(m)
+        builder.emit_push_int(m)
         pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
         for pk in pub_keys:
-            builder.emit_push_byte_array(pk)
-        builder.emit_push_integer(n)
+            builder.emit_push_bytearray(pk)
+        builder.emit_push_int(n)
         builder.emit(CHECKMULTISIG)
         return builder.to_bytes()
 
