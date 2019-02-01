@@ -58,21 +58,11 @@ class BinaryWriter(StreamManager):
         elif isinstance(value, int):
             self.stream.write(bytes([value]))
 
-    def write_bytes(self, value, unhex=True):
-        """
-        Write a `bytes` type to the stream.
-
-        Args:
-            value (bytes): array of bytes to write to the stream.
-            unhex (bool): (Default) True. Set to unhexlify the stream. Use when the bytes are not raw bytes; i.e. b'aabb'
-
-        Returns:
-            int: the number of bytes written.
-        """
-        if unhex:
+    def write_bytes(self, value, to_bytes: bool = False):
+        if to_bytes:
             try:
-                value = binascii.unhexlify(value)
-            except binascii.Error:
+                value = bytes.fromhex(value)
+            except ValueError:
                 pass
         return self.stream.write(value)
 
@@ -88,7 +78,7 @@ class BinaryWriter(StreamManager):
         Returns:
             int: the number of bytes written.
         """
-        return self.write_bytes(struct.pack(fmt, data), unhex=False)
+        return self.write_bytes(struct.pack(fmt, data))
 
     def write_char(self, value):
         """
@@ -320,33 +310,27 @@ class BinaryWriter(StreamManager):
             self.write_byte(0xff)
             return self.write_uint64(value, little_endian)
 
-    def write_var_bytes(self, value, little_endian=True):
+    def write_var_bytes(self, value, little_endian: bool = True):
         """
         Write an integer value in a space saving way to the stream.
 
-        Args:
-            value (bytes):
-            little_endian=endian (bool): specify the endianness. (Default) Little endian.
-
-        Returns:
-            int: the number of bytes written.
+        :param value:
+        :param little_endian: specify the endianness. (Default) Little endian.
+        :return: int: the number of bytes written.
         """
         length = len(value)
         self.write_var_int(length, little_endian)
+        return self.write_bytes(value, to_bytes=False)
 
-        return self.write_bytes(value, unhex=False)
-
-    def write_var_str(self, value, encoding="utf-8"):
+    def write_var_str(self, value, encoding: str = 'utf-8'):
         """
         Write a string value to the stream.
 
-        Args:
-            value (string): value to write to the stream.
-            encoding (str): string encoding format.
+        :param value: value to write to the stream.
+        :param encoding: string encoding format.
         """
         if isinstance(value, str):
             value = value.encode(encoding)
-
         length = len(value)
         ba = bytearray(value)
         byts = binascii.hexlify(ba)
@@ -387,18 +371,6 @@ class BinaryWriter(StreamManager):
             for item in array:
                 item.Serialize(self)
 
-    def write_2000256_list(self, arr):
-        """
-        Write an array of 64 byte items to the stream.
-
-        Args:
-            arr (list): a list of 2000 items of 64 bytes in size.
-        """
-        for item in arr:
-            ba = bytearray(binascii.unhexlify(item))
-            ba.reverse()
-            self.write_bytes(ba)
-
     def write_hashes(self, arr):
         """
         Write an array of hashes to the stream.
@@ -411,7 +383,6 @@ class BinaryWriter(StreamManager):
         for item in arr:
             ba = bytearray(binascii.unhexlify(item))
             ba.reverse()
-            #            logger.info("WRITING HASH %s " % ba)
             self.write_bytes(ba)
 
     def write_fixed8(self, value, unsigned=False):
