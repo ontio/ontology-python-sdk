@@ -10,11 +10,9 @@ from test import sdk, acct4, acct3
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.network.rpc import TEST_RPC_ADDRESS
 from ontology.exception.exception import SDKException
-from ontology.network.restful import TEST_RESTFUL_ADDRESS
+from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.utils.contract_data_parser import ContractDataParser
 
 sdk.restful.connect_to_test_net()
 restful_client = sdk.restful
