@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
 
 from typing import List
 from enum import Enum
 
 from ontology.core.sig import Sig
-from ontology.common import define
 from ontology.crypto.digest import Digest
 from ontology.common.address import Address
 from ontology.account.account import Account
@@ -30,9 +28,12 @@ class TransactionType(Enum):
     TransferTransaction = 0x80
 
 
+TX_MAX_SIG_SIZE = 16
+
+
 class Transaction(object):
     def __init__(self, version=0, tx_type=None, nonce=None, gas_price=None, gas_limit=None, payer=None, payload=None,
-                 attributes=None, sig_list: List[Sig] = None):
+                 attributes: bytearray = None, sig_list: List[Sig] = None):
         self.version = version
         self.tx_type = tx_type
         self.nonce = nonce
@@ -53,8 +54,8 @@ class Transaction(object):
         data['gasPrice'] = self.gas_price
         data['gasLimit'] = self.gas_limit
         data['payer'] = Address(self.payer).b58encode()
-        data['payload'] = binascii.b2a_hex(self.payload).decode('ascii')
-        data['attributes'] = binascii.b2a_hex(self.attributes).decode('ascii')
+        data['payload'] = bytes.hex(self.payload)
+        data['attributes'] = bytearray.hex(self.attributes)
         data['sigs'] = list()
         for sig in self.sig_list:
             data['sigs'].append(dict(sig))
@@ -75,10 +76,10 @@ class Transaction(object):
             writer.write_var_bytes(bytes(self.payload))
         writer.write_var_int(len(self.attributes))
         ms.flush()
-        hex_bytes = ms.hexlify()
+        hex_bytes = ms.to_bytes()
         StreamManager.release_stream(ms)
         if is_str:
-            return binascii.a2b_hex(hex_bytes)
+            return bytes.hex(hex_bytes)
         else:
             return hex_bytes
 
@@ -90,37 +91,27 @@ class Transaction(object):
         digest = Digest.hash256(tx_serial)
         if not isinstance(digest, bytes):
             raise SDKException(ErrorCode.require_bytes_params)
-        return binascii.b2a_hex(digest[::-1]).decode('ascii')
+        return bytes.hex(digest[::-1])
 
-    def hash256_bytes(self) -> bytes:
+    def hash256(self, is_hex: bool = False) -> bytes or str:
         tx_serial = self.serialize_unsigned()
-        tx_serial = binascii.a2b_hex(tx_serial)
-        digest = Digest.hash256(tx_serial, False)
-        if not isinstance(digest, bytes):
-            raise SDKException(ErrorCode.require_bytes_params)
+        digest = Digest.hash256(tx_serial, is_hex)
         return digest
 
-    def hash256_hex(self) -> str:
-        tx_serial = self.serialize_unsigned(is_str=True)
-        digest = Digest.hash256(tx_serial, is_hex=True)
-        if not isinstance(digest, str):
-            raise SDKException(ErrorCode.require_str_params)
-        return digest
-
-    def serialize(self, is_hex: bool = False) -> bytes:
+    def serialize(self, is_hex: bool = False) -> bytes or str:
         ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
-        writer.write_bytes(self.serialize_unsigned())
+        writer.write_bytes(self.serialize_unsigned(is_str=False))
         writer.write_var_int(len(self.sig_list))
         for sig in self.sig_list:
             writer.write_bytes(sig.serialize())
         ms.flush()
-        bytes_tx = ms.hexlify()
+        bytes_tx = ms.to_bytes()
         StreamManager.release_stream(ms)
         if is_hex:
-            return bytes_tx
+            return bytes_tx.hex()
         else:
-            return binascii.a2b_hex(bytes_tx)
+            return bytes_tx
 
     @staticmethod
     def deserialize_from(bytes_tx: bytes):
@@ -150,7 +141,7 @@ class Transaction(object):
         :param signer: an Account object which will sign the transaction.
         :return: a Transaction object which has been signed.
         """
-        tx_hash = self.hash256_bytes()
+        tx_hash = self.hash256()
         sig_data = signer.generate_signature(tx_hash)
         sig = [Sig([signer.get_public_key_bytes()], 1, [sig_data])]
         self.sig_list = sig
@@ -164,9 +155,9 @@ class Transaction(object):
         """
         if self.sig_list is None or len(self.sig_list) == 0:
             self.sig_list = []
-        elif len(self.sig_list) >= define.TX_MAX_SIG_SIZE:
+        elif len(self.sig_list) >= TX_MAX_SIG_SIZE:
             raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
-        tx_hash = self.hash256_bytes()
+        tx_hash = self.hash256()
         sig_data = signer.generate_signature(tx_hash)
         sig = Sig([signer.get_public_key_bytes()], 1, [sig_data])
         self.sig_list.append(sig)
@@ -185,11 +176,11 @@ class Transaction(object):
             if isinstance(pk, str):
                 pub_keys[index] = pk.encode('ascii')
         pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
-        tx_hash = self.hash256_bytes()
+        tx_hash = self.hash256()
         sig_data = signer.generate_signature(tx_hash)
         if self.sig_list is None or len(self.sig_list) == 0:
             self.sig_list = []
-        elif len(self.sig_list) >= define.TX_MAX_SIG_SIZE:
+        elif len(self.sig_list) >= TX_MAX_SIG_SIZE:
             raise SDKException(ErrorCode.param_err('the number of transaction signatures should not be over 16'))
         else:
             for i in range(len(self.sig_list)):
