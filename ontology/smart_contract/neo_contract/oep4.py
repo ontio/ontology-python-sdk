@@ -8,9 +8,9 @@ from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data import ContractDataParser
+from ontology.utils.contract_event import ContractEventParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
-from ontology.utils.contract_data_parser import ContractDataParser
-from ontology.utils.contract_event_parser import ContractEventParser
 
 
 class Oep4(object):
@@ -30,7 +30,7 @@ class Oep4(object):
 
     def __get_token_setting(self, func_name: str) -> str:
         func = InvokeFunction(func_name)
-        res = self.__sdk.rpc.send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func, True)
+        res = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
         return res.get('Result', '')
 
     @staticmethod
@@ -58,6 +58,7 @@ class Oep4(object):
         :return: a short string symbol of the oep4 token
         """
         symbol = self.__get_token_setting('symbol')
+        print(symbol)
         return ContractDataParser.to_utf8_str(symbol)
 
     def get_decimal(self) -> int:
@@ -83,7 +84,7 @@ class Oep4(object):
         """
         func = InvokeFunction('init')
         tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, acct, payer_acct,
-                                                                   gas_limit, gas_price, func, False)
+                                                                   gas_limit, gas_price, func)
         return tx_hash
 
     def get_total_supply(self) -> int:
@@ -94,8 +95,7 @@ class Oep4(object):
         :return: the total supply of the oep4 token.
         """
         func = InvokeFunction('totalSupply')
-        response = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func,
-                                                                    True)
+        response = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
         try:
             total_supply = ContractDataParser.to_int(response['Result'])
         except SDKException:
@@ -114,8 +114,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_address)
         address = Address.b58decode(b58_address).to_bytes()
         func.set_params_value(address)
-        result = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0,
-                                                                  func, True)
+        result = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
         try:
             balance = ContractDataParser.to_int(result['Result'])
         except SDKException:
@@ -151,7 +150,27 @@ class Oep4(object):
                                                                    gas_limit, gas_price, func, False)
         return tx_hash
 
-    def query_transfer_event(self, tx_hash):
+    def query_transfer_event(self, tx_hash: str):
+        event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
+        notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+        notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
+        notify['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
+        notify['States'][3] = ContractDataParser.to_int(notify['States'][3])
+        return notify
+
+    def query_multi_transfer_event(self, tx_hash: str) -> list:
+        event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
+        notify_list = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
+        for index, notify in enumerate(notify_list):
+            if notify.get('ContractAddress', '') == self.__hex_contract_address:
+                notify_list[index]['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+                notify_list[index]['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
+                notify_list[index]['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
+                notify_list[index]['States'][3] = ContractDataParser.to_int(notify['States'][3])
+        return notify_list
+
+    def query_approve_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
         notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
@@ -231,7 +250,7 @@ class Oep4(object):
         spender_address = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner_address, spender_address, amount)
         tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, owner_acct, payer_acct,
-                                                                   gas_limit, gas_price, func, False)
+                                                                   gas_limit, gas_price, func)
         return tx_hash
 
     def allowance(self, b58_owner_address: str, b58_spender_address: str):
@@ -249,8 +268,7 @@ class Oep4(object):
         Oep4.__b58_address_check(b58_spender_address)
         spender = Address.b58decode(b58_spender_address).to_bytes()
         func.set_params_value(owner, spender)
-        result = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func,
-                                                                  True)
+        result = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
         try:
             allowance = ContractDataParser.to_int(result['Result'])
         except SDKException:
