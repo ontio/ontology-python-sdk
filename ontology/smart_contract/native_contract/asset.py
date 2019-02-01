@@ -5,11 +5,11 @@ from time import time
 
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.exception.error_code import ErrorCode
 from ontology.core.transaction import Transaction
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data_parser import ContractDataParser
 from ontology.vm.build_vm import build_native_invoke_code
+from ontology.utils.contract_data import ContractDataParser
 
 
 class Asset(object):
