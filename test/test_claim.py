@@ -55,29 +55,6 @@ class TestClaim(unittest.TestCase):
         claim_payload_recv = Payload.from_base64(b64_payload)
         self.assertEqual(dict(claim_payload), dict(claim_payload_recv))
 
-    def test_proof(self):
-        proof_node = [
-            {'Direction': 'Left', 'TargetHash': '328c513fcfcd715e8ec537ab7d9d3a40a4a0cab6147afb2342b5a45226eaf134'},
-            {'Direction': 'Left', 'TargetHash': '3035c97472f112e92ab0f72d0d2d7d5ee36ae4d46aae0c08874cef90f1f32f0c'},
-            {'Direction': 'Left', 'TargetHash': '94237b775cb687b15413ada5166fb723ea7f0767fa4ecbf899af5db6932444e5'},
-            {'Direction': 'Left', 'TargetHash': 'c8c494ae321875dd94d9622ebb38f013c477edece714f7d68d605b42b0abe09e'},
-            {'Direction': 'Left', 'TargetHash': '610f87fbcbdd3b4c316946086d9177f85db5d40b2335f797ab8b869fe0248a90'},
-            {'Direction': 'Left', 'TargetHash': '92f41a0485e2591ccd11efd41b9a931fab56349bebe340e9fd81a0281bb1ef73'},
-            {'Direction': 'Left', 'TargetHash': 'bcbc040368a66ec9d1dfcf489eb00aaa424e286ac84c53979c325531e9d0ea80'},
-            {'Direction': 'Left', 'TargetHash': '84bb65ae876c5cc67c3c57fad08382ba18d0ddd6758e6b37794fd461c173cea4'}]
-        tx_hash = 'c6e2b089a835821916bc612a046e3eaada3c6abc0c274062303384d0a8c71b56'
-        hex_contract_address = '36bb5c053b6b839c8f6b923fe852f91239b9fccc'
-        merkle_root = 'ed7f4d2e91925917d4242b3a59a3f47830d77bca383ffc78e078a1f93ddb62c4'
-        blk_height = 705043
-        proof = sdk.service.blockchain_proof()
-        proof.set_proof(tx_hash, hex_contract_address, blk_height, merkle_root, proof_node)
-        self.assertTrue(isinstance(proof, BlockchainProof))
-        self.assertTrue(proof.validate_blk_proof(True))
-        dict_proof = dict(proof)
-        self.assertTrue(isinstance(dict_proof, dict))
-        proof.merkle_root = 'ed7f4d2e91925917d4242b3a59a3f47830d77bca383ffc78e078a1f93ddb62c5'
-        self.assertFalse(proof.validate_blk_proof(True))
-
     def test_signature_info(self):
         sdk.rpc.connect_to_test_net()
         try:
