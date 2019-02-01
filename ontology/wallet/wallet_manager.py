@@ -7,6 +7,7 @@ import uuid
 import base64
 import codecs
 
+from typing import List
 from os import remove, path
 from datetime import datetime
 
@@ -111,6 +112,9 @@ class WalletManager(object):
 
     def get_wallet(self):
         return self.wallet_in_mem
+
+    def get_acct_data_list(self) -> List[AccountData]:
+        return self.wallet_in_mem.accounts
 
     def write_wallet(self):
         self.save()
