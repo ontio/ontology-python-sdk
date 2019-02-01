@@ -3,16 +3,15 @@
 
 import time
 import unittest
-import binascii
 
 from Cryptodome.Random.random import randint
 
-from ontology.utils.contract_data_parser import ContractDataParser
 from test import acct1, acct2, acct3, acct4
 
 from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
@@ -193,9 +192,9 @@ class TestOep4(unittest.TestCase):
             self.assertEqual('approval', bytes.fromhex(states[0]).decode())
             self.assertEqual(hex_owner_address, states[1])
             self.assertEqual(hex_spender_address, states[2])
-            array = bytearray(binascii.a2b_hex(states[3].encode('ascii')))
+            array = bytearray.fromhex(states[3].encode('ascii'))
             array.reverse()
-            notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+            notify_value = int(bytes.hex(array), 16)
             self.assertEqual(amount, notify_value)
         except SDKException as e:
             raised = False
@@ -244,9 +243,9 @@ class TestOep4(unittest.TestCase):
             self.assertEqual('transfer', bytes.fromhex(notify['States'][0]).decode())
             self.assertEqual(hex_from_address, notify['States'][1])
             self.assertEqual(hex_to_address, notify['States'][2])
-            array = bytearray(binascii.a2b_hex(notify['States'][3].encode('ascii')))
+            array = bytearray.fromhex(notify['States'][3])
             array.reverse()
-            notify_value = int(binascii.b2a_hex(array).decode('ascii'), 16)
+            notify_value = int(bytes.hex(array), 16)
             self.assertEqual(value, notify_value)
         except SDKException as e:
             raised = False
