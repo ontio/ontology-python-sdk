@@ -147,7 +147,7 @@ class Claim(object):
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, is_big_endian)
         if not result:
             raise SDKException(ErrorCode.other_error('Invalid merkle proof'))
-        self.__blk_proof.set_proof(tx_hash, hex_contract_address, current_block_height, merkle_root, proof_node)
+        self.__blk_proof.set_proof(tx_hash, hex_contract_address, tx_block_height, merkle_root, proof_node)
         return self.__blk_proof
 
     def validate_blk_proof(self, is_big_endian: bool = True):
