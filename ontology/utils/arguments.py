@@ -10,7 +10,7 @@ from ontology.exception.exception import SDKException
 
 
 def check_ont_id(func):
-    if not __debug__:
+    if __debug__ is False:
         return func
 
     sig = signature(func)
@@ -30,7 +30,7 @@ def check_ont_id(func):
 
 def type_assert(*ty_args, **ty_kwargs):
     def decorate(func):
-        if not __debug__:
+        if __debug__ is False:
             return func
         sig = signature(func)
         bound_types = sig.bind_partial(*ty_args, **ty_kwargs).arguments
