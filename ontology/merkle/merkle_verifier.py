@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import binascii
-
 from typing import List
 
 from ontology.crypto.digest import Digest
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data_parser import ContractDataParser
+from ontology.utils.contract_data import ContractDataParser
 
 
 class MerkleVerifier(object):
@@ -49,10 +47,10 @@ class MerkleVerifier(object):
                 except KeyError:
                     raise SDKException(ErrorCode.other_error('Invalid proof'))
                 if direction == 'left':
-                    value = binascii.a2b_hex('01' + sibling + hex_proof_hash)
+                    value = bytes.fromhex('01' + sibling + hex_proof_hash)
                     hex_proof_hash = Digest.sha256(value, is_hex=True)
                 elif direction == 'right':
-                    value = binascii.a2b_hex('01' + hex_proof_hash + sibling)
+                    value = bytes.fromhex('01' + hex_proof_hash + sibling)
                     hex_proof_hash = Digest.sha256(value, is_hex=True)
                 else:
                     raise SDKException(ErrorCode.other_error('Invalid proof.'))
