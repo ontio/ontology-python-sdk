@@ -43,6 +43,17 @@ class TestOntId(unittest.TestCase):
             self.assertEqual('ECDSA', pk['Type'])
             self.assertEqual('P256', pk['Curve'])
             self.assertEqual(66, len(pk['Value']))
+        sdk.rpc.connect_to_main_net()
+        try:
+            ont_id = 'did:ont:ATZhaVirdEYkpsHQDn9PMt5kDCq1VPHcTr'
+            pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
+            for pk in pub_keys:
+                self.assertIn(ont_id, pk['PubKeyId'])
+                self.assertEqual('ECDSA', pk['Type'])
+                self.assertEqual('P256', pk['Curve'])
+                self.assertEqual(66, len(pk['Value']))
+        finally:
+            sdk.rpc.connect_to_test_net()
 
     def test_get_ddo(self):
         sdk.rpc.connect_to_test_net()
