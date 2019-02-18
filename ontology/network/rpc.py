@@ -81,7 +81,7 @@ class RpcClient(object):
 
     def connect_to_main_net(self, index: int = 0):
         if index == 0:
-            index = randint(1, 3)
+            index = randint(1, 4)
         rpc_address = f'http://dappnode{index}.ont.io:20336'
         self.set_address(rpc_address)
 
