@@ -34,11 +34,11 @@
 
 ## 简介
 
-Ontology-Python-SDK是一个基于`Python3.6`实现的综合性SDK。目前，它支持本地钱包管理、数字身份管理、数字资产管理、智能合约的部署和调用、OEP4智能合约的调用以及与Ontology区块链的通信。并且，未来它还将支持更多功能和应用。
+本体团队的官方 Python SDK 基于 Python 3.6 实现。目前，它支持钱包文件管理、数字身份管理、数字资产管理、智能合约的部署和调用、以及与本体区块链网络的通信。
 
 ## 准备
 
-安装需要`Python 3.6`或更高版本的环境。
+安装需要 `Python 3.6` 或更高版本的环境。
 
 ```bash
 pip install ontology-python-sdk
@@ -46,11 +46,11 @@ pip install ontology-python-sdk
 
 ## 接口
 
-更多信息可浏览[Ontology-Python-SDK API 文档](https://apidoc.ont.io/pythonsdk/).
+这里以列表的形式列出所支持的接口，更详细的信息可以点击[这里](https://apidoc.ont.io/pythonsdk/)访问我们的 API 文档。
 
 ### Network
 
-这是一个用于与Ontology节点进行交互的API集合。
+这是一个用于与本体网络进行交互的API集合。
 
 |       | Main Function                         |
 | :---: | :------------------------------------ |
