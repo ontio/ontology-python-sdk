@@ -292,8 +292,8 @@ class Asset(object):
         payer_array = Address.b58decode(b58_payer_address).to_bytes()
         return Transaction(0, 0xd1, unix_time_now, gas_price, gas_limit, payer_array, invoke_code, bytearray(), list())
 
-    def send_transfer(self, asset: str, from_acct: Account, b58_to_address: str, amount: int, payer: Account,
-                      gas_limit: int, gas_price: int):
+    def transfer(self, asset: str, from_acct: Account, b58_to_address: str, amount: int, payer: Account,
+                 gas_limit: int, gas_price: int):
         """
         This interface is used to send a transfer transaction that only for ONT or ONG.
 
@@ -313,8 +313,8 @@ class Asset(object):
             tx.add_sign_transaction(payer)
         return self.__sdk.get_network().send_raw_transaction(tx)
 
-    def send_withdraw_ong_transaction(self, claimer: Account, b58_recv_address: str, amount: int, payer: Account,
-                                      gas_limit: int, gas_price: int) -> str:
+    def withdraw_ong(self, claimer: Account, b58_recv_address: str, amount: int, payer: Account,
+                     gas_limit: int, gas_price: int) -> str:
         """
         This interface is used to withdraw a amount of ong and transfer them to receive address.
 
@@ -344,8 +344,8 @@ class Asset(object):
             tx.add_sign_transaction(payer)
         return self.__sdk.get_network().send_raw_transaction(tx)
 
-    def send_approve(self, asset, sender: Account, b58_recv_address: str, amount: int, payer: Account, gas_limit: int,
-                     gas_price: int) -> str:
+    def approve(self, asset, sender: Account, b58_recv_address: str, amount: int, payer: Account, gas_limit: int,
+                gas_price: int) -> str:
         """
         This is an interface used to send an approve transaction
         which allow receiver to spend a amount of ONT or ONG asset in sender's account.
@@ -378,8 +378,8 @@ class Asset(object):
             tx.add_sign_transaction(payer)
         return self.__sdk.get_network().send_raw_transaction(tx)
 
-    def send_transfer_from(self, asset: str, sender: Account, b58_from_address: str, b58_recv_address: str, amount: int,
-                           payer: Account, gas_limit: int, gas_price: int) -> str:
+    def transfer_from(self, asset: str, sender: Account, b58_from_address: str, b58_recv_address: str, amount: int,
+                      payer: Account, gas_limit: int, gas_price: int) -> str:
         """
         This interface is used to generate a Transaction object for transfer that
         allow one account to transfer a amount of ONT or ONG Asset to another account,
