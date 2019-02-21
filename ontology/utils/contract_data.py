@@ -4,6 +4,7 @@
 from typing import List
 
 from ontology.common.address import Address
+from ontology.vm.op_code import PUSHM1, PUSH0
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
@@ -31,6 +32,21 @@ class ContractDataParser(object):
         except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return num
+
+    @staticmethod
+    def op_code_to_int(op_code: str):
+        if op_code.lower() == '4f':
+            return -1
+        elif op_code == '00':
+            return 0
+        elif 80 < int(op_code, base=16) < 103:
+            return int(op_code, base=16) - 80
+        else:
+            op_code = bytearray.fromhex(op_code)
+            stream = StreamManager.get_stream(op_code)
+            reader = BinaryReader(stream)
+            op_code = bytearray(reader.read_var_bytes())
+            return ContractDataParser.neo_bytearray_to_big_int(op_code)
 
     @staticmethod
     def to_int_list(hex_str_list: list) -> List[int]:
