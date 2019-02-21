@@ -237,25 +237,3 @@ class ContractDataParser(object):
         if bit_length <= t:
             bit_length += 1
         return bytearray(data.to_bytes(bit_length, "big", signed=True))
-
-    @staticmethod
-    def parser_oep4_transfer_notify(notify: dict):
-        try:
-            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-            notify['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
-            notify['States'][3] = ContractDataParser.to_int(notify['States'][3])
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('Invalid event'))
-        return notify
-
-    @staticmethod
-    def parser_oep4_states(states: list):
-        try:
-            states[0] = ContractDataParser.to_utf8_str(states[0])
-            states[1] = ContractDataParser.to_b58_address(states[1])
-            states[2] = ContractDataParser.to_b58_address(states[2])
-            states[3] = ContractDataParser.to_int(states[3])
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('Invalid states'))
-        return states
