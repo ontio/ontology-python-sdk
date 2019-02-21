@@ -189,7 +189,7 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         gas_limit = 20000
         try:
-            tx_hash = asset.send_transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
+            tx_hash = asset.transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
         except SDKException as e:
             self.assertIn('balance insufficient', e.args[1])
             return
@@ -257,7 +257,7 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         for _ in range(5):
             try:
-                tx_hash = asset.send_withdraw_ong_transaction(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
+                tx_hash = asset.withdraw_ong(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
                 time.sleep(1)
                 self.assertEqual(64, len(tx_hash))
             except SDKException as e:
@@ -276,7 +276,7 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         for _ in range(3):
             try:
-                tx_hash = asset.send_approve('ont', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
+                tx_hash = asset.approve('ont', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
                 time.sleep(1)
                 self.assertEqual(len(tx_hash), 64)
             except SDKException as e:
@@ -296,8 +296,8 @@ class TestAsset(unittest.TestCase):
         gas_price = 500
         for _ in range(3):
             try:
-                tx_hash = asset.send_transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
-                                                   gas_limit, gas_price)
+                tx_hash = asset.transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
+                                              gas_limit, gas_price)
                 self.assertEqual(64, len(tx_hash))
                 time.sleep(1)
                 time.sleep(randint(6, 10))

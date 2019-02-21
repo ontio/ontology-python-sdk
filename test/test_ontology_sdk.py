@@ -35,9 +35,9 @@ class TestOntologySdk(unittest.TestCase):
         amount = 1
         gas_price = 500
         gas_limit = 20000
-        tx_hash = asset.send_transfer('ont', acct2, b58_multi_address, amount, acct2, gas_limit, gas_price)
+        tx_hash = asset.transfer('ont', acct2, b58_multi_address, amount, acct2, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        tx_hash = asset.send_transfer('ong', acct2, b58_multi_address, amount, acct2, gas_limit, gas_price)
+        tx_hash = asset.transfer('ong', acct2, b58_multi_address, amount, acct2, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         b58_acct1_address = acct1.get_address_base58()
         b58_acct2_address = acct2.get_address_base58()
