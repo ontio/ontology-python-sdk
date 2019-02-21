@@ -53,7 +53,7 @@ class TestAsset(unittest.TestCase):
         decimals = asset.query_decimals('ong')
         self.assertEqual(9, decimals)
         decimals = asset.query_decimals('ont')
-        self.assertEqual(1, decimals)
+        self.assertEqual(0, decimals)
 
     def test_unbound_ong(self):
         b58_address1 = acct1.get_address_base58()
@@ -179,7 +179,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(b58_payer_address, notify['States'][1])
         self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
-    def test_send_transfer(self):
+    def test_transfer(self):
         sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         from_acct = acct2
@@ -247,7 +247,7 @@ class TestAsset(unittest.TestCase):
                 msg = 'already in the tx pool'
                 self.assertTrue(msg in e.args[1])
 
-    def test_send_withdraw_ong_transaction(self):
+    def test_withdraw_ong(self):
         claimer = acct1
         payer = acct2
         sdk.rpc.connect_to_test_net()
@@ -265,7 +265,7 @@ class TestAsset(unittest.TestCase):
                 msg2 = 'ConnectTimeout'
                 self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
 
-    def test_send_approve(self):
+    def test_approve(self):
         sender = acct1
         payer = acct2
         sdk.rpc.connect_to_test_net()
@@ -284,7 +284,7 @@ class TestAsset(unittest.TestCase):
                 msg2 = 'ConnectTimeout'
                 self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
 
-    def test_send_transfer_from(self):
+    def test_transfer_from(self):
         sender = acct2
         payer = sender
         sdk.rpc.connect_to_test_net()
