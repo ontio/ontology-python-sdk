@@ -11,6 +11,9 @@ class ParamsBuilder:
     def __init__(self):
         self.ms = MemoryStream()
 
+    def clear_up(self):
+        self.ms.clean_up()
+
     def emit(self, op):
         self.write_bytes(op)
 

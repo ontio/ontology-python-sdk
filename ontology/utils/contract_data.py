@@ -4,6 +4,7 @@
 from typing import List
 
 from ontology.common.address import Address
+from ontology.vm.op_code import PUSHM1, PUSH0
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
@@ -31,6 +32,21 @@ class ContractDataParser(object):
         except ValueError as e:
             raise SDKException(ErrorCode.other_error(e.args[0]))
         return num
+
+    @staticmethod
+    def op_code_to_int(op_code: str):
+        if op_code.lower() == '4f':
+            return -1
+        elif op_code == '00':
+            return 0
+        elif 80 < int(op_code, base=16) < 103:
+            return int(op_code, base=16) - 80
+        else:
+            op_code = bytearray.fromhex(op_code)
+            stream = StreamManager.get_stream(op_code)
+            reader = BinaryReader(stream)
+            op_code = bytearray(reader.read_var_bytes())
+            return ContractDataParser.neo_bytearray_to_big_int(op_code)
 
     @staticmethod
     def to_int_list(hex_str_list: list) -> List[int]:
@@ -221,25 +237,3 @@ class ContractDataParser(object):
         if bit_length <= t:
             bit_length += 1
         return bytearray(data.to_bytes(bit_length, "big", signed=True))
-
-    @staticmethod
-    def parser_oep4_transfer_notify(notify: dict):
-        try:
-            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-            notify['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
-            notify['States'][3] = ContractDataParser.to_int(notify['States'][3])
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('Invalid event'))
-        return notify
-
-    @staticmethod
-    def parser_oep4_states(states: list):
-        try:
-            states[0] = ContractDataParser.to_utf8_str(states[0])
-            states[1] = ContractDataParser.to_b58_address(states[1])
-            states[2] = ContractDataParser.to_b58_address(states[2])
-            states[3] = ContractDataParser.to_int(states[3])
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('Invalid states'))
-        return states

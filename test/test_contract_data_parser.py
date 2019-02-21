@@ -4,6 +4,7 @@
 import unittest
 
 from ontology.utils.contract_data import ContractDataParser
+from ontology.vm.params_builder import ParamsBuilder
 
 
 class TestContractDataParser(unittest.TestCase):
@@ -15,3 +16,12 @@ class TestContractDataParser(unittest.TestCase):
             self.assertTrue(isinstance(neo_bytearray, bytearray))
             neo_value = ContractDataParser.neo_bytearray_to_big_int(neo_bytearray)
             self.assertEqual(value, neo_value)
+
+    def test_op_code_to_int(self):
+        builder = ParamsBuilder()
+        for num in range(100000):
+            builder.emit_push_int(num)
+            op_code = builder.to_bytes().hex()
+            builder.clear_up()
+            value = ContractDataParser.op_code_to_int(op_code)
+            self.assertEqual(num, value)

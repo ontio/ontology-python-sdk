@@ -29,7 +29,7 @@ class TestWebsocketClient(unittest.TestCase):
 
     def test_heartbeat(self):
         response = asyncio.get_event_loop().run_until_complete(TestWebsocketClient.heartbeat_case())
-        self.assertEqual(None, response['ConstractsFilter'])
+        self.assertEqual(None, response['ContractsFilter'])
         self.assertEqual(False, response['SubscribeEvent'])
         self.assertEqual(False, response['SubscribeJsonBlock'])
         self.assertEqual(False, response['SubscribeRawBlock'])
@@ -62,14 +62,17 @@ class TestWebsocketClient(unittest.TestCase):
 
         try:
             response, event = await asyncio.wait_for(subscribe_task, timeout=10)
-            self.assertEqual([hex_contract_address], response['ConstractsFilter'])
+            self.assertEqual([hex_contract_address], response['ContractsFilter'])
             self.assertEqual(True, response['SubscribeEvent'])
             self.assertEqual(False, response['SubscribeJsonBlock'])
             self.assertEqual(False, response['SubscribeRawBlock'])
             self.assertEqual(False, response['SubscribeBlockTxHashs'])
             self.assertEqual(64, len(event['TxHash']))
             notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
-            notify = ContractDataParser.parser_oep4_transfer_notify(notify)
+            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
+            notify['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
+            notify['States'][3] = ContractDataParser.to_int(notify['States'][3])
             self.assertEqual(hex_contract_address, notify['ContractAddress'])
             self.assertEqual('transfer', notify['States'][0])
             self.assertEqual(from_acct.get_address_base58(), notify['States'][1])
