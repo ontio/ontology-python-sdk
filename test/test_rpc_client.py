@@ -4,7 +4,7 @@
 import time
 import unittest
 
-from test import acct1, acct2, acct3
+from test import sdk, acct1, acct2, acct3
 
 from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
@@ -19,34 +19,24 @@ multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         version = sdk.rpc.get_version()
         self.assertTrue(isinstance(version, str))
         if version != '':
             self.assertIn('v', version)
 
     def test_get_connection_count(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         count = sdk.rpc.get_connection_count()
         self.assertGreaterEqual(count, 0)
 
     def test_get_gas_price(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         price = sdk.rpc.get_gas_price()
         self.assertGreater(price, 0)
 
     def test_get_network_id(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         network_id = sdk.rpc.get_network_id()
         self.assertGreaterEqual(network_id, 0)
 
     def test_get_block_by_hash(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
         block = sdk.rpc.get_block_by_hash(block_hash)
         self.assertEqual(block['Hash'], block_hash)
