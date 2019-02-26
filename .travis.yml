@@ -10,5 +10,10 @@ env:
 go_import_path: github.com/ontio/ontology
 install:
   - pip install -r requirements.txt
+  - sudo apt install wget
+  - sudo apt install unzip
+  - wget https://github.com/ontio/ontology/releases/download/v1.6.0/tool-linux.zip --no-check-certificate
+  - unzip tool-linux.zip
+  - ./tool-linux/sigsvr-linux-amd64
 script:
   - python -m unittest discover
