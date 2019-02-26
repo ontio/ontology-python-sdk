@@ -5,8 +5,11 @@ import unittest
 
 from os import path
 
-from ontology.crypto.signature_handler import SignatureHandler
 from test import sdk, password
+
+from ontology.crypto.signature_handler import SignatureHandler
+
+sdk.service.sig_svr().connect_to_localhost()
 
 
 class TestSigSvr(unittest.TestCase):
@@ -18,7 +21,7 @@ class TestSigSvr(unittest.TestCase):
     def test_export_account(self):
         export_path = path.dirname(__file__)
         result = sdk.service.sig_svr().export_account(export_path)
-        wm =sdk.wallet_manager
+        wm = sdk.wallet_manager
         wm.open_wallet(result['wallet_file'])
         try:
             self.assertEqual(result['account_num'], len(wm.get_acct_data_list()))
