@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import threading
+
 from ontology.merkle.merkle_verifier import MerkleVerifier
 
 
 class TxVerifier(object):
+    _instance_lock = threading.Lock()
+
     def __init__(self, sdk):
         self.__sdk = sdk
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(TxVerifier, '_instance'):
+            with TxVerifier._instance_lock:
+                if not hasattr(TxVerifier, '_instance'):
+                    TxVerifier._instance = object.__new__(cls)
+        return TxVerifier._instance
 
     def verify_by_tx_hash(self, tx_hash: str):
         merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
