@@ -5,8 +5,9 @@ import unittest
 
 from os import path
 
-from ontology.crypto.signature_handler import SignatureHandler
 from test import sdk, password
+
+from ontology.crypto.signature_handler import SignatureHandler
 
 
 class TestSigSvr(unittest.TestCase):
