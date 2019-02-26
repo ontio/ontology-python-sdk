@@ -5,6 +5,7 @@ import threading
 
 from Cryptodome.Random.random import choice
 
+from ontology.sigsvr.sigsvr import SigSvr
 from ontology.service.service import Service
 from ontology.smart_contract.neo_vm import NeoVm
 from ontology.exception.error_code import ErrorCode
@@ -20,7 +21,7 @@ from ontology.network.restful import RestfulClient, TEST_RESTFUL_ADDRESS, MAIN_R
 class OntologySdk(object):
     _instance_lock = threading.Lock()
 
-    def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '',
+    def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '', sig_svr_address='',
                  default_signature_scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(default_signature_scheme, SignatureScheme):
             raise SDKException(ErrorCode.param_err('SignatureScheme object is required.'))

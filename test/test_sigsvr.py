@@ -9,19 +9,18 @@ from test import sdk, password
 
 from ontology.crypto.signature_handler import SignatureHandler
 
-sig_svr = sdk.service.sig_svr()
-sig_svr.connect_to_localhost()
-
 
 class TestSigSvr(unittest.TestCase):
     def test_create_account(self):
-        result = sig_svr.create_account(password)
+        sdk.service.sig_svr.connect_to_localhost()
+        result = sdk.service.sig_svr.create_account(password)
         self.assertTrue(isinstance(result, dict))
         self.assertEqual(34, len(result.get('account', '')))
 
     def test_export_account(self):
+        sdk.sig_svr.connect_to_localhost()
         export_path = path.dirname(__file__)
-        result = sig_svr.export_account(export_path)
+        result = sdk.service.sig_svr.export_account(export_path)
         wm = sdk.wallet_manager
         wm.open_wallet(result['wallet_file'])
         try:
@@ -30,8 +29,9 @@ class TestSigSvr(unittest.TestCase):
             wm.del_wallet_file()
 
     def test_sig_data(self):
+        sdk.service.sig_svr.connect_to_localhost()
         export_path = path.dirname(__file__)
-        result = sig_svr.export_account(export_path)
+        result = sdk.service.sig_svr.export_account(export_path)
         wm = sdk.wallet_manager
         wm.open_wallet(result['wallet_file'])
         try:
@@ -40,7 +40,7 @@ class TestSigSvr(unittest.TestCase):
             b58_address = acct.b58_address
             scheme = acct.signature_scheme
             msg = b'Hello, world!'
-            result = sdk.service.sig_svr().sig_data(bytes.hex(msg), b58_address, password)
+            result = sdk.service.sig_svr.sig_data(bytes.hex(msg), b58_address, password)
             signature = bytes.fromhex(result.get('signed_data', ''))
             handler = SignatureHandler(scheme)
             is_valid = handler.verify_signature(acct.public_key, msg, signature)
