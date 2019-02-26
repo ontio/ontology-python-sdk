@@ -9,6 +9,8 @@ password = environ['SDK_TEST_PASSWORD']
 sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()
 sdk.restful.connect_to_test_net()
+sdk.websocket.connect_to_test_net()
+sdk.service.sig_svr().connect_to_localhost()
 wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
 wallet_manager = sdk.wallet_manager
 wallet_manager.open_wallet(wallet_path)

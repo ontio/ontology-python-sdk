@@ -39,7 +39,7 @@ class WebsocketClient(object):
         return self.__url
 
     def connect_to_localhost(self):
-        self.set_address('http://localhost:20335')
+        self.set_address('ws://localhost:20335')
 
     def connect_to_test_net(self, index: int = 0):
         if index == 0:
@@ -175,7 +175,7 @@ class WebsocketClient(object):
             self.__id = self.__generate_ws_id()
         if isinstance(contract_address_list, str):
             contract_address_list = [contract_address_list]
-        msg = dict(Action='subscribe', Version='1.0.0', Id=self.__id, ConstractsFilter=contract_address_list,
+        msg = dict(Action='subscribe', Version='1.0.0', Id=self.__id, ContractsFilter=contract_address_list,
                    SubscribeEvent=is_event, SubscribeJsonBlock=is_json_block, SubscribeRawBlock=is_raw_block,
                    SubscribeBlockTxHashs=is_tx_hash)
         return await self.__send_recv(msg, is_full)
