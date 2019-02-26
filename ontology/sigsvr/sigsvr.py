@@ -3,10 +3,10 @@
 
 import json
 import platform
+import requests
 
 from sys import maxsize
 
-import requests
 from Cryptodome.Random.random import randint
 
 from ontology.exception.error_code import ErrorCode
