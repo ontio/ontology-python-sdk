@@ -3,7 +3,6 @@
 
 import json
 import platform
-import threading
 
 from sys import maxsize
 
@@ -15,17 +14,8 @@ from ontology.exception.exception import SDKException
 
 
 class SigSvr(object):
-    _instance_lock = threading.Lock()
-
     def __init__(self, url: str = ''):
         self.__url = url
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(SigSvr, '_instance'):
-            with SigSvr._instance_lock:
-                if not hasattr(SigSvr, '_instance'):
-                    SigSvr._instance = object.__new__(cls)
-        return SigSvr._instance
 
     def set_address(self, url: str):
         self.__url = url

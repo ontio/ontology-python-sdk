@@ -8,24 +8,20 @@ from test import sdk
 
 
 class TestMerkleVerifier(unittest.TestCase):
-    def test_main_net(self):
+    def check_tx_in_block(self, height: int):
+        block = sdk.rpc.get_block_by_height(height)
+        for tx in block.get('Transactions', dict()):
+            result = sdk.service.tx_verifier().verify_by_tx_hash(tx['Hash'])
+            self.assertTrue(result)
+
+    def test_verifier(self):
         sdk.rpc.connect_to_main_net()
         try:
-            block = sdk.rpc.get_block_by_height(0)
-            for tx in block.get('Transactions', dict()):
-                tx_hash = tx['Hash']
-                result = sdk.service.tx_verifier().verify_by_tx_hash(tx_hash)
-                self.assertTrue(result)
+            self.check_tx_in_block(0)
+            sdk.rpc.connect_to_test_net()
+            self.check_tx_in_block(0)
         finally:
             sdk.rpc.connect_to_test_net()
-
-    def test_test_net(self):
-        sdk.rpc.connect_to_test_net()
-        block = sdk.rpc.get_block_by_height(0)
-        for tx in block.get('Transactions', dict()):
-            tx_hash = tx['Hash']
-            result = sdk.service.tx_verifier().verify_by_tx_hash(tx_hash)
-            self.assertTrue(result)
 
 
 if __name__ == '__main__':

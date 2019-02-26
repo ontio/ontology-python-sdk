@@ -27,31 +27,23 @@ sdk.restful.connect_to_test_net()
 
 
 class TestOntId(unittest.TestCase):
+    def check_pk_by_ont_id(self, ont_id):
+        pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
+        for pk in pub_keys:
+            self.assertIn(ont_id, pk['PubKeyId'])
+            self.assertEqual('ECDSA', pk['Type'])
+            self.assertEqual('P256', pk['Curve'])
+            self.assertEqual(66, len(pk['Value']))
+
     def test_get_public_keys(self):
         sdk.rpc.connect_to_test_net()
-        ont_id = 'did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR'
-        pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
-        for pk in pub_keys:
-            self.assertIn(ont_id, pk['PubKeyId'])
-            self.assertEqual('ECDSA', pk['Type'])
-            self.assertEqual('P256', pk['Curve'])
-            self.assertEqual(66, len(pk['Value']))
-        ont_id = 'did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD'
-        pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
-        for pk in pub_keys:
-            self.assertIn(ont_id, pk['PubKeyId'])
-            self.assertEqual('ECDSA', pk['Type'])
-            self.assertEqual('P256', pk['Curve'])
-            self.assertEqual(66, len(pk['Value']))
+        ont_id_list = ['did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR', 'did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD']
+        for ont_id in ont_id_list:
+            self.check_pk_by_ont_id(ont_id)
         sdk.rpc.connect_to_main_net()
         try:
             ont_id = 'did:ont:ATZhaVirdEYkpsHQDn9PMt5kDCq1VPHcTr'
-            pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
-            for pk in pub_keys:
-                self.assertIn(ont_id, pk['PubKeyId'])
-                self.assertEqual('ECDSA', pk['Type'])
-                self.assertEqual('P256', pk['Curve'])
-                self.assertEqual(66, len(pk['Value']))
+            self.check_pk_by_ont_id(ont_id)
         finally:
             sdk.rpc.connect_to_test_net()
 

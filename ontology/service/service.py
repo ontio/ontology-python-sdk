@@ -11,7 +11,7 @@ class Service(object):
     def __init__(self, sdk):
         self.__sdk = sdk
         self.__claim = None
-        self.__sig_svr = None
+        self.__sig_svr = SigSvr()
         self.__tx_verifier = None
         self.__blockchain_proof = None
 
@@ -31,6 +31,4 @@ class Service(object):
         return self.__claim
 
     def sig_svr(self):
-        if self.__sig_svr is None:
-            self.__sig_svr = SigSvr()
         return self.__sig_svr
