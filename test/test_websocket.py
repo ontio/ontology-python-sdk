@@ -14,7 +14,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_event import ContractEventParser
 
 websocket_client = sdk.websocket
-
+websocket_client.connect_to_test_net()
 
 class TestWebsocketClient(unittest.TestCase):
     @staticmethod
