@@ -18,7 +18,7 @@ class TestSigSvr(unittest.TestCase):
         self.assertEqual(34, len(result.get('account', '')))
 
     def test_export_account(self):
-        sdk.sig_svr.connect_to_localhost()
+        sdk.service.sig_svr.connect_to_localhost()
         export_path = path.dirname(__file__)
         result = sdk.service.sig_svr.export_account(export_path)
         wm = sdk.wallet_manager
