@@ -14,6 +14,6 @@ install:
   - sudo apt install unzip
   - wget https://github.com/ontio/ontology/releases/download/v1.6.0/tool-linux.zip --no-check-certificate
   - unzip tool-linux.zip
-  - ./tool-linux/sigsvr-linux-amd64 --abi ./tool-linux/abi
+  - ./tool-linux/sigsvr-linux-amd64 --abi ./tool-linux/abi &
 script:
   - python -m unittest discover
