@@ -39,7 +39,7 @@ class WebsocketClient(object):
         return self.__url
 
     def connect_to_localhost(self):
-        self.set_address('http://localhost:20335')
+        self.set_address('ws://localhost:20335')
 
     def connect_to_test_net(self, index: int = 0):
         if index == 0:
