@@ -4,6 +4,7 @@
 from ontology.claim.claim import Claim
 from ontology.claim.proof import BlockchainProof
 from ontology.merkle.tx_verifier import TxVerifier
+from ontology.service.sigsvr import SigSvr
 
 
 class Service(object):
@@ -18,3 +19,7 @@ class Service(object):
 
     def claim(self):
         return Claim(self.__sdk)
+
+    @staticmethod
+    def sig_svr():
+        return SigSvr()
