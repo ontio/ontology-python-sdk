@@ -27,10 +27,10 @@ class OntologySdk(object):
         self.__rpc = RpcClient(rpc_address)
         self.__restful = RestfulClient(restful_address)
         self.__websocket = WebsocketClient(ws_address)
+        self.__native_vm = NativeVm(self._instance)
+        self.__neo_vm = NeoVm(self._instance)
+        self.__service = Service(self._instance)
         self.__wallet_manager = WalletManager()
-        self.__native_vm = None
-        self.__neo_vm = None
-        self.__service = None
         self.__default_signature_scheme = default_signature_scheme
 
     def __new__(cls, *args, **kwargs):
@@ -104,20 +104,14 @@ class OntologySdk(object):
 
     @property
     def native_vm(self):
-        if self.__native_vm is None:
-            self.__native_vm = NativeVm(self._instance)
         return self.__native_vm
 
     @property
     def neo_vm(self):
-        if self.__neo_vm is None:
-            self.__neo_vm = NeoVm(self._instance)
         return self.__neo_vm
 
     @property
     def service(self):
-        if self.__service is None:
-            self.__service = Service(self._instance)
         return self.__service
 
     def set_rpc_address(self, rpc_address: str):
