@@ -3,6 +3,7 @@
 
 import json
 import platform
+
 import requests
 
 from sys import maxsize

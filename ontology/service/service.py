@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from ontology.claim.claim import Claim
+from ontology.sigsvr.sigsvr import SigSvr
 from ontology.claim.proof import BlockchainProof
 from ontology.merkle.tx_verifier import TxVerifier
-from ontology.service.sigsvr import SigSvr
 
 
 class Service(object):
     def __init__(self, sdk):
         self.__sdk = sdk
+        self.__sig_svr = None
         self.__claim = None
-        self.__sig_svr = SigSvr()
         self.__tx_verifier = None
         self.__blockchain_proof = None
 
@@ -30,5 +30,8 @@ class Service(object):
             self.__claim = Claim(self.__sdk)
         return self.__claim
 
+    @property
     def sig_svr(self):
+        if self.__sig_svr is None:
+            self.__sig_svr = SigSvr()
         return self.__sig_svr
