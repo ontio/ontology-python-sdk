@@ -4,9 +4,8 @@
 import asyncio
 import unittest
 
-from test import acct1, acct2, acct3, acct4
+from test import sdk, acct1, acct2, acct3, acct4
 
-from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -14,9 +13,6 @@ from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_event import ContractEventParser
 
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
-sdk.websocket.connect_to_test_net()
 websocket_client = sdk.websocket
 
 
