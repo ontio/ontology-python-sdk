@@ -51,11 +51,17 @@ class ClaimRecord(object):
                                                                    gas_limit, gas_price, func)
         return tx_hash
 
-    def get_status(self, claim_id: str) -> bool:
+    def get_status(self, claim_id: str):
         func = InvokeFunction('GetStatus')
         func.set_params_value(claim_id)
         result = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
-        return result
+        status = result['Result']
+        if status == '':
+            status = False
+        else:
+            status = ContractDataParser.to_dict(status)
+            status = bool(status[3])
+        return status
 
     def query_commit_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
