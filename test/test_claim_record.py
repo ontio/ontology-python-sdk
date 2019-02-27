@@ -12,7 +12,7 @@ gas_price = 500
 
 
 class TestClaimRecord(unittest.TestCase):
-    def test_commit(self):
+    def generate_claim(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
         try:
             pk = pub_keys[0]
@@ -34,14 +34,52 @@ class TestClaimRecord(unittest.TestCase):
             msg = 'get key failed'
             self.assertTrue(msg in e.args[1])
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
-        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
-                                                   gas_limit, gas_price)
-        sleep(6)
+        return claim
+
+    def query_commit_event_create_test_case(self, tx_hash: str, claim_id: str):
         event = sdk.neo_vm.claim_record().query_commit_event(tx_hash)
         self.assertEqual('Push', event['States'][0])
         self.assertEqual(identity2_ctrl_acct.get_address_base58(), event['States'][1])
         self.assertEqual(' create new claim: ', event['States'][2])
-        self.assertEqual(claim.claim_id, event['States'][3])
+        self.assertEqual(claim_id, event['States'][3])
+
+    def query_commit_event_exist_test_case(self, tx_hash: str, claim_id: str):
+        event = sdk.neo_vm.claim_record().query_commit_event(tx_hash)
+        self.assertEqual('ErrorMsg', event['States'][0])
+        self.assertEqual(claim_id, event['States'][1])
+        self.assertEqual(' existed!', event['States'][2])
+
+    def query_revoke_event_test_case(self, tx_hash: str, claim_id: str):
+        event = sdk.neo_vm.claim_record().query_revoke_event(tx_hash)
+        self.assertEqual('Push', event['States'][0])
+        self.assertEqual(identity2_ctrl_acct.get_address_base58(), event['States'][1])
+        self.assertEqual(' revoke claim: ', event['States'][2])
+        self.assertEqual(claim_id, event['States'][3])
+
+    def test_claim_record(self):
+        claim = self.generate_claim()
+        status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
+        self.assertFalse(status)
+
+        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
+                                                   gas_limit, gas_price)
+        sleep(6)
+        self.query_commit_event_create_test_case(tx_hash, claim.claim_id)
+
+        status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
+        self.assertTrue(status)
+
+        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
+                                                   gas_limit, gas_price)
+        sleep(6)
+        self.query_commit_event_exist_test_case(tx_hash, claim.claim_id)
+
+        tx_hash = sdk.neo_vm.claim_record().revoke(claim.claim_id, identity2_ctrl_acct, acct1, gas_limit, gas_price)
+        sleep(6)
+        self.query_revoke_event_test_case(tx_hash, claim.claim_id)
+
+        status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
+        self.assertFalse(status)
 
 
 if __name__ == '__main__':
