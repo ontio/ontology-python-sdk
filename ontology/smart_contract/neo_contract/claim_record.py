@@ -52,13 +52,10 @@ class ClaimRecord(object):
         return tx_hash
 
     def get_status(self, claim_id: str) -> bool:
-        func = InvokeFunction('Revoke')
+        func = InvokeFunction('GetStatus')
         func.set_params_value(claim_id)
         result = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
-        print(result)
-        status = result['Result']
-        status = ContractDataParser.to_bool(status)
-        return status
+        return result
 
     def query_commit_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
@@ -74,4 +71,14 @@ class ClaimRecord(object):
             notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
             notify['States'][1] = ContractDataParser.to_hex_str(notify['States'][1])
             notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
+        return notify
+
+    def query_revoke_event(self, tx_hash: str):
+        event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
+        notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
+        if len(notify['States']) == 4:
+            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
+            notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
+            notify['States'][3] = ContractDataParser.to_hex_str(notify['States'][3])
         return notify
