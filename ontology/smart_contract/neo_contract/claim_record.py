@@ -37,7 +37,7 @@ class ClaimRecord(object):
         func = InvokeFunction('Commit')
         func.set_params_value(claim_id, issuer_acct.get_address_bytes(), owner_ont_id)
         tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
-                                                                   gas_limit, gas_price, func, False)
+                                                                   gas_limit, gas_price, func)
         return tx_hash
 
     def revoke(self, claim_id: str, issuer_acct: Account, payer_acct: Account, gas_limit: int, gas_price: int):
@@ -48,14 +48,16 @@ class ClaimRecord(object):
         func = InvokeFunction('Revoke')
         func.set_params_value(claim_id, issuer_acct.get_address_bytes())
         tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
-                                                                   gas_limit, gas_price, func, False)
+                                                                   gas_limit, gas_price, func)
         return tx_hash
 
-    def get_status(self, claim_id: str):
+    def get_status(self, claim_id: str) -> bool:
         func = InvokeFunction('Revoke')
         func.set_params_value(claim_id)
-        status = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, None, None, 0, 0, func,
-                                                                  True)
+        result = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
+        print(result)
+        status = result['Result']
+        status = ContractDataParser.to_bool(status)
         return status
 
     def query_commit_event(self, tx_hash: str):
@@ -63,8 +65,13 @@ class ClaimRecord(object):
         notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
         if len(notify) == 0:
             return notify
-        notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-        notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-        notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
-        notify['States'][3] = ContractDataParser.to_hex_str(notify['States'][3])
+        if len(notify['States']) == 4:
+            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
+            notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
+            notify['States'][3] = ContractDataParser.to_hex_str(notify['States'][3])
+        if len(notify['States']) == 3:
+            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
+            notify['States'][1] = ContractDataParser.to_hex_str(notify['States'][1])
+            notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
         return notify
