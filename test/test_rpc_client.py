@@ -42,21 +42,15 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(block['Hash'], block_hash)
 
     def test_get_block_by_height(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         height = 0
         block = sdk.rpc.get_block_by_height(height)
         self.assertEqual(block['Header']['Height'], height)
 
     def test_get_block_height(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         count = sdk.rpc.get_block_height()
         self.assertGreater(count, 103712)
 
     def test_get_block_height_by_tx_hash(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
         block_height = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
         self.assertEqual(0, block_height)
@@ -65,8 +59,6 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(564235, block_height)
 
     def test_get_block_count_by_tx_hash(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
         block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
         self.assertEqual(1, block_count)
@@ -75,21 +67,15 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(564236, block_count)
 
     def test_get_current_block_hash(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         current_block_hash = sdk.rpc.get_current_block_hash()
         self.assertEqual(len(current_block_hash), 64)
 
     def test_get_block_hash_by_height(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         height = 0
         block_hash = sdk.rpc.get_block_hash_by_height(height)
         self.assertEqual(len(block_hash), 64)
 
     def test_get_balance(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         address_balance = sdk.rpc.get_balance(base58_address)
         try:
@@ -127,22 +113,16 @@ class TestRpcClient(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised')
 
     def test_get_grant_ong(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         b58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         grant_ong = sdk.rpc.get_grant_ong(b58_address)
         self.assertGreaterEqual(grant_ong, 0)
 
     def test_get_allowance(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         base58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         allowance = sdk.rpc.get_allowance('ong', base58_address, base58_address)
         self.assertEqual(allowance, '0')
 
     def test_get_storage(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = sdk.rpc.get_storage(contract_address, key)
@@ -150,15 +130,11 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(1000000000, value)
 
     def test_get_smart_contract_event_by_tx_hash(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         self.assertEqual(event['TxHash'], tx_hash)
 
     def test_get_smart_contract_event_by_height(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         height = 0
         event_list = sdk.rpc.get_smart_contract_event_by_height(height)
         self.assertEqual(10, len(event_list))
@@ -167,8 +143,6 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(0, len(event_list))
 
     def test_get_smart_contract_event_by_count(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         count = 1
         event_list = sdk.rpc.get_smart_contract_event_by_count(count)
         self.assertEqual(10, len(event_list))
@@ -177,8 +151,6 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(0, len(event_list))
 
     def test_sync_block(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         current_height = sdk.rpc.get_block_height()
         start_time = time.perf_counter()
         while True:
@@ -194,55 +166,40 @@ class TestRpcClient(unittest.TestCase):
                 self.assertGreaterEqual(len(event_list), 0)
 
     def test_get_transaction_by_tx_hash(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         tx_hash = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
         tx = sdk.rpc.get_transaction_by_tx_hash(tx_hash)
         self.assertEqual(tx['Hash'], tx_hash)
 
     def test_get_smart_contract(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
-        hex_contract_address = '0100000000000000000000000000000000000000'
-        contract = sdk.rpc.get_smart_contract(hex_contract_address)
+        contract = sdk.rpc.get_smart_contract('0100000000000000000000000000000000000000')
         self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
+        sdk.rpc.connect_to_main_net()
+        try:
+            contract = sdk.rpc.get_smart_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
+            self.assertEqual('Youle_le_service@fosun.com', contract.get('Email', ''))
+            self.assertEqual('chentao', contract.get('Author', ''))
+        finally:
+            sdk.rpc.connect_to_test_net()
 
     def test_get_merkle_proof(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
-        tx_hash_1 = '12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3'
-        merkle_proof_1 = sdk.rpc.get_merkle_proof(tx_hash_1)
-        self.assertEqual('MerkleProof', merkle_proof_1['Type'])
-        self.assertEqual(0, merkle_proof_1['BlockHeight'])
-        tx_hash_2 = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
-        merkle_proof_2 = sdk.rpc.get_merkle_proof(tx_hash_2)
-        self.assertEqual('MerkleProof', merkle_proof_2['Type'])
-        self.assertEqual(0, merkle_proof_2['BlockHeight'])
-        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_2['TransactionsRoot'])
-        tx_hash_3 = '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290'
-        merkle_proof_3 = sdk.rpc.get_merkle_proof(tx_hash_3)
-        self.assertEqual('MerkleProof', merkle_proof_3['Type'])
-        self.assertEqual(0, merkle_proof_3['BlockHeight'])
-        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_3['TransactionsRoot'])
-        tx_hash_4 = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
-        merkle_proof_4 = sdk.rpc.get_merkle_proof(tx_hash_4)
-        self.assertEqual('MerkleProof', merkle_proof_4['Type'])
-        self.assertEqual(0, merkle_proof_4['BlockHeight'])
-        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_4['TransactionsRoot'])
-        tx_hash_5 = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
-        merkle_proof_5 = sdk.rpc.get_merkle_proof(tx_hash_5)
-        self.assertEqual('MerkleProof', merkle_proof_5['Type'])
-        self.assertEqual(0, merkle_proof_5['BlockHeight'])
-        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_5['TransactionsRoot'])
-        tx_hash_6 = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
-        merkle_proof_6 = sdk.rpc.get_merkle_proof(tx_hash_6)
-        self.assertEqual('MerkleProof', merkle_proof_6['Type'])
-        self.assertEqual(0, merkle_proof_6['BlockHeight'])
-        self.assertEqual(merkle_proof_1['TransactionsRoot'], merkle_proof_6['TransactionsRoot'])
+        tx_hash_list = ['12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3',
+                        '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
+                        '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290',
+                        '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74',
+                        '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb',
+                        '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e']
+        pre_tx_root = 0
+        for tx_hash in tx_hash_list:
+            merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
+            self.assertEqual('MerkleProof', merkle_proof['Type'])
+            self.assertEqual(0, merkle_proof['BlockHeight'])
+            if pre_tx_root == 0:
+                pre_tx_root = merkle_proof['TransactionsRoot']
+            else:
+                self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
+                pre_tx_root = merkle_proof['TransactionsRoot']
 
     def test_send_raw_transaction(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         b58_from_address = acct2.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
         amount = 1
@@ -256,8 +213,6 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(tx_hash, tx.hash256_explorer())
 
     def test_send_raw_transaction_pre_exec(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         random_pk = get_random_hex_str(64)
         random_acct = Account(random_pk)
         b58_address_1 = acct2.get_address_base58()
@@ -271,14 +226,10 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(result['State'], 1)
 
     def test_get_memory_pool_tx_count(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         tx_count = sdk.rpc.get_memory_pool_tx_count()
         self.assertGreaterEqual(tx_count, [0, 0])
 
     def test_get_memory_pool_tx_state(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
         try:
             sdk.rpc.get_memory_pool_tx_state(tx_hash)
