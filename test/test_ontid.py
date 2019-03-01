@@ -4,21 +4,20 @@
 import time
 import unittest
 
-from test import sdk, acct2, acct3, acct4, password
-
-from ontology.crypto.curve import Curve
-from ontology.crypto.signature import Signature
-from ontology.utils.contract_data import ContractDataParser
-from ontology.utils.contract_event import ContractEventParser
-from ontology.smart_contract.native_contract.ontid import Attribute
-
 from Cryptodome.Random.random import randint
 
+from test import sdk, acct2, acct3, acct4, password
+
 from ontology.utils import utils
+from ontology.crypto.curve import Curve
 from ontology.common.define import DID_ONT
 from ontology.account.account import Account
+from ontology.crypto.signature import Signature
 from ontology.exception.exception import SDKException
+from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
+from ontology.utils.contract_event import ContractEventParser
+from ontology.smart_contract.native_contract.ontid import Attribute
 
 
 class TestOntId(unittest.TestCase):
@@ -31,7 +30,6 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(66, len(pk['Value']))
 
     def test_get_public_keys(self):
-        sdk.rpc.connect_to_test_net()
         ont_id_list = ['did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR', 'did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD']
         for ont_id in ont_id_list:
             self.check_pk_by_ont_id(ont_id)
@@ -43,7 +41,6 @@ class TestOntId(unittest.TestCase):
             sdk.rpc.connect_to_test_net()
 
     def test_get_ddo(self):
-        sdk.rpc.connect_to_test_net()
         ont_id = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         ddo = sdk.native_vm.ont_id().get_ddo(ont_id)
         try:
@@ -68,7 +65,6 @@ class TestOntId(unittest.TestCase):
             sdk.rpc.connect_to_test_net()
 
     def test_new_registry_ont_id_transaction(self):
-        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         hex_public_key = acct2.get_public_key_hex()
         b58_address = acct2.get_address_base58()
@@ -86,7 +82,6 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
 
     def test_registry_ont_id(self):
-        sdk.rpc.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         try:
@@ -104,8 +99,6 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already registered', e.args[1])
 
     def test_add_and_remove_public_key(self):
-        sdk.rpc.connect_to_test_net()
-        sdk.restful.connect_to_test_net()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
@@ -113,7 +106,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -127,7 +120,7 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                         gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -142,7 +135,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('already exists', e.args[1])
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            gas_limit, gas_price)
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
@@ -156,8 +149,6 @@ class TestOntId(unittest.TestCase):
             self.assertIn('public key has already been revoked', e.args[1])
 
     def test_add_and_remove_attribute(self):
-        sdk.rpc.connect_to_test_net()
-        sdk.restful.connect_to_test_net()
         ont_id = sdk.native_vm.ont_id()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
@@ -166,7 +157,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -178,7 +169,7 @@ class TestOntId(unittest.TestCase):
         gas_limit = 20000
         gas_price = 500
         tx_hash = ont_id.add_attribute(identity.ont_id, ctrl_acct, attribute, acct2, gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual('Attribute', notify['States'][0])
@@ -188,7 +179,7 @@ class TestOntId(unittest.TestCase):
 
         attrib_key = 'hello'
         tx_hash = ont_id.remove_attribute(identity.ont_id, ctrl_acct, attrib_key, acct3, gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual('Attribute', notify['States'][0])
@@ -218,7 +209,7 @@ class TestOntId(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(tx.hash256_explorer(), tx_hash)
-            time.sleep(randint(6, 10))
+            time.sleep(randint(7, 12))
             notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
             self.assertEqual('Attribute', notify[0]['States'][0])
             self.assertEqual('remove', notify[0]['States'][1])
@@ -229,8 +220,6 @@ class TestOntId(unittest.TestCase):
             self.assertIn('attribute not exist', e.args[1])
 
     def test_add_recovery(self):
-        sdk.rpc.connect_to_test_net()
-        sdk.restful.connect_to_test_net()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
@@ -238,7 +227,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -253,7 +242,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -284,7 +273,7 @@ class TestOntId(unittest.TestCase):
         hex_new_public_key = public_key.hex()
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key, acct2, gas_limit,
                                                         gas_price, True)
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -310,7 +299,7 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
                                                            gas_limit, gas_price, True)
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
@@ -342,7 +331,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -357,7 +346,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -385,7 +374,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('operator is not the recovery', e.args[1])
         tx_hash = sdk.native_vm.ont_id().change_recovery(identity.ont_id, b58_new_recovery_address, recovery, acct2,
                                                          gas_limit, gas_price)
-        time.sleep(5)
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
 
@@ -396,8 +385,6 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(new_recovery.get_address_hex_reverse(), notify['States'][3])
 
     def test_verify_signature(self):
-        sdk.rpc.connect_to_test_net()
-        sdk.restful.connect_to_test_net()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
@@ -405,7 +392,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
@@ -420,7 +407,7 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                         gas_limit, gas_price)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)

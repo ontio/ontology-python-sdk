@@ -38,11 +38,9 @@ class TestTransaction(unittest.TestCase):
         b58_multi_address = multi_address.b58encode()
         b58_acct1_address = acct1.get_address_base58()
         b58_acct2_address = acct2.get_address_base58()
-        amount = 1000000000
         gas_price = 500
         gas_limit = 20000
-        sdk.rpc.connect_to_test_net()
-        tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount,
+        tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, 1000000000,
                                                              b58_acct1_address, gas_limit, gas_price)
         tx_bytes = tx1.serialize()
         tx2 = Transaction.deserialize_from(tx_bytes)
@@ -68,15 +66,11 @@ class TestTransaction(unittest.TestCase):
         notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
         for event in notify:
             self.assertEqual(event['States'][0], 'transfer')
-
         multi_address = Address.address_from_multi_pub_keys(m, pub_keys[::-1])
         b58_multi_address = multi_address.b58encode()
         b58_acct1_address = acct1.get_address_base58()
         b58_acct2_address = acct2.get_address_base58()
-        amount = 100000
-        gas_price = 500
-        gas_limit = 20000
-        tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount,
+        tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, 100000,
                                                              b58_acct1_address, gas_limit, gas_price)
         tx_bytes = tx1.serialize()
         tx2 = Transaction.deserialize_from(tx_bytes)

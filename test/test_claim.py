@@ -155,7 +155,10 @@ class TestClaim(unittest.TestCase):
         claim = sdk.service.claim()
         sdk.rpc.connect_to_main_net()
         try:
-            self.assertTrue(claim.validate_signature(b64_claim))
+            try:
+                self.assertTrue(claim.validate_signature(b64_claim))
+            except SDKException:
+                self.assertTrue(claim.validate_signature(b64_claim, verify_kid=False))
             claim.from_base64(b64_claim, True)
             self.assertTrue(claim.validate_blk_proof())
             self.assertTrue(isinstance(claim, Claim))

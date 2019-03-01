@@ -76,7 +76,7 @@ class TestRpcClient(unittest.TestCase):
         height_lst = [0, 564235]
         try:
             for index, tx_hash in enumerate(tx_hash_lst):
-                block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
+                block_count = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
                 self.assertEqual(height_lst[index], block_count)
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])

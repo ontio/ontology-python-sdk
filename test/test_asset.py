@@ -18,7 +18,6 @@ from ontology.utils.contract_event import ContractEventParser
 
 class TestAsset(unittest.TestCase):
     def test_get_asset_address(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         ont_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
         ong_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
@@ -26,7 +25,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(ong_address, asset.get_asset_address('ong'))
 
     def test_query_name(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         token_name = asset.query_name('ont')
         self.assertEqual('ONT Token', token_name)
@@ -34,7 +32,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('ONG Token', token_name)
 
     def test_query_symbol(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         try:
             token_symbol = asset.query_symbol('ont')
@@ -48,7 +45,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_decimals(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         decimals = asset.query_decimals('ong')
         self.assertEqual(9, decimals)
@@ -147,8 +143,7 @@ class TestAsset(unittest.TestCase):
         gas_limit = 20000
 
         tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, amount,
-                                                            b58_payer_address,
-                                                            gas_limit, gas_price)
+                                                            b58_payer_address, gas_limit, gas_price)
         tx.sign_transaction(from_acct)
         tx.add_sign_transaction(to_acct)
         try:
@@ -224,7 +219,6 @@ class TestAsset(unittest.TestCase):
             try:
                 tx_hash = sdk.rpc.send_raw_transaction(tx)
                 self.assertEqual(64, len(tx_hash))
-                time.sleep(1)
             except SDKException as e:
                 msg = 'already in the tx pool'
                 self.assertTrue(msg in e.args[1])
@@ -239,7 +233,6 @@ class TestAsset(unittest.TestCase):
         for _ in range(5):
             try:
                 tx_hash = asset.withdraw_ong(claimer, b58_recv_address, 1, payer, gas_limit, gas_price)
-                time.sleep(1)
                 self.assertEqual(64, len(tx_hash))
             except SDKException as e:
                 msg1 = 'no balance enough'
@@ -258,7 +251,6 @@ class TestAsset(unittest.TestCase):
         for _ in range(3):
             try:
                 tx_hash = asset.approve('ont', sender, b58_recv_address, amount, payer, gas_limit, gas_price)
-                time.sleep(1)
                 self.assertEqual(len(tx_hash), 64)
             except SDKException as e:
                 msg1 = 'no balance enough'
@@ -280,7 +272,6 @@ class TestAsset(unittest.TestCase):
                 tx_hash = asset.transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
                                               gas_limit, gas_price)
                 self.assertEqual(64, len(tx_hash))
-                time.sleep(1)
                 time.sleep(randint(6, 10))
                 event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
                 self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
