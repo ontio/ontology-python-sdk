@@ -18,61 +18,94 @@ multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 class TestRpcClient(unittest.TestCase):
     def test_get_version(self):
-        version = sdk.rpc.get_version()
-        self.assertTrue(isinstance(version, str))
-        if version != '':
-            self.assertIn('v', version)
+        try:
+            version = sdk.rpc.get_version()
+            self.assertTrue(isinstance(version, str))
+            if version != '':
+                self.assertIn('v', version)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_connection_count(self):
-        count = sdk.rpc.get_connection_count()
-        self.assertGreaterEqual(count, 0)
+        try:
+            count = sdk.rpc.get_connection_count()
+            self.assertGreaterEqual(count, 0)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_gas_price(self):
-        price = sdk.rpc.get_gas_price()
-        self.assertGreater(price, 0)
+        try:
+            price = sdk.rpc.get_gas_price()
+            self.assertGreater(price, 0)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_network_id(self):
-        network_id = sdk.rpc.get_network_id()
-        self.assertGreaterEqual(network_id, 0)
+        try:
+            network_id = sdk.rpc.get_network_id()
+            self.assertGreaterEqual(network_id, 0)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_by_hash(self):
-        block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
-        block = sdk.rpc.get_block_by_hash(block_hash)
-        self.assertEqual(block['Hash'], block_hash)
+        try:
+            block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
+            block = sdk.rpc.get_block_by_hash(block_hash)
+            self.assertEqual(block['Hash'], block_hash)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_by_height(self):
-        height = 0
-        block = sdk.rpc.get_block_by_height(height)
-        self.assertEqual(block['Header']['Height'], height)
+        try:
+            height = 0
+            block = sdk.rpc.get_block_by_height(height)
+            self.assertEqual(block['Header']['Height'], height)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_height(self):
-        count = sdk.rpc.get_block_height()
-        self.assertGreater(count, 103712)
+        try:
+            height = sdk.rpc.get_block_height()
+            self.assertGreater(height, 103712)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_height_by_tx_hash(self):
-        tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
-        block_height = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
-        self.assertEqual(0, block_height)
-        tx_hash = 'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2'
-        block_height = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
-        self.assertEqual(564235, block_height)
+        tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
+                       'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2']
+        height_lst = [0, 564235]
+        try:
+            for index, tx_hash in enumerate(tx_hash_lst):
+                block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
+                self.assertEqual(height_lst[index], block_count)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_count_by_tx_hash(self):
-        tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
-        block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
-        self.assertEqual(1, block_count)
-        tx_hash = 'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2'
-        block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
-        self.assertEqual(564236, block_count)
+        tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
+                       'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2']
+        count_lst = [1, 564236]
+        try:
+            for index, tx_hash in enumerate(tx_hash_lst):
+                block_count = sdk.rpc.get_block_count_by_tx_hash(tx_hash)
+                self.assertEqual(count_lst[index], block_count)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_current_block_hash(self):
-        current_block_hash = sdk.rpc.get_current_block_hash()
-        self.assertEqual(len(current_block_hash), 64)
+        try:
+            current_block_hash = sdk.rpc.get_current_block_hash()
+            self.assertEqual(len(current_block_hash), 64)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_hash_by_height(self):
         height = 0
-        block_hash = sdk.rpc.get_block_hash_by_height(height)
-        self.assertEqual(len(block_hash), 64)
+        try:
+            block_hash = sdk.rpc.get_block_hash_by_height(height)
+            self.assertEqual(len(block_hash), 64)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_balance(self):
         base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
@@ -118,36 +151,49 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_allowance(self):
         base58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
-        allowance = sdk.rpc.get_allowance('ong', base58_address, base58_address)
-        self.assertEqual(allowance, '0')
+        try:
+            allowance = sdk.rpc.get_allowance('ong', base58_address, base58_address)
+            self.assertEqual(allowance, '0')
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_storage(self):
-        contract_address = "0100000000000000000000000000000000000000"
+        hex_contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
-        value = sdk.rpc.get_storage(contract_address, key)
-        value = ContractDataParser.to_int(value)
-        self.assertEqual(1000000000, value)
+        try:
+            value = sdk.rpc.get_storage(hex_contract_address, key)
+            value = ContractDataParser.to_int(value)
+            self.assertEqual(1000000000, value)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_smart_contract_event_by_tx_hash(self):
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
-        self.assertEqual(event['TxHash'], tx_hash)
+        try:
+            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            self.assertEqual(event['TxHash'], tx_hash)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_smart_contract_event_by_height(self):
-        height = 0
-        event_list = sdk.rpc.get_smart_contract_event_by_height(height)
-        self.assertEqual(10, len(event_list))
-        height = 1309737
-        event_list = sdk.rpc.get_smart_contract_event_by_height(height)
-        self.assertEqual(0, len(event_list))
+        height_lst = [0, 1309737]
+        event_len_lst = [10, 0]
+        try:
+            for index, h in enumerate(height_lst):
+                event_list = sdk.rpc.get_smart_contract_event_by_height(h)
+                self.assertEqual(event_len_lst[index], len(event_list))
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_smart_contract_event_by_count(self):
-        count = 1
-        event_list = sdk.rpc.get_smart_contract_event_by_count(count)
-        self.assertEqual(10, len(event_list))
-        count = 1309738
-        event_list = sdk.rpc.get_smart_contract_event_by_count(count)
-        self.assertEqual(0, len(event_list))
+        cnt_lst = [1, 1309738]
+        event_len_lst = [10, 0]
+        try:
+            for index, cnt in enumerate(cnt_lst):
+                event_list = sdk.rpc.get_smart_contract_event_by_count(cnt)
+                self.assertEqual(event_len_lst[index], len(event_list))
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_sync_block(self):
         current_height = sdk.rpc.get_block_height()
@@ -170,46 +216,53 @@ class TestRpcClient(unittest.TestCase):
         self.assertEqual(tx['Hash'], tx_hash)
 
     def test_get_smart_contract(self):
-        contract = sdk.rpc.get_smart_contract('0100000000000000000000000000000000000000')
-        self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
+        try:
+            contract = sdk.rpc.get_smart_contract('0100000000000000000000000000000000000000')
+            self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
         sdk.rpc.connect_to_main_net()
         try:
             contract = sdk.rpc.get_smart_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
             self.assertEqual('Youle_le_service@fosun.com', contract.get('Email', ''))
             self.assertEqual('chentao', contract.get('Author', ''))
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
         finally:
             sdk.rpc.connect_to_test_net()
 
     def test_get_merkle_proof(self):
+        pre_tx_root = 0
         tx_hash_list = ['12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3',
                         '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
                         '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290',
                         '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74',
                         '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb',
                         '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e']
-        pre_tx_root = 0
-        for tx_hash in tx_hash_list:
-            merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
-            self.assertEqual('MerkleProof', merkle_proof['Type'])
-            self.assertEqual(0, merkle_proof['BlockHeight'])
-            if pre_tx_root == 0:
-                pre_tx_root = merkle_proof['TransactionsRoot']
-            else:
-                self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
-                pre_tx_root = merkle_proof['TransactionsRoot']
+        try:
+            for tx_hash in tx_hash_list:
+                merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
+                self.assertEqual('MerkleProof', merkle_proof['Type'])
+                self.assertEqual(0, merkle_proof['BlockHeight'])
+                if pre_tx_root == 0:
+                    pre_tx_root = merkle_proof['TransactionsRoot']
+                else:
+                    self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
+                    pre_tx_root = merkle_proof['TransactionsRoot']
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_send_raw_transaction(self):
         b58_from_address = acct2.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
-        amount = 1
-        gas_price = 500
-        gas_limit = 20000
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, amount,
-                                                            b58_from_address,
-                                                            gas_limit, gas_price)
+        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, 1,
+                                                            b58_from_address, 20000, 500)
         tx.sign_transaction(acct2)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(tx_hash, tx.hash256_explorer())
+        try:
+            tx_hash = sdk.rpc.send_raw_transaction(tx)
+            self.assertEqual(tx_hash, tx.hash256_explorer())
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_send_raw_transaction_pre_exec(self):
         random_pk = get_random_hex_str(64)
@@ -219,10 +272,13 @@ class TestRpcClient(unittest.TestCase):
         tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_address_1, random_b58_address, 2, b58_address_1,
                                                             20000, 500)
         tx.sign_transaction(acct2)
-        result = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        self.assertEqual(result['Result'], '01')
-        self.assertEqual(result['Gas'], 20000)
-        self.assertEqual(result['State'], 1)
+        try:
+            result = sdk.rpc.send_raw_transaction_pre_exec(tx)
+            self.assertEqual(result['Result'], '01')
+            self.assertEqual(result['Gas'], 20000)
+            self.assertEqual(result['State'], 1)
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_memory_pool_tx_count(self):
         tx_count = sdk.rpc.get_memory_pool_tx_count()
