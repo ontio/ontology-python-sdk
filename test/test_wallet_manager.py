@@ -23,30 +23,50 @@ path = os.path.join(os.path.dirname(__file__), 'test.json')
 class TestWalletManager(unittest.TestCase):
     def test_create_write(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             random_password = utils.get_random_hex_str(10)
             label = 'label'
-            wm.create_account(label, random_password)
+            wm.create_account(random_password, label)
             default_account = wm.get_default_account_data()
             self.assertEqual(label, default_account.label)
-            wm.create_identity(label, random_password)
+            wm.create_identity(random_password, label)
             default_identity = wm.get_default_identity()
-            self.assertEqual(label, default_identity.label)
+            self.assertEqual(default_identity.label, label)
             wm.write_wallet()
         finally:
             wm.del_wallet_file()
 
+    def test_del_account_by_b58_address(self):
+        wm = WalletManager()
+        b58_addr_lst = list()
+        count = 0
+        for _ in range(5):
+            acct = wm.create_account(password)
+            b58_addr_lst.append(acct.get_address_base58())
+            count += 1
+            self.assertEqual(count, wm.get_account_count())
+        for _ in range(5):
+            wm.del_account_by_b58_address(b58_addr_lst.pop(-1))
+            wm.get_acct_data_list()
+            count -= 1
+            self.assertEqual(count, wm.get_account_count())
+
+    def test_create_account_from_wif(self):
+        wm = WalletManager()
+        wif = 'L1eCFtiZH2ZU6KjTR9MR14wfTEHnGGGoxSuRB2TUXRqoGwa7NAjN'
+        acct = wm.create_account_from_wif(wif, password)
+        self.assertTrue(isinstance(acct, Account))
+        self.assertEqual('AdqppUTygLd2ws9n6u4NJ1pRJtxmBse2pv', acct.get_address_base58())
+
     def test_deep_copy(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             for index in range(5):
-                wm.create_account(f'label{index}', password)
+                wm.create_account(password, f'label{index}')
                 wm.write_wallet()
                 self.assertEqual(len(wm.wallet_file.identities), len(wm.wallet_in_mem.identities))
                 self.assertEqual(len(wm.wallet_file.accounts), len(wm.wallet_in_mem.accounts))
@@ -70,7 +90,7 @@ class TestWalletManager(unittest.TestCase):
     def test_open_cyano_wallet(self):
         wm = WalletManager()
         cyano_path = os.path.join(os.path.dirname(__file__), 'cyano_wallet.json')
-        wm.open_wallet(cyano_path)
+        wm.open_wallet(cyano_path, is_create=False)
         self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         account = wm.get_account_by_b58_address('ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6', '1234567890')
         self.assertTrue(isinstance(account, Account))
@@ -125,8 +145,8 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_account(self):
         wallet_manager = WalletManager()
-        acct0 = wallet_manager.create_account('', password)
-        self.assertTrue(isinstance(acct0, AccountData))
+        acct0 = wallet_manager.create_account(password)
+        self.assertTrue(isinstance(acct0, Account))
         b58_address = wallet_manager.wallet_in_mem.default_account_address
         acct0 = wallet_manager.get_account_by_b58_address(b58_address, password)
         self.assertEqual(acct0.get_address_base58(), b58_address)
@@ -143,13 +163,12 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_accounts(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             size = 5
             for i in range(size):
-                wm.create_account('', password)
+                wm.create_account(password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
         finally:
@@ -157,7 +176,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_identity_by_index(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
@@ -177,7 +195,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_identity_by_ont_id(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
@@ -201,13 +218,12 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_account_by_index(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             size = 3
             for _ in range(size):
-                wm.create_account('', password)
+                wm.create_account(password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
             self.assertRaises(SDKException, wm.get_wallet().set_default_account_by_index, size)
@@ -220,13 +236,12 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_account_by_address(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             size = 3
             for _ in range(size):
-                wm.create_account('', password)
+                wm.create_account(password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
             self.assertRaises(SDKException, wm.get_wallet().set_default_account_by_address, '1')
@@ -239,13 +254,12 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_default_account(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             size = 3
             for _ in range(size):
-                wm.create_account('', password)
+                wm.create_account(password)
             accounts = wm.get_wallet().get_accounts()
             self.assertEqual(len(accounts), size)
             for acct in accounts:
@@ -257,7 +271,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_import_identity(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         wm.open_wallet(path)
         try:
@@ -276,7 +289,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_identity_from_pri_key(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
@@ -289,7 +301,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_import_account(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.wallet_path = path
         self.assertEqual(path, wm.wallet_path)
         wm.create_wallet_file()
@@ -309,13 +320,12 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_account_from_private_key(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
             private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
             label = 'hello_account'
-            account = wm.create_account_from_private_key(label, password, private_key)
+            account = wm.create_account_from_private_key(password, private_key, label)
             b58_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
             wm.save()
             self.assertEqual(b58_address, account.b58_address)
@@ -324,7 +334,6 @@ class TestWalletManager(unittest.TestCase):
 
     def test_add_control_by_private_key(self):
         wm = WalletManager()
-        self.assertRaises(SDKException, wm.open_wallet)
         wm.create_wallet_file(path)
         try:
             wm.open_wallet(path)
