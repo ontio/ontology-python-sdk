@@ -4,14 +4,10 @@
 import unittest
 
 from time import sleep
-from test import acct1, acct2, acct4
+from test import sdk, acct1, acct2, acct4
 
-from ontology.ont_sdk import OntologySdk
 from ontology.utils.contract_data import ContractDataParser
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
-
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
 
 
 class TestNeoVm(unittest.TestCase):

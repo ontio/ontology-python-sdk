@@ -13,14 +13,12 @@ from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_event import ContractEventParser
 
-websocket_client = sdk.websocket
-websocket_client.connect_to_test_net()
 
 class TestWebsocketClient(unittest.TestCase):
     @staticmethod
     async def heartbeat_case():
-        response = await websocket_client.send_heartbeat()
-        await websocket_client.close_connect()
+        response = await sdk.websocket.send_heartbeat()
+        await sdk.websocket.close_connect()
         return response
 
     def test_heartbeat(self):
@@ -43,8 +41,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def subscribe_oep4_transfer_event(hex_contract_address):
-        response = await websocket_client.subscribe(hex_contract_address, True, False, False, False)
-        event = await websocket_client.recv_subscribe_info()
+        response = await sdk.websocket.subscribe(hex_contract_address, True, False, False, False)
+        event = await sdk.websocket.recv_subscribe_info()
         return response, event
 
     async def subscribe_oep4_case(self, event_loop):
@@ -78,7 +76,7 @@ class TestWebsocketClient(unittest.TestCase):
             self.assertEqual(64, len(tx_hash))
         except asyncio.TimeoutError:
             pass
-        await websocket_client.close_connect()
+        await sdk.websocket.close_connect()
 
     def test_subscribe(self):
         event_loop = asyncio.get_event_loop()
@@ -86,8 +84,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_connection_count_case():
-        response = await websocket_client.get_connection_count()
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_connection_count()
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_connection_count(self):
@@ -96,8 +94,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_session_count():
-        response = await websocket_client.get_session_count()
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_session_count()
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_session_count(self):
@@ -109,7 +107,7 @@ class TestWebsocketClient(unittest.TestCase):
     async def get_balance(b58_address: str):
         if not isinstance(b58_address, str):
             raise SDKException(ErrorCode.other_error('Invalid base58 encode address.'))
-        balance = await websocket_client.get_balance(b58_address)
+        balance = await sdk.websocket.get_balance(b58_address)
         return balance
 
     def test_get_balance(self):
@@ -121,8 +119,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_storage(hex_contract_address: str, key: str):
-        storage = await websocket_client.get_storage(hex_contract_address, key)
-        await websocket_client.close_connect()
+        storage = await sdk.websocket.get_storage(hex_contract_address, key)
+        await sdk.websocket.close_connect()
         return storage
 
     def test_get_storage(self):
@@ -135,8 +133,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_smart_contract_case(hex_contract_address: str):
-        response = await websocket_client.get_smart_contract(hex_contract_address)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_smart_contract(hex_contract_address)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_smart_contract(self):
@@ -157,8 +155,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_smart_contract_event_by_tx_hash_case(tx_hash):
-        response = await websocket_client.get_smart_contract_event_by_tx_hash(tx_hash)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_smart_contract_event_by_tx_hash(tx_hash)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_smart_contract_event_by_tx_hash(self):
@@ -171,8 +169,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_smart_contract_event_by_height_case(height):
-        response = await websocket_client.get_smart_contract_event_by_height(height)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_smart_contract_event_by_height(height)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_smart_contract_event_by_height(self):
@@ -191,8 +189,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_block_height_case():
-        response = await websocket_client.get_block_height()
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_block_height()
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_block_height(self):
@@ -201,8 +199,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_block_height_by_tx_hash_case(tx_hash):
-        response = await websocket_client.get_block_height_by_tx_hash(tx_hash)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_block_height_by_tx_hash(tx_hash)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_block_height_by_tx_hash(self):
@@ -216,8 +214,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_block_hash_by_height_case(height):
-        response = await websocket_client.get_block_hash_by_height(height)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_block_hash_by_height(height)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_block_hash_by_height(self):
@@ -228,8 +226,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_block_by_height_case(height):
-        response = await websocket_client.get_block_by_height(height)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_block_by_height(height)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_block_by_height(self):
@@ -240,8 +238,8 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def get_block_by_hash_case(block_hash):
-        response = await websocket_client.get_block_by_hash(block_hash)
-        await websocket_client.close_connect()
+        response = await sdk.websocket.get_block_by_hash(block_hash)
+        await sdk.websocket.close_connect()
         return response
 
     def test_get_block_by_hash(self):
@@ -252,10 +250,10 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def send_raw_transaction_and_query_tx_case(tx):
-        tx_hash = await websocket_client.send_raw_transaction(tx)
+        tx_hash = await sdk.websocket.send_raw_transaction(tx)
         await asyncio.sleep(6)
-        event = await websocket_client.get_smart_contract_event_by_tx_hash(tx_hash)
-        await websocket_client.close_connect()
+        event = await sdk.websocket.get_smart_contract_event_by_tx_hash(tx_hash)
+        await sdk.websocket.close_connect()
         return tx_hash, event
 
     def test_send_raw_transaction(self):
@@ -290,14 +288,14 @@ class TestWebsocketClient(unittest.TestCase):
                                                             gas_limit, gas_price)
         tx.sign_transaction(acct)
         event_loop = asyncio.get_event_loop()
-        response = event_loop.run_until_complete(websocket_client.send_raw_transaction_pre_exec(tx))
+        response = event_loop.run_until_complete(sdk.websocket.send_raw_transaction_pre_exec(tx))
         self.assertEqual('01', response['Result'])
         self.assertEqual(1, response['State'])
 
     @staticmethod
     async def get_merkle_proof_case(tx_hash: str):
-        merkle_proof = await websocket_client.get_merkle_proof(tx_hash)
-        await websocket_client.close_connect()
+        merkle_proof = await sdk.websocket.get_merkle_proof(tx_hash)
+        await sdk.websocket.close_connect()
         return merkle_proof
 
     def test_get_merkle_proof(self):

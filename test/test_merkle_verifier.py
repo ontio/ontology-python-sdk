@@ -6,9 +6,6 @@ import unittest
 from ontology.ont_sdk import OntologySdk
 from ontology.merkle.merkle_verifier import MerkleVerifier
 
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
-
 
 class TestMerkleVerifier(unittest.TestCase):
     def test_validate_proof(self):

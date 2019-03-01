@@ -4,7 +4,7 @@
 import time
 import unittest
 
-from test import password, acct2, acct3, acct4
+from test import sdk, acct2, acct3, acct4, password
 
 from ontology.crypto.curve import Curve
 from ontology.crypto.signature import Signature
@@ -15,15 +15,10 @@ from ontology.smart_contract.native_contract.ontid import Attribute
 from Cryptodome.Random.random import randint
 
 from ontology.utils import utils
-from ontology.ont_sdk import OntologySdk
 from ontology.common.define import DID_ONT
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
-
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
-sdk.restful.connect_to_test_net()
 
 
 class TestOntId(unittest.TestCase):

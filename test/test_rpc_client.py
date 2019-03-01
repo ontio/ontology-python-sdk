@@ -6,7 +6,6 @@ import unittest
 
 from test import sdk, acct1, acct2, acct3
 
-from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str

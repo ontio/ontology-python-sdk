@@ -6,9 +6,8 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from test import acct1, acct2, acct3, acct4
+from test import sdk, acct1, acct2, acct3, acct4
 
-from ontology.ont_sdk import OntologySdk
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
@@ -16,32 +15,24 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 class TestOep4(unittest.TestCase):
     def test_set_contract_address(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '85848b5ec3b15617e396bdd62cb49575738dd413'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         self.assertEqual(contract_address, oep4.hex_contract_address)
 
     def test_get_name(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         self.assertEqual('DXToken', oep4.get_name())
 
     def test_get_symbol(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         self.assertEqual('DX', oep4.get_symbol())
 
     def test_get_decimal(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address1 = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address1
@@ -54,8 +45,6 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(255, oep4.get_decimal())
 
     def test_init(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -70,16 +59,12 @@ class TestOep4(unittest.TestCase):
         self.assertEqual('Already initialized!', bytes.fromhex(notify['States']).decode())
 
     def test_get_total_supply(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         self.assertEqual(10000000000000000000, oep4.get_total_supply())
 
     def test_transfer(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -98,8 +83,6 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(value, notify['States'][3])
 
     def test_balance_of(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -111,8 +94,6 @@ class TestOep4(unittest.TestCase):
         self.assertGreaterEqual(balance, 1)
 
     def test_transfer_multi(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -140,8 +121,6 @@ class TestOep4(unittest.TestCase):
 
         tx_hash = oep4.transfer_multi(transfer_list, signers[0], signers, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         time.sleep(randint(6, 10))
         notify_list = oep4.query_multi_transfer_event(tx_hash)
         try:
@@ -156,8 +135,6 @@ class TestOep4(unittest.TestCase):
             self.assertTrue(raised, e)
 
     def test_approve(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -173,8 +150,6 @@ class TestOep4(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
             return
         self.assertEqual(len(tx_hash), 64)
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         time.sleep(randint(6, 10))
         try:
             event = oep4.query_approve_event(tx_hash)
@@ -188,8 +163,6 @@ class TestOep4(unittest.TestCase):
             self.assertTrue(raised, e)
 
     def test_allowance(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -199,8 +172,6 @@ class TestOep4(unittest.TestCase):
         self.assertGreaterEqual(allowance, 1)
 
     def test_transfer_from(self):
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
@@ -220,8 +191,6 @@ class TestOep4(unittest.TestCase):
         tx_hash = oep4.transfer_from(spender_acct, b58_from_address, b58_to_address, value, from_acct, gas_limit,
                                      gas_price)
         self.assertEqual(64, len(tx_hash))
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         time.sleep(randint(6, 10))
         try:
             event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
