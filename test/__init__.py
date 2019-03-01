@@ -12,7 +12,7 @@ sdk.restful.connect_to_test_net()
 sdk.websocket.connect_to_test_net()
 wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
 wallet_manager = sdk.wallet_manager
-wallet_manager.open_wallet(wallet_path)
+wallet_manager.open_wallet(wallet_path, is_create=False)
 acct1 = wallet_manager.get_account_by_b58_address('ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD', password)
 acct2 = wallet_manager.get_account_by_b58_address('Af1n2cZHhMZumNqKgw9sfCNoTWu9de4NDn', password)
 acct3 = wallet_manager.get_account_by_b58_address('AXJZrP1jBRo398ebfyemsDxDaThsxcXGMk', password)
