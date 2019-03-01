@@ -80,9 +80,7 @@ class TestAsset(unittest.TestCase):
 
     def test_query_balance(self):
         asset = sdk.native_vm.asset()
-        private_key = utils.get_random_hex_str(64)
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        b58_address = acct.get_address_base58()
+        b58_address = acct1.get_address_base58()
         try:
             balance = asset.query_balance('ont', b58_address)
             self.assertTrue(isinstance(balance, int))
