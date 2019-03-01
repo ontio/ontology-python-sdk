@@ -13,16 +13,6 @@ from ontology.exception.exception import SDKException
 
 
 class TestOntologySdk(unittest.TestCase):
-    def test_open_wallet(self):
-        path = os.path.join(os.path.dirname(__file__), 'test.json')
-        self.assertRaises(SDKException, sdk.wallet_manager.open_wallet)
-        sdk.wallet_manager.create_wallet_file(path)
-        try:
-            wallet = sdk.wallet_manager.open_wallet(path)
-            self.assertTrue(wallet, isinstance(wallet, WalletData))
-        finally:
-            sdk.wallet_manager.del_wallet_file()
-
     def test_add_multi_sign_transaction(self):
         asset = sdk.native_vm.asset()
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
