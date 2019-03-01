@@ -56,7 +56,6 @@ class TestClaim(unittest.TestCase):
         self.assertEqual(dict(claim_payload), dict(claim_payload_recv))
 
     def test_signature_info(self):
-        sdk.rpc.connect_to_test_net()
         try:
             pub_keys = sdk.native_vm.ont_id().get_public_keys(identity2.ont_id)
             pk = pub_keys[0]
@@ -86,7 +85,6 @@ class TestClaim(unittest.TestCase):
             self.assertTrue(claim.validate_signature(b64_claim, verify_kid=False))
 
     def test_claim_demo(self):
-        sdk.rpc.connect_to_test_net()
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
         try:
             pk = pub_keys[0]
