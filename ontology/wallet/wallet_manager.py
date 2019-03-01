@@ -71,6 +71,9 @@ class WalletManager(object):
             return True
         return False
 
+    def get_account_count(self) -> int:
+        return len(self.wallet_in_mem.accounts)
+
     def create_wallet_file(self, wallet_path: str = ''):
         if not isinstance(wallet_path, str):
             raise SDKException(ErrorCode.require_str_params)
@@ -121,9 +124,12 @@ class WalletManager(object):
         self.wallet_file = copy.deepcopy(self.wallet_in_mem)
         return self.wallet_file
 
-    def reset_wallet(self):
+    def restore(self):
         self.wallet_in_mem = copy.deepcopy(self.wallet_file)
         return self.wallet_in_mem
+
+    def reset(self):
+        self.wallet_in_mem = WalletData()
 
     def get_signature_scheme(self):
         return self.scheme
@@ -151,7 +157,7 @@ class WalletManager(object):
                 return identity
         raise SDKException(ErrorCode.other_error('Import identity failed.'))
 
-    def create_identity(self, label: str, pwd: str) -> Identity:
+    def create_identity(self, pwd: str, label: str = '') -> Identity:
         """
 
         :param label: a label for identity.
@@ -160,6 +166,8 @@ class WalletManager(object):
         """
         pri_key = get_random_hex_str(64)
         salt = get_random_hex_str(16)
+        if len(label) == 0 or label is None:
+            label = uuid.uuid4().hex[0:8]
         return self.__create_identity(label, pwd, salt, pri_key)
 
     def __create_identity(self, label: str, pwd: str, salt: str, private_key: str):
@@ -180,7 +188,7 @@ class WalletManager(object):
         identity = self.__create_identity(label, pwd, salt, private_key)
         return identity
 
-    def create_account(self, label: str, pwd: str) -> AccountData:
+    def create_account(self, pwd: str, label: str = '') -> Account:
         """
         This interface is used to create account based on given password and label.
 
@@ -190,8 +198,17 @@ class WalletManager(object):
         """
         pri_key = get_random_hex_str(64)
         salt = get_random_hex_str(16)
+        if len(label) == 0 or label is None:
+            label = uuid.uuid4().hex[0:8]
         acct = self.__create_account(label, pwd, salt, pri_key, True)
-        return self.wallet_in_mem.get_account_by_b58_address(acct.get_address_base58())
+        return self.get_account_by_b58_address(acct.get_address_base58(), pwd)
+
+    def del_account_by_b58_address(self, b58_address: str):
+        for acct in self.wallet_in_mem.accounts:
+            if acct.b58_address == b58_address:
+                self.wallet_in_mem.accounts.remove(acct)
+                return
+        raise SDKException(ErrorCode.other_error(f'{b58_address} not exist.'))
 
     def __create_account(self, label: str, pwd: str, salt: str, private_key: str, account_flag: bool) -> Account:
         account = Account(private_key, self.scheme)
@@ -205,8 +222,7 @@ class WalletManager(object):
             acct_data.key = account.get_private_key_hex()
 
         acct_data.b58_address = account.get_address_base58()
-        # set label
-        if label is None or label == '':
+        if len(label) == 0 or label is None:
             label = uuid.uuid4().hex[0:8]
         if account_flag:
             for memory_acct in self.wallet_in_mem.accounts:
@@ -305,7 +321,7 @@ class WalletManager(object):
         info.salt = salt
         return info
 
-    def create_account_from_private_key(self, label: str, password: str, private_key: str) -> AccountData or None:
+    def create_account_from_private_key(self, password: str, private_key: str, label: str = '') -> AccountData:
         """
         This interface is used to create account by providing an encrypted private key and it's decrypt password.
 
@@ -316,11 +332,21 @@ class WalletManager(object):
                   if failed, return a None object.
         """
         salt = get_random_hex_str(16)
+        if len(label) == 0 or label is None:
+            label = uuid.uuid4().hex[0:8]
         info = self.create_account_info(label, password, salt, private_key)
         for acct in self.wallet_in_mem.accounts:
             if info.address_base58 == acct.b58_address:
                 return acct
         raise SDKException(ErrorCode.other_error(f'Create account from key {private_key} failed.'))
+
+    def create_account_from_wif(self, wif: str, password: str, label: str = '') -> Account:
+        private_key = Account.get_private_key_from_wif(wif).hex()
+        salt = get_random_hex_str(16)
+        if len(label) == 0 or label is None:
+            label = uuid.uuid4().hex[0:8]
+        info = self.create_account_info(label, password, salt, private_key)
+        return self.get_account_by_b58_address(info.address_base58, password)
 
     def get_account_by_ont_id(self, ont_id: str, password: str) -> Account:
         """
