@@ -3,7 +3,8 @@
 
 import unittest
 
-from ontology.ont_sdk import OntologySdk
+from test import sdk
+
 from ontology.merkle.merkle_verifier import MerkleVerifier
 
 
@@ -57,7 +58,6 @@ class TestMerkleVerifier(unittest.TestCase):
 
     def test_get_proof_test_net(self):
         tx_hash = 'bf74e9208c0a20ec417de458ab6c9d29c12c614e77fb943be4566c95fab61454'
-        sdk.rpc.connect_to_test_net()
         merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
         current_block_height = merkle_proof['CurBlockHeight']
