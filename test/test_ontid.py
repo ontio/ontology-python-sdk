@@ -322,8 +322,6 @@ class TestOntId(unittest.TestCase):
             self.assertIn('no authorization', e.args[1])
 
     def test_change_recovery(self):
-        sdk.rpc.connect_to_test_net()
-        sdk.restful.connect_to_test_net()
         label = 'label'
         identity = sdk.wallet_manager.create_identity(label, password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
