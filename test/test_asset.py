@@ -181,7 +181,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_transfer_from_transaction(self):
-        sdk.rpc.connect_to_test_net()
         sender = acct2
         b58_sender_address = sender.get_address_base58()
         b58_payer_address = sender.get_address_base58()
