@@ -79,7 +79,7 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -100,7 +100,7 @@ class TestInvokeFunction(unittest.TestCase):
         func.set_params_value(bytes_owner_address, bytes_spender_address, amount)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -130,7 +130,7 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states_list = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states_list[0][0] = ContractDataParser.to_utf8_str(states_list[0][0])
@@ -165,7 +165,7 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -195,7 +195,7 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -261,7 +261,7 @@ class TestInvokeFunction(unittest.TestCase):
         notify_args.set_params_value(bool_msg, int_msg, bytes_msg, str_msg, bytes_address_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, notify_args,
                                                   False)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -283,7 +283,7 @@ class TestInvokeFunction(unittest.TestCase):
         func = InvokeFunction('testList')
         func.set_params_value(list_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
@@ -330,7 +330,7 @@ class TestInvokeFunction(unittest.TestCase):
         func = InvokeFunction('testMapInMap')
         func.set_params_value(dict_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])

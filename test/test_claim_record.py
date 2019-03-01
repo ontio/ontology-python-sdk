@@ -63,7 +63,7 @@ class TestClaimRecord(unittest.TestCase):
 
         tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
                                                    gas_limit, gas_price)
-        sleep(6)
+        sleep(8)
         self.query_commit_event_create_test_case(tx_hash, claim.claim_id)
 
         status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
@@ -71,11 +71,11 @@ class TestClaimRecord(unittest.TestCase):
 
         tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
                                                    gas_limit, gas_price)
-        sleep(6)
+        sleep(8)
         self.query_commit_event_exist_test_case(tx_hash, claim.claim_id)
 
         tx_hash = sdk.neo_vm.claim_record().revoke(claim.claim_id, identity2_ctrl_acct, acct1, gas_limit, gas_price)
-        sleep(6)
+        sleep(8)
         self.query_revoke_event_test_case(tx_hash, claim.claim_id)
 
         status = sdk.neo_vm.claim_record().get_status(claim.claim_id)

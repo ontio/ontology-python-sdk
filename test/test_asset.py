@@ -244,7 +244,8 @@ class TestAsset(unittest.TestCase):
             except SDKException as e:
                 msg1 = 'no balance enough'
                 msg2 = 'ConnectTimeout'
-                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
+                msg3 = 'already in the tx pool'
+                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
 
     def test_approve(self):
         sender = acct1
@@ -262,7 +263,8 @@ class TestAsset(unittest.TestCase):
             except SDKException as e:
                 msg1 = 'no balance enough'
                 msg2 = 'ConnectTimeout'
-                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
+                msg3 = 'already in the tx pool'
+                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
 
     def test_transfer_from(self):
         sender = acct2
@@ -286,7 +288,8 @@ class TestAsset(unittest.TestCase):
             except SDKException as e:
                 msg1 = 'balance insufficient'
                 msg2 = 'ConnectTimeout'
-                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
+                msg3 = 'already in the tx pool'
+                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
 
 
 if __name__ == '__main__':
