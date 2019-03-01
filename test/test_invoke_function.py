@@ -229,7 +229,6 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        sdk.rpc.connect_to_test_net()
         response['Result'] = ContractDataParser.to_bool(response['Result'])
         self.assertEqual(1, response['State'])
         self.assertEqual(20000, response['Gas'])

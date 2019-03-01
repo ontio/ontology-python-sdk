@@ -31,7 +31,6 @@ class TestWebsocketClient(unittest.TestCase):
 
     @staticmethod
     async def oep4_transfer(hex_contract_address, from_acct, b58_to_address, value):
-        sdk.rpc.connect_to_test_net()
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = hex_contract_address
         gas_limit = 20000000
