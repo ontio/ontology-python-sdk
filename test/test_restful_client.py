@@ -146,7 +146,6 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual(tx['Hash'], tx_hash)
 
     def test_send_raw_transaction(self):
-        sdk = OntologySdk()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_from_address = acct.get_address_base58()
@@ -161,7 +160,6 @@ class TestRestfulClient(unittest.TestCase):
         self.assertEqual(tx_hash, tx.hash256_explorer())
 
     def test_send_raw_transaction_pre_exec(self):
-        sdk = OntologySdk()
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_from_address = acct.get_address_base58()
@@ -214,8 +212,6 @@ class TestRestfulClient(unittest.TestCase):
         except SDKException as e:
             self.assertIn('UNKNOWN TRANSACTION', e.args[1])
         contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         from_acct = acct4

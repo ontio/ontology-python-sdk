@@ -5,10 +5,9 @@ import unittest
 
 from time import sleep
 
-from test import acct1, acct2, acct3
+from test import acct1, acct2, acct3, sdk
 
 from ontology.utils import utils
-from ontology.ont_sdk import OntologySdk
 from ontology.common.address import Address
 from ontology.core.transaction import Transaction
 from ontology.utils.contract_event import ContractEventParser
@@ -42,7 +41,6 @@ class TestTransaction(unittest.TestCase):
         amount = 1000000000
         gas_price = 500
         gas_limit = 20000
-        sdk = OntologySdk()
         sdk.rpc.connect_to_test_net()
         tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, amount,
                                                              b58_acct1_address, gas_limit, gas_price)

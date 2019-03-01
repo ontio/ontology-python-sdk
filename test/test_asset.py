@@ -60,8 +60,6 @@ class TestAsset(unittest.TestCase):
         b58_address2 = acct2.get_address_base58()
         b58_address3 = acct3.get_address_base58()
         b58_address4 = acct4.get_address_base58()
-        sdk = OntologySdk()
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         try:
             acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
@@ -85,7 +83,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_balance(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         private_key = utils.get_random_hex_str(64)
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
@@ -111,7 +108,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_allowance(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
@@ -121,7 +117,6 @@ class TestAsset(unittest.TestCase):
         self.assertGreaterEqual(allowance, 0)
 
     def test_new_approve_transaction(self):
-        sdk.rpc.connect_to_test_net()
         sender = acct2
         b58_send_address = sender.get_address_base58()
         b58_payer_address = sender.get_address_base58()
@@ -140,7 +135,6 @@ class TestAsset(unittest.TestCase):
             self.assertIn('balance insufficient', e.args[1])
 
     def test_new_transfer_transaction(self):
-        sdk.rpc.connect_to_test_net()
         from_acct = acct1
         to_acct = acct2
 
@@ -165,7 +159,6 @@ class TestAsset(unittest.TestCase):
             return
 
         time.sleep(randint(6, 10))
-
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         ont_contract_address = '0100000000000000000000000000000000000000'
         notify = ContractEventParser.get_notify_list_by_contract_address(event, ont_contract_address)
@@ -180,16 +173,10 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
     def test_transfer(self):
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
-        from_acct = acct2
-        payer = acct4
         b58_to_address = acct1.get_address_base58()
-        amount = 1
-        gas_price = 500
-        gas_limit = 20000
         try:
-            tx_hash = asset.transfer('ont', from_acct, b58_to_address, amount, payer, gas_limit, gas_price)
+            tx_hash = asset.transfer('ont', acct2, b58_to_address, 1, acct4, 20000, 500)
         except SDKException as e:
             self.assertIn('balance insufficient', e.args[1])
             return
@@ -205,12 +192,8 @@ class TestAsset(unittest.TestCase):
         b58_payer_address = sender.get_address_base58()
         b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()
-        amount = 1
-        gas_limit = 20000
-        gas_price = 500
         tx = sdk.native_vm.asset().new_transfer_from_transaction('ont', b58_sender_address, b58_from_address,
-                                                                 b58_recv_address, amount,
-                                                                 b58_payer_address, gas_limit, gas_price)
+                                                                 b58_recv_address, 1, b58_payer_address, 20000, 500)
         tx.add_sign_transaction(sender)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
@@ -226,7 +209,6 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
-        sdk.rpc.connect_to_test_net()
         claimer = acct1
         b58_claimer_address = claimer.get_address_base58()
         b58_recv_address = claimer.get_address_base58()
@@ -250,7 +232,6 @@ class TestAsset(unittest.TestCase):
     def test_withdraw_ong(self):
         claimer = acct1
         payer = acct2
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_recv_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
         gas_limit = 20000
@@ -268,7 +249,6 @@ class TestAsset(unittest.TestCase):
     def test_approve(self):
         sender = acct1
         payer = acct2
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_recv_address = acct2.get_address_base58()
         amount = 10
@@ -287,7 +267,6 @@ class TestAsset(unittest.TestCase):
     def test_transfer_from(self):
         sender = acct2
         payer = sender
-        sdk.rpc.connect_to_test_net()
         asset = sdk.native_vm.asset()
         b58_from_address = acct1.get_address_base58()
         b58_recv_address = sender.get_address_base58()

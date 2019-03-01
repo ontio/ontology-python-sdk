@@ -4,16 +4,12 @@
 import os
 import unittest
 
-from ontology.exception.exception import SDKException
-from test import acct1, acct2, acct3
+from test import acct1, acct2, acct3, sdk
 
 from ontology.common.address import Address
-from ontology.core.program import ProgramBuilder
-from ontology.ont_sdk import OntologySdk
 from ontology.wallet.wallet import WalletData
-
-sdk = OntologySdk()
-sdk.rpc.connect_to_test_net()
+from ontology.core.program import ProgramBuilder
+from ontology.exception.exception import SDKException
 
 
 class TestOntologySdk(unittest.TestCase):
