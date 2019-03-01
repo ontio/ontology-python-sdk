@@ -135,7 +135,7 @@ class Claim(object):
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
         tx_hash = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, iss_acct, self.payload.sub, payer,
                                                           gas_limit, gas_price)
-        sleep(10)
+        sleep(12)
         hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
         merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
