@@ -5,7 +5,6 @@ import threading
 
 from Cryptodome.Random.random import choice
 
-from ontology.sigsvr.sigsvr import SigSvr
 from ontology.service.service import Service
 from ontology.smart_contract.neo_vm import NeoVm
 from ontology.exception.error_code import ErrorCode
@@ -18,9 +17,20 @@ from ontology.network.rpc import RpcClient, TEST_RPC_ADDRESS, MAIN_RPC_ADDRESS
 from ontology.network.restful import RestfulClient, TEST_RESTFUL_ADDRESS, MAIN_RESTFUL_ADDRESS
 
 
-class OntologySdk(object):
-    _instance_lock = threading.Lock()
+class _Singleton(type):
+    def __init__(cls, *args, **kwargs):
+        cls.__instance = None
+        super().__init__(*args, **kwargs)
 
+    def __call__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__call__(*args, **kwargs)
+            return cls.__instance
+        else:
+            return cls.__instance
+
+
+class OntologySdk(metaclass=_Singleton):
     def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '', sig_svr_address='',
                  default_signature_scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(default_signature_scheme, SignatureScheme):
@@ -28,18 +38,11 @@ class OntologySdk(object):
         self.__rpc = RpcClient(rpc_address)
         self.__restful = RestfulClient(restful_address)
         self.__websocket = WebsocketClient(ws_address)
-        self.__native_vm = NativeVm(self._instance)
-        self.__neo_vm = NeoVm(self._instance)
-        self.__service = Service(self._instance)
+        self.__native_vm = NativeVm(self)
+        self.__neo_vm = NeoVm(self)
+        self.__service = Service(self)
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(OntologySdk, '_instance'):
-            with OntologySdk._instance_lock:
-                if not hasattr(OntologySdk, '_instance'):
-                    OntologySdk._instance = object.__new__(cls)
-        return OntologySdk._instance
 
     def get_network(self) -> RpcClient or RestfulClient:
         if self.__rpc.get_address() != '':
