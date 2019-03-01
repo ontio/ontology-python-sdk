@@ -153,7 +153,7 @@ class TestAsset(unittest.TestCase):
             self.assertIn('balance insufficient', e.args[1])
             return
 
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         ont_contract_address = '0100000000000000000000000000000000000000'
         notify = ContractEventParser.get_notify_list_by_contract_address(event, ont_contract_address)
@@ -175,7 +175,7 @@ class TestAsset(unittest.TestCase):
         except SDKException as e:
             self.assertIn('balance insufficient', e.args[1])
             return
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
@@ -197,7 +197,7 @@ class TestAsset(unittest.TestCase):
             self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
             return
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(6, 10))
+        time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
@@ -271,7 +271,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = asset.transfer_from('ont', sender, b58_from_address, b58_recv_address, amount, payer,
                                               gas_limit, gas_price)
                 self.assertEqual(64, len(tx_hash))
-                time.sleep(randint(6, 10))
+                time.sleep(randint(7, 12))
                 event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
                 self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
                 self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
