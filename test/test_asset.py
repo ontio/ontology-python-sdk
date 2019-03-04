@@ -232,6 +232,7 @@ class TestAsset(unittest.TestCase):
                 self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
 
     def test_transfer_from(self):
+        sdk.rpc.connect_to_test_net()
         b58_from_address = acct1.get_address_base58()
         b58_recv_address = acct2.get_address_base58()
         for _ in range(3):

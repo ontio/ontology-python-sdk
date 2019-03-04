@@ -81,9 +81,8 @@ class TestOntId(unittest.TestCase):
 
     def test_registry_ont_id(self):
         ont_id = sdk.native_vm.ont_id()
-        label = 'label'
         try:
-            identity = sdk.wallet_manager.create_identity(label, password)
+            identity = sdk.wallet_manager.create_identity(password)
             ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         except SDKException as e:
             self.assertIn('Wallet identity exists', e.args[1])
@@ -98,7 +97,7 @@ class TestOntId(unittest.TestCase):
 
     def test_add_and_remove_public_key(self):
         label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -148,8 +147,7 @@ class TestOntId(unittest.TestCase):
 
     def test_add_and_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -199,10 +197,8 @@ class TestOntId(unittest.TestCase):
         hex_public_key = acct2.get_public_key_hex()
         b58_address = acct2.get_address_base58()
         acct_did = "did:ont:" + b58_address
-        gas_limit = 20000
-        gas_price = 500
         path = 'try'
-        tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, gas_limit, gas_price)
+        tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, 20000, 500)
         tx.sign_transaction(acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
@@ -218,8 +214,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('attribute not exist', e.args[1])
 
     def test_add_recovery(self):
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -236,8 +231,6 @@ class TestOntId(unittest.TestCase):
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
-        gas_limit = 20000
-        gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
         time.sleep(randint(7, 12))
@@ -320,8 +313,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('no authorization', e.args[1])
 
     def test_change_recovery(self):
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -338,8 +330,6 @@ class TestOntId(unittest.TestCase):
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
-        gas_limit = 20000
-        gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
         time.sleep(randint(7, 12))
@@ -381,8 +371,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(new_recovery.get_address_hex_reverse(), notify['States'][3])
 
     def test_verify_signature(self):
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
