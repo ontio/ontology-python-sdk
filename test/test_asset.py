@@ -187,17 +187,17 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_withdraw_ong_transaction(self):
-        claimer = acct1
-        b58_claimer_address = claimer.get_address_base58()
-        b58_recv_address = claimer.get_address_base58()
-        b58_payer_address = claimer.get_address_base58()
+        sdk.rpc.connect_to_test_net()
+        b58_claimer_address = acct1.get_address_base58()
+        b58_recv_address = acct1.get_address_base58()
+        b58_payer_address = acct1.get_address_base58()
         amount = 1
         gas_price = 500
         gas_limit = 20000
         for _ in range(3):
             tx = sdk.native_vm.asset().new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount,
                                                                     b58_payer_address, gas_limit, gas_price)
-            tx.add_sign_transaction(claimer)
+            tx.add_sign_transaction(acct1)
             try:
                 tx_hash = sdk.rpc.send_raw_transaction(tx)
                 self.assertEqual(64, len(tx_hash))
