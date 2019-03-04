@@ -81,9 +81,8 @@ class TestOntId(unittest.TestCase):
 
     def test_registry_ont_id(self):
         ont_id = sdk.native_vm.ont_id()
-        label = 'label'
         try:
-            identity = sdk.wallet_manager.create_identity(label, password)
+            identity = sdk.wallet_manager.create_identity(password)
             ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         except SDKException as e:
             self.assertIn('Wallet identity exists', e.args[1])
