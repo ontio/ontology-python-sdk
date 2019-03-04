@@ -20,12 +20,14 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(ong_address, sdk.native_vm.asset().get_asset_address('ong'))
 
     def test_query_name(self):
+        sdk.rpc.connect_to_test_net()
         token_name = sdk.native_vm.asset().query_name('ont')
         self.assertEqual('ONT Token', token_name)
         token_name = sdk.native_vm.asset().query_name('ong')
         self.assertEqual('ONG Token', token_name)
 
     def test_query_symbol(self):
+        sdk.rpc.connect_to_test_net()
         try:
             token_symbol = sdk.native_vm.asset().query_symbol('ont')
             self.assertEqual('ONT', token_symbol)
@@ -38,6 +40,7 @@ class TestAsset(unittest.TestCase):
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_decimals(self):
+        sdk.rpc.connect_to_test_net()
         decimals = sdk.native_vm.asset().query_decimals('ong')
         self.assertEqual(9, decimals)
         decimals = sdk.native_vm.asset().query_decimals('ont')
@@ -116,21 +119,17 @@ class TestAsset(unittest.TestCase):
             self.assertIn('balance insufficient', e.args[1])
 
     def test_new_transfer_transaction(self):
-        from_acct = acct1
-        to_acct = acct2
-
-        b58_from_address = from_acct.get_address_base58()
-        b58_to_address = to_acct.get_address_base58()
+        sdk.rpc.connect_to_test_net()
+        b58_from_address = acct1.get_address_base58()
+        b58_to_address = acct2.get_address_base58()
         b58_payer_address = b58_to_address
-
         amount = 1
         gas_price = 500
         gas_limit = 20000
-
         tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, amount,
                                                             b58_payer_address, gas_limit, gas_price)
-        tx.sign_transaction(from_acct)
-        tx.add_sign_transaction(to_acct)
+        tx.sign_transaction(acct1)
+        tx.add_sign_transaction(acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
@@ -153,6 +152,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(gas_price * gas_limit, notify['States'][3])
 
     def test_transfer(self):
+        sdk.rpc.connect_to_test_net()
         b58_to_address = acct1.get_address_base58()
         try:
             tx_hash = sdk.native_vm.asset().transfer('ont', acct2, b58_to_address, 1, acct4, 20000, 500)
@@ -165,14 +165,14 @@ class TestAsset(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
     def test_new_transfer_from_transaction(self):
-        sender = acct2
-        b58_sender_address = sender.get_address_base58()
-        b58_payer_address = sender.get_address_base58()
+        sdk.rpc.connect_to_test_net()
+        b58_sender_address = acct2.get_address_base58()
+        b58_payer_address = acct2.get_address_base58()
         b58_from_address = acct1.get_address_base58()
-        b58_recv_address = sender.get_address_base58()
+        b58_recv_address = acct2.get_address_base58()
         tx = sdk.native_vm.asset().new_transfer_from_transaction('ont', b58_sender_address, b58_from_address,
                                                                  b58_recv_address, 1, b58_payer_address, 20000, 500)
-        tx.add_sign_transaction(sender)
+        tx.add_sign_transaction(acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
