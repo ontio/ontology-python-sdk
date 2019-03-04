@@ -148,8 +148,7 @@ class TestOntId(unittest.TestCase):
 
     def test_add_and_remove_attribute(self):
         ont_id = sdk.native_vm.ont_id()
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -218,8 +217,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('attribute not exist', e.args[1])
 
     def test_add_recovery(self):
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -320,8 +318,7 @@ class TestOntId(unittest.TestCase):
             self.assertIn('no authorization', e.args[1])
 
     def test_change_recovery(self):
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
@@ -381,8 +378,7 @@ class TestOntId(unittest.TestCase):
         self.assertEqual(new_recovery.get_address_hex_reverse(), notify['States'][3])
 
     def test_verify_signature(self):
-        label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
