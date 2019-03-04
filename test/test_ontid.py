@@ -98,7 +98,7 @@ class TestOntId(unittest.TestCase):
 
     def test_add_and_remove_public_key(self):
         label = 'label'
-        identity = sdk.wallet_manager.create_identity(label, password)
+        identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         gas_limit = 20000
         gas_price = 500
