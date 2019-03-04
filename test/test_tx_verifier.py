@@ -15,8 +15,8 @@ class TestMerkleVerifier(unittest.TestCase):
             self.assertTrue(result)
 
     def test_verifier(self):
-        sdk.rpc.connect_to_main_net()
         try:
+            sdk.rpc.connect_to_main_net()
             self.check_tx_in_block(0)
             sdk.rpc.connect_to_test_net()
             self.check_tx_in_block(0)

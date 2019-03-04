@@ -27,10 +27,8 @@ class TestWalletData(unittest.TestCase):
         acct = wallet.accounts[0]
         self.assertTrue(isinstance(acct, AccountData))
 
-    def test_remove_account(self):
-        test_id = "test_ont_id"
-        wallet = WalletData(default_id=test_id)
-        size = 10
+    def create_wallet_data(self, default_id, size):
+        wallet = WalletData(default_id=default_id)
         address_list = list()
         for i in range(size):
             address = randint(0, 1000000000)
@@ -38,6 +36,12 @@ class TestWalletData(unittest.TestCase):
             wallet.add_account(acct)
             address_list.append(address)
             self.assertEqual(len(wallet.accounts), i + 1)
+        return wallet, address_list
+
+    def test_remove_account(self):
+        test_id = "test_ont_id"
+        size = 10
+        wallet, address_list = self.create_wallet_data(test_id, size)
         for i in range(size):
             rand_address = choice(address_list)
             wallet.remove_account(rand_address)
@@ -46,16 +50,8 @@ class TestWalletData(unittest.TestCase):
 
     def test_get_account_by_index(self):
         test_id = "test_ont_id"
-        wallet = WalletData(default_id=test_id)
         size = 10
-        address_list = list()
-        for i in range(size):
-            address = randint(0, 1000000000)
-            acct = AccountData(b58_address=address)
-            wallet.add_account(acct)
-            address_list.append(address)
-            self.assertEqual(len(wallet.accounts), i + 1)
-
+        wallet, address_list = self.create_wallet_data(test_id, size)
         for _ in range(size * 2):
             index = choice(range(size))
             acct = wallet.get_account_by_index(index)
@@ -63,16 +59,8 @@ class TestWalletData(unittest.TestCase):
 
     def test_get_account_by_address(self):
         test_id = "test_ont_id"
-        wallet = WalletData(default_id=test_id)
         size = 10
-        address_list = list()
-        for i in range(size):
-            address = randint(0, 1000000000)
-            acct = AccountData(b58_address=address)
-            wallet.add_account(acct)
-            address_list.append(address)
-            self.assertEqual(len(wallet.accounts), i + 1)
-
+        wallet, address_list = self.create_wallet_data(test_id, size)
         for i in range(size * 2):
             rand_address = choice(address_list)
             acct = wallet.get_account_by_b58_address(rand_address)

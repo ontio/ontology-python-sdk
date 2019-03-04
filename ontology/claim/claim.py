@@ -86,7 +86,7 @@ class Claim(object):
         self.__signature = iss.generate_signature(msg)
         return self.__signature
 
-    def validate_signature(self, b64_claim: str, verify_kid: bool = True):
+    def validate_signature(self, b64_claim: str):
         try:
             b64_head, b64_payload, b64_signature, _ = b64_claim.split('.')
         except ValueError:
@@ -98,16 +98,13 @@ class Claim(object):
         iss_ont_id = payload.iss
         msg = f'{b64_head}.{b64_payload}'.encode('ascii')
         pk = ''
-        if verify_kid:
-            pub_keys = self.__sdk.native_vm.ont_id().get_public_keys(iss_ont_id)
-            if len(pub_keys) == 0:
-                raise SDKException(ErrorCode.invalid_claim_head_params)
-            for pk_info in pub_keys:
-                if kid == pk_info.get('PubKeyId', ''):
-                    pk = pk_info.get('Value', '')
-                    break
-        else:
-            pk = kid.split('#')[0]
+        pub_keys = self.__sdk.native_vm.ont_id().get_public_keys(iss_ont_id)
+        if len(pub_keys) == 0:
+            raise SDKException(ErrorCode.invalid_claim_head_params)
+        for pk_info in pub_keys:
+            if kid == pk_info.get('PubKeyId', ''):
+                pk = pk_info.get('Value', '')
+                break
         if pk == '':
             raise SDKException(ErrorCode.invalid_b64_claim_data)
         handler = SignatureHandler(head.alg)
