@@ -198,10 +198,8 @@ class TestOntId(unittest.TestCase):
         hex_public_key = acct2.get_public_key_hex()
         b58_address = acct2.get_address_base58()
         acct_did = "did:ont:" + b58_address
-        gas_limit = 20000
-        gas_price = 500
         path = 'try'
-        tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, gas_limit, gas_price)
+        tx = ont_id.new_remove_attribute_transaction(acct_did, hex_public_key, path, b58_address, 20000, 500)
         tx.sign_transaction(acct2)
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
@@ -234,8 +232,6 @@ class TestOntId(unittest.TestCase):
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
-        gas_limit = 20000
-        gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
         time.sleep(randint(7, 12))
@@ -335,8 +331,6 @@ class TestOntId(unittest.TestCase):
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
-        gas_limit = 20000
-        gas_price = 500
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
         time.sleep(randint(7, 12))
