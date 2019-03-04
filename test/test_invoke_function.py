@@ -65,6 +65,16 @@ class TestInvokeFunction(unittest.TestCase):
         balance = ContractDataParser.to_int(balance)
         self.assertGreater(balance, 100)
 
+    def send_tx(self, hex_contract_address, signer, payer, func):
+        try:
+            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, signer, payer, gas_limit, gas_price, func,
+                                                      False)
+            self.assertEqual(64, len(tx_hash))
+            return tx_hash
+        except SDKException as e:
+            self.assertIn('already in the tx pool', e.args[1])
+            return ''
+
     def test_oep4_transfer(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('transfer')
@@ -72,12 +82,8 @@ class TestInvokeFunction(unittest.TestCase):
         bytes_to_address = acct2.get_address().to_bytes()
         value = 1
         func.set_params_value(bytes_from_address, bytes_to_address, value)
-        try:
-            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func,
-                                                      False)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            self.assertIn('already in the tx pool', e.args[1])
+        tx_hash = self.send_tx(hex_contract_address, acct1, acct2, func)
+        if len(tx_hash) == 0:
             return
         time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -188,12 +194,8 @@ class TestInvokeFunction(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi_args')
         func.set_params_value(transfer_1, transfer_2)
-        try:
-            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func,
-                                                      False)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            self.assertIn('already in the tx pool', e.args[1])
+        tx_hash = self.send_tx(hex_contract_address, acct1, acct2, func)
+        if len(tx_hash) == 0:
             return
         time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
@@ -258,8 +260,9 @@ class TestInvokeFunction(unittest.TestCase):
         str_msg = 'Hello'
         bytes_address_msg = acct1.get_address().to_bytes()
         notify_args.set_params_value(bool_msg, int_msg, bytes_msg, str_msg, bytes_address_msg)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, notify_args,
-                                                  False)
+        tx_hash = self.send_tx(hex_contract_address, None, acct1, notify_args)
+        if len(tx_hash) == 0:
+            return
         time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
@@ -281,7 +284,9 @@ class TestInvokeFunction(unittest.TestCase):
         list_msg = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
         func = InvokeFunction('testList')
         func.set_params_value(list_msg)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
+        tx_hash = self.send_tx(hex_contract_address, None, acct1, func)
+        if len(tx_hash) == 0:
+            return
         time.sleep(randint(7, 12))
         event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
