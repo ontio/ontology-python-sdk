@@ -152,10 +152,7 @@ class Oep4(object):
     def query_transfer_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
-        notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-        notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-        notify['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
-        notify['States'][3] = ContractDataParser.to_int(notify['States'][3])
+        notify = ContractDataParser.parse_addr_addr_int_notify(notify)
         return notify
 
     def query_multi_transfer_event(self, tx_hash: str) -> list:
@@ -172,10 +169,7 @@ class Oep4(object):
     def query_approve_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
-        notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-        notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-        notify['States'][2] = ContractDataParser.to_b58_address(notify['States'][2])
-        notify['States'][3] = ContractDataParser.to_int(notify['States'][3])
+        notify = ContractDataParser.parse_addr_addr_int_notify(notify)
         return notify
 
     def transfer_multi(self, transfer_list: list, payer_acct: Account, signers: list, gas_limit: int, gas_price: int):
