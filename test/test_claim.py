@@ -82,7 +82,6 @@ class TestClaim(unittest.TestCase):
         except SDKException as e:
             msg = 'invalid claim head parameter'
             self.assertTrue(msg in e.args[1])
-            self.assertTrue(claim.validate_signature(b64_claim, verify_kid=False))
 
     def test_claim_demo(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
@@ -155,8 +154,9 @@ class TestClaim(unittest.TestCase):
             claim = sdk.service.claim()
             try:
                 self.assertTrue(claim.validate_signature(b64_claim))
-            except SDKException:
-                self.assertTrue(claim.validate_signature(b64_claim, verify_kid=False))
+            except SDKException as e:
+                msg = 'invalid claim head parameter'
+                self.assertTrue(msg in e.args[1])
             claim.from_base64(b64_claim, True)
             self.assertTrue(claim.validate_blk_proof())
             self.assertTrue(isinstance(claim, Claim))
