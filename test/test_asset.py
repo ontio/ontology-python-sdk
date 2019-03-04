@@ -206,8 +206,7 @@ class TestAsset(unittest.TestCase):
         gas_limit = 20000
         for _ in range(3):
             tx = sdk.native_vm.asset().new_withdraw_ong_transaction(b58_claimer_address, b58_recv_address, amount,
-                                                                    b58_payer_address,
-                                                                    gas_limit, gas_price)
+                                                                    b58_payer_address, gas_limit, gas_price)
             tx.add_sign_transaction(claimer)
             try:
                 tx_hash = sdk.rpc.send_raw_transaction(tx)
