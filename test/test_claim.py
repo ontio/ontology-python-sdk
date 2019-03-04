@@ -150,9 +150,9 @@ class TestClaim(unittest.TestCase):
                      'HsiVGFyZ2V0SGFzaCI6ImRlMzE0YzgxMmU5NTVkZDBhNTczYzJkNGJjMzlmMmI3MGQxMTllNTBlNTZlMWRhMjVjYzMzOTM1N2'
                      'QwOTA4OTAiLCJEaXJlY3Rpb24iOiJMZWZ0In1dLCJDb250cmFjdEFkZHIiOiIzNmJiNWMwNTNiNmI4MzljOGY2YjkyM2ZlODU'
                      'yZjkxMjM5YjlmY2NjIn0=')
-        claim = sdk.service.claim()
-        sdk.rpc.connect_to_main_net()
         try:
+            sdk.rpc.connect_to_main_net()
+            claim = sdk.service.claim()
             try:
                 self.assertTrue(claim.validate_signature(b64_claim))
             except SDKException:

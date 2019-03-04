@@ -221,8 +221,8 @@ class TestRpcClient(unittest.TestCase):
             self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
-        sdk.rpc.connect_to_main_net()
         try:
+            sdk.rpc.connect_to_main_net()
             contract = sdk.rpc.get_smart_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
             self.assertEqual('Youle_le_service@fosun.com', contract.get('Email', ''))
             self.assertEqual('chentao', contract.get('Author', ''))

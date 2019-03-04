@@ -69,8 +69,8 @@ class TestMerkleVerifier(unittest.TestCase):
         self.assertTrue(result)
 
     def test_get_proof_main_net(self):
-        sdk.rpc.connect_to_main_net()
         try:
+            sdk.rpc.connect_to_main_net()
             tx_hash = 'c17e574dda17f268793757fab0c274d44427fa1b67d63113bd31e39b31d1a026'
             merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
             tx_block_height = merkle_proof['BlockHeight']

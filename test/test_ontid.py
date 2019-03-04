@@ -33,34 +33,32 @@ class TestOntId(unittest.TestCase):
         ont_id_list = ['did:ont:APywVQ2UKBtitqqJQ9JrpNeY8VFAnrZXiR', 'did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD']
         for ont_id in ont_id_list:
             self.check_pk_by_ont_id(ont_id)
-        sdk.rpc.connect_to_main_net()
         try:
+            sdk.rpc.connect_to_main_net()
             ont_id = 'did:ont:ATZhaVirdEYkpsHQDn9PMt5kDCq1VPHcTr'
             self.check_pk_by_ont_id(ont_id)
         finally:
             sdk.rpc.connect_to_test_net()
 
+    def get_ddo_test_case(self, ont_id: str):
+        ddo = sdk.native_vm.ont_id().get_ddo(ont_id)
+        for pk in ddo['Owners']:
+            self.assertIn(ont_id, pk['PubKeyId'])
+            self.assertEqual('ECDSA', pk['Type'])
+            self.assertEqual('P256', pk['Curve'])
+            self.assertEqual(66, len(pk['Value']))
+        self.assertEqual(ont_id, ddo['OntId'])
+
     def test_get_ddo(self):
         ont_id = 'did:ont:AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        ddo = sdk.native_vm.ont_id().get_ddo(ont_id)
         try:
-            for pk in ddo['Owners']:
-                self.assertIn(ont_id, pk['PubKeyId'])
-                self.assertEqual('ECDSA', pk['Type'])
-                self.assertEqual('P256', pk['Curve'])
-                self.assertEqual(66, len(pk['Value']))
-            self.assertEqual('AXBNi95PVZGP9gvYSgg8SjhqJxQFdwky9f', ddo['Recovery'])
-            self.assertEqual(ont_id, ddo['OntId'])
-        except KeyError:
-            ont_id = 'did:ont:AP8n55wdQCRePFiNiR4kobGBhvBCMkVPun'
+            self.get_ddo_test_case(ont_id)
+        finally:
+            sdk.rpc.connect_to_test_net()
+        try:
             sdk.rpc.connect_to_main_net()
-            ddo = sdk.native_vm.ont_id().get_ddo(ont_id)
-            for pk in ddo['Owners']:
-                self.assertIn(ont_id, pk['PubKeyId'])
-                self.assertEqual('ECDSA', pk['Type'])
-                self.assertEqual('P256', pk['Curve'])
-                self.assertEqual(66, len(pk['Value']))
-            self.assertEqual(ont_id, ddo['OntId'])
+            ont_id = 'did:ont:AP8n55wdQCRePFiNiR4kobGBhvBCMkVPun'
+            self.get_ddo_test_case(ont_id)
         finally:
             sdk.rpc.connect_to_test_net()
 
