@@ -14,37 +14,33 @@ from ontology.utils.contract_event import ContractEventParser
 
 class TestAsset(unittest.TestCase):
     def test_get_asset_address(self):
-        asset = sdk.native_vm.asset()
         ont_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
         ong_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02'
-        self.assertEqual(ont_address, asset.get_asset_address('ont'))
-        self.assertEqual(ong_address, asset.get_asset_address('ong'))
+        self.assertEqual(ont_address, sdk.native_vm.asset().get_asset_address('ont'))
+        self.assertEqual(ong_address, sdk.native_vm.asset().get_asset_address('ong'))
 
     def test_query_name(self):
-        asset = sdk.native_vm.asset()
-        token_name = asset.query_name('ont')
+        token_name = sdk.native_vm.asset().query_name('ont')
         self.assertEqual('ONT Token', token_name)
-        token_name = asset.query_name('ong')
+        token_name = sdk.native_vm.asset().query_name('ong')
         self.assertEqual('ONG Token', token_name)
 
     def test_query_symbol(self):
-        asset = sdk.native_vm.asset()
         try:
-            token_symbol = asset.query_symbol('ont')
+            token_symbol = sdk.native_vm.asset().query_symbol('ont')
             self.assertEqual('ONT', token_symbol)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
         try:
-            token_symbol = asset.query_symbol('ong')
+            token_symbol = sdk.native_vm.asset().query_symbol('ong')
             self.assertEqual('ONG', token_symbol)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_decimals(self):
-        asset = sdk.native_vm.asset()
-        decimals = asset.query_decimals('ong')
+        decimals = sdk.native_vm.asset().query_decimals('ong')
         self.assertEqual(9, decimals)
-        decimals = asset.query_decimals('ont')
+        decimals = sdk.native_vm.asset().query_decimals('ont')
         self.assertEqual(0, decimals)
 
     def test_unbound_ong(self):
@@ -52,58 +48,55 @@ class TestAsset(unittest.TestCase):
         b58_address2 = acct2.get_address_base58()
         b58_address3 = acct3.get_address_base58()
         b58_address4 = acct4.get_address_base58()
-        asset = sdk.native_vm.asset()
         try:
-            acct1_unbound_ong = asset.query_unbound_ong(b58_address1)
+            acct1_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address1)
             self.assertGreaterEqual(acct1_unbound_ong, 0)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
         try:
-            acct2_unbound_ong = asset.query_unbound_ong(b58_address2)
+            acct2_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address2)
             self.assertGreaterEqual(acct2_unbound_ong, 0)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
         try:
-            acct3_unbound_ong = asset.query_unbound_ong(b58_address3)
+            acct3_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address3)
             self.assertGreaterEqual(acct3_unbound_ong, 0)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
         try:
-            acct4_unbound_ong = asset.query_unbound_ong(b58_address4)
+            acct4_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address4)
             self.assertGreaterEqual(acct4_unbound_ong, 0)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_balance(self):
-        asset = sdk.native_vm.asset()
         b58_address = acct1.get_address_base58()
         try:
-            balance = asset.query_balance('ont', b58_address)
+            balance = sdk.native_vm.asset().query_balance('ont', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 0)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
         try:
-            balance = asset.query_balance('ong', b58_address)
+            balance = sdk.native_vm.asset().query_balance('ong', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 0)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
         b58_address = acct2.get_address_base58()
         try:
-            balance = asset.query_balance('ong', b58_address)
+            balance = sdk.native_vm.asset().query_balance('ong', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 1)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
 
     def test_query_allowance(self):
-        asset = sdk.native_vm.asset()
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
         b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        allowance = asset.query_allowance('ont', b58_from_address, b58_to_address)
+        allowance = sdk.native_vm.asset().query_allowance('ont', b58_from_address, b58_to_address)
         self.assertGreaterEqual(allowance, 0)
-        allowance = asset.query_allowance('ong', b58_from_address, b58_to_address)
+        allowance = sdk.native_vm.asset().query_allowance('ong', b58_from_address, b58_to_address)
         self.assertGreaterEqual(allowance, 0)
 
     def test_new_approve_transaction(self):
