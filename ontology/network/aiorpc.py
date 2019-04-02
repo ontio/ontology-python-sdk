@@ -326,8 +326,8 @@ class AioRpc(object):
             return response
         return response['result']
 
-    async def get_smart_contract(self, hex_contract_address: str, session: ClientSession = None,
-                                 is_full: bool = False) -> dict:
+    async def get_contract(self, hex_contract_address: str, session: ClientSession = None,
+                           is_full: bool = False) -> dict:
         """
         This interface is used to get the information of smart contract based on the specified hexadecimal hash value.
         """
