@@ -113,7 +113,7 @@ class RestfulMethod(object):
         return f'{url}/api/v1/grantong/{b58_address}'
 
 
-class RestfulClient(object):
+class Restful(object):
     def __init__(self, url: str = ''):
         self.__url = url
 

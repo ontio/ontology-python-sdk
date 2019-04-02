@@ -15,7 +15,7 @@ from ontology.smart_contract.native_vm import NativeVm
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.network.rpc import Rpc, TEST_RPC_ADDRESS, MAIN_RPC_ADDRESS
-from ontology.network.restful import RestfulClient, TEST_RESTFUL_ADDRESS, MAIN_RESTFUL_ADDRESS
+from ontology.network.restful import Restful, TEST_RESTFUL_ADDRESS, MAIN_RESTFUL_ADDRESS
 
 
 class _Singleton(type):
@@ -38,7 +38,7 @@ class OntologySdk(metaclass=_Singleton):
             raise SDKException(ErrorCode.param_err('SignatureScheme object is required.'))
         self.__rpc = Rpc(rpc_address)
         self.__aio_rpc = AioRpc(rpc_address)
-        self.__restful = RestfulClient(restful_address)
+        self.__restful = Restful(restful_address)
         self.__websocket = Websocket(ws_address)
         self.__native_vm = NativeVm(self)
         self.__neo_vm = NeoVm(self)
@@ -46,7 +46,7 @@ class OntologySdk(metaclass=_Singleton):
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
 
-    def get_network(self) -> Rpc or RestfulClient:
+    def get_network(self) -> Rpc or Restful:
         if self.__rpc.get_address() != '':
             return self.__rpc
         elif self.__restful.get_address() != '':
@@ -100,12 +100,12 @@ class OntologySdk(metaclass=_Singleton):
             self.__rpc = rpc_client
 
     @property
-    def restful(self) -> RestfulClient:
+    def restful(self) -> Restful:
         return self.__restful
 
     @restful.setter
-    def restful(self, restful_client: RestfulClient):
-        if isinstance(restful_client, RestfulClient):
+    def restful(self, restful_client: Restful):
+        if isinstance(restful_client, Restful):
             self.__restful = restful_client
 
     @property
@@ -149,13 +149,13 @@ class OntologySdk(metaclass=_Singleton):
         return choice(MAIN_RPC_ADDRESS)
 
     def set_restful_address(self, restful_address: str):
-        if isinstance(self.__restful, RestfulClient):
+        if isinstance(self.__restful, Restful):
             self.__restful.set_address(restful_address)
         else:
-            self.__restful = RestfulClient(restful_address)
+            self.__restful = Restful(restful_address)
 
     def get_restful_address(self):
-        if not isinstance(self.__restful, RestfulClient):
+        if not isinstance(self.__restful, Restful):
             return ''
         return self.__restful.get_address()
 

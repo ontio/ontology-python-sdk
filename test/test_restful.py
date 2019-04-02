@@ -12,7 +12,7 @@ from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
-class TestRestfulClient(unittest.TestCase):
+class TestRestful(unittest.TestCase):
     def test_get_version(self):
         version = sdk.restful.get_version()
         self.assertTrue(isinstance(version, str))
@@ -205,15 +205,14 @@ class TestRestfulClient(unittest.TestCase):
             sdk.restful.get_memory_pool_tx_state(tx_hash)
         except SDKException as e:
             self.assertIn('UNKNOWN TRANSACTION', e.args[1])
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.hex_contract_address = contract_address
-        from_acct = acct4
-        gas_limit = 20000000
-        gas_price = 500
+        oep4.hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
+        b58_from_address = acct4.get_address_base58()
         b58_to_address = acct3.get_address_base58()
         value = 10
-        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
+        tx = oep4.transfer(b58_from_address, b58_to_address, value, b58_from_address, 20000000, 500)
+        tx.sign_transaction(acct4)
+        tx_hash = sdk.restful.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         try:
             tx_state = sdk.restful.get_memory_pool_tx_state(tx_hash)
