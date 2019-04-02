@@ -132,7 +132,7 @@ class Websocket(object):
         msg = dict(Action='getstorage', Id=self.__id, Version='1.0.0', Hash=hex_contract_address, Key=key)
         return await self.__send_recv(msg, is_full)
 
-    async def get_smart_contract(self, hex_contract_address: str, is_full: bool = False):
+    async def get_contract(self, hex_contract_address: str, is_full: bool = False):
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getcontract', Id=self.__id, Version='1.0.0', Hash=hex_contract_address, Raw=0)
@@ -141,13 +141,13 @@ class Websocket(object):
             return response
         return response['Result']
 
-    async def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
+    async def get_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getsmartcodeeventbyhash', Id=self.__id, Version='1.0.0', Hash=tx_hash, Raw=0)
         return await self.__send_recv(msg, is_full)
 
-    async def get_smart_contract_event_by_height(self, height: int, is_full: bool = False):
+    async def get_contract_event_by_height(self, height: int, is_full: bool = False):
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getsmartcodeeventbyheight', Id=self.__id, Version='1.0.0', Height=height)
