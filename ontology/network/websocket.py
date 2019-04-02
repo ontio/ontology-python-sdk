@@ -3,11 +3,14 @@
 
 import json
 import socket
+import asyncio
+import inspect
 
 from time import time
 from sys import maxsize
 from typing import List
 from websockets import client
+
 from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
@@ -21,11 +24,23 @@ from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
-class WebsocketClient(object):
+class Websocket(object):
     def __init__(self, url: str = ''):
         self.__url = url
         self.__id = 0
         self.__ws_client = None
+
+    @staticmethod
+    def runner(func):
+        def wrapper(*args, **kwargs):
+            if inspect.iscoroutinefunction(func):
+                future = func(*args, **kwargs)
+            else:
+                coroutine = asyncio.coroutine(func)
+                future = coroutine(*args, **kwargs)
+            asyncio.get_event_loop().run_until_complete(future)
+
+        return wrapper
 
     def __generate_ws_id(self):
         if self.__id == 0:
@@ -209,7 +224,7 @@ class WebsocketClient(object):
         else:
             raise SDKException(ErrorCode.other_error('the type of func is error.'))
         contract_address = ensure_bytearray_contract_address(contract_address)
-        tx = NeoVm.make_invoke_transaction(contract_address, params, b'', 0, 0)
+        tx = NeoVm.make_invoke_transaction(contract_address, params)
         if signer is not None:
             tx.sign_transaction(signer)
         return await self.send_raw_transaction_pre_exec(tx, is_full)

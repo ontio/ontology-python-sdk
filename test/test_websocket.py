@@ -7,7 +7,7 @@ import unittest
 from test import sdk, acct1, acct2, acct3, acct4
 
 from ontology.account.account import Account
-from ontology.exception.error_code import ErrorCode
+from ontology.network.websocket import Websocket
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
@@ -16,20 +16,8 @@ from ontology.utils.contract_event import ContractEventParser
 import inspect
 
 
-def ws_runner(f):
-    def wrapper(*args, **kwargs):
-        if inspect.iscoroutinefunction(f):
-            future = f(*args, **kwargs)
-        else:
-            coroutine = asyncio.coroutine(f)
-            future = coroutine(*args, **kwargs)
-        asyncio.get_event_loop().run_until_complete(future)
-
-    return wrapper
-
-
 class TestWebsocketClient(unittest.TestCase):
-    @ws_runner
+    @Websocket.runner
     async def test_heartbeat(self):
         response = await sdk.websocket.send_heartbeat()
         await sdk.websocket.close_connect()
@@ -39,7 +27,7 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(False, response['SubscribeRawBlock'])
         self.assertEqual(False, response['SubscribeBlockTxHashs'])
 
-    @ws_runner
+    @Websocket.runner
     async def test_subscribe(self):
         oep4 = sdk.neo_vm.oep4()
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
@@ -70,19 +58,19 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_connection_count(self):
         response = await sdk.websocket.get_connection_count()
         await sdk.websocket.close_connect()
         self.assertGreater(response, 0)
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_session_count(self):
         count = await sdk.websocket.get_session_count()
         await sdk.websocket.close_connect()
         self.assertGreaterEqual(count, 1)
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_balance(self):
         b58_address = acct4.get_address_base58()
         balance = await sdk.websocket.get_balance(b58_address)
@@ -90,7 +78,7 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertGreaterEqual(balance['ont'], 1)
         self.assertGreaterEqual(balance['ong'], 1)
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_storage(self):
         hex_contract_address = '0100000000000000000000000000000000000000'
         key = '746f74616c537570706c79'
@@ -99,7 +87,7 @@ class TestWebsocketClient(unittest.TestCase):
         value = ContractDataParser.to_int(storage)
         self.assertEqual(1000000000, value)
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_smart_contract(self):
         hex_contract_address = '0100000000000000000000000000000000000000'
         response = await sdk.websocket.get_smart_contract(hex_contract_address)
@@ -116,20 +104,20 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual('A sample of OEP4', response['Description'])
         await sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_smart_contract_event_by_tx_hash(self):
         tx_hash = '7bc2dd4693996133c15e6349c3f8dd1edeba2fcd3219c8bc2b854c939337c8ff'
         event_loop = asyncio.get_event_loop()
-        response = await sdk.websocket.get_smart_contract_event_by_tx_hash(tx_hash)
+        response = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
         await sdk.websocket.close_connect()
         self.assertEqual(tx_hash, response['TxHash'])
         self.assertEqual(1, response['State'])
         self.assertEqual(1, len(response['Notify']))
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_smart_contract_event_by_height(self):
         height = 0
-        event_list = await sdk.websocket.get_smart_contract_event_by_height(height)
+        event_list = await sdk.websocket.get_contract_event_by_height(height)
         self.assertEqual(10, len(event_list))
         for tx in event_list:
             self.assertEqual(64, len(tx['TxHash']))
@@ -137,11 +125,11 @@ class TestWebsocketClient(unittest.TestCase):
             self.assertEqual(0, tx['GasConsumed'])
             self.assertTrue(isinstance(tx['Notify'], list))
         height = 1309737
-        event_list = await sdk.websocket.get_smart_contract_event_by_height(height)
+        event_list = await sdk.websocket.get_contract_event_by_height(height)
         self.assertEqual(0, len(event_list))
         await sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_block_height(self):
         try:
             height = await sdk.websocket.get_block_height()
@@ -149,7 +137,7 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_block_height_by_tx_hash(self):
         try:
             tx_hash = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
@@ -161,7 +149,7 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_block_hash_by_height(self):
         try:
             response = await sdk.websocket.get_block_hash_by_height(1024)
@@ -175,7 +163,7 @@ class TestWebsocketClient(unittest.TestCase):
         await sdk.websocket.close_connect()
         return response
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_block_by_height(self):
         try:
             height = 1024
@@ -185,7 +173,7 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_block_by_hash(self):
         try:
             block_hash = '2e36db16c8faf0ea0f84172256e79b78a3d8d076114fe8aaa302794668b9396f'
@@ -195,7 +183,7 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @ws_runner
+    @Websocket.runner
     async def test_send_raw_transaction(self):
         b58_from_address = acct1.get_address_base58()
         b58_to_address = acct2.get_address_base58()
@@ -204,14 +192,14 @@ class TestWebsocketClient(unittest.TestCase):
         tx.sign_transaction(acct1)
         tx_hash = await sdk.websocket.send_raw_transaction(tx)
         await asyncio.sleep(6)
-        event = await sdk.websocket.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
         await sdk.websocket.close_connect()
         self.assertEqual(tx_hash, event['TxHash'])
         self.assertEqual(1, event['State'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
-    @ws_runner
+    @Websocket.runner
     async def test_send_raw_transaction_pre_exec(self):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
@@ -224,7 +212,7 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual('01', response['Result'])
         self.assertEqual(1, response['State'])
 
-    @ws_runner
+    @Websocket.runner
     async def test_get_merkle_proof(self):
         pre_tx_root = 0
         tx_hash_list = ['12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3',
