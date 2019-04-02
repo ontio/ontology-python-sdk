@@ -104,7 +104,12 @@ class TestClaim(unittest.TestCase):
             msg = 'get key failed'
             self.assertTrue(msg in e.args[1])
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
-        blockchain_proof = claim.generate_blk_proof(identity2_ctrl_acct, acct1, gas_limit, gas_price)
+        tx = claim.commit(identity2_ctrl_acct.get_address_base58(), acct1.get_address_base58(), gas_limit, gas_price)
+        tx.sign_transaction(identity2_ctrl_acct)
+        tx.add_sign_transaction(acct1)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        sleep(7)
+        blockchain_proof = claim.generate_blk_proof(tx_hash)
         self.assertTrue(claim.validate_blk_proof())
         b64_claim = claim.to_base64()
         claim_list = b64_claim.split('.')

@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
+from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_data import ContractDataParser
 from ontology.utils.contract_event import ContractEventParser
+from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
@@ -28,33 +27,42 @@ class ClaimRecord(object):
         else:
             raise SDKException(ErrorCode.invalid_contract_address(hex_contract_address))
 
-    def commit(self, claim_id: str, issuer_acct: Account, owner_ont_id: str, payer_acct: Account, gas_limit: int,
-               gas_price: int):
+    def commit(self, claim_id: str, b58_issuer_address: str, owner_ont_id: str, b58_payer_address: str, gas_limit: int,
+               gas_price: int) -> InvokeTransaction:
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('Gas limit less than 0.'))
         if gas_price < 0:
             raise SDKException(ErrorCode.other_error('Gas price less than 0.'))
         func = InvokeFunction('Commit')
-        func.set_params_value(claim_id, issuer_acct.get_address_bytes(), owner_ont_id)
-        tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
-                                                                   gas_limit, gas_price, func)
-        return tx_hash
+        issuer = Address.b58decode(b58_issuer_address).to_bytes()
+        func.set_params_value(claim_id, issuer, owner_ont_id)
+        payer = Address.b58decode(b58_payer_address).to_bytes()
+        tx = InvokeTransaction(payer, gas_price, gas_limit)
+        tx.add_invoke_code(self.__hex_contract_address, func)
+        return tx
 
-    def revoke(self, claim_id: str, issuer_acct: Account, payer_acct: Account, gas_limit: int, gas_price: int):
+    def revoke(self, claim_id: str, b58_issuer_address: str, b58_payer_address: str, gas_limit: int, gas_price: int):
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('Gas limit less than 0.'))
         if gas_price < 0:
             raise SDKException(ErrorCode.other_error('Gas price less than 0.'))
         func = InvokeFunction('Revoke')
-        func.set_params_value(claim_id, issuer_acct.get_address_bytes())
-        tx_hash = self.__sdk.get_network().send_neo_vm_transaction(self.__hex_contract_address, issuer_acct, payer_acct,
-                                                                   gas_limit, gas_price, func)
-        return tx_hash
+        issuer = Address.b58decode(b58_issuer_address).to_bytes()
+        func.set_params_value(claim_id, issuer)
+        payer = Address.b58decode(b58_payer_address).to_bytes()
+        tx = InvokeTransaction(payer, gas_price, gas_limit)
+        tx.add_invoke_code(self.__hex_contract_address, func)
+        return tx
 
     def get_status(self, claim_id: str):
         func = InvokeFunction('GetStatus')
         func.set_params_value(claim_id)
-        result = self.__sdk.get_network().send_neo_vm_transaction_pre_exec(self.__hex_contract_address, None, func)
+        tx = InvokeTransaction()
+        tx.add_invoke_code(self.__hex_contract_address, func)
+        return tx
+
+    @staticmethod
+    def parse_status(result: dict):
         status = result['Result']
         if status == '':
             status = False

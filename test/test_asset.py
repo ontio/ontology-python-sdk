@@ -11,6 +11,8 @@ from test import sdk, acct1, acct2, acct3, acct4
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_event import ContractEventParser
 
+error_msg = ['balance insufficient', 'ConnectTimeout', 'already in the tx pool']
+
 
 class TestAsset(unittest.TestCase):
     def test_get_asset_address(self):
@@ -32,12 +34,12 @@ class TestAsset(unittest.TestCase):
             token_symbol = sdk.native_vm.asset().query_symbol('ont')
             self.assertEqual('ONT', token_symbol)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
         try:
             token_symbol = sdk.native_vm.asset().query_symbol('ong')
             self.assertEqual('ONG', token_symbol)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
 
     def test_query_decimals(self):
         sdk.rpc.connect_to_test_net()
@@ -55,22 +57,22 @@ class TestAsset(unittest.TestCase):
             acct1_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address1)
             self.assertGreaterEqual(acct1_unbound_ong, 0)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
         try:
             acct2_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address2)
             self.assertGreaterEqual(acct2_unbound_ong, 0)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
         try:
             acct3_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address3)
             self.assertGreaterEqual(acct3_unbound_ong, 0)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
         try:
             acct4_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address4)
             self.assertGreaterEqual(acct4_unbound_ong, 0)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
 
     def test_query_balance(self):
         b58_address = acct1.get_address_base58()
@@ -79,20 +81,20 @@ class TestAsset(unittest.TestCase):
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 0)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
         try:
             balance = sdk.native_vm.asset().query_balance('ong', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 0)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
         b58_address = acct2.get_address_base58()
         try:
             balance = sdk.native_vm.asset().query_balance('ong', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 1)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
 
     def test_query_allowance(self):
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
@@ -116,7 +118,7 @@ class TestAsset(unittest.TestCase):
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
         except SDKException as e:
-            self.assertIn('balance insufficient', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
 
     def test_new_transfer_transaction(self):
         sdk.rpc.connect_to_test_net()
@@ -134,7 +136,7 @@ class TestAsset(unittest.TestCase):
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
         except SDKException as e:
-            self.assertIn('balance insufficient', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
             return
 
         time.sleep(randint(7, 12))
@@ -157,7 +159,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.native_vm.asset().transfer('ont', acct2, b58_to_address, 1, acct4, 20000, 500)
         except SDKException as e:
-            self.assertIn('balance insufficient', e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
             return
         time.sleep(randint(7, 12))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
@@ -176,9 +178,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            msg1 = 'balance insufficient'
-            msg2 = 'already in the tx pool'
-            self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1])
+            self.assertTrue(e.args[1] in error_msg)
             return
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
@@ -202,8 +202,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = sdk.rpc.send_raw_transaction(tx)
                 self.assertEqual(64, len(tx_hash))
             except SDKException as e:
-                msg = 'already in the tx pool'
-                self.assertTrue(msg in e.args[1])
+                self.assertTrue(e.args[1] in error_msg)
 
     def test_withdraw_ong(self):
         claimer = acct1
@@ -214,10 +213,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = sdk.native_vm.asset().withdraw_ong(claimer, b58_recv_address, 1, payer, 20000, 500)
                 self.assertEqual(64, len(tx_hash))
             except SDKException as e:
-                msg1 = 'no balance enough'
-                msg2 = 'ConnectTimeout'
-                msg3 = 'already in the tx pool'
-                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
+                self.assertTrue(e.args[1] in error_msg)
 
     def test_approve(self):
         b58_recv_address = acct2.get_address_base58()
@@ -226,10 +222,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = sdk.native_vm.asset().approve('ont', acct1, b58_recv_address, 10, acct2, 20000, 500)
                 self.assertEqual(len(tx_hash), 64)
             except SDKException as e:
-                msg1 = 'no balance enough'
-                msg2 = 'ConnectTimeout'
-                msg3 = 'already in the tx pool'
-                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
+                self.assertTrue(e.args[1] in error_msg)
 
     def test_transfer_from(self):
         sdk.rpc.connect_to_test_net()
@@ -245,10 +238,7 @@ class TestAsset(unittest.TestCase):
                 self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
                 self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
             except SDKException as e:
-                msg1 = 'balance insufficient'
-                msg2 = 'ConnectTimeout'
-                msg3 = 'already in the tx pool'
-                self.assertTrue(msg1 in e.args[1] or msg2 in e.args[1] or msg3 in e.args[1])
+                self.assertTrue(e.args[1] in error_msg)
 
 
 if __name__ == '__main__':

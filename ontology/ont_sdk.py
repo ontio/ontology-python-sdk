@@ -130,10 +130,10 @@ class OntologySdk(metaclass=_Singleton):
         return self.__service
 
     def set_rpc_address(self, rpc_address: str):
-        if isinstance(self.__rpc, RpcClient):
+        if isinstance(self.__rpc, Rpc):
             self.__rpc.set_address(rpc_address)
         else:
-            self.__rpc = RpcClient(rpc_address)
+            self.__rpc = Rpc(rpc_address)
 
     def get_rpc_address(self):
         if self.__rpc is None:
