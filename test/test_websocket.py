@@ -196,7 +196,11 @@ class TestWebsocketClient(unittest.TestCase):
         tx_hash = await sdk.websocket.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         await asyncio.sleep(7)
-        event = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
+        event = dict()
+        count = 0
+        while len(event) == 0 and count < 5:
+            await sdk.websocket.send_heartbeat()
+            event = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
         await sdk.websocket.close_connect()
         self.assertEqual(tx_hash, event['TxHash'])
         self.assertEqual(1, event['State'])
