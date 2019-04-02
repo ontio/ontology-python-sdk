@@ -190,7 +190,7 @@ class TestRpcClient(unittest.TestCase):
         event_len_lst = [10, 0]
         try:
             for index, cnt in enumerate(cnt_lst):
-                event_list = sdk.rpc.get_smart_contract_event_by_count(cnt)
+                event_list = sdk.rpc.get_contract_event_by_count(cnt)
                 self.assertEqual(event_len_lst[index], len(event_list))
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])

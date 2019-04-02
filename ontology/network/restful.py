@@ -77,15 +77,15 @@ class RestfulMethod(object):
         return f'{url}/api/v1/node/generateblocktime'
 
     @staticmethod
-    def get_smart_contract(url: str, contract_address: str):
+    def get_contract(url: str, contract_address: str):
         return f'{url}/api/v1/contract/{contract_address}'
 
     @staticmethod
-    def get_smart_contract_event_by_height(url: str, height: int):
+    def get_contract_event_by_height(url: str, height: int):
         return f'{url}/api/v1/smartcode/event/transactions/{height}'
 
     @staticmethod
-    def get_smart_contract_event_by_tx_hash(url: str, tx_hash: str):
+    def get_contract_event_by_tx_hash(url: str, tx_hash: str):
         return f'{url}/api/v1/smartcode/event/txhash/{tx_hash}'
 
     @staticmethod
@@ -270,15 +270,15 @@ class RestfulClient(object):
             return response
         return response['Result']
 
-    def get_smart_contract(self, contract_address: str, is_full: bool = False):
-        url = RestfulMethod.get_smart_contract(self.__url, contract_address)
+    def get_contract(self, contract_address: str, is_full: bool = False):
+        url = RestfulMethod.get_contract(self.__url, contract_address)
         response = self.__get(url)
         if is_full:
             return response
         return response['Result']
 
-    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
-        url = RestfulMethod.get_smart_contract_event_by_height(self.__url, height)
+    def get_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
+        url = RestfulMethod.get_contract_event_by_height(self.__url, height)
         response = self.__get(url)
         if is_full:
             return response
@@ -287,11 +287,11 @@ class RestfulClient(object):
             result = list()
         return result
 
-    def get_smart_contract_event_by_count(self, count: int, is_full: bool = False) -> List[dict]:
-        return self.get_smart_contract_event_by_height(count - 1, is_full)
+    def get_contract_event_by_count(self, count: int, is_full: bool = False) -> List[dict]:
+        return self.get_contract_event_by_height(count - 1, is_full)
 
-    def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False):
-        url = RestfulMethod.get_smart_contract_event_by_tx_hash(self.__url, tx_hash)
+    def get_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False):
+        url = RestfulMethod.get_contract_event_by_tx_hash(self.__url, tx_hash)
         response = self.__get(url)
         if is_full:
             return response

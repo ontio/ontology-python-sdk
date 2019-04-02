@@ -116,10 +116,11 @@ class TestOep4(unittest.TestCase):
         transfer_list.append(transfer1)
         transfer_list.append(transfer2)
 
-        gas_limit = 20000000
-        gas_price = 500
-
-        tx_hash = oep4.transfer_multi(transfer_list, signers[0], signers, gas_limit, gas_price)
+        tx = oep4.transfer_multi(transfer_list, acct1.get_address_base58(), 20000000, 500)
+        tx.sign_transaction(acct1)
+        for signer in signers:
+            tx.add_sign_transaction(signer)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         notify_list = oep4.query_multi_transfer_event(tx_hash)

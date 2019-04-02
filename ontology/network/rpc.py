@@ -337,7 +337,7 @@ class Rpc(object):
             return response
         return response['result']
 
-    def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
+    def get_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
         This interface is used to get the corresponding smart contract event based on the height of block.
         :param tx_hash: a hexadecimal hash value.
@@ -350,7 +350,7 @@ class Rpc(object):
             return response
         return response['result']
 
-    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
+    def get_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
         """
         This interface is used to get the corresponding smart contract event based on the height of block.
         :param height: a decimal height value.
@@ -366,8 +366,8 @@ class Rpc(object):
             event_list = list()
         return event_list
 
-    def get_smart_contract_event_by_count(self, count: int, is_full: bool = False) -> List[dict]:
-        return self.get_smart_contract_event_by_height(count - 1, is_full)
+    def get_contract_event_by_count(self, count: int, is_full: bool = False) -> List[dict]:
+        return self.get_contract_event_by_height(count - 1, is_full)
 
     def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
@@ -382,7 +382,7 @@ class Rpc(object):
             return response
         return response['result']
 
-    def get_smart_contract(self, hex_contract_address: str, is_full: bool = False) -> dict:
+    def get_contract(self, hex_contract_address: str, is_full: bool = False) -> dict:
         """
         This interface is used to get the information of smart contract based on the specified hexadecimal hash value.
         :param hex_contract_address: str, a hexadecimal hash value.

@@ -91,7 +91,7 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(1000000000, value)
 
     @Websocket.runner
-    async def test_get_smart_contract(self):
+    async def test_get_contract(self):
         hex_contract_address = '0100000000000000000000000000000000000000'
         response = await sdk.websocket.get_contract(hex_contract_address)
         self.assertEqual(True, response['NeedStorage'])
@@ -108,7 +108,7 @@ class TestWebsocketClient(unittest.TestCase):
         await sdk.websocket.close_connect()
 
     @Websocket.runner
-    async def test_get_smart_contract_event_by_tx_hash(self):
+    async def test_get_contract_event_by_tx_hash(self):
         tx_hash = '7bc2dd4693996133c15e6349c3f8dd1edeba2fcd3219c8bc2b854c939337c8ff'
         event_loop = asyncio.get_event_loop()
         response = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
@@ -118,7 +118,7 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(1, len(response['Notify']))
 
     @Websocket.runner
-    async def test_get_smart_contract_event_by_height(self):
+    async def test_get_contract_event_by_height(self):
         height = 0
         event_list = await sdk.websocket.get_contract_event_by_height(height)
         self.assertEqual(10, len(event_list))
