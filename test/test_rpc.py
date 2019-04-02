@@ -290,15 +290,13 @@ class TestRpcClient(unittest.TestCase):
             sdk.rpc.get_memory_pool_tx_state(tx_hash)
         except SDKException as e:
             self.assertIn('unknown transaction', e.args[1])
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
-        oep4.hex_contract_address = contract_address
-        from_acct = acct1
-        gas_limit = 20000000
-        gas_price = 500
+        oep4.hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
-        value = 10
-        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
+        tx = oep4.transfer(acct1.get_address_base58(), b58_to_address, 10, acct1.get_address_base58(),
+                           20000000, 500)
+        tx.sign_transaction(acct1)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         try:
             tx_state = sdk.rpc.get_memory_pool_tx_state(tx_hash)

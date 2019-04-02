@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import json
-import requests
+import asyncio
+import inspect
 
 from time import time
 from sys import maxsize
 from typing import List
+from aiohttp.client import ClientSession
 
 from Cryptodome.Random.random import randint
 
@@ -53,11 +55,23 @@ class RpcMethod(object):
     RPC_VERSION = '2.0'
 
 
-class Rpc(object):
+class AioRpc(object):
     def __init__(self, url: str = '', qid: int = 0):
         self.__url = url
         self.__qid = qid
         self.__generate_qid()
+
+    @staticmethod
+    def rpc_runner(func):
+        def wrapper(*args, **kwargs):
+            if inspect.iscoroutinefunction(func):
+                future = func(*args, **kwargs)
+            else:
+                coroutine = asyncio.coroutine(func)
+                future = coroutine(*args, **kwargs)
+            asyncio.get_event_loop().run_until_complete(future)
+
+        return wrapper
 
     def set_address(self, url: str):
         self.__url = url
@@ -85,280 +99,211 @@ class Rpc(object):
         rpc_address = f'http://dappnode{index}.ont.io:20336'
         self.set_address(rpc_address)
 
-    @staticmethod
-    def __post(url, payload):
-        header = {'Content-type': 'application/json'}
-        try:
-            response = requests.post(url, json=payload, headers=header, timeout=10)
-        except requests.exceptions.MissingSchema as e:
-            raise SDKException(ErrorCode.connect_err(e.args[0])) from None
-        except requests.exceptions.ConnectTimeout:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url]))) from None
-        except requests.exceptions.ConnectionError:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from None
-        except requests.exceptions.ReadTimeout:
-            raise SDKException(ErrorCode.other_error(''.join(['ReadTimeout: ', url]))) from None
-        try:
-            content = response.content.decode('utf-8')
-        except Exception as e:
-            raise SDKException(ErrorCode.other_error(e.args[0])) from None
-        if response.status_code != 200:
-            raise SDKException(ErrorCode.other_error(content))
-        try:
-            content = json.loads(content)
-        except json.decoder.JSONDecodeError as e:
-            raise SDKException(ErrorCode.other_error(e.args[0])) from None
-        if content['error'] != 0:
-            if content['result'] != '':
-                raise SDKException(ErrorCode.other_error(content['result']))
-            else:
-                raise SDKException(ErrorCode.other_error(content['desc']))
-        return content
-
-    @staticmethod
-    def __get(url, payload):
-        header = {'Content-type': 'application/json'}
-        try:
-            response = requests.get(url, params=json.dumps(payload), headers=header, timeout=10)
-        except requests.exceptions.MissingSchema as e:
-            raise SDKException(ErrorCode.connect_err(e.args[0]))
-        except requests.exceptions.ConnectTimeout:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url])))
-        except requests.exceptions.ConnectionError:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url])))
-        try:
-            content = response.content.decode('utf-8')
-        except Exception as e:
-            raise SDKException(ErrorCode.other_error(e.args[0]))
-        if response.status_code != 200:
-            raise SDKException(ErrorCode.other_error(content))
-        try:
-            content = json.loads(content)
-        except json.decoder.JSONDecodeError as e:
-            raise SDKException(ErrorCode.other_error(e.args[0]))
-        if content['error'] != 0:
-            if content['result'] != '':
-                raise SDKException(ErrorCode.other_error(content['result']))
-            else:
-                raise SDKException(ErrorCode.other_error(content['desc']))
-        return content
-
     def generate_json_rpc_payload(self, method, param=None):
         if param is None:
             param = list()
         json_rpc_payload = dict(jsonrpc=RpcMethod.RPC_VERSION, id=self.__qid, method=method, params=param)
         return json_rpc_payload
 
-    def get_version(self, is_full: bool = False) -> dict or str:
+    async def __post(self, session, payload):
+        header = {'Content-type': 'application/json'}
+        if session is None:
+            async with ClientSession() as session:
+                async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
+                    return json.loads(await response.content.read(-1))
+        else:
+            async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
+                return json.loads(await response.content.read(-1))
+
+    async def get_version(self, session: ClientSession = None, is_full: bool = False):
         """
         This interface is used to get the version information of the connected node in current network.
+
         Return:
             the version information of the connected node.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_VERSION)
-        response = self.__post(self.__url, payload)
+        if session is None:
+            async with ClientSession() as session:
+                response = await self.__post(session, payload)
+        else:
+            response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_connection_count(self, is_full: bool = False) -> int:
+    async def get_connection_count(self, session: ClientSession = None, is_full: bool = False) -> int or dict:
         """
         This interface is used to get the current number of connections for the node in current network.
+
         Return:
             the number of connections.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_NODE_COUNT)
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_gas_price(self, is_full: bool = False) -> int or dict:
+    async def get_gas_price(self, session: ClientSession = None, is_full: bool = False) -> int or dict:
         """
         This interface is used to get the gas price in current network.
-        Return:
-            the value of gas price.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GAS_PRICE)
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']['gasprice']
 
-    def get_network_id(self, is_full: bool = False) -> int:
+    async def get_network_id(self, session: ClientSession = None, is_full: bool = False) -> int:
         """
         This interface is used to get the network id of current network.
-        Return:
-            the network id of current network.
         """
-
         payload = self.generate_json_rpc_payload(RpcMethod.GET_NETWORK_ID)
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_block_by_hash(self, block_hash: str, is_full: bool = False) -> dict:
+    async def get_block_by_hash(self, block_hash: str, session: ClientSession = None, is_full: bool = False) -> dict:
         """
         This interface is used to get the hexadecimal hash value of specified block height in current network.
-        :param block_hash: a hexadecimal value of block hash.
-        :param is_full:
-        :return: the block information of the specified block hash.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK, [block_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_block_by_height(self, height: int, is_full: bool = False) -> dict:
+    async def get_block_by_height(self, height: int, session: ClientSession = None, is_full: bool = False) -> dict:
         """
         This interface is used to get the block information by block height in current network.
-        Return:
-            the decimal total number of blocks in current network.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK, [height, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_block_count(self, is_full: bool = False) -> int or dict:
+    async def get_block_count(self, session: ClientSession = None, is_full: bool = False) -> int or dict:
         """
         This interface is used to get the decimal block number in current network.
-        Return:
-            the decimal total number of blocks in current network.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_COUNT)
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_block_height(self, is_full: bool = False) -> int or dict:
+    async def get_block_height(self, session: ClientSession = None, is_full: bool = False) -> int or dict:
         """
         This interface is used to get the decimal block height in current network.
-        Return:
-            the decimal total height of blocks in current network.
         """
-        response = self.get_block_count(is_full=True)
+        response = await self.get_block_count(session, is_full=True)
         response['result'] -= 1
         if is_full:
             return response
         return response['result']
 
-    def get_block_height_by_tx_hash(self, tx_hash: str, is_full: bool = False):
+    async def get_block_height_by_tx_hash(self, tx_hash: str, session: ClientSession = None, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_HEIGHT_BY_HASH, [tx_hash])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_block_count_by_tx_hash(self, tx_hash: str, is_full: bool = False):
-        response = self.get_block_height_by_tx_hash(tx_hash, is_full=True)
+    async def get_block_count_by_tx_hash(self, tx_hash: str, session: ClientSession = None, is_full: bool = False):
+        response = await self.get_block_height_by_tx_hash(tx_hash, session, is_full=True)
         response['result'] += 1
         if is_full:
             return response
         return response['result']
 
-    def get_current_block_hash(self, is_full: bool = False) -> str:
+    async def get_current_block_hash(self, session: ClientSession = None, is_full: bool = False) -> str:
         """
         This interface is used to get the hexadecimal hash value of the highest block in current network.
+
         Return:
             the hexadecimal hash value of the highest block in current network.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_CURRENT_BLOCK_HASH)
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_block_hash_by_height(self, height: int, is_full: bool = False) -> str:
+    async def get_block_hash_by_height(self, height: int, session: ClientSession = None, is_full: bool = False) -> str:
         """
         This interface is used to get the hexadecimal hash value of specified block height in current network.
-        :param height: a decimal block height value.
-        :param is_full:
-        :return: the hexadecimal hash value of the specified block height.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_HASH, [height, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_balance(self, b58_address: str, is_full: bool = False) -> dict:
+    async def get_balance(self, b58_address: str, session: ClientSession = None, is_full: bool = False) -> dict:
         """
         This interface is used to get the account balance of specified base58 encoded address in current network.
+
         :param b58_address: a base58 encoded account address.
         :param is_full:
         :return: the value of account balance in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BALANCE, [b58_address, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_grant_ong(self, b58_address: str, is_full: bool = False):
+    async def get_grant_ong(self, b58_address: str, session: ClientSession = None, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GRANT_ONG, [b58_address])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return int(response['result'])
 
-    def get_allowance(self, asset_name: str, from_address: str, to_address: str, is_full: bool = False) -> str:
+    async def get_allowance(self, asset_name: str, from_address: str, to_address: str, session: ClientSession = None,
+                            is_full: bool = False) -> str:
         """
         This interface is used to get the the allowance
         from transfer-from account to transfer-to account in current network.
-        :param asset_name:
-        :param from_address: a base58 encoded account address.
-        :param to_address: a base58 encoded account address.
-        :param is_full:
-        :return: the information of allowance in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_ALLOWANCE, [asset_name, from_address, to_address])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_storage(self, hex_contract_address: str, hex_key: str, is_full: bool = False) -> str:
+    async def get_storage(self, hex_contract_address: str, hex_key: str, session: ClientSession = None,
+                          is_full: bool = False) -> str:
         """
         This interface is used to get the corresponding stored value
         based on hexadecimal contract address and stored key.
-        :param hex_contract_address: hexadecimal contract address.
-        :param hex_key: a hexadecimal stored key.
-        :param is_full:
-        :return: the information of contract storage.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_STORAGE, [hex_contract_address, hex_key, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
+    async def get_contract_event_by_tx_hash(self, tx_hash: str, session: ClientSession = None,
+                                            is_full: bool = False) -> dict:
         """
         This interface is used to get the corresponding smart contract event based on the height of block.
-        :param tx_hash: a hexadecimal hash value.
-        :param is_full:
-        :return: the information of smart contract event in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_smart_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
+    async def get_contract_event_by_height(self, height: int, session: ClientSession = None, is_full: bool = False):
         """
         This interface is used to get the corresponding smart contract event based on the height of block.
-        :param height: a decimal height value.
-        :param is_full:
-        :return: the information of smart contract event in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT_EVENT, [height, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         event_list = response['result']
@@ -366,111 +311,99 @@ class Rpc(object):
             event_list = list()
         return event_list
 
-    def get_smart_contract_event_by_count(self, count: int, is_full: bool = False) -> List[dict]:
-        return self.get_smart_contract_event_by_height(count - 1, is_full)
+    async def get_contract_event_by_count(self, count: int, session: ClientSession = None,
+                                          is_full: bool = False) -> List[dict]:
+        return await self.get_contract_event_by_height(count - 1, session, is_full)
 
-    def get_transaction_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
+    async def get_transaction_by_tx_hash(self, tx_hash: str, session: ClientSession = None,
+                                         is_full: bool = False) -> dict:
         """
         This interface is used to get the corresponding transaction information based on the specified hash value.
-        :param tx_hash: str, a hexadecimal hash value.
-        :param is_full:
-        :return: dict
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_TRANSACTION, [tx_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_smart_contract(self, hex_contract_address: str, is_full: bool = False) -> dict:
+    async def get_smart_contract(self, hex_contract_address: str, session: ClientSession = None,
+                                 is_full: bool = False) -> dict:
         """
         This interface is used to get the information of smart contract based on the specified hexadecimal hash value.
-        :param hex_contract_address: str, a hexadecimal hash value.
-        :param is_full:
-        :return: the information of smart contract in dictionary form.
         """
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.param_err('a hexadecimal contract address is required.'))
         if len(hex_contract_address) != 40:
             raise SDKException(ErrorCode.param_err('the length of the contract address should be 40 bytes.'))
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT, [hex_contract_address, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_merkle_proof(self, tx_hash: str, is_full: bool = False) -> dict:
+    async def get_merkle_proof(self, tx_hash: str, session: ClientSession = None, is_full: bool = False) -> dict:
         """
         This interface is used to get the corresponding merkle proof based on the specified hexadecimal hash value.
-        :param tx_hash: an hexadecimal transaction hash value.
-        :param is_full:
-        :return: the merkle proof in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MERKLE_PROOF, [tx_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_memory_pool_tx_count(self, is_full: bool = False):
+    async def get_memory_pool_tx_count(self, session: ClientSession = None, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_COUNT)
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
+    async def get_memory_pool_tx_state(self, tx_hash: str, session: ClientSession = None, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
+        if isinstance(response['result'], str):
+            return response['result']
         return response['result']['State']
 
-    def send_raw_transaction(self, tx: Transaction, is_full: bool = False) -> str:
+    async def send_raw_transaction(self, tx: Transaction, session: ClientSession = None, is_full: bool = False) -> str:
         """
         This interface is used to send the transaction into the network.
-        :param tx: Transaction object in ontology Python SDK.
-        :param is_full:
-        :return: a hexadecimal transaction hash value.
         """
         tx_data = tx.serialize(is_hex=True)
         payload = self.generate_json_rpc_payload(RpcMethod.SEND_TRANSACTION, [tx_data])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def send_raw_transaction_pre_exec(self, tx: Transaction, is_full: bool = False):
+    async def send_raw_transaction_pre_exec(self, tx: Transaction, session: ClientSession = None,
+                                            is_full: bool = False):
         """
         This interface is used to send the transaction that is prepare to execute.
-        :param tx: Transaction object in ontology Python SDK.
-        :param is_full: Whether to return all information.
-        :return: the execution result of transaction that is prepare to execute.
         """
         tx_data = tx.serialize(is_hex=True)
         payload = self.generate_json_rpc_payload(RpcMethod.SEND_TRANSACTION, [tx_data, 1])
-        response = self.__post(self.__url, payload)
+        response = await self.__post(session, payload)
         if is_full:
             return response
         return response['result']
 
-    def send_neo_vm_transaction_pre_exec(self, contract_address: str or bytes or bytearray, signer: Account or None,
-                                         func: AbiFunction or InvokeFunction, is_full: bool = False):
-        if isinstance(func, AbiFunction):
-            params = BuildParams.serialize_abi_function(func)
-        elif isinstance(func, InvokeFunction):
-            params = func.create_invoke_code()
-        else:
-            raise SDKException(ErrorCode.other_error('the type of func is error.'))
+    async def send_neo_vm_transaction_pre_exec(self, contract_address: str or bytes or bytearray,
+                                               signer: Account or None, func: AbiFunction or InvokeFunction,
+                                               session: ClientSession = None,
+                                               is_full: bool = False):
         contract_address = ensure_bytearray_contract_address(contract_address)
-        tx = NeoVm.make_invoke_transaction(contract_address, params, b'', 0, 0)
+        tx = NeoVm.make_invoke_transaction(contract_address, func)
         if signer is not None:
             tx.sign_transaction(signer)
-        return self.send_raw_transaction_pre_exec(tx, is_full)
+        return await self.send_raw_transaction_pre_exec(tx, session, is_full)
 
-    def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
-                                payer: Account or None, gas_limit: int, gas_price: int,
-                                func: AbiFunction or InvokeFunction, is_full: bool = False):
+    async def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
+                                      payer: Account or None, gas_limit: int, gas_price: int,
+                                      func: AbiFunction or InvokeFunction, session: ClientSession = None,
+                                      is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
         elif isinstance(func, InvokeFunction):
@@ -487,4 +420,4 @@ class Rpc(object):
         tx.sign_transaction(payer)
         if isinstance(signer, Account) and signer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(signer)
-        return self.send_raw_transaction(tx, is_full)
+        return await self.send_raw_transaction(tx, session, is_full)
