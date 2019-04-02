@@ -359,7 +359,7 @@ class RestfulClient(object):
         else:
             raise SDKException(ErrorCode.other_error('the type of func is error.'))
         contract_address = ensure_bytearray_contract_address(contract_address)
-        tx = NeoVm.make_invoke_transaction(contract_address, params, b'', 0, 0)
+        tx = NeoVm.make_invoke_transaction(contract_address, params)
         if signer is not None:
             tx.sign_transaction(signer)
         return self.send_raw_transaction_pre_exec(tx, is_full)
