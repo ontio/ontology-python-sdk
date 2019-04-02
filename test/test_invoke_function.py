@@ -86,7 +86,7 @@ class TestInvokeFunction(unittest.TestCase):
         if len(tx_hash) == 0:
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         self.assertEqual('transfer', states[0])
@@ -107,7 +107,7 @@ class TestInvokeFunction(unittest.TestCase):
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_limit, gas_price, func, False)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         self.assertEqual('approval', states[0])
@@ -137,7 +137,7 @@ class TestInvokeFunction(unittest.TestCase):
             self.assertIn('already in the tx pool', e.args[1])
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states_list = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states_list[0][0] = ContractDataParser.to_utf8_str(states_list[0][0])
         self.assertEqual('transfer', states_list[0][0])
@@ -172,7 +172,7 @@ class TestInvokeFunction(unittest.TestCase):
             self.assertIn('already in the tx pool', e.args[1])
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         states[1][0][0] = ContractDataParser.to_b58_address(states[1][0][0])
@@ -198,7 +198,7 @@ class TestInvokeFunction(unittest.TestCase):
         if len(tx_hash) == 0:
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         self.assertEqual('transfer_multi_args', states[0])
@@ -264,7 +264,7 @@ class TestInvokeFunction(unittest.TestCase):
         if len(tx_hash) == 0:
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         self.assertEqual('testHello', states[0])
@@ -288,7 +288,7 @@ class TestInvokeFunction(unittest.TestCase):
         if len(tx_hash) == 0:
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         self.assertEqual('testMsgList', states[0])
@@ -335,7 +335,7 @@ class TestInvokeFunction(unittest.TestCase):
         func.set_params_value(dict_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, func, False)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = ContractEventParser.get_states_by_contract_address(event, hex_contract_address)
         states[0] = ContractDataParser.to_utf8_str(states[0])
         self.assertEqual('mapInfo', states[0])

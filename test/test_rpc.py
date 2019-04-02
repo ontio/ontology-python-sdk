@@ -170,7 +170,7 @@ class TestRpcClient(unittest.TestCase):
     def test_get_smart_contract_event_by_tx_hash(self):
         tx_hash = "65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74"
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
             self.assertEqual(event['TxHash'], tx_hash)
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
@@ -180,7 +180,7 @@ class TestRpcClient(unittest.TestCase):
         event_len_lst = [10, 0]
         try:
             for index, h in enumerate(height_lst):
-                event_list = sdk.rpc.get_smart_contract_event_by_height(h)
+                event_list = sdk.rpc.get_contract_event_by_height(h)
                 self.assertEqual(event_len_lst[index], len(event_list))
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
@@ -207,7 +207,7 @@ class TestRpcClient(unittest.TestCase):
             current_height = (height, current_height)[height - current_height == 1]
             if height != current_height:
                 current_height = height
-                event_list = sdk.rpc.get_smart_contract_event_by_height(height)
+                event_list = sdk.rpc.get_contract_event_by_height(height)
                 self.assertGreaterEqual(len(event_list), 0)
 
     def test_get_transaction_by_tx_hash(self):
@@ -217,13 +217,13 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_smart_contract(self):
         try:
-            contract = sdk.rpc.get_smart_contract('0100000000000000000000000000000000000000')
+            contract = sdk.rpc.get_contract('0100000000000000000000000000000000000000')
             self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
         try:
             sdk.rpc.connect_to_main_net()
-            contract = sdk.rpc.get_smart_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
+            contract = sdk.rpc.get_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
             self.assertEqual('Youle_le_service@fosun.com', contract.get('Email', ''))
             self.assertEqual('chentao', contract.get('Author', ''))
         except SDKException as e:

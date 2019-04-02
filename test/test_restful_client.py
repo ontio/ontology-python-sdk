@@ -104,22 +104,22 @@ class TestRestfulClient(unittest.TestCase):
 
     def test_get_smart_contract(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        contract = sdk.restful.get_smart_contract(hex_contract_address)
+        contract = sdk.restful.get_contract(hex_contract_address)
         self.assertEqual(True, contract['NeedStorage'])
         self.assertEqual('DINGXIN', contract['Author'])
         self.assertEqual('A sample of OEP4', contract['Description'])
         hex_contract_address = '0100000000000000000000000000000000000000'
-        contract = sdk.restful.get_smart_contract(hex_contract_address)
+        contract = sdk.restful.get_contract(hex_contract_address)
         self.assertEqual(True, contract['NeedStorage'])
         self.assertEqual('Ontology Team', contract['Author'])
         self.assertEqual('Ontology Network ONT Token', contract['Description'])
 
     def test_get_smart_contract_event_by_height(self):
         height = 0
-        event_list = sdk.restful.get_smart_contract_event_by_height(height)
+        event_list = sdk.restful.get_contract_event_by_height(height)
         self.assertEqual(10, len(event_list))
         height = 1309737
-        event_list = sdk.restful.get_smart_contract_event_by_height(height)
+        event_list = sdk.restful.get_contract_event_by_height(height)
         self.assertEqual(0, len(event_list))
 
     def test_get_storage(self):

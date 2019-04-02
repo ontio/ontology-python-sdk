@@ -37,10 +37,13 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(True, response['SubscribeEvent'])
         self.assertEqual(False, response['SubscribeJsonBlock'])
         self.assertEqual(False, response['SubscribeRawBlock'])
-        from_acct = acct1
         b58_to_address = acct2.get_address_base58()
         value = 10
-        tx_hash = oep4.transfer(from_acct, b58_to_address, value, acct3, 20000000, 500)
+        b58_payer_address = acct3.get_address_base58()
+        tx = oep4.transfer(acct1.get_address_base58(), b58_to_address, value, b58_payer_address, 20000000, 500)
+        tx.sign_transaction(acct1)
+        tx.add_sign_transaction(acct3)
+        tx_hash = await sdk.websocket.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         try:
             event = await asyncio.wait_for(sdk.websocket.recv_subscribe_info(), timeout=10)
@@ -50,7 +53,7 @@ class TestWebsocketClient(unittest.TestCase):
             notify = ContractDataParser.parse_addr_addr_int_notify(notify)
             self.assertEqual(hex_contract_address, notify['ContractAddress'])
             self.assertEqual('transfer', notify['States'][0])
-            self.assertEqual(from_acct.get_address_base58(), notify['States'][1])
+            self.assertEqual(acct1.get_address_base58(), notify['States'][1])
             self.assertEqual(b58_to_address, notify['States'][2])
             self.assertEqual(value, notify['States'][3])
         except asyncio.TimeoutError:
@@ -191,7 +194,8 @@ class TestWebsocketClient(unittest.TestCase):
                                                             b58_from_address, 20000, 500)
         tx.sign_transaction(acct1)
         tx_hash = await sdk.websocket.send_raw_transaction(tx)
-        await asyncio.sleep(6)
+        self.assertEqual(64, len(tx_hash))
+        await asyncio.sleep(7)
         event = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
         await sdk.websocket.close_connect()
         self.assertEqual(tx_hash, event['TxHash'])

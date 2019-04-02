@@ -104,7 +104,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -118,7 +118,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                         gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
@@ -133,7 +133,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
         self.assertIn('remove', notify['States'])
@@ -154,7 +154,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -166,7 +166,7 @@ class TestOntId(unittest.TestCase):
         gas_price = 500
         tx_hash = ont_id.add_attribute(identity.ont_id, ctrl_acct, attribute, acct2, gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual('Attribute', notify['States'][0])
         self.assertEqual('add', notify['States'][1])
@@ -176,7 +176,7 @@ class TestOntId(unittest.TestCase):
         attrib_key = 'hello'
         tx_hash = ont_id.remove_attribute(identity.ont_id, ctrl_acct, attrib_key, acct3, gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual('Attribute', notify['States'][0])
         self.assertEqual('remove', notify['States'][1])
@@ -204,7 +204,7 @@ class TestOntId(unittest.TestCase):
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(tx.hash256_explorer(), tx_hash)
             time.sleep(randint(7, 12))
-            notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify']
+            notify = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)['Notify']
             self.assertEqual('Attribute', notify[0]['States'][0])
             self.assertEqual('remove', notify[0]['States'][1])
             self.assertEqual(acct_did, notify[0]['States'][2])
@@ -221,7 +221,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -234,7 +234,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Recovery', notify['States'][0])
@@ -265,7 +265,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key, acct2, gas_limit,
                                                         gas_price, True)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('PublicKey', notify['States'][0])
@@ -291,7 +291,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
                                                            gas_limit, gas_price, True)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
         self.assertIn('remove', notify['States'])
@@ -320,7 +320,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -333,7 +333,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Recovery', notify['States'][0])
@@ -361,7 +361,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().change_recovery(identity.ont_id, b58_new_recovery_address, recovery, acct2,
                                                          gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
 
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -378,7 +378,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_limit, gas_price)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.restful.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
@@ -393,7 +393,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                         gas_limit, gas_price)
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])

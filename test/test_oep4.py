@@ -55,7 +55,7 @@ class TestOep4(unittest.TestCase):
         tx_hash = oep4.init(acct, acct1, gas_limit, gas_price)
         self.assertEqual(len(tx_hash), 64)
         time.sleep(randint(6, 10))
-        notify = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)['Notify'][0]
+        notify = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)['Notify'][0]
         self.assertEqual('Already initialized!', bytes.fromhex(notify['States']).decode())
 
     def test_get_total_supply(self):
@@ -193,7 +193,7 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         try:
-            event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+            event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
             notify = event['Notify'][0]
             self.assertEqual(2, len(notify))
             self.assertEqual('transfer', bytes.fromhex(notify['States'][0]).decode())

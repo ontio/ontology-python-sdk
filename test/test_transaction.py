@@ -61,7 +61,7 @@ class TestTransaction(unittest.TestCase):
         tx_hash = sdk.rpc.send_raw_transaction(tx5)
         self.assertEqual(64, len(tx_hash))
         sleep(6)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         contract_address = '0200000000000000000000000000000000000000'
         notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
         for event in notify:
@@ -91,7 +91,7 @@ class TestTransaction(unittest.TestCase):
         tx_hash = sdk.rpc.send_raw_transaction(tx5)
         self.assertEqual(64, len(tx_hash))
         sleep(6)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         contract_address = '0200000000000000000000000000000000000000'
         notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
         for event in notify:

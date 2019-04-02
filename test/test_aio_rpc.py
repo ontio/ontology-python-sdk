@@ -20,7 +20,7 @@ multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 
 class TestAioRpc(unittest.TestCase):
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_version(self):
         try:
             version = await sdk.aio_rpc.get_version()
@@ -30,7 +30,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_connection_count(self):
         try:
             count = await sdk.aio_rpc.get_connection_count()
@@ -38,7 +38,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_gas_price(self):
         async with ClientSession() as session:
             try:
@@ -47,7 +47,7 @@ class TestAioRpc(unittest.TestCase):
             except SDKException as e:
                 self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_network_id(self):
         try:
             network_id = await sdk.aio_rpc.get_network_id()
@@ -55,7 +55,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_block_by_hash(self):
         try:
             block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
@@ -64,7 +64,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_block_by_height(self):
         try:
             height = 0
@@ -73,7 +73,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_block_height(self):
         tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
                        'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2']
@@ -88,7 +88,7 @@ class TestAioRpc(unittest.TestCase):
             except SDKException as e:
                 self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_block_count_by_tx_hash(self):
         tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
                        'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2']
@@ -103,7 +103,7 @@ class TestAioRpc(unittest.TestCase):
             except SDKException as e:
                 self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_block_hash(self):
         async with ClientSession() as session:
             try:
@@ -114,7 +114,7 @@ class TestAioRpc(unittest.TestCase):
             except SDKException as e:
                 self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_balance(self):
         async with ClientSession() as session:
             address_balance = await sdk.aio_rpc.get_balance(acct1.get_address_base58(), session)
@@ -122,13 +122,13 @@ class TestAioRpc(unittest.TestCase):
             multi_address_balance = await sdk.aio_rpc.get_balance(multi_address.b58encode(), session)
             self.assertTrue(isinstance(multi_address_balance, dict))
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_grant_ong(self):
         b58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         grant_ong = await sdk.aio_rpc.get_grant_ong(b58_address)
         self.assertGreaterEqual(grant_ong, 0)
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_allowance(self):
         base58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
         try:
@@ -137,7 +137,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_storage(self):
         hex_contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
@@ -147,7 +147,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_contract_event(self):
         event_len_lst = [10, 0]
         height_lst = [0, 1309737]
@@ -162,7 +162,7 @@ class TestAioRpc(unittest.TestCase):
             except SDKException as e:
                 self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_sync_block(self):
         current_height = await sdk.aio_rpc.get_block_height()
         start_time = perf_counter()
@@ -178,19 +178,19 @@ class TestAioRpc(unittest.TestCase):
                 event_list = await sdk.aio_rpc.get_contract_event_by_height(height)
                 self.assertGreaterEqual(len(event_list), 0)
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_transaction_by_tx_hash(self):
         tx_hash = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
         tx = await sdk.aio_rpc.get_transaction_by_tx_hash(tx_hash)
         self.assertEqual(tx['Hash'], tx_hash)
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_smart_contract(self):
         try:
-            contract = await sdk.aio_rpc.get_smart_contract('0100000000000000000000000000000000000000')
+            contract = await sdk.aio_rpc.get_contract('0100000000000000000000000000000000000000')
             self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
             sdk.aio_rpc.connect_to_main_net()
-            contract = await sdk.aio_rpc.get_smart_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
+            contract = await sdk.aio_rpc.get_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
             self.assertEqual('Youle_le_service@fosun.com', contract.get('Email', ''))
             self.assertEqual('chentao', contract.get('Author', ''))
         except SDKException as e:
@@ -198,7 +198,7 @@ class TestAioRpc(unittest.TestCase):
         finally:
             sdk.aio_rpc.connect_to_test_net()
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_merkle_proof(self):
         pre_tx_root = 0
         tx_hash_list = ['12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3',
@@ -220,7 +220,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_send_raw_transaction(self):
         b58_from_address = acct2.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
@@ -233,7 +233,7 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_send_raw_transaction_pre_exec(self):
         random_pk = get_random_hex_str(64)
         random_acct = Account(random_pk)
@@ -250,12 +250,12 @@ class TestAioRpc(unittest.TestCase):
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_memory_pool_tx_count(self):
         tx_count = await sdk.aio_rpc.get_memory_pool_tx_count()
         self.assertGreaterEqual(tx_count, [0, 0])
 
-    @AioRpc.rpc_runner
+    @AioRpc.runner
     async def test_get_memory_pool_tx_state(self):
         tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
         try:

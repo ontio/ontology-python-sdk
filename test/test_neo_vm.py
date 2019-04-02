@@ -120,7 +120,7 @@ class TestNeoVm(unittest.TestCase):
         gas_price = 500
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_limit, gas_price, hello)
         sleep(6)
-        response = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        response = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = response['Notify'][0]
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         notify['States'] = ContractDataParser.to_utf8_str(notify['States'])

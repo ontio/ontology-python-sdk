@@ -138,7 +138,7 @@ class TestAsset(unittest.TestCase):
             return
 
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         ont_contract_address = '0100000000000000000000000000000000000000'
         notify = ContractEventParser.get_notify_list_by_contract_address(event, ont_contract_address)
         self.assertEqual('transfer', notify['States'][0])
@@ -160,7 +160,7 @@ class TestAsset(unittest.TestCase):
             self.assertIn('balance insufficient', e.args[1])
             return
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
@@ -182,7 +182,7 @@ class TestAsset(unittest.TestCase):
             return
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
@@ -241,7 +241,7 @@ class TestAsset(unittest.TestCase):
                                                               acct2, 20000, 500)
                 self.assertEqual(64, len(tx_hash))
                 time.sleep(randint(7, 12))
-                event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+                event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
                 self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
                 self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
             except SDKException as e:
