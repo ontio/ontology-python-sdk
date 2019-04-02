@@ -62,7 +62,7 @@ class AioRpc(object):
         self.__generate_qid()
 
     @staticmethod
-    def rpc_runner(func):
+    def runner(func):
         def wrapper(*args, **kwargs):
             if inspect.iscoroutinefunction(func):
                 future = func(*args, **kwargs)
