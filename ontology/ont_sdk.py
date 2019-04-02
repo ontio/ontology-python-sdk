@@ -5,15 +5,16 @@ import threading
 
 from Cryptodome.Random.random import choice
 
+from ontology.network.aiorpc import AioRpc
 from ontology.service.service import Service
+from ontology.network.websocket import Websocket
 from ontology.smart_contract.neo_vm import NeoVm
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.native_vm import NativeVm
-from ontology.network.websocket import WebsocketClient
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.network.rpc import RpcClient, TEST_RPC_ADDRESS, MAIN_RPC_ADDRESS
+from ontology.network.rpc import Rpc, TEST_RPC_ADDRESS, MAIN_RPC_ADDRESS
 from ontology.network.restful import RestfulClient, TEST_RESTFUL_ADDRESS, MAIN_RESTFUL_ADDRESS
 
 
@@ -35,16 +36,17 @@ class OntologySdk(metaclass=_Singleton):
                  default_signature_scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(default_signature_scheme, SignatureScheme):
             raise SDKException(ErrorCode.param_err('SignatureScheme object is required.'))
-        self.__rpc = RpcClient(rpc_address)
+        self.__rpc = Rpc(rpc_address)
+        self.__aio_rpc = AioRpc(rpc_address)
         self.__restful = RestfulClient(restful_address)
-        self.__websocket = WebsocketClient(ws_address)
+        self.__websocket = Websocket(ws_address)
         self.__native_vm = NativeVm(self)
         self.__neo_vm = NeoVm(self)
         self.__service = Service(self)
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
 
-    def get_network(self) -> RpcClient or RestfulClient:
+    def get_network(self) -> Rpc or RestfulClient:
         if self.__rpc.get_address() != '':
             return self.__rpc
         elif self.__restful.get_address() != '':
@@ -80,12 +82,21 @@ class OntologySdk(metaclass=_Singleton):
             raise SDKException(ErrorCode.other_error('Invalid signature scheme'))
 
     @property
-    def rpc(self) -> RpcClient:
+    def rpc(self) -> Rpc:
         return self.__rpc
 
+    @property
+    def aio_rpc(self) -> AioRpc:
+        return self.__aio_rpc
+
+    @aio_rpc.setter
+    def aio_rpc(self, aio_rpc: AioRpc):
+        if isinstance(aio_rpc, AioRpc):
+            self.__rpc = aio_rpc
+
     @rpc.setter
-    def rpc(self, rpc_client: RpcClient):
-        if isinstance(rpc_client, RpcClient):
+    def rpc(self, rpc_client: Rpc):
+        if isinstance(rpc_client, Rpc):
             self.__rpc = rpc_client
 
     @property
@@ -98,12 +109,12 @@ class OntologySdk(metaclass=_Singleton):
             self.__restful = restful_client
 
     @property
-    def websocket(self) -> WebsocketClient:
+    def websocket(self) -> Websocket:
         return self.__websocket
 
     @websocket.setter
-    def websocket(self, websocket_client: WebsocketClient):
-        if isinstance(websocket_client, WebsocketClient):
+    def websocket(self, websocket_client: Websocket):
+        if isinstance(websocket_client, Websocket):
             self.__websocket = websocket_client
 
     @property
@@ -165,12 +176,12 @@ class OntologySdk(metaclass=_Singleton):
         return MAIN_RESTFUL_ADDRESS
 
     def set_websocket_address(self, websocket_address: str):
-        if isinstance(self.__websocket, WebsocketClient):
+        if isinstance(self.__websocket, Websocket):
             self.__websocket.set_address(websocket_address)
         else:
-            self.__websocket = WebsocketClient(websocket_address)
+            self.__websocket = Websocket(websocket_address)
 
     def get_websocket_address(self):
-        if not isinstance(self.__websocket, WebsocketClient):
+        if not isinstance(self.__websocket, Websocket):
             return ''
         return self.__websocket.get_address()

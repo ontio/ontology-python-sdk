@@ -64,7 +64,7 @@ class ClaimRecord(object):
         return status
 
     def query_commit_event(self, tx_hash: str):
-        event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
+        event = self.__sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
         if len(notify) == 0:
             return notify
@@ -80,7 +80,7 @@ class ClaimRecord(object):
         return notify
 
     def query_revoke_event(self, tx_hash: str):
-        event = self.__sdk.get_network().get_smart_contract_event_by_tx_hash(tx_hash)
+        event = self.__sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
         notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
         if len(notify['States']) == 4:
             notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])

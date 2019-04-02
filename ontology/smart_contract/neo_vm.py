@@ -3,6 +3,9 @@
 
 from time import time
 
+from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.vm.op_code import APPCALL
 from ontology.common.address import Address
 from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
@@ -56,21 +59,8 @@ class NeoVm(object):
         return deploy_tx
 
     @staticmethod
-    def make_invoke_transaction(code_address: bytearray, params: bytearray, payer: bytes, gas_limit: int,
-                                gas_price: int):
-        params += bytearray([0x67])
-        params += code_address
-        invoke_tx = InvokeTransaction()
-        invoke_tx.version = 0
-        invoke_tx.sig_list = bytearray()
-        invoke_tx.attributes = bytearray()
-        unix_time_now = int(time())
-        invoke_tx.nonce = unix_time_now
-        invoke_tx.code = params
-        invoke_tx.gas_limit = gas_limit
-        invoke_tx.gas_price = gas_price
-        if isinstance(payer, bytes) and payer != b'':
-            invoke_tx.payer = payer
-        else:
-            invoke_tx.payer = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-        return invoke_tx
+    def make_invoke_transaction(contract_address: bytearray, func: AbiFunction or InvokeFunction, payer: bytes = b'',
+                                gas_price: int = 0, gas_limit: int = 0):
+        tx = InvokeTransaction(payer, gas_price, gas_limit)
+        tx.add_invoke_code(contract_address, func)
+        return tx
