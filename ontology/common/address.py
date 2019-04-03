@@ -73,8 +73,8 @@ class Address(object):
         bytearray_zero.reverse()
         return bytearray.hex(bytearray_zero)
 
-    @staticmethod
-    def b58decode(address: str):
+    @classmethod
+    def b58decode(cls, address: str):
         data = base58.b58decode(address)
         if len(data) != 25:
             raise SDKException(ErrorCode.param_error)
@@ -83,4 +83,4 @@ class Address(object):
         checksum = Digest.hash256(data[0:21])
         if data[21:25] != checksum[0:4]:
             raise SDKException(ErrorCode.param_error)
-        return Address(data[1:21])
+        return cls(data[1:21])
