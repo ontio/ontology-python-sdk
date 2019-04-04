@@ -39,28 +39,16 @@ class NeoVm(object):
         return bytearray_contract_address
 
     @staticmethod
-    def make_deploy_transaction(code_str: str, need_storage: bool, name: str, code_version: str, author: str,
-                                email: str, desp: str, payer: str, gas_limit: int, gas_price: int) -> DeployTransaction:
-        unix_time_now = int(time())
-        deploy_tx = DeployTransaction()
-        deploy_tx.payer = Address.b58decode(payer).to_bytes()
-        deploy_tx.attributes = bytearray()
-        deploy_tx.nonce = unix_time_now
-        deploy_tx.code = bytearray.fromhex(code_str)
-        deploy_tx.code_version = code_version
-        deploy_tx.version = 0
-        deploy_tx.need_storage = need_storage
-        deploy_tx.name = name
-        deploy_tx.author = author
-        deploy_tx.email = email
-        deploy_tx.gas_limit = gas_limit
-        deploy_tx.gas_price = gas_price
-        deploy_tx.description = desp
-        return deploy_tx
+    def make_deploy_transaction(code: str, need_storage: bool, name: str, code_version: str, author: str,
+                                email: str, description: str, gas_price: int, gas_limit: int,
+                                b58_payer_address: str) -> DeployTransaction:
+        tx = DeployTransaction(code, need_storage, name, code_version, author, email, description, gas_price, gas_limit,
+                               b58_payer_address)
+        return tx
 
     @staticmethod
-    def make_invoke_transaction(contract_address: bytearray, func: AbiFunction or InvokeFunction, payer: bytes = b'',
-                                gas_price: int = 0, gas_limit: int = 0):
+    def make_invoke_transaction(contract_address: str or bytes or bytearray, func: AbiFunction or InvokeFunction,
+                                payer: bytes or str = b'', gas_price: int = 0, gas_limit: int = 0):
         tx = InvokeTransaction(payer, gas_price, gas_limit)
         tx.add_invoke_code(contract_address, func)
         return tx
