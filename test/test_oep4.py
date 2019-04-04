@@ -1,6 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import time
 import unittest
 
@@ -142,11 +160,12 @@ class TestOep4(unittest.TestCase):
         owner_acct = acct1
         spender = acct2
         b58_spender_address = spender.get_address_base58()
-        amount = 100
+        amount = 10
         gas_limit = 20000000
         gas_price = 500
         try:
-            tx_hash = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, gas_limit, gas_price)
+            tx = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, gas_limit, gas_price)
+            tx_hash = sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
             self.assertIn('ConnectTimeout', e.args[1])
             return
@@ -169,7 +188,8 @@ class TestOep4(unittest.TestCase):
         oep4.hex_contract_address = contract_address
         b58_owner_address = acct1.get_address_base58()
         b58_spender_address = acct2.get_address_base58()
-        allowance = oep4.allowance(b58_owner_address, b58_spender_address)
+        tx = oep4.allowance(b58_owner_address, b58_spender_address)
+        allowance = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertGreaterEqual(allowance, 1)
 
     def test_transfer_from(self):
@@ -189,8 +209,9 @@ class TestOep4(unittest.TestCase):
         gas_limit = 20000000
         gas_price = 500
         value = 1
-        tx_hash = oep4.transfer_from(spender_acct, b58_from_address, b58_to_address, value, from_acct, gas_limit,
-                                     gas_price)
+        tx = oep4.transfer_from(spender_acct, b58_from_address, b58_to_address, value, from_acct, gas_limit,
+                                gas_price)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         try:

@@ -1,11 +1,23 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
 
-import time
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_data import ContractDataParser
@@ -97,7 +109,8 @@ class Oep4(object):
         tx.add_invoke_code(self.__hex_contract_address, func)
         return tx
 
-    def transfer(self, b58_from_address: str, b58_to_address: str, value: int, b58_payer_address: str, gas_limit: int,
+    def transfer(self, from_acct: str or bytes or Account, b58_to_address: str, value: int, b58_payer_address: str,
+                 gas_limit: int,
                  gas_price: int) -> InvokeTransaction:
         """
         This interface is used to call the Transfer method in ope4
@@ -108,8 +121,8 @@ class Oep4(object):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
         if value < 0:
             raise SDKException(ErrorCode.param_err('the value should be equal or great than 0.'))
-        from_address = Address.b58decode(b58_from_address).to_bytes()
-        to_address = Address.b58decode(b58_to_address).to_bytes()
+        from_address = self.get_bytes_address(from_acct)
+        to_address = self.get_bytes_address(b58_to_address)
         payer = Address.b58decode(b58_payer_address).to_bytes()
         func.set_params_value(from_address, to_address, value)
         params = InvokeTransaction.generate_invoke_code(self.__hex_contract_address, func)
@@ -161,8 +174,8 @@ class Oep4(object):
         tx = InvokeTransaction(payer, gas_price, gas_limit, params)
         return tx
 
-    def approve(self, b58_owner_address: str, b58_spender_address: str, amount: int, b58_payer_address: str,
-                gas_limit: int, gas_price: int) -> InvokeTransaction:
+    def approve(self, owner: str or bytes or Account, b58_spender_address: str, amount: int,
+                payer: str or bytes or Account, gas_limit: int, gas_price: int) -> InvokeTransaction:
         """
         This interface is used to call the Approve method in ope4
         that allows spender to withdraw a certain amount of oep4 token from owner account multiple times.
@@ -173,13 +186,15 @@ class Oep4(object):
             raise SDKException(ErrorCode.param_err('the data type of amount should be int.'))
         if amount < 0:
             raise SDKException(ErrorCode.param_err('the amount should be equal or great than 0.'))
-        owner = Address.b58decode(b58_owner_address).to_bytes()
-        spender = Address.b58decode(b58_spender_address).to_bytes()
-        payer = Address.b58decode(b58_payer_address).to_bytes()
+        owner_address, spender_address, payer_address = self.get_bytes_address(owner, b58_spender_address, payer)
         func = InvokeFunction('approve')
-        func.set_params_value(owner, spender, amount)
+        func.set_params_value(owner_address, spender_address, amount)
         params = InvokeTransaction.generate_invoke_code(self.__hex_contract_address, func)
-        tx = InvokeTransaction(payer, gas_price, gas_limit, params)
+        tx = InvokeTransaction(payer_address, gas_price, gas_limit, params)
+        if isinstance(owner, Account):
+            tx.sign_transaction(owner)
+        if isinstance(payer, Account):
+            tx.add_sign_transaction(payer)
         return tx
 
     def allowance(self, b58_owner_address: str, b58_spender_address: str) -> InvokeTransaction:
@@ -187,8 +202,8 @@ class Oep4(object):
         This interface is used to call the Allowance method in ope4
         that query the amount of spender still allowed to withdraw from owner account.
         """
-        owner = Address.b58decode(b58_owner_address).to_bytes()
-        spender = Address.b58decode(b58_spender_address).to_bytes()
+        owner = self.get_bytes_address(b58_owner_address)
+        spender = self.get_bytes_address(b58_spender_address)
         func = InvokeFunction('allowance')
         func.set_params_value(owner, spender)
         tx = InvokeTransaction()
