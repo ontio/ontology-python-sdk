@@ -149,30 +149,25 @@ class TestRestful(unittest.TestCase):
         self.assertEqual(1, result['State'])
 
     def test_get_merkle_proof(self):
-        tx_hash_1 = '12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3'
-        merkle_proof_1 = sdk.restful.get_merkle_proof(tx_hash_1)
-        self.assertEqual('MerkleProof', merkle_proof_1['Type'])
-        self.assertEqual(0, merkle_proof_1['BlockHeight'])
-        tx_hash_2 = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
-        merkle_proof_2 = sdk.restful.get_merkle_proof(tx_hash_2)
-        self.assertEqual('MerkleProof', merkle_proof_2['Type'])
-        self.assertEqual(0, merkle_proof_2['BlockHeight'])
-        tx_hash_3 = '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290'
-        merkle_proof_3 = sdk.restful.get_merkle_proof(tx_hash_3)
-        self.assertEqual('MerkleProof', merkle_proof_3['Type'])
-        self.assertEqual(0, merkle_proof_3['BlockHeight'])
-        tx_hash_4 = '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74'
-        merkle_proof_4 = sdk.restful.get_merkle_proof(tx_hash_4)
-        self.assertEqual('MerkleProof', merkle_proof_4['Type'])
-        self.assertEqual(0, merkle_proof_4['BlockHeight'])
-        tx_hash_5 = '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb'
-        merkle_proof_5 = sdk.restful.get_merkle_proof(tx_hash_5)
-        self.assertEqual('MerkleProof', merkle_proof_5['Type'])
-        self.assertEqual(0, merkle_proof_5['BlockHeight'])
-        tx_hash_6 = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
-        merkle_proof_6 = sdk.restful.get_merkle_proof(tx_hash_6)
-        self.assertEqual('MerkleProof', merkle_proof_6['Type'])
-        self.assertEqual(0, merkle_proof_6['BlockHeight'])
+        pre_tx_root = 0
+        tx_hash_list = ['12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3',
+                        '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
+                        '5d09b2b9ba302e9da8b9472ef10c824caf998e940cc5a73d7da16971d64c0290',
+                        '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74',
+                        '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb',
+                        '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e']
+        try:
+            for tx_hash in tx_hash_list:
+                merkle_proof = sdk.restful.get_merkle_proof(tx_hash)
+                self.assertEqual('MerkleProof', merkle_proof['Type'])
+                self.assertEqual(0, merkle_proof['BlockHeight'])
+                if pre_tx_root == 0:
+                    pre_tx_root = merkle_proof['TransactionsRoot']
+                else:
+                    self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
+                    pre_tx_root = merkle_proof['TransactionsRoot']
+        except SDKException as e:
+            self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_memory_pool_tx_count(self):
         tx_count = sdk.restful.get_memory_pool_tx_count()
