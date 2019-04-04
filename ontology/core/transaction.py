@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-from typing import List
+from time import time
 from enum import Enum
+from typing import List
 
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
@@ -32,18 +32,27 @@ TX_MAX_SIG_SIZE = 16
 
 
 class Transaction(object):
-    def __init__(self, version=0, tx_type=None, nonce=None, gas_price=None, gas_limit=None, payer=None, payload=None,
-                 attributes: bytearray = None, sig_list: List[Sig] = None):
+    def __init__(self, version=0, tx_type: TransactionType or int = None, gas_price: int = 0, gas_limit: int = 0,
+                 payer: str or bytes = b'', payload: bytearray = bytearray(), nonce: int = None,
+                 attributes: bytearray = bytearray(), sig_list: List[Sig] = None):
         self.version = version
+        if isinstance(tx_type, TransactionType):
+            tx_type = tx_type.value
         self.tx_type = tx_type
+        if not nonce:
+            nonce = int(time())
         self.nonce = nonce
         self.gas_price = gas_price
         self.gas_limit = gas_limit
-        if payer is None or payer == b'' or payer == bytearray():
+        if not payer:
             payer = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        if isinstance(payer, str):
+            payer = Address.b58decode(payer).to_bytes()
         self.payer = payer
         self.payload = payload
         self.attributes = attributes
+        if not sig_list:
+            sig_list = list()
         self.sig_list = sig_list
 
     def __iter__(self):
