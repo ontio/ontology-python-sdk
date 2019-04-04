@@ -3,9 +3,12 @@ from ontology.io.binary_writer import BinaryWriter
 
 
 class DeployTransaction(Transaction):
-    def __init__(self, code=None, need_storage=None, name=None, version=None, author=None, email=None,
-                 description=None):
-        super().__init__()
+    def __init__(self, code: bytearray or str, need_storage: bool, name: str = '', version: str = '', author: str = '',
+                 email: str = '', description: str = '', gas_price: int = 0, gas_limit: int = 0,
+                 payer: str or bytes = b''):
+        super().__init__(0, TransactionType.DeployCode.value, gas_price, gas_limit, payer)
+        if isinstance(code, str):
+            code = bytearray.fromhex(code)
         self.__code = code
         self.__need_storage = need_storage
         self.__name = name
@@ -13,7 +16,6 @@ class DeployTransaction(Transaction):
         self.__author = author
         self.__email = email
         self.__description = description
-        self.__tx_type = TransactionType.DeployCode.value
 
     def serialize_exclusive_data(self, writer: BinaryWriter):
         writer.write_var_bytes(self.__code)
