@@ -43,8 +43,8 @@ class Asset(object):
         """
         raw_address = Address.b58decode(b58_address).to_bytes()
         contract_address = self.get_asset_address(asset)
-        invoke_code = build_native_invoke_code(contract_address, b'\x00', "balanceOf", raw_address)
-        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), list())
+        invoke_code = build_native_invoke_code(contract_address, self.__version, 'balanceOf', raw_address)
+        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
             balance = ContractDataParser.to_int(response['Result'])
@@ -65,7 +65,7 @@ class Asset(object):
         raw_to = Address.b58decode(b58_to_address).to_bytes()
         args = {"from": raw_from, "to": raw_to}
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "allowance", args)
-        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), list())
+        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
             allowance = ContractDataParser.to_int(response['Result'])
@@ -94,7 +94,7 @@ class Asset(object):
         contract_address = self.get_asset_address(asset)
         method = 'name'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
-        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), list())
+        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         name = response['Result']
         name = ContractDataParser.to_utf8_str(name)
@@ -110,7 +110,7 @@ class Asset(object):
         contract_address = self.get_asset_address(asset)
         method = 'symbol'
         invoke_code = build_native_invoke_code(contract_address, b'\x00', method, bytearray())
-        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), list())
+        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         symbol = ContractDataParser.to_utf8_str(response['Result'])
         return symbol
@@ -124,7 +124,7 @@ class Asset(object):
         """
         contract_address = self.get_asset_address(asset)
         invoke_code = build_native_invoke_code(contract_address, b'\x00', 'decimals', bytearray())
-        tx = Transaction(0, 0xd1, int(time()), 0, 0, None, invoke_code, bytearray(), list())
+        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
         response = self.__sdk.rpc.send_raw_transaction_pre_exec(tx)
         try:
             decimal = ContractDataParser.to_int(response['Result'])
@@ -163,7 +163,7 @@ class Asset(object):
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
         state = [{"from": raw_from, "to": raw_to, "amount": amount}]
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "transfer", state)
-        return Transaction(0, 0xd1, int(time()), gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
+        return Transaction(0, 0xd1, gas_price, gas_limit, raw_payer, invoke_code)
 
     def new_approve_transaction(self, asset: str, b58_send_address: str, b58_recv_address: str, amount: int,
                                 b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
@@ -195,7 +195,7 @@ class Asset(object):
         raw_payer = Address.b58decode(b58_payer_address).to_bytes()
         args = {"from": raw_send, "to": raw_recv, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, b'\x00', 'approve', args)
-        return Transaction(0, 0xd1, int(time()), gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
+        return Transaction(0, 0xd1, gas_price, gas_limit, raw_payer, invoke_code)
 
     def new_transfer_from_transaction(self, asset: str, b58_send_address: str, b58_from_address: str,
                                       b58_recv_address: str, amount: int, b58_payer_address: str, gas_limit: int,
@@ -221,7 +221,7 @@ class Asset(object):
         contract_address = self.get_asset_address(asset)
         args = {"sender": raw_sender, "from": raw_from, "to": raw_to, "amount": amount}
         invoke_code = build_native_invoke_code(contract_address, b'\x00', "transferFrom", args)
-        return Transaction(0, 0xd1, int(time()), gas_price, gas_limit, raw_payer, invoke_code, bytearray(), list())
+        return Transaction(0, 0xd1, gas_price, gas_limit, raw_payer, invoke_code)
 
     def new_withdraw_ong_transaction(self, b58_claimer_address: str, b58_recv_address: str, amount: int,
                                      b58_payer_address: str, gas_limit: int, gas_price: int) -> Transaction:
@@ -253,8 +253,8 @@ class Asset(object):
         args = {"sender": Address.b58decode(b58_claimer_address).to_bytes(), "from": ont_contract_address,
                 "to": Address.b58decode(b58_recv_address).to_bytes(), "value": amount}
         invoke_code = build_native_invoke_code(ong_contract_address, b'\x00', "transferFrom", args)
-        payer_array = Address.b58decode(b58_payer_address).to_bytes()
-        return Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer_array, invoke_code, bytearray(), list())
+        raw_payer = Address.b58decode(b58_payer_address).to_bytes()
+        return Transaction(0, 0xd1, gas_price, gas_limit, raw_payer, invoke_code)
 
     def transfer(self, asset: str, from_acct: Account, b58_to_address: str, amount: int, payer: Account,
                  gas_limit: int, gas_price: int):
