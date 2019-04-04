@@ -1,20 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
 
-VERSION_TRANSACTION = b'\x00'
-VERSION_CONTRACT_ONT = b'\x00'
-VERSION_CONTRACT_ONG = b'\x00'
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-NATIVE_TRANSFER = 'transfer'
-NATIVE_TRANSFER_FROM = 'transferFrom'
-NATIVE_APPROVE = 'approve'
-NATIVE_ALLOWANCE = 'allowance'
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 DID_ONT = 'did:ont:'
-
-# NeoVM invokes a smart contract return type
-
-NEOVM_TYPE_BOOL = 1
-NEOVM_TYPE_INTEGER = 2
-NEOVM_TYPE_BYTE_ARRAY = 3
-NEOVM_TYPE_STRING = 4
-UINT256_SIZE = 32
