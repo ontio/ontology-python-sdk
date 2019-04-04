@@ -6,7 +6,7 @@ from time import perf_counter
 from aiohttp.client import ClientSession
 import unittest
 
-from test import sdk, acct1, acct2, acct3
+from test import sdk, acct1, acct2, acct3, acct4
 
 from ontology.common.address import Address
 from ontology.network.aiorpc import AioRpc
@@ -14,9 +14,6 @@ from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_data import ContractDataParser
-
-pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 
 class TestAioRpc(unittest.TestCase):
@@ -49,11 +46,14 @@ class TestAioRpc(unittest.TestCase):
 
     @AioRpc.runner
     async def test_get_network_id(self):
+        network_id = await sdk.aio_rpc.get_network_id()
+        self.assertEqual(network_id, 2)
         try:
+            sdk.aio_rpc.connect_to_main_net()
             network_id = await sdk.aio_rpc.get_network_id()
-            self.assertGreaterEqual(network_id, 0)
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
+            self.assertEqual(network_id, 1)
+        finally:
+            sdk.aio_rpc.connect_to_test_net()
 
     @AioRpc.runner
     async def test_get_block_by_hash(self):
@@ -75,18 +75,18 @@ class TestAioRpc(unittest.TestCase):
 
     @AioRpc.runner
     async def test_get_block_height(self):
-        tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
-                       'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2']
-        height_lst = [0, 564235]
-        async with ClientSession() as session:
-            try:
-                height = await sdk.aio_rpc.get_block_height(session)
-                self.assertGreater(height, 103712)
-                for index, tx_hash in enumerate(tx_hash_lst):
-                    block_count = await sdk.aio_rpc.get_block_height_by_tx_hash(tx_hash, session)
-                    self.assertEqual(height_lst[index], block_count)
-            except SDKException as e:
-                self.assertTrue('ConnectTimeout' in e.args[1])
+        tx_hash_list = ['1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
+                        '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb',
+                        'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2',
+                        '0000000000000000000000000000000000000000000000000000000000000000']
+        height_list = [0, 1024, 564235, -1]
+        for index, tx_hash in enumerate(tx_hash_list):
+            if height_list[index] == -1:
+                with self.assertRaises(SDKException):
+                    await sdk.aio_rpc.get_block_height_by_tx_hash(tx_hash)
+                continue
+            height = await sdk.aio_rpc.get_block_height_by_tx_hash(tx_hash)
+            self.assertEqual(height_list[index], height)
 
     @AioRpc.runner
     async def test_get_block_count_by_tx_hash(self):
@@ -116,11 +116,15 @@ class TestAioRpc(unittest.TestCase):
 
     @AioRpc.runner
     async def test_get_balance(self):
-        async with ClientSession() as session:
-            address_balance = await sdk.aio_rpc.get_balance(acct1.get_address_base58(), session)
-            self.assertTrue(isinstance(address_balance, dict))
-            multi_address_balance = await sdk.aio_rpc.get_balance(multi_address.b58encode(), session)
-            self.assertTrue(isinstance(multi_address_balance, dict))
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
+        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                        acct4.get_address_base58(), multi_address.b58encode()]
+        for address in address_list:
+            balance = await sdk.aio_rpc.get_balance(address)
+            self.assertTrue(isinstance(balance, dict))
+            self.assertGreaterEqual(balance['ONT'], 0)
+            self.assertGreaterEqual(balance['ONG'], 0)
 
     @AioRpc.runner
     async def test_get_grant_ong(self):
@@ -186,9 +190,14 @@ class TestAioRpc(unittest.TestCase):
 
     @AioRpc.runner
     async def test_get_smart_contract(self):
+        address_list = ['1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9', '0100000000000000000000000000000000000000']
+        info_list = [[True, 'DINGXIN', 'A sample of OEP4'], [True, 'Ontology Team', 'Ontology Network ONT Token']]
+        for index, address in enumerate(address_list):
+            contract = await sdk.aio_rpc.get_contract(address)
+            self.assertEqual(info_list[index][0], contract['NeedStorage'])
+            self.assertEqual(info_list[index][1], contract['Author'])
+            self.assertEqual(info_list[index][2], contract['Description'])
         try:
-            contract = await sdk.aio_rpc.get_contract('0100000000000000000000000000000000000000')
-            self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
             sdk.aio_rpc.connect_to_main_net()
             contract = await sdk.aio_rpc.get_contract('6c80f3a5c183edee7693a038ca8c476fb0d6ac91')
             self.assertEqual('Youle_le_service@fosun.com', contract.get('Email', ''))
