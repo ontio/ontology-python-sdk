@@ -14,8 +14,6 @@ from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.utils.contract_event import ContractEventParser
 
-import inspect
-
 
 class TestWebsocketClient(unittest.TestCase):
     @Websocket.runner

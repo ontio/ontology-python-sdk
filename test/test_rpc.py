@@ -4,16 +4,13 @@
 import time
 import unittest
 
-from test import sdk, acct1, acct2, acct3
+from test import sdk, acct1, acct2, acct3, acct4
 
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.utils.utils import get_random_hex_str
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_data import ContractDataParser
-
-pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
 
 
 class TestRpcClient(unittest.TestCase):
@@ -41,11 +38,16 @@ class TestRpcClient(unittest.TestCase):
             self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_network_id(self):
+        network_id = sdk.rpc.get_network_id()
+        self.assertEqual(2, network_id)
         try:
+            sdk.rpc.connect_to_main_net()
             network_id = sdk.rpc.get_network_id()
-            self.assertGreaterEqual(network_id, 0)
+            self.assertEqual(1, network_id)
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
+        finally:
+            sdk.rpc.connect_to_test_net()
 
     def test_get_block_by_hash(self):
         try:
@@ -71,15 +73,17 @@ class TestRpcClient(unittest.TestCase):
             self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_block_height_by_tx_hash(self):
-        tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
-                       'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2']
-        height_lst = [0, 564235]
-        try:
-            for index, tx_hash in enumerate(tx_hash_lst):
-                block_count = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
-                self.assertEqual(height_lst[index], block_count)
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
+        tx_hash_list = ['1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
+                        '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb',
+                        'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2',
+                        '0000000000000000000000000000000000000000000000000000000000000000']
+        height_list = [0, 1024, 564235, -1]
+        for index, tx_hash in enumerate(tx_hash_list):
+            if height_list[index] == -1:
+                self.assertRaises(SDKException, sdk.rpc.get_block_height_by_tx_hash, tx_hash)
+                continue
+            height = sdk.rpc.get_block_height_by_tx_hash(tx_hash)
+            self.assertEqual(height_list[index], height)
 
     def test_get_block_count_by_tx_hash(self):
         tx_hash_lst = ['7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e',
@@ -108,41 +112,19 @@ class TestRpcClient(unittest.TestCase):
             self.assertTrue('ConnectTimeout' in e.args[1])
 
     def test_get_balance(self):
-        base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        address_balance = sdk.rpc.get_balance(base58_address)
-        try:
-            address_balance['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            address_balance['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        address_balance = sdk.rpc.get_balance(acct1.get_address_base58())
-        try:
-            address_balance['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            address_balance['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-
-        multi_address_balance = sdk.rpc.get_balance(multi_address.b58encode())
-        try:
-            multi_address_balance['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            multi_address_balance['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
+        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                        acct4.get_address_base58(), multi_address.b58encode()]
+        for address in address_list:
+            try:
+                balance = sdk.rpc.get_balance(address)
+            except SDKException as e:
+                self.assertTrue('ConnectTimeout' in e.args[1])
+                continue
+            self.assertTrue(isinstance(balance, dict))
+            self.assertGreaterEqual(balance['ONT'], 0)
+            self.assertGreaterEqual(balance['ONG'], 0)
 
     def test_get_grant_ong(self):
         b58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
@@ -217,8 +199,13 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_smart_contract(self):
         try:
-            contract = sdk.rpc.get_contract('0100000000000000000000000000000000000000')
-            self.assertEqual(contract['Description'], 'Ontology Network ONT Token')
+            address_list = ['1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9', '0100000000000000000000000000000000000000']
+            info_list = [[True, 'DINGXIN', 'A sample of OEP4'], [True, 'Ontology Team', 'Ontology Network ONT Token']]
+            for index, address in enumerate(address_list):
+                contract = sdk.rpc.get_contract(address)
+                self.assertEqual(info_list[index][0], contract['NeedStorage'])
+                self.assertEqual(info_list[index][1], contract['Author'])
+                self.assertEqual(info_list[index][2], contract['Description'])
         except SDKException as e:
             self.assertTrue('ConnectTimeout' in e.args[1])
         try:
@@ -286,10 +273,8 @@ class TestRpcClient(unittest.TestCase):
 
     def test_get_memory_pool_tx_state(self):
         tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
-        try:
+        with self.assertRaises(SDKException):
             sdk.rpc.get_memory_pool_tx_state(tx_hash)
-        except SDKException as e:
-            self.assertIn('unknown transaction', e.args[1])
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         b58_to_address = 'AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'
