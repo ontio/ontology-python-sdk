@@ -122,14 +122,14 @@ class TestAsset(unittest.TestCase):
 
     def test_new_transfer_transaction(self):
         sdk.rpc.connect_to_test_net()
-        b58_from_address = acct1.get_address_base58()
-        b58_to_address = acct2.get_address_base58()
+        b58_from_address = acct2.get_address_base58()
+        b58_to_address = acct1.get_address_base58()
         b58_payer_address = b58_to_address
         amount = 1
         gas_price = 500
         gas_limit = 20000
         tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, amount,
-                                                            b58_payer_address, gas_limit, gas_price)
+                                                            b58_payer_address, 20000, 500)
         tx.sign_transaction(acct1)
         tx.add_sign_transaction(acct2)
         try:
