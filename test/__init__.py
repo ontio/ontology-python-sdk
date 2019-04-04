@@ -10,6 +10,7 @@ sdk = OntologySdk()
 sdk.rpc.connect_to_test_net()
 sdk.aio_rpc.connect_to_test_net()
 sdk.restful.connect_to_test_net()
+sdk.aio_restful.connect_to_test_net()
 sdk.websocket.connect_to_test_net()
 wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
 wallet_manager = sdk.wallet_manager
