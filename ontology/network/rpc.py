@@ -295,6 +295,7 @@ class Rpc(object):
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BALANCE, [b58_address, 1])
         response = self.__post(self.__url, payload)
+        response['result'] = dict((k.upper(), int(v)) for k, v in response.get('result', dict()).items())
         if is_full:
             return response
         return response['result']
@@ -422,6 +423,8 @@ class Rpc(object):
     def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
         response = self.__post(self.__url, payload)
+        if response.get('result', '') == '':
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
         if is_full:
             return response
         return response['result']['State']
