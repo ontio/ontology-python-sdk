@@ -4,6 +4,7 @@
 import asyncio
 import unittest
 
+from ontology.common.address import Address
 from test import sdk, acct1, acct2, acct3, acct4
 
 from ontology.account.account import Account
@@ -75,11 +76,15 @@ class TestWebsocketClient(unittest.TestCase):
 
     @Websocket.runner
     async def test_get_balance(self):
-        b58_address = acct4.get_address_base58()
-        balance = await sdk.websocket.get_balance(b58_address)
-        await sdk.websocket.close_connect()
-        self.assertGreaterEqual(balance['ont'], 1)
-        self.assertGreaterEqual(balance['ong'], 1)
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
+        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                        acct4.get_address_base58(), multi_address.b58encode()]
+        for address in address_list:
+            balance = await sdk.websocket.get_balance(address)
+            self.assertTrue(isinstance(balance, dict))
+            self.assertGreaterEqual(balance['ONT'], 0)
+            self.assertGreaterEqual(balance['ONG'], 0)
 
     @Websocket.runner
     async def test_get_storage(self):
@@ -142,13 +147,19 @@ class TestWebsocketClient(unittest.TestCase):
 
     @Websocket.runner
     async def test_get_block_height_by_tx_hash(self):
+        tx_hash_list = ['1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
+                        '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb',
+                        'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2',
+                        '0000000000000000000000000000000000000000000000000000000000000000']
+        height_list = [0, 1024, 564235, -1]
         try:
-            tx_hash = '1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79'
-            height = await sdk.websocket.get_block_height_by_tx_hash(tx_hash)
-            self.assertEqual(0, height)
-            tx_hash = '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb'
-            height = await sdk.websocket.get_block_height_by_tx_hash(tx_hash)
-            self.assertEqual(1024, height)
+            for index, tx_hash in enumerate(tx_hash_list):
+                if height_list[index] == -1:
+                    with self.assertRaises(SDKException):
+                        await sdk.websocket.get_block_height_by_tx_hash(tx_hash)
+                    continue
+                height = await sdk.websocket.get_block_height_by_tx_hash(tx_hash)
+                self.assertEqual(height_list[index], height)
         finally:
             await sdk.websocket.close_connect()
 
@@ -174,7 +185,7 @@ class TestWebsocketClient(unittest.TestCase):
             self.assertEqual('2e36db16c8faf0ea0f84172256e79b78a3d8d076114fe8aaa302794668b9396f', response['Hash'])
             self.assertEqual(height, response['Header']['Height'])
         finally:
-            sdk.websocket.close_connect()
+            await sdk.websocket.close_connect()
 
     @Websocket.runner
     async def test_get_block_by_hash(self):
@@ -195,13 +206,15 @@ class TestWebsocketClient(unittest.TestCase):
         tx.sign_transaction(acct1)
         tx_hash = await sdk.websocket.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
-        await asyncio.sleep(7)
+        await asyncio.sleep(6)
         event = dict()
-        count = 0
-        while len(event) == 0 and count < 5:
-            await sdk.websocket.send_heartbeat()
+        for _ in range(0, 10):
             event = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
+            if isinstance(event, dict) and event.get('TxHash', '') == tx_hash:
+                break
+            await asyncio.sleep(2)
         await sdk.websocket.close_connect()
+        self.assertTrue(isinstance(event, dict))
         self.assertEqual(tx_hash, event['TxHash'])
         self.assertEqual(1, event['State'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
