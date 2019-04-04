@@ -59,6 +59,10 @@ class ErrorCode:
     def invalid_tx_hash(tx_hash: str):
         return ErrorCode.get_error(60001, f'Network Error, invalid TxHash: {tx_hash}')
 
+    @staticmethod
+    def connect_timeout(url: str):
+        return ErrorCode.get_error(60002, f'Network Error, connect timeout: {url}')
+
     invalid_private_key = get_error.__func__(100001, 'Account Error, invalid private key.')
     unsupported_key_type = get_error.__func__(100002, 'Account Error, unsupported key type.')
 
