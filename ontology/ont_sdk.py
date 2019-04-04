@@ -9,6 +9,7 @@ from ontology.network.aiorpc import AioRpc
 from ontology.service.service import Service
 from ontology.network.websocket import Websocket
 from ontology.smart_contract.neo_vm import NeoVm
+from ontology.network.aiorestful import AioRestful
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.smart_contract.native_vm import NativeVm
@@ -39,6 +40,7 @@ class OntologySdk(metaclass=_Singleton):
         self.__rpc = Rpc(rpc_address)
         self.__aio_rpc = AioRpc(rpc_address)
         self.__restful = Restful(restful_address)
+        self.__aio_restful = AioRestful(restful_address)
         self.__websocket = Websocket(ws_address)
         self.__native_vm = NativeVm(self)
         self.__neo_vm = NeoVm(self)
@@ -85,6 +87,11 @@ class OntologySdk(metaclass=_Singleton):
     def rpc(self) -> Rpc:
         return self.__rpc
 
+    @rpc.setter
+    def rpc(self, rpc_client: Rpc):
+        if isinstance(rpc_client, Rpc):
+            self.__rpc = rpc_client
+
     @property
     def aio_rpc(self) -> AioRpc:
         return self.__aio_rpc
@@ -94,11 +101,6 @@ class OntologySdk(metaclass=_Singleton):
         if isinstance(aio_rpc, AioRpc):
             self.__rpc = aio_rpc
 
-    @rpc.setter
-    def rpc(self, rpc_client: Rpc):
-        if isinstance(rpc_client, Rpc):
-            self.__rpc = rpc_client
-
     @property
     def restful(self) -> Restful:
         return self.__restful
@@ -107,6 +109,15 @@ class OntologySdk(metaclass=_Singleton):
     def restful(self, restful_client: Restful):
         if isinstance(restful_client, Restful):
             self.__restful = restful_client
+
+    @property
+    def aio_restful(self) -> AioRestful:
+        return self.__aio_restful
+
+    @restful.setter
+    def restful(self, aio_restful: AioRestful):
+        if isinstance(aio_restful, AioRestful):
+            self.__aio_restful = aio_restful
 
     @property
     def websocket(self) -> Websocket:
