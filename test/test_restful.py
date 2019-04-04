@@ -3,7 +3,7 @@
 
 import unittest
 
-from test import sdk, acct4, acct3
+from test import sdk, acct4, acct3, acct1, acct2
 
 from ontology.common.address import Address
 from ontology.account.account import Account
@@ -28,11 +28,18 @@ class TestRestful(unittest.TestCase):
         self.assertGreater(height, 1)
 
     def test_get_block_height_by_tx_hash(self):
-        tx_hash = '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e'
-        block_height = sdk.restful.get_block_height_by_tx_hash(tx_hash)
-        self.assertEqual(0, block_height)
-        tx_hash = '0000000000000000000000000000000000000000000000000000000000000000'
-        self.assertRaises(SDKException, sdk.restful.get_block_height_by_tx_hash, tx_hash)
+        tx_hash_list = ['1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
+                        '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb',
+                        'e96994829aa9f6cf402da56f427491458a730df1c3ff9158ef1cbed31b8628f2',
+                        '0000000000000000000000000000000000000000000000000000000000000000']
+        height_list = [0, 1024, 564235, -1]
+        for index, tx_hash in enumerate(tx_hash_list):
+            if height_list[index] == -1:
+                with self.assertRaises(SDKException):
+                    sdk.restful.get_block_height_by_tx_hash(tx_hash)
+                continue
+            height = sdk.restful.get_block_height_by_tx_hash(tx_hash)
+            self.assertEqual(height_list[index], height)
 
     def test_get_gas_price(self):
         price = sdk.restful.get_gas_price()
@@ -40,7 +47,13 @@ class TestRestful(unittest.TestCase):
 
     def test_get_network_id(self):
         network_id = sdk.restful.get_network_id()
-        self.assertGreaterEqual(network_id, 0)
+        self.assertEqual(network_id, 2)
+        try:
+            sdk.restful.connect_to_main_net()
+            network_id = sdk.restful.get_network_id()
+            self.assertEqual(network_id, 1)
+        finally:
+            sdk.restful.connect_to_test_net()
 
     def test_get_block_by_hash(self):
         block_hash = "1aae9881945b42a30072c608674687c6d9845b29c8c34f91c65081d6bc631868"
@@ -53,49 +66,15 @@ class TestRestful(unittest.TestCase):
         self.assertEqual(block['Header']['Height'], height)
 
     def test_get_balance(self):
-        private_key1 = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        private_key2 = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        private_key3 = '1383ed1fe570b6673351f1a30a66b21204918ef8f673e864769fa2a653401114'
-        acct = Account(private_key1, SignatureScheme.SHA256withECDSA)
-        acct2 = Account(private_key2, SignatureScheme.SHA256withECDSA)
-        acct3 = Account(private_key3, SignatureScheme.SHA256withECDSA)
-        pub_keys = [acct.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-        multi_addr = Address.address_from_multi_pub_keys(2, pub_keys)
-        base58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
-        address_balance = sdk.restful.get_balance(base58_address)
-        try:
-            address_balance['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            address_balance['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        address_balance = sdk.restful.get_balance(acct.get_address_base58())
-        try:
-            address_balance['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            address_balance['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-
-        multi_address_balance = sdk.restful.get_balance(multi_addr.b58encode())
-        try:
-            multi_address_balance['ont']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
-        try:
-            multi_address_balance['ong']
-        except KeyError:
-            raised = True
-            self.assertFalse(raised, 'Exception raised')
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
+        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                        acct4.get_address_base58(), multi_address.b58encode()]
+        for address in address_list:
+            balance = sdk.restful.get_balance(address)
+            self.assertTrue(isinstance(balance, dict))
+            self.assertGreaterEqual(balance['ONT'], 0)
+            self.assertGreaterEqual(balance['ONG'], 0)
 
     def test_get_grant_ong(self):
         b58_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
