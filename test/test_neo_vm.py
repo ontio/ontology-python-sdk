@@ -25,27 +25,6 @@ class TestNeoVm(unittest.TestCase):
         self.assertEqual(num_hex_str_little, num_dec.to_bytes(8, 'little').hex())
         self.assertEqual(num_hex_str_big, num_dec.to_bytes(8, 'big').hex())
 
-    def test_get_balance(self):
-        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
-        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
-                        acct4.get_address_base58(), multi_address.b58encode()]
-        for address in address_list:
-            balance = sdk.restful.get_balance(address)
-            self.assertTrue(isinstance(balance, dict))
-            self.assertGreaterEqual(balance['ONT'], 0)
-            self.assertGreaterEqual(balance['ONG'], 0)
-
-    def test_unbound_ong(self):
-        acct1_unbound_ong = sdk.native_vm.asset().query_unbound_ong(acct1.get_address_base58())
-        self.assertGreaterEqual(int(acct1_unbound_ong), 0)
-        acct2_unbound_ong = sdk.native_vm.asset().query_unbound_ong(acct4.get_address_base58())
-        self.assertGreaterEqual(int(acct2_unbound_ong), 0)
-        acct3_unbound_ong = sdk.native_vm.asset().query_unbound_ong(acct4.get_address_base58())
-        self.assertGreaterEqual(int(acct3_unbound_ong), 0)
-        acct4_unbound_ong = sdk.native_vm.asset().query_unbound_ong(acct4.get_address_base58())
-        self.assertGreaterEqual(int(acct4_unbound_ong), 0)
-
     def test_address_from_vm_code(self):
         avm_code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
                    '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \

@@ -49,30 +49,14 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(0, decimals)
 
     def test_unbound_ong(self):
-        b58_address1 = acct1.get_address_base58()
-        b58_address2 = acct2.get_address_base58()
-        b58_address3 = acct3.get_address_base58()
-        b58_address4 = acct4.get_address_base58()
-        try:
-            acct1_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address1)
-            self.assertGreaterEqual(acct1_unbound_ong, 0)
-        except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
-        try:
-            acct2_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address2)
-            self.assertGreaterEqual(acct2_unbound_ong, 0)
-        except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
-        try:
-            acct3_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address3)
-            self.assertGreaterEqual(acct3_unbound_ong, 0)
-        except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
-        try:
-            acct4_unbound_ong = sdk.native_vm.asset().query_unbound_ong(b58_address4)
-            self.assertGreaterEqual(acct4_unbound_ong, 0)
-        except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                        acct4.get_address_base58()]
+        for address in address_list:
+            try:
+                unbound_ong = sdk.native_vm.asset().query_unbound_ong(address)
+                self.assertGreaterEqual(unbound_ong, 0)
+            except SDKException as e:
+                self.assertTrue(e.args[1] in error_msg)
 
     def test_query_balance(self):
         b58_address = acct1.get_address_base58()
