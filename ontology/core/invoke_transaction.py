@@ -13,10 +13,9 @@ from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
 class InvokeTransaction(Transaction):
-    def __init__(self, payer: bytes = None, gas_price: int = 0, gas_limit: int = 0, params: bytearray = None,
+    def __init__(self, payer: bytes or str = b'', gas_price: int = 0, gas_limit: int = 0, payload: bytearray = None,
                  version: int = 0):
-        super().__init__(version, TransactionType.InvokeCode.value, int(time()), gas_price, gas_limit, payer, params,
-                         bytearray(), [])
+        super().__init__(version, TransactionType.InvokeCode.value, gas_price, gas_limit, payer, payload)
 
     @staticmethod
     def generate_invoke_code(contract_address: str or bytes or bytearray, func: AbiFunction or InvokeFunction):
