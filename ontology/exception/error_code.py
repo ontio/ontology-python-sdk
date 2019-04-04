@@ -55,6 +55,10 @@ class ErrorCode:
     def invalid_contract_address(contract_address: str):
         return ErrorCode.get_error(50001, f'NeoVm Error, invalid hex contract address: {contract_address}')
 
+    @staticmethod
+    def invalid_tx_hash(tx_hash: str):
+        return ErrorCode.get_error(60001, f'Network Error, invalid TxHash: {tx_hash}')
+
     invalid_private_key = get_error.__func__(100001, 'Account Error, invalid private key.')
     unsupported_key_type = get_error.__func__(100002, 'Account Error, unsupported key type.')
 
