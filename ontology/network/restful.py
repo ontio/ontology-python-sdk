@@ -252,6 +252,7 @@ class Restful(object):
     def get_balance(self, b58_address: str, is_full: bool = False):
         url = RestfulMethod.get_account_balance(self.__url, b58_address)
         response = self.__get(url)
+        response['Result'] = dict((k.upper(), int(v)) for k, v in response.get('Result', dict()).items())
         if is_full:
             return response
         return response['Result']
@@ -346,6 +347,8 @@ class Restful(object):
     def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False) -> List[dict] or dict:
         url = RestfulMethod.get_mem_pool_tx_state(self.__url, tx_hash)
         response = self.__get(url)
+        if response.get('Result', '') == '':
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
         if is_full:
             return response
         return response['Result']['State']
