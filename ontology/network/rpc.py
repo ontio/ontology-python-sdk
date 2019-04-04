@@ -347,6 +347,8 @@ class Rpc(object):
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
         response = self.__post(self.__url, payload)
+        if not response['result']:
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
         if is_full:
             return response
         return response['result']
