@@ -1,16 +1,28 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
 
-from time import time
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
-from ontology.vm.op_code import APPCALL
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from ontology.common.address import Address
 from ontology.smart_contract.neo_contract.oep4 import Oep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
+from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
 class NeoVm(object):
