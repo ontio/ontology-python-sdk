@@ -107,13 +107,16 @@ class AioRpc(object):
 
     async def __post(self, session, payload):
         header = {'Content-type': 'application/json'}
-        if session is None:
-            async with ClientSession() as session:
+        try:
+            if session is None:
+                async with ClientSession() as session:
+                    async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
+                        return json.loads(await response.content.read(-1))
+            else:
                 async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
                     return json.loads(await response.content.read(-1))
-        else:
-            async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
-                return json.loads(await response.content.read(-1))
+        except asyncio.TimeoutError:
+            raise SDKException(ErrorCode.connect_timeout(self.__url))
 
     async def get_version(self, session: ClientSession = None, is_full: bool = False):
         """
@@ -208,6 +211,8 @@ class AioRpc(object):
     async def get_block_height_by_tx_hash(self, tx_hash: str, session: ClientSession = None, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_HEIGHT_BY_HASH, [tx_hash])
         response = await self.__post(session, payload)
+        if response.get('result', '') == '':
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
         if is_full:
             return response
         return response['result']
@@ -252,6 +257,7 @@ class AioRpc(object):
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BALANCE, [b58_address, 1])
         response = await self.__post(session, payload)
+        response['result'] = dict((k.upper(), int(v)) for k, v in response.get('result', dict()).items())
         if is_full:
             return response
         return response['result']
@@ -361,10 +367,12 @@ class AioRpc(object):
     async def get_memory_pool_tx_state(self, tx_hash: str, session: ClientSession = None, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
         response = await self.__post(session, payload)
+        if response.get('result', '') == '':
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
+        if response.get('error', -1) != 0:
+            raise SDKException(ErrorCode.other_error(response.get('result', '')))
         if is_full:
             return response
-        if isinstance(response['result'], str):
-            return response['result']
         return response['result']['State']
 
     async def send_raw_transaction(self, tx: Transaction, session: ClientSession = None, is_full: bool = False) -> str:
