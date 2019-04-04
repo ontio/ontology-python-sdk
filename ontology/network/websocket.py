@@ -115,7 +115,7 @@ class Websocket(object):
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getbalance', Id=self.__id, Version='1.0.0', Addr=b58_address)
         response = await self.__send_recv(msg, is_full=True)
-        response['Result'] = dict((k, int(v)) for k, v in response['Result'].items())
+        response['Result'] = dict((k.upper(), int(v)) for k, v in response.get('Result', dict()).items())
         if is_full:
             return response
         return response['Result']
@@ -163,7 +163,12 @@ class Websocket(object):
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getblockheightbytxhash', Id=self.__id, Version='1.0.0', Hash=tx_hash)
-        return await self.__send_recv(msg, is_full)
+        response = await self.__send_recv(msg, is_full=True)
+        if response.get('Result', '') == '':
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
+        if is_full:
+            return response
+        return response['Result']
 
     async def get_block_hash_by_height(self, height: int, is_full: bool = False):
         if self.__id == 0:
