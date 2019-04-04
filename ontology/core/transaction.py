@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from time import time
 from enum import Enum
 from typing import List
+
+from Cryptodome.Random.random import randint
 
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
@@ -40,7 +41,7 @@ class Transaction(object):
             tx_type = tx_type.value
         self.tx_type = tx_type
         if not nonce:
-            nonce = int(time())
+            nonce = randint(0, 0xFFFFFFFF)
         self.nonce = nonce
         self.gas_price = gas_price
         self.gas_limit = gas_limit
