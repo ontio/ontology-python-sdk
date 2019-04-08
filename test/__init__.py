@@ -44,3 +44,4 @@ ont_id_2 = 'did:ont:AP8XfCUo7w3qM4b5gyQU8AEyRSwgtDFSzp'
 identity2 = wallet_manager.get_identity_by_ont_id(ont_id_2)
 identity2_ctrl_acct = wallet_manager.get_control_account_by_index(ont_id_2, 0, password)
 wallet_manager.save()
+no_panic_exception = ['balance insufficient', 'ConnectTimeout', 'already in the tx pool']

@@ -24,12 +24,10 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from test import sdk, acct1, acct2, acct3, acct4
+from test import sdk, acct1, acct2, acct3, acct4, no_panic_exception
 
 from ontology.exception.exception import SDKException
 from ontology.utils.contract_event import ContractEventParser
-
-error_msg = ['balance insufficient', 'ConnectTimeout', 'already in the tx pool']
 
 
 class TestAsset(unittest.TestCase):
@@ -52,12 +50,12 @@ class TestAsset(unittest.TestCase):
             token_symbol = sdk.native_vm.asset().query_symbol('ont')
             self.assertEqual('ONT', token_symbol)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
         try:
             token_symbol = sdk.native_vm.asset().query_symbol('ong')
             self.assertEqual('ONG', token_symbol)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_query_decimals(self):
         sdk.rpc.connect_to_test_net()
@@ -74,7 +72,7 @@ class TestAsset(unittest.TestCase):
                 unbound_ong = sdk.native_vm.asset().query_unbound_ong(address)
                 self.assertGreaterEqual(unbound_ong, 0)
             except SDKException as e:
-                self.assertTrue(e.args[1] in error_msg)
+                self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_query_balance(self):
         b58_address = acct1.get_address_base58()
@@ -83,20 +81,20 @@ class TestAsset(unittest.TestCase):
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 0)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
         try:
             balance = sdk.native_vm.asset().query_balance('ong', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 0)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
         b58_address = acct2.get_address_base58()
         try:
             balance = sdk.native_vm.asset().query_balance('ong', b58_address)
             self.assertTrue(isinstance(balance, int))
             self.assertGreaterEqual(balance, 1)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_query_allowance(self):
         b58_from_address = 'ANH5bHrrt111XwNEnuPZj6u95Dd6u7G4D6'
@@ -110,17 +108,14 @@ class TestAsset(unittest.TestCase):
         b58_send_address = acct2.get_address_base58()
         b58_payer_address = acct2.get_address_base58()
         b58_recv_address = acct1.get_address_base58()
-        amount = 5
-        gas_price = 500
-        gas_limit = 20000
         try:
-            tx = sdk.native_vm.asset().new_approve_transaction('ont', b58_send_address, b58_recv_address, amount,
-                                                               b58_payer_address, gas_limit, gas_price)
+            tx = sdk.native_vm.asset().new_approve_transaction('ont', b58_send_address, b58_recv_address, 5,
+                                                               b58_payer_address, 20000, 500)
             tx.sign_transaction(acct2)
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_new_transfer_transaction(self):
         sdk.rpc.connect_to_test_net()
@@ -138,7 +133,7 @@ class TestAsset(unittest.TestCase):
             tx_hash = sdk.rpc.send_raw_transaction(tx)
             self.assertEqual(64, len(tx_hash))
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
             return
 
         time.sleep(randint(7, 12))
@@ -161,7 +156,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.native_vm.asset().transfer('ont', acct2, b58_to_address, 1, acct4, 20000, 500)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
             return
         time.sleep(randint(7, 12))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
@@ -180,7 +175,7 @@ class TestAsset(unittest.TestCase):
         try:
             tx_hash = sdk.rpc.send_raw_transaction(tx)
         except SDKException as e:
-            self.assertTrue(e.args[1] in error_msg)
+            self.assertTrue(e.args[1] in no_panic_exception)
             return
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(7, 12))
@@ -204,7 +199,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = sdk.rpc.send_raw_transaction(tx)
                 self.assertEqual(64, len(tx_hash))
             except SDKException as e:
-                self.assertTrue(e.args[1] in error_msg)
+                self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_withdraw_ong(self):
         claimer = acct1
@@ -215,7 +210,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = sdk.native_vm.asset().withdraw_ong(claimer, b58_recv_address, 1, payer, 20000, 500)
                 self.assertEqual(64, len(tx_hash))
             except SDKException as e:
-                self.assertTrue(e.args[1] in error_msg)
+                self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_approve(self):
         b58_recv_address = acct2.get_address_base58()
@@ -224,7 +219,7 @@ class TestAsset(unittest.TestCase):
                 tx_hash = sdk.native_vm.asset().approve('ont', acct1, b58_recv_address, 10, acct2, 20000, 500)
                 self.assertEqual(len(tx_hash), 64)
             except SDKException as e:
-                self.assertTrue(e.args[1] in error_msg)
+                self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_transfer_from(self):
         sdk.rpc.connect_to_test_net()
@@ -240,7 +235,7 @@ class TestAsset(unittest.TestCase):
                 self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
                 self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
             except SDKException as e:
-                self.assertTrue(e.args[1] in error_msg)
+                self.assertTrue(e.args[1] in no_panic_exception)
 
 
 if __name__ == '__main__':
