@@ -17,24 +17,9 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ontology.smart_contract.native_contract.asset import Asset
-from ontology.smart_contract.native_contract.ong import Ong
-from ontology.smart_contract.native_contract.ont import Ont
-from ontology.smart_contract.native_contract.ontid import OntId
-from ontology.smart_contract.native_contract.governance import Governance
 
 
-class NativeVm(object):
-    def __init__(self, sdk):
-        self.__sdk = sdk
-
-    def ont(self):
-        return Ont(self.__sdk)
-
-    def ong(self):
-        return Ong(self.__sdk)
-
-    def ont_id(self):
-        return OntId(self.__sdk)
-
-    def governance(self):
-        return Governance(self.__sdk)
+class Ont(Asset):
+    def __init__(self, sdk=None):
+        super().__init__(sdk)
+        self._contract_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
