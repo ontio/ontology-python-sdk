@@ -16,18 +16,22 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
+
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
-def ensure_bytearray_contract_address(contract_address: str or bytes or bytearray) -> bytearray:
+def ensure_bytearray_contract_address(contract_address: Union[str, bytes, bytearray, Address]) -> bytearray:
     if isinstance(contract_address, str) and len(contract_address) == 40:
         contract_address = bytearray.fromhex(contract_address)
         contract_address.reverse()
     if isinstance(contract_address, bytes):
         contract_address = bytearray(contract_address)
+    elif isinstance(contract_address, Address):
+        contract_address = contract_address.to_bytearray()
     elif isinstance(contract_address, bytearray):
         pass
     else:
