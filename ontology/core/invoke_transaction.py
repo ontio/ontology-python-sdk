@@ -16,7 +16,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
+
 from ontology.vm.op_code import APPCALL
+from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.transaction import Transaction, TransactionType
@@ -27,7 +30,8 @@ from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
 
 class InvokeTransaction(Transaction):
-    def __init__(self, payer: bytes or str = b'', gas_price: int = 0, gas_limit: int = 0, payload: bytearray = None,
+    def __init__(self, payer: Union[bytes, str, Address] = b'', gas_price: int = 0, gas_limit: int = 0,
+                 payload: bytearray = None,
                  version: int = 0):
         super().__init__(version, TransactionType.InvokeCode.value, gas_price, gas_limit, payer, payload)
 

@@ -17,7 +17,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from enum import Enum
-from typing import List
+from typing import List, Union
 
 from Cryptodome.Random.random import randint
 
@@ -49,7 +49,7 @@ TX_MAX_SIG_SIZE = 16
 
 class Transaction(object):
     def __init__(self, version=0, tx_type: TransactionType or int = None, gas_price: int = 0, gas_limit: int = 0,
-                 payer: str or bytes = b'', payload: bytearray = bytearray(), nonce: int = None,
+                 payer: Union[bytes, str, Address] = b'', payload: bytearray = bytearray(), nonce: int = None,
                  attributes: bytearray = bytearray(), sig_list: List[Sig] = None):
         self.version = version
         if isinstance(tx_type, TransactionType):
@@ -64,6 +64,8 @@ class Transaction(object):
             payer = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
         if isinstance(payer, str):
             payer = Address.b58decode(payer).to_bytes()
+        if isinstance(payer, Address):
+            payer = payer.to_bytes()
         self.payer = payer
         self.payload = payload
         self.attributes = attributes
@@ -162,9 +164,6 @@ class Transaction(object):
     def sign_transaction(self, signer: Account):
         """
         This interface is used to sign the transaction.
-
-        :param signer: an Account object which will sign the transaction.
-        :return: a Transaction object which has been signed.
         """
         tx_hash = self.hash256()
         sig_data = signer.generate_signature(tx_hash)
@@ -174,9 +173,6 @@ class Transaction(object):
     def add_sign_transaction(self, signer: Account):
         """
         This interface is used to add signature into the transaction.
-
-        :param signer: an Account object which will sign the transaction.
-        :return: a Transaction object which has been signed.
         """
         if self.sig_list is None or len(self.sig_list) == 0:
             self.sig_list = []
@@ -190,12 +186,6 @@ class Transaction(object):
     def add_multi_sign_transaction(self, m: int, pub_keys: List[bytes] or List[str], signer: Account):
         """
         This interface is used to generate an Transaction object which has multi signature.
-
-        :param tx: a Transaction object which will be signed.
-        :param m: the amount of signer.
-        :param pub_keys: a list of public keys.
-        :param signer: an Account object which will sign the transaction.
-        :return: a Transaction object which has been signed.
         """
         for index, pk in enumerate(pub_keys):
             if isinstance(pk, str):
