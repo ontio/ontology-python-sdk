@@ -16,6 +16,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
+
 from Cryptodome.Random.random import choice
 
 from ontology.network.aiorpc import AioRpc
@@ -46,7 +48,7 @@ class _Singleton(type):
 
 
 class OntologySdk(metaclass=_Singleton):
-    def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '', sig_svr_address='',
+    def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '',
                  default_signature_scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(default_signature_scheme, SignatureScheme):
             raise SDKException(ErrorCode.param_err('SignatureScheme object is required.'))
@@ -55,19 +57,29 @@ class OntologySdk(metaclass=_Singleton):
         self.__restful = Restful(restful_address)
         self.__aio_restful = AioRestful(restful_address)
         self.__websocket = Websocket(ws_address)
+        self.__default_network = self.__rpc
+        self.__default_aio_network = self.__aio_rpc
         self.__native_vm = NativeVm(self)
         self.__neo_vm = NeoVm(self)
         self.__service = Service(self)
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
 
-    def get_network(self) -> Rpc or Restful:
-        if self.__rpc.get_address() != '':
-            return self.__rpc
-        elif self.__restful.get_address() != '':
-            return self.__restful
-        else:
-            raise SDKException(ErrorCode.other_error('Invalid network instance.'))
+    @property
+    def default_network(self):
+        return self.__default_network
+
+    @default_network.setter
+    def default_network(self, network: Union[Rpc, Restful]):
+        self.__default_network = network
+
+    @property
+    def default_aio_network(self):
+        return self.__default_aio_network
+
+    @default_aio_network.setter
+    def default_aio_network(self, network: Union[AioRpc, AioRestful, Websocket]):
+        self.__default_aio_network = network
 
     @property
     def wallet_manager(self):
