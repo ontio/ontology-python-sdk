@@ -27,7 +27,7 @@ from ontology.smart_contract.neo_contract.abi.struct_type import Struct
 from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
 
 
-class Contract(object):
+class Data(object):
     @staticmethod
     def to_bool(hex_str) -> bool:
         if len(hex_str) != 2:
@@ -60,15 +60,15 @@ class Contract(object):
             stream = StreamManager.get_stream(op_code)
             reader = BinaryReader(stream)
             op_code = bytearray(reader.read_var_bytes())
-            return Contract.neo_bytearray_to_big_int(op_code)
+            return Data.neo_bytearray_to_big_int(op_code)
 
     @staticmethod
     def to_int_list(hex_str_list: list) -> List[int]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Contract.to_int_list(item)
+                hex_str_list[index] = Data.to_int_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Contract.to_int(item)
+                hex_str_list[index] = Data.to_int(item)
             else:
                 raise SDKException(ErrorCode.other_error('Invalid data.'))
         return hex_str_list
@@ -85,9 +85,9 @@ class Contract(object):
     def to_bytes_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Contract.to_bytes_list(item)
+                hex_str_list[index] = Data.to_bytes_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Contract.to_bytes(item)
+                hex_str_list[index] = Data.to_bytes(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -115,9 +115,9 @@ class Contract(object):
     def to_utf8_str_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Contract.to_utf8_str_list(item)
+                hex_str_list[index] = Data.to_utf8_str_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Contract.to_utf8_str(item)
+                hex_str_list[index] = Data.to_utf8_str(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -135,9 +135,9 @@ class Contract(object):
     def to_b58_address_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Contract.to_b58_address_list(item)
+                hex_str_list[index] = Data.to_b58_address_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Contract.to_b58_address(item)
+                hex_str_list[index] = Data.to_b58_address(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -155,9 +155,9 @@ class Contract(object):
     def to_bytes_address_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Contract.to_bytes_address_list(item)
+                hex_str_list[index] = Data.to_bytes_address_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Contract.to_bytes_address(item)
+                hex_str_list[index] = Data.to_bytes_address(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -166,7 +166,7 @@ class Contract(object):
     def to_dict(item_serialize: str) -> dict:
         stream = StreamManager.get_stream(bytearray.fromhex(item_serialize))
         reader = BinaryReader(stream)
-        return Contract.__deserialize_stack_item(reader)
+        return Data.__deserialize_stack_item(reader)
 
     @staticmethod
     def __deserialize_stack_item(reader: BinaryReader) -> dict or bytearray:
@@ -178,12 +178,12 @@ class Contract(object):
             return reader.read_bool()
         elif param_type == BuildParams.Type.int_type.value:
             b = reader.read_var_bytes()
-            return Contract.__big_int_from_bytes(bytearray(b))
+            return Data.__big_int_from_bytes(bytearray(b))
         elif param_type == BuildParams.Type.struct_type.value or param_type == BuildParams.Type.array_type.value:
             count = reader.read_var_int()
             item_list = list()
             for _ in range(count):
-                item = Contract.__deserialize_stack_item(reader)
+                item = Data.__deserialize_stack_item(reader)
                 item_list.append(item)
             if param_type == BuildParams.Type.struct_type.value:
                 return Struct(item_list)
@@ -192,8 +192,8 @@ class Contract(object):
             count = reader.read_var_int()
             item_dict = dict()
             for _ in range(count):
-                key = Contract.__deserialize_stack_item(reader)
-                value = Contract.__deserialize_stack_item(reader)
+                key = Data.__deserialize_stack_item(reader)
+                value = Data.__deserialize_stack_item(reader)
                 item_dict[key] = value
             return item_dict
         else:
@@ -225,11 +225,11 @@ class Contract(object):
     def big_int_to_neo_bytearray(data: int) -> bytearray:
         if data == 0:
             return bytearray()
-        data_bytes = Contract.int_to_bytearray(data)
+        data_bytes = Data.int_to_bytearray(data)
         if len(data_bytes) == 0:
             return bytearray()
         if data < 0:
-            data_bytes2 = Contract.int_to_bytearray(-data)
+            data_bytes2 = Data.int_to_bytearray(-data)
             b = data_bytes2[0]
             data_bytes.reverse()
             if b >> 7 == 1:
@@ -254,12 +254,14 @@ class Contract(object):
 
     @staticmethod
     def parse_addr_addr_int_notify(notify: dict):
-        notify['States'][0] = Contract.to_utf8_str(notify['States'][0])
-        notify['States'][1] = Contract.to_b58_address(notify['States'][1])
-        notify['States'][2] = Contract.to_b58_address(notify['States'][2])
-        notify['States'][3] = Contract.to_int(notify['States'][3])
+        notify['States'][0] = Data.to_utf8_str(notify['States'][0])
+        notify['States'][1] = Data.to_b58_address(notify['States'][1])
+        notify['States'][2] = Data.to_b58_address(notify['States'][2])
+        notify['States'][3] = Data.to_int(notify['States'][3])
         return notify
 
+
+class Event(object):
     @staticmethod
     def __check_event(event: dict):
         if not isinstance(event, dict):
@@ -267,7 +269,7 @@ class Contract(object):
 
     @staticmethod
     def get_tx_hash(event: dict):
-        Contract.__check_event(event)
+        Event.__check_event(event)
         try:
             return event['TxHash']
         except KeyError:
@@ -275,7 +277,7 @@ class Contract(object):
 
     @staticmethod
     def get_state(event: dict):
-        Contract.__check_event(event)
+        Event.__check_event(event)
         try:
             return event['State']
         except KeyError:
@@ -283,7 +285,7 @@ class Contract(object):
 
     @staticmethod
     def get_gas_consumed(event: dict):
-        Contract.__check_event(event)
+        Event.__check_event(event)
         try:
             return event['GasConsumed']
         except KeyError:
@@ -291,7 +293,7 @@ class Contract(object):
 
     @staticmethod
     def get_notify_list(event: dict):
-        Contract.__check_event(event)
+        Event.__check_event(event)
         try:
             return event['Notify']
         except KeyError:
@@ -299,8 +301,8 @@ class Contract(object):
 
     @staticmethod
     def get_ong_contract_notify(event: dict) -> dict:
-        Contract.__check_event(event)
-        notify_list = Contract.get_notify_list(event)
+        Event.__check_event(event)
+        notify_list = Event.get_notify_list(event)
         for notify in notify_list:
             if notify['ContractAddress'] == '0200000000000000000000000000000000000000':
                 return notify
@@ -310,8 +312,8 @@ class Contract(object):
     def __get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.require_str_params)
-        Contract.__check_event(event)
-        notify_list = Contract.get_notify_list(event)
+        Event.__check_event(event)
+        notify_list = Event.get_notify_list(event)
         specify_notify_list = list()
         for notify in notify_list:
             if notify['ContractAddress'] == hex_contract_address:
@@ -335,10 +337,8 @@ class Contract(object):
                 contract_address = contract_address.hex()
             except AttributeError:
                 raise SDKException(ErrorCode.require_str_params) from None
-        print(event)
-        print(contract_address)
-        Contract.__check_event(event)
-        notify_list = Contract.get_notify_list(event)
+        Event.__check_event(event)
+        notify_list = Event.get_notify_list(event)
         specify_notify_list = list()
         for notify in notify_list:
             if notify['ContractAddress'] == contract_address:
@@ -351,7 +351,7 @@ class Contract(object):
     def get_states_by_contract_address(event: dict, hex_contract_address: str):
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.require_str_params)
-        notify_list = Contract.__get_notify_list_by_contract_address(event, hex_contract_address)
+        notify_list = Event.__get_notify_list_by_contract_address(event, hex_contract_address)
         states_list = list()
         for notify in notify_list:
             states = notify.get('States', list())
