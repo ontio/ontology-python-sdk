@@ -17,10 +17,9 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import Union
-from abc import abstractmethod
 
 from ontology.common.address import Address
-from ontology.utils.contract import Contract
+from ontology.utils.contract import Data
 from ontology.account.account import Account
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
@@ -116,7 +115,7 @@ class Asset(object):
         """
         tx = self.new_name_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Contract.to_utf8_str(response['Result'])
+        return Data.to_utf8_str(response['Result'])
 
     def symbol(self) -> str:
         """
@@ -124,7 +123,7 @@ class Asset(object):
         """
         tx = self.new_symbol_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Contract.to_utf8_str(response['Result'])
+        return Data.to_utf8_str(response['Result'])
 
     def decimals(self) -> int:
         """
@@ -133,7 +132,7 @@ class Asset(object):
         tx = self.new_decimals_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         try:
-            decimal = Contract.to_int(response['Result'])
+            decimal = Data.to_int(response['Result'])
             return decimal
         except SDKException:
             return 0
@@ -145,7 +144,7 @@ class Asset(object):
         tx = self.new_balance_of_tx(owner)
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         try:
-            balance = Contract.to_int(response['Result'])
+            balance = Data.to_int(response['Result'])
             return balance
         except SDKException:
             return 0
@@ -154,7 +153,7 @@ class Asset(object):
         tx = self.new_allowance_tx(from_address, to_address)
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         try:
-            allowance = Contract.to_int(response['Result'])
+            allowance = Data.to_int(response['Result'])
             return allowance
         except SDKException:
             return 0
