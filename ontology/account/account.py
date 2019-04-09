@@ -96,21 +96,13 @@ class Account(object):
         """
         return self.__address.b58encode()
 
-    def get_address_hex(self):
+    def get_address_hex(self, little_endian: bool = True):
         """
         This interface is used to get the little-endian hexadecimal account address.
 
         :return: little-endian hexadecimal account address.
         """
-        return self.__address.to_hex_str()
-
-    def get_address_hex_reverse(self):
-        """
-        This interface is used to get the big-endian hexadecimal account address.
-
-        :return: big-endian hexadecimal account address.
-        """
-        return self.__address.to_reverse_hex_str()
+        return self.__address.hex(little_endian)
 
     def get_signature_scheme(self) -> SignatureScheme:
         """
