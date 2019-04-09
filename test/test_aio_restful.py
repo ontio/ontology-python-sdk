@@ -25,10 +25,10 @@ import unittest
 from test import sdk, acct4, acct3, acct2, acct1
 
 from ontology.common.address import Address
+from ontology.utils.contract import Contract
 from ontology.account.account import Account
 from ontology.network.aiorestful import AioRestful
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
 
 
@@ -96,7 +96,7 @@ class TestAioRestful(unittest.TestCase):
     @AioRestful.runner
     async def test_get_balance(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
+        multi_address = Address.from_multi_pub_keys(2, pub_keys)
         address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
                         acct4.get_address_base58(), multi_address.b58encode()]
         for address in address_list:
@@ -143,7 +143,7 @@ class TestAioRestful(unittest.TestCase):
         contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = await sdk.aio_restful.get_storage(contract_address, key)
-        value = ContractDataParser.to_int(value)
+        value = Contract.to_int(value)
         self.assertEqual(1000000000, value)
 
     @AioRestful.runner
