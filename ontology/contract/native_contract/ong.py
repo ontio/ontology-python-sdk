@@ -18,11 +18,10 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
-from ontology.account.account import Account
 from ontology.common.address import Address
+from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.utils.contract import Contract
 from ontology.vm.build_vm import build_native_invoke_code
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.smart_contract.native_contract.asset import Asset

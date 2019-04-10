@@ -15,6 +15,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Union
 
 from ontology.common.address import Address
 from ontology.smart_contract.neo_contract.oep4 import Oep4
@@ -29,26 +30,15 @@ class NeoVm(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
-    def oep4(self):
-        return Oep4(self.__sdk)
+    def oep4(self, hex_contract_address: str):
+        return Oep4(hex_contract_address, self.__sdk)
 
     def claim_record(self):
         return ClaimRecord(self.__sdk)
 
     @staticmethod
-    def avm_code_to_hex_contract_address(avm_code: str):
-        hex_contract_address = Address.address_from_vm_code(avm_code).to_hex_str()
-        return hex_contract_address
-
-    @staticmethod
-    def avm_code_to_bytes_contract_address(avm_code: str):
-        bytes_contract_address = Address.address_from_vm_code(avm_code).to_bytes()
-        return bytes_contract_address
-
-    @staticmethod
-    def avm_code_to_bytearray_contract_address(avm_code: str):
-        bytearray_contract_address = Address.address_from_vm_code(avm_code).to_bytearray()
-        return bytearray_contract_address
+    def address_from_avm_code(avm_code: str) -> Address:
+        return Address.from_avm_code(avm_code)
 
     @staticmethod
     def make_deploy_transaction(code: str, need_storage: bool, name: str, code_version: str, author: str,
@@ -59,8 +49,9 @@ class NeoVm(object):
         return tx
 
     @staticmethod
-    def make_invoke_transaction(contract_address: str or bytes or bytearray, func: AbiFunction or InvokeFunction,
-                                payer: bytes or str = b'', gas_price: int = 0, gas_limit: int = 0):
+    def make_invoke_transaction(contract_address: Union[str, bytes, bytearray, Address],
+                                func: Union[AbiFunction, InvokeFunction], payer: Union[str, bytes, Address] = b'',
+                                gas_price: int = 0, gas_limit: int = 0):
         tx = InvokeTransaction(payer, gas_price, gas_limit)
         tx.add_invoke_code(contract_address, func)
         return tx

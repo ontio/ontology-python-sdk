@@ -17,10 +17,9 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ontology.common.address import Address
+from ontology.utils.contract import Data, Event
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data import ContractDataParser
-from ontology.utils.contract_event import ContractEventParser
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
 
@@ -84,32 +83,32 @@ class ClaimRecord(object):
         if status == '':
             status = False
         else:
-            status = ContractDataParser.to_dict(status)
+            status = Data.to_dict(status)
             status = bool(status[3])
         return status
 
     def query_commit_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
+        notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify) == 0:
             return notify
         if len(notify['States']) == 4:
-            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-            notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
-            notify['States'][3] = ContractDataParser.to_hex_str(notify['States'][3])
+            notify['States'][0] = Data.to_utf8_str(notify['States'][0])
+            notify['States'][1] = Data.to_b58_address(notify['States'][1])
+            notify['States'][2] = Data.to_utf8_str(notify['States'][2])
+            notify['States'][3] = Data.to_hex_str(notify['States'][3])
         if len(notify['States']) == 3:
-            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-            notify['States'][1] = ContractDataParser.to_hex_str(notify['States'][1])
-            notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
+            notify['States'][0] = Data.to_utf8_str(notify['States'][0])
+            notify['States'][1] = Data.to_hex_str(notify['States'][1])
+            notify['States'][2] = Data.to_utf8_str(notify['States'][2])
         return notify
 
     def query_revoke_event(self, tx_hash: str):
         event = self.__sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, self.__hex_contract_address)
+        notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify['States']) == 4:
-            notify['States'][0] = ContractDataParser.to_utf8_str(notify['States'][0])
-            notify['States'][1] = ContractDataParser.to_b58_address(notify['States'][1])
-            notify['States'][2] = ContractDataParser.to_utf8_str(notify['States'][2])
-            notify['States'][3] = ContractDataParser.to_hex_str(notify['States'][3])
+            notify['States'][0] = Data.to_utf8_str(notify['States'][0])
+            notify['States'][1] = Data.to_b58_address(notify['States'][1])
+            notify['States'][2] = Data.to_utf8_str(notify['States'][2])
+            notify['States'][3] = Data.to_hex_str(notify['States'][3])
         return notify

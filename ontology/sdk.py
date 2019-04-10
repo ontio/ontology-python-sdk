@@ -15,19 +15,21 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+import asyncio
+import inspect
 
 from typing import Union
 
 from Cryptodome.Random.random import choice
 
 from ontology.network.aiorpc import AioRpc
+from ontology.contract.neo_vm import NeoVm
 from ontology.service.service import Service
+from ontology.contract.native_vm import NativeVm
 from ontology.network.websocket import Websocket
-from ontology.smart_contract.neo_vm import NeoVm
 from ontology.network.aiorestful import AioRestful
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.smart_contract.native_vm import NativeVm
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.network.rpc import Rpc, TEST_RPC_ADDRESS, MAIN_RPC_ADDRESS
@@ -47,7 +49,7 @@ class _Singleton(type):
             return cls.__instance
 
 
-class OntologySdk(metaclass=_Singleton):
+class Ontology(metaclass=_Singleton):
     def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '',
                  default_signature_scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(default_signature_scheme, SignatureScheme):
@@ -64,6 +66,18 @@ class OntologySdk(metaclass=_Singleton):
         self.__service = Service(self)
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
+
+    @staticmethod
+    def runner(func):
+        def wrapper(*args, **kwargs):
+            if inspect.iscoroutinefunction(func):
+                future = func(*args, **kwargs)
+            else:
+                coroutine = asyncio.coroutine(func)
+                future = coroutine(*args, **kwargs)
+            asyncio.get_event_loop().run_until_complete(future)
+
+        return wrapper
 
     @property
     def default_network(self):

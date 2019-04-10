@@ -21,10 +21,10 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import path, environ
 
-from ontology.ont_sdk import OntologySdk
+from ontology.sdk import Ontology
 
 password = environ['SDK_TEST_PASSWORD']
-sdk = OntologySdk()
+sdk = Ontology()
 sdk.rpc.connect_to_test_net()
 sdk.aio_rpc.connect_to_test_net()
 sdk.restful.connect_to_test_net()
