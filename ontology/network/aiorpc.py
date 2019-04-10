@@ -20,61 +20,24 @@ import json
 import asyncio
 import inspect
 
-from time import time
-from sys import maxsize
 from typing import List
 from aiohttp.client import ClientSession
 
-from Cryptodome.Random.random import randint
-
 from ontology.account.account import Account
-from ontology.smart_contract.neo_vm import NeoVm
+from ontology.contract.neo_vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
+from ontology.network.rpc import Rpc, RpcMethod
 from ontology.utils.transaction import ensure_bytearray_contract_address
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
-
-TEST_RPC_ADDRESS = ['http://polaris1.ont.io:20336', 'http://polaris2.ont.io:20336', 'http://polaris3.ont.io:20336',
-                    'http://polaris4.ont.io:20336']
-MAIN_RPC_ADDRESS = ['http://dappnode1.ont.io:20336', 'http://dappnode2.ont.io:20336']
+from ontology.contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.contract.neo_contract.abi.build_params import BuildParams
+from ontology.contract.neo_contract.invoke_function import InvokeFunction
 
 
-class RpcMethod(object):
-    GET_VERSION = 'getversion'
-    GET_NODE_COUNT = 'getconnectioncount'
-    GET_GAS_PRICE = 'getgasprice'
-    GET_NETWORK_ID = 'getnetworkid'
-    GET_TRANSACTION = 'getrawtransaction'
-    SEND_TRANSACTION = 'sendrawtransaction'
-    GET_BLOCK = 'getblock'
-    GET_BLOCK_COUNT = 'getblockcount'
-    GET_BLOCK_HASH = 'getblockhash'
-    GET_CURRENT_BLOCK_HASH = 'getbestblockhash'
-    GET_BLOCK_HEIGHT_BY_HASH = 'getblockheightbytxhash'
-    GET_BALANCE = 'getbalance'
-    GET_GRANT_ONG = 'getgrantong'
-    GET_ALLOWANCE = 'getallowance'
-    GET_SMART_CONTRACT_EVENT = 'getsmartcodeevent'
-    GET_STORAGE = 'getstorage'
-    GET_SMART_CONTRACT = 'getcontractstate'
-    GET_GENERATE_BLOCK_TIME = 'getgenerateblocktime'
-    GET_MERKLE_PROOF = 'getmerkleproof'
-    SEND_EMERGENCY_GOV_REQ = 'sendemergencygovreq'
-    GET_BLOCK_ROOT_WITH_NEW_TX_ROOT = 'getblockrootwithnewtxroot'
-    GET_MEM_POOL_TX_COUNT = 'getmempooltxcount'
-    GET_MEM_POOL_TX_STATE = 'getmempooltxstate'
-
-    RPC_VERSION = '2.0'
-
-
-class AioRpc(object):
+class AioRpc(Rpc):
     def __init__(self, url: str = '', qid: int = 0):
-        self.__url = url
-        self.__qid = qid
-        self.__generate_qid()
+        super().__init__(url, qid)
 
     @staticmethod
     def runner(func):
@@ -88,50 +51,18 @@ class AioRpc(object):
 
         return wrapper
 
-    def set_address(self, url: str):
-        self.__url = url
-
-    def get_address(self):
-        return self.__url
-
-    def __generate_qid(self):
-        if self.__qid == 0:
-            self.__qid = randint(0, maxsize)
-        return self.__qid
-
-    def connect_to_localhost(self):
-        self.set_address('http://localhost:20336')
-
-    def connect_to_test_net(self, index: int = 0):
-        if index == 0:
-            index = randint(1, 5)
-        rpc_address = f'http://polaris{index}.ont.io:20336'
-        self.set_address(rpc_address)
-
-    def connect_to_main_net(self, index: int = 0):
-        if index == 0:
-            index = randint(1, 4)
-        rpc_address = f'http://dappnode{index}.ont.io:20336'
-        self.set_address(rpc_address)
-
-    def generate_json_rpc_payload(self, method, param=None):
-        if param is None:
-            param = list()
-        json_rpc_payload = dict(jsonrpc=RpcMethod.RPC_VERSION, id=self.__qid, method=method, params=param)
-        return json_rpc_payload
-
     async def __post(self, session, payload):
         header = {'Content-type': 'application/json'}
         try:
             if session is None:
                 async with ClientSession() as session:
-                    async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
+                    async with session.post(self._url, json=payload, headers=header, timeout=10) as response:
                         return json.loads(await response.content.read(-1))
             else:
-                async with session.post(self.__url, json=payload, headers=header, timeout=10) as response:
+                async with session.post(self._url, json=payload, headers=header, timeout=10) as response:
                     return json.loads(await response.content.read(-1))
         except asyncio.TimeoutError:
-            raise SDKException(ErrorCode.connect_timeout(self.__url))
+            raise SDKException(ErrorCode.connect_timeout(self._url))
 
     async def get_version(self, session: ClientSession = None, is_full: bool = False):
         """
@@ -439,7 +370,7 @@ class AioRpc(object):
             params.append(i)
         if payer is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer.get_address_bytes(), params, bytearray(), [])
+        tx = Transaction(0, 0xd1, gas_price, gas_limit, payer.get_address_bytes(), params)
         tx.sign_transaction(payer)
         if isinstance(signer, Account) and signer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(signer)

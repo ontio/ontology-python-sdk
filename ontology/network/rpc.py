@@ -26,14 +26,14 @@ from typing import List
 from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
-from ontology.smart_contract.neo_vm import NeoVm
+from ontology.contract.neo_vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.contract.neo_contract.abi.build_params import BuildParams
+from ontology.contract.neo_contract.invoke_function import InvokeFunction
 
 TEST_RPC_ADDRESS = ['http://polaris1.ont.io:20336', 'http://polaris2.ont.io:20336', 'http://polaris3.ont.io:20336',
                     'http://polaris4.ont.io:20336']
@@ -70,20 +70,20 @@ class RpcMethod(object):
 
 class Rpc(object):
     def __init__(self, url: str = '', qid: int = 0):
-        self.__url = url
-        self.__qid = qid
-        self.__generate_qid()
+        self._url = url
+        self._qid = qid
+        self._generate_qid()
 
     def set_address(self, url: str):
-        self.__url = url
+        self._url = url
 
     def get_address(self):
-        return self.__url
+        return self._url
 
-    def __generate_qid(self):
-        if self.__qid == 0:
-            self.__qid = randint(0, maxsize)
-        return self.__qid
+    def _generate_qid(self):
+        if self._qid == 0:
+            self._qid = randint(0, maxsize)
+        return self._qid
 
     def connect_to_localhost(self):
         self.set_address('http://localhost:20336')
@@ -161,7 +161,7 @@ class Rpc(object):
     def generate_json_rpc_payload(self, method, param=None):
         if param is None:
             param = list()
-        json_rpc_payload = dict(jsonrpc=RpcMethod.RPC_VERSION, id=self.__qid, method=method, params=param)
+        json_rpc_payload = dict(jsonrpc=RpcMethod.RPC_VERSION, id=self._qid, method=method, params=param)
         return json_rpc_payload
 
     def get_version(self, is_full: bool = False) -> dict or str:
@@ -171,7 +171,7 @@ class Rpc(object):
             the version information of the connected node.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_VERSION)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -183,7 +183,7 @@ class Rpc(object):
             the number of connections.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_NODE_COUNT)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -195,7 +195,7 @@ class Rpc(object):
             the value of gas price.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GAS_PRICE)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']['gasprice']
@@ -208,7 +208,7 @@ class Rpc(object):
         """
 
         payload = self.generate_json_rpc_payload(RpcMethod.GET_NETWORK_ID)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -221,7 +221,7 @@ class Rpc(object):
         :return: the block information of the specified block hash.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK, [block_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -233,7 +233,7 @@ class Rpc(object):
             the decimal total number of blocks in current network.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK, [height, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -245,7 +245,7 @@ class Rpc(object):
             the decimal total number of blocks in current network.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_COUNT)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -264,7 +264,7 @@ class Rpc(object):
 
     def get_block_height_by_tx_hash(self, tx_hash: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_HEIGHT_BY_HASH, [tx_hash])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -283,7 +283,7 @@ class Rpc(object):
             the hexadecimal hash value of the highest block in current network.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_CURRENT_BLOCK_HASH)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -296,7 +296,7 @@ class Rpc(object):
         :return: the hexadecimal hash value of the specified block height.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BLOCK_HASH, [height, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -309,7 +309,7 @@ class Rpc(object):
         :return: the value of account balance in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_BALANCE, [b58_address, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         response['result'] = dict((k.upper(), int(v)) for k, v in response.get('result', dict()).items())
         if is_full:
             return response
@@ -317,7 +317,7 @@ class Rpc(object):
 
     def get_grant_ong(self, b58_address: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GRANT_ONG, [b58_address])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return int(response['result'])
@@ -333,7 +333,7 @@ class Rpc(object):
         :return: the information of allowance in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_ALLOWANCE, [asset_name, from_address, to_address])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -348,7 +348,7 @@ class Rpc(object):
         :return: the information of contract storage.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_STORAGE, [hex_contract_address, hex_key, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -361,7 +361,7 @@ class Rpc(object):
         :return: the information of smart contract event in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT_EVENT, [tx_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if not response['result']:
             raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
         if is_full:
@@ -376,7 +376,7 @@ class Rpc(object):
         :return: the information of smart contract event in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT_EVENT, [height, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         event_list = response['result']
@@ -395,7 +395,7 @@ class Rpc(object):
         :return: dict
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_TRANSACTION, [tx_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -412,7 +412,7 @@ class Rpc(object):
         if len(hex_contract_address) != 40:
             raise SDKException(ErrorCode.param_err('the length of the contract address should be 40 bytes.'))
         payload = self.generate_json_rpc_payload(RpcMethod.GET_SMART_CONTRACT, [hex_contract_address, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -425,21 +425,21 @@ class Rpc(object):
         :return: the merkle proof in dictionary form.
         """
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MERKLE_PROOF, [tx_hash, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
 
     def get_memory_pool_tx_count(self, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_COUNT)
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
 
     def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if response.get('result', '') == '':
             raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
         if is_full:
@@ -455,7 +455,7 @@ class Rpc(object):
         """
         tx_data = tx.serialize(is_hex=True)
         payload = self.generate_json_rpc_payload(RpcMethod.SEND_TRANSACTION, [tx_data])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -469,7 +469,7 @@ class Rpc(object):
         """
         tx_data = tx.serialize(is_hex=True)
         payload = self.generate_json_rpc_payload(RpcMethod.SEND_TRANSACTION, [tx_data, 1])
-        response = self.__post(self.__url, payload)
+        response = self.__post(self._url, payload)
         if is_full:
             return response
         return response['result']
@@ -503,7 +503,7 @@ class Rpc(object):
             params.append(i)
         if payer is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer.get_address_bytes(), params, bytearray(), [])
+        tx = Transaction(0, 0xd1, gas_price, gas_limit, payer.get_address_bytes(), params)
         tx.sign_transaction(payer)
         if isinstance(signer, Account) and signer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(signer)

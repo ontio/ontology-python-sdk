@@ -25,14 +25,14 @@ from typing import List
 from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
-from ontology.smart_contract.neo_vm import NeoVm
+from ontology.contract.neo_vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.contract.neo_contract.abi.build_params import BuildParams
+from ontology.contract.neo_contract.invoke_function import InvokeFunction
 
 TEST_RESTFUL_ADDRESS = ['http://polaris1.ont.io:20334', 'http://polaris2.ont.io:20334', 'http://polaris3.ont.io:20334']
 MAIN_RESTFUL_ADDRESS = ['http://dappnode1.ont.io:20334', 'http://dappnode2.ont.io:20334']
