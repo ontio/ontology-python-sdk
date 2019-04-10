@@ -24,7 +24,7 @@ from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.vm.build_vm import build_native_invoke_code
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.smart_contract.native_contract.asset import Asset
+from ontology.contract.native_contract.asset import Asset
 
 
 class Ong(Asset):
@@ -75,4 +75,4 @@ class Ong(Asset):
         tx.sign_transaction(claimer)
         if claimer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(payer)
-        return self._sdk.get_network().send_raw_transaction(tx)
+        return self._sdk.default_network.send_raw_transaction(tx)

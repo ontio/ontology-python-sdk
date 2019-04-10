@@ -21,7 +21,7 @@ from ontology.utils.contract import Data, Event
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo_contract.invoke_function import InvokeFunction
 
 
 class ClaimRecord(object):

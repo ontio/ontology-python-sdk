@@ -23,9 +23,9 @@ from typing import Union
 from Cryptodome.Random.random import choice
 
 from ontology.network.aiorpc import AioRpc
-from ontology.contract.neo_vm import NeoVm
+from ontology.contract.neo.vm import NeoVm
 from ontology.service.service import Service
-from ontology.contract.native_vm import NativeVm
+from ontology.contract.native.vm import NativeVm
 from ontology.network.websocket import Websocket
 from ontology.network.aiorestful import AioRestful
 from ontology.exception.error_code import ErrorCode
@@ -49,7 +49,22 @@ class _Singleton(type):
             return cls.__instance
 
 
-class Ontology(metaclass=_Singleton):
+class AioRunner(object):
+
+    @staticmethod
+    def runner(func):
+        def wrapper(*args, **kwargs):
+            if inspect.iscoroutinefunction(func):
+                future = func(*args, **kwargs)
+            else:
+                coroutine = asyncio.coroutine(func)
+                future = coroutine(*args, **kwargs)
+            asyncio.get_event_loop().run_until_complete(future)
+
+        return wrapper
+
+
+class Ontology(AioRunner, metaclass=_Singleton):
     def __init__(self, rpc_address: str = '', restful_address: str = '', ws_address: str = '',
                  default_signature_scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(default_signature_scheme, SignatureScheme):
@@ -66,18 +81,6 @@ class Ontology(metaclass=_Singleton):
         self.__service = Service(self)
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
-
-    @staticmethod
-    def runner(func):
-        def wrapper(*args, **kwargs):
-            if inspect.iscoroutinefunction(func):
-                future = func(*args, **kwargs)
-            else:
-                coroutine = asyncio.coroutine(func)
-                future = coroutine(*args, **kwargs)
-            asyncio.get_event_loop().run_until_complete(future)
-
-        return wrapper
 
     @property
     def default_network(self):
@@ -168,6 +171,45 @@ class Ontology(metaclass=_Singleton):
             self.__websocket = websocket_client
 
     @property
+    def rpc_address(self):
+        if self.__rpc is None:
+            return ''
+        return self.__rpc.get_address()
+
+    @rpc_address.setter
+    def rpc_address(self, rpc_address: str):
+        if isinstance(self.__rpc, Rpc):
+            self.__rpc.set_address(rpc_address)
+        else:
+            self.__rpc = Rpc(rpc_address)
+
+    @property
+    def restful_address(self):
+        if not isinstance(self.__restful, Restful):
+            return ''
+        return self.__restful.get_address()
+
+    @restful_address.setter
+    def restful_address(self, restful_address: str):
+        if isinstance(self.__restful, Restful):
+            self.__restful.set_address(restful_address)
+        else:
+            self.__restful = Restful(restful_address)
+
+    @property
+    def websocket_address(self) -> str:
+        if not isinstance(self.__websocket, Websocket):
+            return ''
+        return self.__websocket.get_address()
+
+    @websocket_address.setter
+    def websocket_address(self, websocket_address: str):
+        if isinstance(self.__websocket, Websocket):
+            self.__websocket.set_address(websocket_address)
+        else:
+            self.__websocket = Websocket(websocket_address)
+
+    @property
     def native_vm(self):
         return self.__native_vm
 
@@ -179,17 +221,6 @@ class Ontology(metaclass=_Singleton):
     def service(self):
         return self.__service
 
-    def set_rpc_address(self, rpc_address: str):
-        if isinstance(self.__rpc, Rpc):
-            self.__rpc.set_address(rpc_address)
-        else:
-            self.__rpc = Rpc(rpc_address)
-
-    def get_rpc_address(self):
-        if self.__rpc is None:
-            return ''
-        return self.__rpc.get_address()
-
     @staticmethod
     def get_random_test_rpc_address():
         return choice(TEST_RPC_ADDRESS)
@@ -197,17 +228,6 @@ class Ontology(metaclass=_Singleton):
     @staticmethod
     def get_random_main_rpc_address():
         return choice(MAIN_RPC_ADDRESS)
-
-    def set_restful_address(self, restful_address: str):
-        if isinstance(self.__restful, Restful):
-            self.__restful.set_address(restful_address)
-        else:
-            self.__restful = Restful(restful_address)
-
-    def get_restful_address(self):
-        if not isinstance(self.__restful, Restful):
-            return ''
-        return self.__restful.get_address()
 
     @staticmethod
     def get_random_test_restful_address():
@@ -224,14 +244,3 @@ class Ontology(metaclass=_Singleton):
     @staticmethod
     def get_main_net_restful_address_list():
         return MAIN_RESTFUL_ADDRESS
-
-    def set_websocket_address(self, websocket_address: str):
-        if isinstance(self.__websocket, Websocket):
-            self.__websocket.set_address(websocket_address)
-        else:
-            self.__websocket = Websocket(websocket_address)
-
-    def get_websocket_address(self):
-        if not isinstance(self.__websocket, Websocket):
-            return ''
-        return self.__websocket.get_address()

@@ -15,15 +15,17 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 from typing import Union
 
 from ontology.common.address import Address
-from ontology.smart_contract.neo_contract.oep4 import Oep4
+from ontology.contract.neo.oep4 import Oep4
+from ontology.contract.neo.aio_oep4 import AioOep4
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.smart_contract.neo_contract.claim_record import ClaimRecord
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo.claim_record import ClaimRecord
+from ontology.contract.neo.abi.abi_function import AbiFunction
+from ontology.contract.neo.invoke_function import InvokeFunction
 
 
 class NeoVm(object):
@@ -32,6 +34,9 @@ class NeoVm(object):
 
     def oep4(self, hex_contract_address: str):
         return Oep4(hex_contract_address, self.__sdk)
+
+    def aio_oep4(self, hex_contract_address: str):
+        return AioOep4(hex_contract_address, self.__sdk)
 
     def claim_record(self):
         return ClaimRecord(self.__sdk)

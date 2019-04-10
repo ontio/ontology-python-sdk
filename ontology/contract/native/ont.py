@@ -15,3 +15,11 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+
+from ontology.contract.native_contract.asset import Asset
+
+
+class Ont(Asset):
+    def __init__(self, sdk=None):
+        super().__init__(sdk)
+        self._contract_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'

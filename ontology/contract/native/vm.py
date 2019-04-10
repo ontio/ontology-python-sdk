@@ -16,11 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ontology.smart_contract.native_contract.asset import Asset
-from ontology.smart_contract.native_contract.ong import Ong
-from ontology.smart_contract.native_contract.ont import Ont
-from ontology.smart_contract.native_contract.ontid import OntId
-from ontology.smart_contract.native_contract.governance import Governance
+from ontology.contract.native.ont import Ont
+from ontology.contract.native.ong import Ong
+from ontology.contract.native.ontid import OntId
+from ontology.contract.native.aio_ont import AioOnt
+from ontology.contract.native.aio_ong import AioOng
+from ontology.contract.native.governance import Governance
 
 
 class NativeVm(object):
@@ -29,6 +30,12 @@ class NativeVm(object):
 
     def ont(self):
         return Ont(self.__sdk)
+
+    def aio_ont(self):
+        return AioOnt(self.__sdk)
+
+    def aio_ong(self):
+        return AioOng(self.__sdk)
 
     def ong(self):
         return Ong(self.__sdk)
