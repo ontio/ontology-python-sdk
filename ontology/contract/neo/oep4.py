@@ -25,7 +25,7 @@ from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import InvokeFunction
 
 
 class Oep4(object):
@@ -41,6 +41,7 @@ class Oep4(object):
     def hex_contract_address(self, hex_contract_address: str):
         if not isinstance(hex_contract_address, str) and len(hex_contract_address) == 40:
             raise SDKException(ErrorCode.require_str_params)
+        hex_contract_address.replace(' ', '')
         self._contract_address = hex_contract_address
 
     def __new_token_setting_tx(self, func_name: str) -> InvokeTransaction:
@@ -121,9 +122,11 @@ class Oep4(object):
         tx.add_invoke_code(self._contract_address, InvokeFunction('init'))
         return tx
 
-    def init(self, payer: Account, gas_price: int, gas_limit: int):
+    def init(self, founder: Account, payer: Account, gas_price: int, gas_limit: int):
         tx = self.new_init_tx(payer.get_address(), gas_price, gas_limit)
-        tx.sign_transaction(payer)
+        tx.sign_transaction(founder)
+        if founder.get_address_bytes() != payer.get_address_bytes():
+            tx.add_sign_transaction(payer)
         tx_hash = self._sdk.default_network.send_raw_transaction(tx)
         return tx_hash
 
@@ -194,8 +197,8 @@ class Oep4(object):
         tx = InvokeTransaction(payer, gas_price, gas_limit, params)
         return tx
 
-    def transfer_multi(self, transfer_list: list, payer_acct: Account, signers: list, gas_limit: int,
-                       gas_price: int) -> str:
+    def transfer_multi(self, transfer_list: list, signers: list, payer_acct: Account, gas_price: int,
+                       gas_limit: int) -> str:
         """
         This interface is used to transfer amount of token from from-account to to-account multiple times synchronously.
         """
@@ -258,33 +261,39 @@ class Oep4(object):
         notify = Data.parse_addr_addr_int_notify(notify)
         return notify
 
-    def allowance(self, b58_owner_address: str, b58_spender_address: str) -> InvokeTransaction:
-        """
-        This interface is used to call the Allowance method in ope4
-        that query the amount of spender still allowed to withdraw from owner account.
-        """
-        owner = self.get_bytes_address(b58_owner_address)
-        spender = self.get_bytes_address(b58_spender_address)
+    def new_allowance_tx(self, owner: Union[str, bytes, Address],
+                         spender: Union[str, bytes, Address]) -> InvokeTransaction:
         func = InvokeFunction('allowance')
         func.set_params_value(owner, spender)
         tx = InvokeTransaction()
         tx.add_invoke_code(self._contract_address, func)
         return tx
 
-    def transfer_from(self, b58_spender_address: str, b58_from_address: str, b58_to_address: str, value: int,
-                      b58_payer_address: str, gas_limit: int, gas_price: int):
-        """
-        This interface is used to call the Allowance method in ope4
-        that allow spender to withdraw amount of oep4 token from from-account to to-account.
-        """
+    def allowance(self, owner: Union[str, bytes, Address], spender: Union[str, bytes, Address]) -> int:
+        tx = self.new_allowance_tx(owner, spender)
+        response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
+        result = response.get('Result')
+        if len(result) == 0:
+            return 0
+        return int(result)
+
+    def new_transfer_from_tx(self, spender: Union[str, bytes, Address], owner: Union[str, bytes, Address],
+                             to_address: Union[str, bytes, Address], value: int, payer: Union[str, bytes, Address],
+                             gas_price: int, gas_limit: int) -> InvokeTransaction:
         func = InvokeFunction('transferFrom')
-        spender = Address.b58decode(b58_spender_address).to_bytes()
-        from_address = Address.b58decode(b58_from_address).to_bytes()
-        to_address = Address.b58decode(b58_to_address).to_bytes()
-        payer = Address.b58decode(b58_payer_address).to_bytes()
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
-        func.set_params_value(spender, from_address, to_address, value)
+        func.set_params_value(spender, owner, to_address, value)
         tx = InvokeTransaction(payer, gas_price, gas_limit)
         tx.add_invoke_code(self._contract_address, func)
         return tx
+
+    def transfer_from(self, spender: Account, owner: Union[str, bytes, Address], to_address: Union[str, bytes, Address],
+                      value: int, payer: Account, gas_price: int, gas_limit: int) -> str:
+        tx = self.new_transfer_from_tx(spender.get_address(), owner, to_address, value, payer.get_address(), gas_price,
+                                       gas_limit)
+        tx.sign_transaction(spender)
+        if spender.get_address_bytes() != payer.get_address_bytes():
+            tx.add_sign_transaction(spender)
+        tx_hash = self._sdk.default_network.send_raw_transaction(tx)
+        return tx_hash
