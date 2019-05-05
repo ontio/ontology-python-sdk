@@ -24,46 +24,57 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from test import sdk, acct1, acct2, acct3, acct4
+from test import sdk, acct1, acct2, acct3, acct4, no_panic_exception
 
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
 from ontology.crypto.signature_scheme import SignatureScheme
 
+networks = [sdk.rpc, sdk.restful]
+
+contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
+
 
 class TestOep4(unittest.TestCase):
+    def setUp(self) -> None:
+        sdk.default_network = sdk.rpc
+
     def test_set_contract_address(self):
-        contract_address = '85848b5ec3b15617e396bdd62cb49575738dd413'
-        oep4 = sdk.neo_vm.oep4()
-        oep4.hex_contract_address = contract_address
+        oep4 = sdk.neo_vm.oep4(contract_address)
         self.assertEqual(contract_address, oep4.hex_contract_address)
 
-    def test_get_name(self):
-        contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
-        oep4 = sdk.neo_vm.oep4()
-        oep4.hex_contract_address = contract_address
-        self.assertEqual('DXToken', oep4.get_name())
+    def test_query_name(self):
+        try:
+            for network in networks:
+                sdk.default_network = network
+                oep4 = sdk.neo_vm.oep4('d7b6a47966770c1545bf74c16426b26c0a238b16')
+                self.assertEqual('DXToken', oep4.name())
+        except SDKException as e:
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_get_symbol(self):
-        contract_address = 'd7b6a47966770c1545bf74c16426b26c0a238b16'
-        oep4 = sdk.neo_vm.oep4()
-        oep4.hex_contract_address = contract_address
-        self.assertEqual('DX', oep4.get_symbol())
+        for network in networks:
+            sdk.default_network = network
+            oep4 = sdk.neo_vm.oep4('d7b6a47966770c1545bf74c16426b26c0a238b16')
+            try:
+                self.assertEqual('DX', oep4.symbol())
+            except SDKException as e:
+                self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_get_decimal(self):
-        contract_address1 = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        oep4 = sdk.neo_vm.oep4()
-        oep4.hex_contract_address = contract_address1
-        self.assertEqual(10, oep4.get_decimal())
-        contract_address2 = '165b1227311d47c22cd073ef8f285d3bddc858ca'
-        oep4.hex_contract_address = contract_address2
-        self.assertEqual(32, oep4.get_decimal())
-        contract_address3 = '8fecd2740b10a7410026774cc1f99fe14860873b'
-        oep4.hex_contract_address = contract_address3
-        self.assertEqual(255, oep4.get_decimal())
+        contract_list = ['1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9', '165b1227311d47c22cd073ef8f285d3bddc858ca',
+                         '8fecd2740b10a7410026774cc1f99fe14860873b']
+        decimal_list = [10, 32, 255]
+        for network in networks:
+            sdk.default_network = network
+            for index, address in enumerate(contract_list):
+                oep4 = sdk.neo_vm.oep4(address)
+                try:
+                    self.assertEqual(decimal_list[index], oep4.decimals())
+                except SDKException as e:
+                    self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_init(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
@@ -77,21 +88,24 @@ class TestOep4(unittest.TestCase):
         self.assertEqual('Already initialized!', bytes.fromhex(notify['States']).decode())
 
     def test_get_total_supply(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
-        self.assertEqual(10000000000000000000, oep4.get_total_supply())
+        self.assertEqual(10000000000000000000, oep4.total_supply())
+        try:
+            sdk.rpc.connect_to_main_net()
+            oep4 = sdk.neo_vm.oep4()
+            oep4.hex_contract_address = '6c80f3a5c183edee7693a038ca8c476fb0d6ac91'
+            self.assertEqual(10000000000, oep4.total_supply())
+        finally:
+            sdk.rpc.connect_to_test_net()
 
     def test_transfer(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         from_acct = acct1
-        gas_limit = 20000000
-        gas_price = 500
         b58_to_address = acct2.get_address_base58()
         value = 10
-        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, gas_limit, gas_price)
+        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, 500, 20000000)
         self.assertEqual(64, len(tx_hash))
         time.sleep(6)
         notify = oep4.query_transfer_event(tx_hash)
@@ -101,7 +115,6 @@ class TestOep4(unittest.TestCase):
         self.assertEqual(value, notify['States'][3])
 
     def test_balance_of(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         b58_address1 = acct3.get_address_base58()
@@ -112,7 +125,6 @@ class TestOep4(unittest.TestCase):
         self.assertGreaterEqual(balance, 1)
 
     def test_transfer_multi(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         transfer_list = list()
@@ -134,11 +146,7 @@ class TestOep4(unittest.TestCase):
         transfer_list.append(transfer1)
         transfer_list.append(transfer2)
 
-        tx = oep4.transfer_multi(transfer_list, acct1.get_address_base58(), 20000000, 500)
-        tx.sign_transaction(acct1)
-        for signer in signers:
-            tx.add_sign_transaction(signer)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        tx_hash = oep4.transfer_multi(transfer_list, signers, acct1, 20000000, 500)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
         notify_list = oep4.query_multi_transfer_event(tx_hash)
@@ -150,24 +158,19 @@ class TestOep4(unittest.TestCase):
                 self.assertEqual(to_address_list[index], notify['States'][2])
                 self.assertEqual(value_list[index], notify['States'][3])
         except SDKException as e:
-            raised = False
-            self.assertTrue(raised, e)
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_approve(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         owner_acct = acct1
         spender = acct2
         b58_spender_address = spender.get_address_base58()
         amount = 10
-        gas_limit = 20000000
-        gas_price = 500
         try:
-            tx = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, gas_limit, gas_price)
-            tx_hash = sdk.rpc.send_raw_transaction(tx)
+            tx_hash = oep4.approve(owner_acct, b58_spender_address, amount, owner_acct, 500, 20000000)
         except SDKException as e:
-            self.assertIn('ConnectTimeout', e.args[1])
+            self.assertTrue(e.args[1] in no_panic_exception)
             return
         self.assertEqual(len(tx_hash), 64)
         time.sleep(randint(6, 10))
@@ -179,21 +182,20 @@ class TestOep4(unittest.TestCase):
             self.assertEqual(b58_spender_address, states[2])
             self.assertEqual(amount, states[3])
         except SDKException as e:
-            raised = False
-            self.assertTrue(raised, e)
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_allowance(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         b58_owner_address = acct1.get_address_base58()
         b58_spender_address = acct2.get_address_base58()
-        tx = oep4.allowance(b58_owner_address, b58_spender_address)
-        allowance = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        self.assertGreaterEqual(allowance, 1)
+        try:
+            allowance = oep4.allowance(b58_owner_address, b58_spender_address)
+            self.assertGreaterEqual(allowance, 1)
+        except SDKException as e:
+            self.assertTrue(e.args[1] in no_panic_exception)
 
     def test_transfer_from(self):
-        contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
         spender_acct = acct2
@@ -205,12 +207,8 @@ class TestOep4(unittest.TestCase):
         to_acct = acct3
         b58_to_address = to_acct.get_address_base58()
         hex_to_address = to_acct.get_address_hex()
-
-        gas_limit = 20000000
-        gas_price = 500
         value = 1
-        tx = oep4.transfer_from(spender_acct, b58_from_address, b58_to_address, value, from_acct, gas_limit,
-                                gas_price)
+        tx = oep4.transfer_from(spender_acct, b58_from_address, b58_to_address, value, from_acct, 500, 20000000)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(6, 10))
@@ -226,8 +224,7 @@ class TestOep4(unittest.TestCase):
             notify_value = int(bytearray_value.hex(), 16)
             self.assertEqual(value, notify_value)
         except SDKException as e:
-            raised = False
-            self.assertTrue(raised, e)
+            self.assertTrue(e.args[1] in no_panic_exception)
 
 
 if __name__ == '__main__':
