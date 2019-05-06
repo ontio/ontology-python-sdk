@@ -130,7 +130,7 @@ class AioOep4(Oep4):
         return notify
 
     async def query_multi_transfer_event(self, tx_hash: str) -> list:
-        event = await self._sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
+        event = await self._sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
         return self._parse_multi_transfer_event(event)
 
     async def query_approve_event(self, tx_hash: str):

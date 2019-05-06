@@ -176,8 +176,8 @@ class Oep4(object):
         tx_hash = self._sdk.default_network.send_raw_transaction(tx)
         return tx_hash
 
-    def new_transfer_multi_tx(self, transfer_list: list, payer: Union[str, bytes, Address], gas_limit: int,
-                              gas_price: int) -> InvokeTransaction:
+    def new_transfer_multi_tx(self, transfer_list: list, payer: Union[str, bytes, Address], gas_price: int,
+                              gas_limit: int) -> InvokeTransaction:
         """
         This interface is used to generate a transaction which can
         transfer amount of token from from-account to to-account multiple times.
@@ -200,7 +200,8 @@ class Oep4(object):
         """
         This interface is used to transfer amount of token from from-account to to-account multiple times synchronously.
         """
-        tx = self.new_transfer_multi_tx(transfer_list, payer_acct.get_address(), gas_limit, gas_price)
+        tx = self.new_transfer_multi_tx(transfer_list, payer_acct.get_address(), gas_price, gas_limit)
+        tx.sign_transaction(payer_acct)
         for signer in signers:
             tx.add_sign_transaction(signer)
         tx_hash = self._sdk.default_network.send_raw_transaction(tx)
