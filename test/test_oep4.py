@@ -26,9 +26,6 @@ from Cryptodome.Random.random import randint
 
 from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
-from ontology.account.account import Account
-from ontology.crypto.signature_scheme import SignatureScheme
-
 networks = [sdk.rpc, sdk.restful]
 
 contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
@@ -71,9 +68,7 @@ class TestOep4(unittest.TestCase):
     def test_init(self):
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = contract_address
-        private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        tx_hash = oep4.init(acct, acct1, 500, 20000000)
+        tx_hash = oep4.init(acct1, acct2, 500, 20000000)
         self.assertEqual(len(tx_hash), 64)
         time.sleep(randint(10, 14))
         notify = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)['Notify'][0]
