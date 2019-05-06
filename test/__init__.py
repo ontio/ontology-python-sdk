@@ -53,7 +53,7 @@ def not_panic_exception(func):
         try:
             func(*args, **kwargs)
         except SDKException as e:
-            not_panic = ['balance insufficient', 'ConnectTimeout']
+            not_panic = ['balance insufficient', 'ConnectTimeout', 'unknown transaction']
             if not any(x in e.args[1] for x in not_panic):
                 raise e
 
