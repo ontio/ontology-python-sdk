@@ -1,4 +1,4 @@
-from ontology.contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.contract.neo.abi.abi_function import AbiFunction
 
 
 class AbiInfo(object):

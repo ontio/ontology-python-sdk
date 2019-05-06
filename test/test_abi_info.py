@@ -23,7 +23,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import unittest
 
-from ontology.smart_contract.neo_contract.abi.abi_info import AbiInfo
+from ontology.contract.neo.abi.abi_info import AbiInfo
 
 str_abi = '{"hash":"0x362cb5608b3eca61d4846591ebb49688900fedd0","entrypoint":"Main","functions":' \
           '[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args",' \
