@@ -155,7 +155,7 @@ class TestRestful(unittest.TestCase):
     def test_send_raw_transaction(self):
         b58_from_address = acct1.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
-        tx = sdk.native_vm.ong.new_transfer_tx(b58_from_address, b58_to_address, 1, b58_from_address, 500, 20000)
+        tx = sdk.native_vm.ong().new_transfer_tx(b58_from_address, b58_to_address, 1, b58_from_address, 500, 20000)
         tx.sign_transaction(acct1)
         tx_hash = sdk.restful.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
@@ -166,7 +166,7 @@ class TestRestful(unittest.TestCase):
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_from_address = acct.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
-        tx = sdk.native_vm.ong.new_transfer_tx('ong', b58_from_address, b58_to_address, 1, b58_from_address, 500, 20000)
+        tx = sdk.native_vm.ong().new_transfer_tx(b58_from_address, b58_to_address, 1, b58_from_address, 500, 20000)
         tx.sign_transaction(acct)
         result = sdk.restful.send_raw_transaction_pre_exec(tx)
         self.assertEqual('01', result['Result'])
