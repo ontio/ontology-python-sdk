@@ -19,21 +19,20 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import requests
 
-from time import time
 from sys import maxsize
 from typing import List
 
 from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
-from ontology.contract.neo_vm import NeoVm
+from ontology.contract.neo.vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
-from ontology.contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.contract.neo_contract.abi.build_params import BuildParams
-from ontology.contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo.abi.abi_function import AbiFunction
+from ontology.contract.neo.abi.build_params import BuildParams
+from ontology.contract.neo.invoke_function import InvokeFunction
 
 TEST_RPC_ADDRESS = ['http://polaris1.ont.io:20336', 'http://polaris2.ont.io:20336', 'http://polaris3.ont.io:20336',
                     'http://polaris4.ont.io:20336']
