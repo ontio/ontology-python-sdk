@@ -36,18 +36,24 @@ class TestOep4(unittest.TestCase):
     @not_panic_exception
     @Ontology.runner
     async def test_query_name(self):
-        for network in networks:
-            sdk.default_aio_network = network
-            oep4 = sdk.neo_vm.aio_oep4(contract_address)
-            self.assertEqual('DXToken', await oep4.name())
+        try:
+            for network in networks:
+                sdk.default_aio_network = network
+                oep4 = sdk.neo_vm.aio_oep4(contract_address)
+                self.assertEqual('DXToken', await oep4.name())
+        finally:
+            sdk.default_aio_network = sdk.aio_rpc
 
     @not_panic_exception
     @Ontology.runner
     async def test_get_symbol(self):
-        for network in networks:
-            sdk.default_network = network
-            oep4 = sdk.neo_vm.aio_oep4(contract_address)
-            self.assertEqual('DX', await oep4.symbol())
+        try:
+            for network in networks:
+                sdk.default_network = network
+                oep4 = sdk.neo_vm.aio_oep4(contract_address)
+                self.assertEqual('DX', await oep4.symbol())
+        finally:
+            sdk.default_aio_network = sdk.aio_rpc
 
     @not_panic_exception
     @Ontology.runner
@@ -55,11 +61,14 @@ class TestOep4(unittest.TestCase):
         contract_list = ['1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9', '165b1227311d47c22cd073ef8f285d3bddc858ca',
                          '8fecd2740b10a7410026774cc1f99fe14860873b']
         decimal_list = [10, 32, 255]
-        for network in networks:
-            sdk.default_network = network
-            for index, address in enumerate(contract_list):
-                oep4 = sdk.neo_vm.aio_oep4(address)
-                self.assertEqual(decimal_list[index], await oep4.decimals())
+        try:
+            for network in networks:
+                sdk.default_network = network
+                for index, address in enumerate(contract_list):
+                    oep4 = sdk.neo_vm.aio_oep4(address)
+                    self.assertEqual(decimal_list[index], await oep4.decimals())
+        finally:
+            sdk.default_aio_network = sdk.aio_rpc
 
     @not_panic_exception
     @Ontology.runner
@@ -79,12 +88,12 @@ class TestOep4(unittest.TestCase):
         oep4.hex_contract_address = contract_address
         self.assertEqual(10000000000000000000, await oep4.total_supply())
         try:
-            sdk.aio_rpc.connect_to_main_net()
+            sdk.default_aio_network.connect_to_main_net()
             oep4 = sdk.neo_vm.aio_oep4()
             oep4.hex_contract_address = '6c80f3a5c183edee7693a038ca8c476fb0d6ac91'
             self.assertEqual(10000000000, await oep4.total_supply())
         finally:
-            sdk.aio_rpc.connect_to_test_net()
+            sdk.default_aio_network.connect_to_test_net()
 
     @not_panic_exception
     @Ontology.runner
