@@ -22,19 +22,20 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import asyncio
 import unittest
 
-from ontology.common.address import Address
-from test import sdk, acct1, acct2, acct3, acct4
+from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
+from ontology.sdk import Ontology
+from ontology.utils.contract import Data
+from ontology.utils.contract import Event
+from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.network.websocket import Websocket
 from ontology.exception.exception import SDKException
-from ontology.utils.contract_data import ContractDataParser
 from ontology.crypto.signature_scheme import SignatureScheme
-from ontology.utils.contract_event import ContractEventParser
 
 
 class TestWebsocketClient(unittest.TestCase):
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_heartbeat(self):
         response = await sdk.websocket.send_heartbeat()
         await sdk.websocket.close_connect()
@@ -44,11 +45,11 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(False, response['SubscribeRawBlock'])
         self.assertEqual(False, response['SubscribeBlockTxHashs'])
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_subscribe(self):
-        oep4 = sdk.neo_vm.oep4()
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        oep4.hex_contract_address = hex_contract_address
+        oep4 = sdk.neo_vm.aio_oep4(hex_contract_address)
         response = await sdk.websocket.subscribe(hex_contract_address, True, False, False, False)
         self.assertEqual([hex_contract_address], response['ContractsFilter'])
         self.assertEqual(True, response['SubscribeEvent'])
@@ -56,18 +57,14 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(False, response['SubscribeRawBlock'])
         b58_to_address = acct2.get_address_base58()
         value = 10
-        b58_payer_address = acct3.get_address_base58()
-        tx = oep4.transfer(acct1.get_address_base58(), b58_to_address, value, b58_payer_address, 20000000, 500)
-        tx.sign_transaction(acct1)
-        tx.add_sign_transaction(acct3)
-        tx_hash = await sdk.websocket.send_raw_transaction(tx)
+        tx_hash = await oep4.transfer(acct1, b58_to_address, value, acct3, 500, 20000)
         self.assertEqual(64, len(tx_hash))
         try:
             event = await asyncio.wait_for(sdk.websocket.recv_subscribe_info(), timeout=10)
             self.assertEqual(False, response['SubscribeBlockTxHashs'])
             self.assertEqual(64, len(event['TxHash']))
-            notify = ContractEventParser.get_notify_list_by_contract_address(event, hex_contract_address)
-            notify = ContractDataParser.parse_addr_addr_int_notify(notify)
+            notify = Event.get_notify_by_contract_address(event, hex_contract_address)
+            notify = Data.parse_addr_addr_int_notify(notify)
             self.assertEqual(hex_contract_address, notify['ContractAddress'])
             self.assertEqual('transfer', notify['States'][0])
             self.assertEqual(acct1.get_address_base58(), notify['States'][1])
@@ -78,22 +75,25 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_connection_count(self):
         response = await sdk.websocket.get_connection_count()
         await sdk.websocket.close_connect()
         self.assertGreater(response, 0)
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_session_count(self):
         count = await sdk.websocket.get_session_count()
         await sdk.websocket.close_connect()
         self.assertGreaterEqual(count, 1)
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_balance(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-        multi_address = Address.address_from_multi_pub_keys(2, pub_keys)
+        multi_address = Address.from_multi_pub_keys(2, pub_keys)
         address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
                         acct4.get_address_base58(), multi_address.b58encode()]
         for address in address_list:
@@ -102,16 +102,18 @@ class TestWebsocketClient(unittest.TestCase):
             self.assertGreaterEqual(balance['ONT'], 0)
             self.assertGreaterEqual(balance['ONG'], 0)
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_storage(self):
         hex_contract_address = '0100000000000000000000000000000000000000'
         key = '746f74616c537570706c79'
         storage = await sdk.websocket.get_storage(hex_contract_address, key)
         await sdk.websocket.close_connect()
-        value = ContractDataParser.to_int(storage)
+        value = Data.to_int(storage)
         self.assertEqual(1000000000, value)
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_contract(self):
         hex_contract_address = '0100000000000000000000000000000000000000'
         response = await sdk.websocket.get_contract(hex_contract_address)
@@ -128,7 +130,8 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual('A sample of OEP4', response['Description'])
         await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_contract_event_by_tx_hash(self):
         tx_hash = '7bc2dd4693996133c15e6349c3f8dd1edeba2fcd3219c8bc2b854c939337c8ff'
         event_loop = asyncio.get_event_loop()
@@ -138,7 +141,8 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(1, response['State'])
         self.assertEqual(1, len(response['Notify']))
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_contract_event_by_height(self):
         height = 0
         event_list = await sdk.websocket.get_contract_event_by_height(height)
@@ -153,7 +157,8 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual(0, len(event_list))
         await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_block_height(self):
         try:
             height = await sdk.websocket.get_block_height()
@@ -161,7 +166,8 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_block_height_by_tx_hash(self):
         tx_hash_list = ['1ebde66ec3f309dad20a63f8929a779162a067c36ce7b00ffbe8f4cfc8050d79',
                         '029b0a7f058cca73ed05651d7b5536eff8be5271a39452e91a1e758d0c36aecb',
@@ -179,7 +185,8 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_block_hash_by_height(self):
         try:
             response = await sdk.websocket.get_block_hash_by_height(1024)
@@ -193,7 +200,8 @@ class TestWebsocketClient(unittest.TestCase):
         await sdk.websocket.close_connect()
         return response
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_block_by_height(self):
         try:
             height = 1024
@@ -203,7 +211,8 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_block_by_hash(self):
         try:
             block_hash = '2e36db16c8faf0ea0f84172256e79b78a3d8d076114fe8aaa302794668b9396f'
@@ -213,12 +222,12 @@ class TestWebsocketClient(unittest.TestCase):
         finally:
             await sdk.websocket.close_connect()
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_send_raw_transaction(self):
         b58_from_address = acct1.get_address_base58()
         b58_to_address = acct2.get_address_base58()
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, 1,
-                                                            b58_from_address, 20000, 500)
+        tx = sdk.native_vm.ong().new_transfer_tx(b58_from_address, b58_to_address, 1, b58_from_address, 500, 20000)
         tx.sign_transaction(acct1)
         tx_hash = await sdk.websocket.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
@@ -236,20 +245,21 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_send_raw_transaction_pre_exec(self):
         private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
         acct = Account(private_key, SignatureScheme.SHA256withECDSA)
         b58_from_address = acct.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
-        tx = sdk.native_vm.asset().new_transfer_transaction('ong', b58_from_address, b58_to_address, 1,
-                                                            b58_from_address, 20000, 500)
+        tx = sdk.native_vm.ong().new_transfer_tx(b58_from_address, b58_to_address, 1, b58_from_address, 20000, 500)
         tx.sign_transaction(acct)
         response = await sdk.websocket.send_raw_transaction_pre_exec(tx)
         self.assertEqual('01', response['Result'])
         self.assertEqual(1, response['State'])
 
-    @Websocket.runner
+    @not_panic_exception
+    @Ontology.runner
     async def test_get_merkle_proof(self):
         pre_tx_root = 0
         tx_hash_list = ['12943957b10643f04d89938925306fa342cec9d32925f5bd8e9ea7ce912d16d3',
@@ -268,8 +278,6 @@ class TestWebsocketClient(unittest.TestCase):
                 else:
                     self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
                     pre_tx_root = merkle_proof['TransactionsRoot']
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
         finally:
             await sdk.websocket.close_connect()
 
