@@ -21,6 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import path, environ
 
+from ontology.exception.exception import SDKException
 from ontology.sdk import Ontology
 
 password = environ['SDK_TEST_PASSWORD']
@@ -45,3 +46,15 @@ identity2 = wallet_manager.get_identity_by_ont_id(ont_id_2)
 identity2_ctrl_acct = wallet_manager.get_control_account_by_index(ont_id_2, 0, password)
 wallet_manager.save()
 no_panic_exception = ['balance insufficient', 'ConnectTimeout', 'already in the tx pool']
+
+
+def not_panic_exception(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except SDKException as e:
+            not_panic = ['balance insufficient', 'ConnectTimeout']
+            if not any(x in e.args[1] for x in not_panic):
+                raise e
+
+    return wrapper

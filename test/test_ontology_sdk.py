@@ -34,7 +34,7 @@ class TestOntologySdk(unittest.TestCase):
         asset = sdk.native_vm.asset()
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         m = 2
-        b58_multi_address = Address.b58_address_from_multi_pub_keys(m, pub_keys)
+        b58_multi_address = Address.from_multi_pub_keys(m, pub_keys).b58encode()
         amount = 1
         gas_price = 500
         gas_limit = 20000
