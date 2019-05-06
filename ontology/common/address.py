@@ -42,7 +42,9 @@ class Address(object):
         self.ZERO = script_hash
 
     @classmethod
-    def __from_byte_script(cls, byte_script):
+    def __from_byte_script(cls, byte_script: bytes, little_endian: bool = True):
+        if not little_endian:
+            return cls(Digest.hash160(msg=byte_script, is_hex=False)[::-1])
         return cls(Digest.hash160(msg=byte_script, is_hex=False))
 
     @classmethod
@@ -61,7 +63,7 @@ class Address(object):
         """
         generate contract address from avm bytecode.
         """
-        return cls.__from_byte_script(bytearray.fromhex(code))[::-1]
+        return cls.__from_byte_script(bytes.fromhex(code), little_endian=False)
 
     def b58encode(self):
         data = Address.__COIN_VERSION + self.ZERO
@@ -85,6 +87,8 @@ class Address(object):
     def b58decode(cls, address: str):
         if isinstance(address, Address):
             return address
+        if isinstance(address, bytes):
+            return cls(address)
         data = base58.b58decode(address)
         if len(data) != 25:
             raise SDKException(ErrorCode.param_error)
