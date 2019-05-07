@@ -16,11 +16,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ontology.contract.native.asset import Asset
+from ontology.contract.native.ont import Ont
+from ontology.contract.native.aio_asset import AioAsset
 
 
-class Ont(Asset):
-    def __init__(self, sdk=None):
+class AioOnt(Ont, AioAsset):
+    def __init__(self, sdk):
         super().__init__(sdk)
-        self._contract_address = b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-        self._invoke_address = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
