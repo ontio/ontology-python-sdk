@@ -23,7 +23,7 @@ import inspect
 
 from time import time
 from sys import maxsize
-from typing import List
+from typing import List, Union
 from websockets import client
 
 from Cryptodome.Random.random import randint
@@ -237,9 +237,9 @@ class Websocket(object):
         msg = dict(Action='sendrawtransaction', Version='1.0.0', Id=self.__id, PreExec='1', Data=tx_data)
         return await self.__send_recv(msg, is_full)
 
-    async def send_neo_vm_transaction_pre_exec(self, contract_address: str or bytes or bytearray,
-                                               signer: Account or None, func: AbiFunction or InvokeFunction,
-                                               is_full: bool = False):
+    async def send_neo_vm_tx_pre_exec(self, contract_address: Union[str, bytes, bytearray],
+                                      func: Union[AbiFunction, InvokeFunction], signer: Account = None,
+                                      is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
         elif isinstance(func, InvokeFunction):
