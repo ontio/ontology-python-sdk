@@ -19,7 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import asyncio
 
-from typing import List
+from typing import List, Union
 
 from aiohttp import client_exceptions
 from aiohttp.client import ClientSession
@@ -208,7 +208,8 @@ class AioRpc(Rpc):
         response['result'] = dict((k.upper(), int(v)) for k, v in response.get('result', dict()).items())
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_grant_ong(self, b58_address: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GRANT_ONG, [b58_address])
@@ -238,7 +239,8 @@ class AioRpc(Rpc):
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         """
@@ -248,7 +250,8 @@ class AioRpc(Rpc):
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_contract_event_by_height(self, height: int, is_full: bool = False) -> List[dict]:
         """
@@ -275,7 +278,8 @@ class AioRpc(Rpc):
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_contract(self, hex_contract_address: str, is_full: bool = False) -> dict:
         """
@@ -289,7 +293,8 @@ class AioRpc(Rpc):
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_merkle_proof(self, tx_hash: str, is_full: bool = False) -> dict:
         """
@@ -299,14 +304,16 @@ class AioRpc(Rpc):
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_memory_pool_tx_count(self, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_COUNT)
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def get_memory_pool_tx_state(self, tx_hash: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_MEM_POOL_TX_STATE, [tx_hash])
@@ -328,7 +335,8 @@ class AioRpc(Rpc):
         response = await self.__post(payload)
         if is_full:
             return response
-        return response['result']
+        result = response['result']
+        return dict() if result is None else result
 
     async def send_raw_transaction_pre_exec(self, tx: Transaction, is_full: bool = False):
         """
@@ -341,10 +349,9 @@ class AioRpc(Rpc):
             return response
         return response['result']
 
-    async def send_neo_vm_transaction_pre_exec(self, contract_address: str or bytes or bytearray,
-                                               signer: Account or None, func: AbiFunction or InvokeFunction,
-
-                                               is_full: bool = False):
+    async def send_neo_vm_tx_pre_exec(self, contract_address: Union[str, bytes, bytearray],
+                                      func: Union[AbiFunction, InvokeFunction], signer: Account = None,
+                                      is_full: bool = False):
         contract_address = ensure_bytearray_contract_address(contract_address)
         tx = NeoVm.make_invoke_transaction(contract_address, func)
         if signer is not None:
