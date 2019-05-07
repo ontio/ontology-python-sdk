@@ -126,7 +126,7 @@ class TestAioOnt(unittest.TestCase):
         ont = sdk.native_vm.aio_ont()
         tx_hash = await ont.transfer_from(acct2, b58_from_address, b58_recv_address, 1, acct2, 500, 20000)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = await sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
         self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
         self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
