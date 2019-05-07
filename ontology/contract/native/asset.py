@@ -33,16 +33,11 @@ class Asset(object):
         self._sdk = sdk
         self._version = b'\x00'
         self._contract_address = b''
-
-    @property
-    def _invoke_address(self):
-        return self._contract_address
+        self._invoke_address = b''
 
     @property
     def contract_address(self) -> Address:
-        address = bytearray(self._contract_address)
-        address.reverse()
-        return Address(address)
+        return Address(self._contract_address)
 
     def _new_token_setting_tx(self, func_name: str) -> InvokeTransaction:
         invoke_code = build_native_invoke_code(self._invoke_address, self._version, func_name, bytearray())
@@ -74,10 +69,6 @@ class Asset(object):
         """
         if amount <= 0:
             raise SDKException(ErrorCode.other_error('the amount should be greater than than zero.'))
-        if gas_price < 0:
-            raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
-        if gas_limit < 0:
-            raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         state = [{'from': Address.b58decode(from_address), 'to': Address.b58decode(to_address), 'amount': amount}]
         invoke_code = build_native_invoke_code(self._invoke_address, self._version, 'transfer', state)
         return InvokeTransaction(Address.b58decode(payer), gas_price, gas_limit, invoke_code)
@@ -89,10 +80,6 @@ class Asset(object):
         """
         if amount <= 0:
             raise SDKException(ErrorCode.other_error('the amount should be greater than than zero.'))
-        if gas_price < 0:
-            raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
-        if gas_limit < 0:
-            raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         args = dict(sender=Address.b58decode(approver), receiver=Address.b58decode(spender), amount=amount)
         invoke_code = build_native_invoke_code(self._invoke_address, self._version, 'approve', args)
         return InvokeTransaction(Address.b58decode(payer), gas_price, gas_limit, invoke_code)
@@ -178,10 +165,6 @@ class Asset(object):
         """
         if amount <= 0:
             raise SDKException(ErrorCode.other_error('the amount should be greater than than zero.'))
-        if gas_price < 0:
-            raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
-        if gas_limit < 0:
-            raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         tx = self.new_approve_tx(approver.get_address(), spender, amount, payer.get_address(), gas_price, gas_limit)
         tx.sign_transaction(approver)
         if approver.get_address_bytes() != payer.get_address_bytes():
@@ -196,11 +179,8 @@ class Asset(object):
         """
         if amount <= 0:
             raise SDKException(ErrorCode.other_error('the amount should be greater than than zero.'))
-        if gas_price < 0:
-            raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
-        if gas_limit < 0:
-            raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
-        tx = self.new_transfer_from_tx(spender.get_address(), from_address, receiver, amount, gas_price, gas_limit)
+        tx = self.new_transfer_from_tx(spender.get_address(), from_address, receiver, amount, payer.get_address(),
+                                       gas_price, gas_limit)
         tx.sign_transaction(spender)
         if spender.get_address_bytes() != payer.get_address_bytes():
             tx.add_sign_transaction(payer)

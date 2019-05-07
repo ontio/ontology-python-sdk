@@ -23,8 +23,8 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.smart_contract.neo_contract.abi.struct_type import Struct
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
+from ontology.contract.neo.abi.struct_type import Struct
+from ontology.contract.neo.abi.build_params import BuildParams
 
 
 class Data(object):
@@ -297,7 +297,7 @@ class Event(object):
         try:
             return event['Notify']
         except KeyError:
-            raise SDKException(ErrorCode.other_error('Notify not found in event'))
+            raise SDKException(ErrorCode.other_error('Notify not found in {}', event)) from None
 
     @staticmethod
     def get_ong_contract_notify(event: dict) -> dict:
