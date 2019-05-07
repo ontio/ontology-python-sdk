@@ -70,7 +70,7 @@ class TestOep4(unittest.TestCase):
         oep4.hex_contract_address = contract_address
         tx_hash = oep4.init(acct1, acct2, 500, 20000000)
         self.assertEqual(len(tx_hash), 64)
-        time.sleep(randint(10, 14))
+        time.sleep(randint(20, 30))
         notify = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)['Notify'][0]
         self.assertEqual('Already initialized!', bytes.fromhex(notify['States']).decode())
 
@@ -96,7 +96,7 @@ class TestOep4(unittest.TestCase):
         value = 10
         tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, 500, 20000000)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(10, 14))
+        time.sleep(randint(20, 30))
         notify = oep4.query_transfer_event(tx_hash)
         self.assertEqual('transfer', notify['States'][0])
         self.assertEqual(from_acct.get_address_base58(), notify['States'][1])
@@ -139,7 +139,7 @@ class TestOep4(unittest.TestCase):
 
         tx_hash = oep4.transfer_multi(transfer_list, signers, acct1, 500, 20000000)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(10, 14))
+        time.sleep(randint(20, 30))
         notify_list = oep4.query_multi_transfer_event(tx_hash)
         self.assertEqual(len(transfer_list), len(notify_list))
         for index, notify in enumerate(notify_list):
