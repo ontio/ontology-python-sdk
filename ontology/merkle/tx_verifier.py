@@ -35,7 +35,7 @@ class TxVerifier(object):
         return TxVerifier._instance
 
     def verify_by_tx_hash(self, tx_hash: str):
-        merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
+        merkle_proof = self.__sdk.default_network.get_merkle_proof(tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
         current_block_height = merkle_proof['CurBlockHeight']
         target_hash_list = merkle_proof['TargetHashes']
