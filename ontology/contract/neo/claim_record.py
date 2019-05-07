@@ -75,7 +75,8 @@ class ClaimRecord(object):
         func.set_params_value(claim_id)
         tx = InvokeTransaction()
         tx.add_invoke_code(self.__hex_contract_address, func)
-        return tx
+        response = self.__sdk.default_network.send_raw_transaction_pre_exec(tx)
+        return self.parse_status(response)
 
     @staticmethod
     def parse_status(result: dict):
@@ -88,7 +89,7 @@ class ClaimRecord(object):
         return status
 
     def query_commit_event(self, tx_hash: str):
-        event = self.__sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
+        event = self.__sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify) == 0:
             return notify
@@ -104,7 +105,7 @@ class ClaimRecord(object):
         return notify
 
     def query_revoke_event(self, tx_hash: str):
-        event = self.__sdk.get_network().get_contract_event_by_tx_hash(tx_hash)
+        event = self.__sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify['States']) == 4:
             notify['States'][0] = Data.to_utf8_str(notify['States'][0])

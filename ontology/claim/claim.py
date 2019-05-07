@@ -153,7 +153,7 @@ class Claim(object):
     def generate_blk_proof(self, commit_tx_hash: str, is_big_endian: bool = True, hex_contract_address: str = ''):
         if len(hex_contract_address) == 0:
             hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
-        merkle_proof = self.__sdk.get_network().get_merkle_proof(commit_tx_hash)
+        merkle_proof = self.__sdk.default_network.get_merkle_proof(commit_tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
         current_block_height = merkle_proof['CurBlockHeight']
         target_hash = merkle_proof['TransactionsRoot']

@@ -97,7 +97,7 @@ class BlockchainProof(object):
             blk_height = self.__blk_proof['BlockHeight']
         except KeyError:
             raise SDKException(ErrorCode.invalid_blk_proof)
-        block = self.__sdk.get_network().get_block_by_height(blk_height)
+        block = self.__sdk.default_network.get_block_by_height(blk_height)
         tx_list = block.get('Transactions', list())
         tx_exist = False
         for tx in tx_list:
