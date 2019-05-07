@@ -100,13 +100,16 @@ class TestAioOnt(unittest.TestCase):
     @Ontology.runner
     async def test_transfer_from_tx(self):
         acct2_b58_address = acct2.get_address_base58()
-        tx_hash = await sdk.native_vm.aio_ont().transfer_from(acct2, acct1.get_address(), acct2_b58_address, 1,
-                                                              acct2, 500, 20000)
+        tx_hash = await sdk.native_vm.aio_ont().transfer_from(acct2, acct1.get_address(), acct2_b58_address, 1, acct2,
+                                                              500, 20000)
         self.assertEqual(64, len(tx_hash))
         await asyncio.sleep(randint(14, 20))
         event = await sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
-        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
-        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+        notify = Event.get_notify_by_contract_address(event, sdk.native_vm.aio_ont().contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(acct1.get_address_base58(), notify['States'][1])
+        self.assertEqual(acct2.get_address_base58(), notify['States'][2])
+        self.assertEqual(1, notify['States'][3])
 
     @not_panic_exception
     @Ontology.runner
