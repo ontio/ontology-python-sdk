@@ -32,10 +32,10 @@ class NeoVm(object):
     def __init__(self, sdk):
         self.__sdk = sdk
 
-    def oep4(self, hex_contract_address: str):
+    def oep4(self, hex_contract_address: str = ''):
         return Oep4(hex_contract_address, self.__sdk)
 
-    def aio_oep4(self, hex_contract_address: str):
+    def aio_oep4(self, hex_contract_address: str = ''):
         return AioOep4(hex_contract_address, self.__sdk)
 
     def claim_record(self):
