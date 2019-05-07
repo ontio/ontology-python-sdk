@@ -297,7 +297,7 @@ class Event(object):
         try:
             return event['Notify']
         except KeyError:
-            raise SDKException(ErrorCode.other_error('Notify not found in {}', event)) from None
+            raise SDKException(ErrorCode.other_error(f'Notify not found in {event}')) from None
 
     @staticmethod
     def get_ong_contract_notify(event: dict) -> dict:
