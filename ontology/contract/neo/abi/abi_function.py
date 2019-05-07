@@ -1,6 +1,6 @@
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.contract.neo_contract.abi.parameter import Parameter
+from ontology.contract.neo.abi.parameter import Parameter
 
 
 class AbiFunction(object):
