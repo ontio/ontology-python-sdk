@@ -47,13 +47,14 @@ identity2_ctrl_acct = wallet_manager.get_control_account_by_index(ont_id_2, 0, p
 wallet_manager.save()
 no_panic_exception = ['balance insufficient', 'ConnectTimeout', 'already in the tx pool']
 
+not_panic = ['balance insufficient', 'ConnectTimeout', 'unknown transaction', 'Notify not found in {}']
+
 
 def not_panic_exception(func):
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except SDKException as e:
-            not_panic = ['balance insufficient', 'ConnectTimeout', 'unknown transaction']
             if not any(x in e.args[1] for x in not_panic):
                 raise e
 
