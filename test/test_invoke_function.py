@@ -108,7 +108,7 @@ class TestInvokeFunction(unittest.TestCase):
         tx_hash = self.send_tx(hex_contract_address, acct1, acct2, func)
         if len(tx_hash) == 0:
             return
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
         states[0] = Data.to_utf8_str(states[0])
@@ -139,7 +139,7 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states_list = Event.get_states_by_contract_address(event, hex_contract_address)
         states_list[0][0] = Data.to_utf8_str(states_list[0][0])
@@ -175,7 +175,7 @@ class TestInvokeFunction(unittest.TestCase):
         except SDKException as e:
             self.assertIn('already in the tx pool', e.args[1])
             return
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
         states[0] = Data.to_utf8_str(states[0])
@@ -241,7 +241,7 @@ class TestInvokeFunction(unittest.TestCase):
         tx_hash = self.send_tx(hex_contract_address, None, acct1, notify_args)
         if len(tx_hash) == 0:
             return
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
         states[0] = Data.to_utf8_str(states[0])
@@ -266,7 +266,7 @@ class TestInvokeFunction(unittest.TestCase):
         tx_hash = self.send_tx(hex_contract_address, None, acct1, func)
         if len(tx_hash) == 0:
             return
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
         states[0] = Data.to_utf8_str(states[0])
@@ -316,7 +316,7 @@ class TestInvokeFunction(unittest.TestCase):
         func = InvokeFunction('testMapInMap')
         func.set_params_value(dict_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_price, gas_limit, func, False)
-        time.sleep(randint(20, 30))
+        time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
         states[0] = Data.to_utf8_str(states[0])
