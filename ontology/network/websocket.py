@@ -1,31 +1,61 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import json
 import socket
+import asyncio
+import inspect
 
 from time import time
 from sys import maxsize
-from typing import List
+from typing import List, Union
 from websockets import client
+
 from Cryptodome.Random.random import randint
 
 from ontology.account.account import Account
-from ontology.smart_contract.neo_vm import NeoVm
+from ontology.contract.neo.vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo.abi.abi_function import AbiFunction
+from ontology.contract.neo.abi.build_params import BuildParams
+from ontology.contract.neo.invoke_function import InvokeFunction
 
 
-class WebsocketClient(object):
+class Websocket(object):
     def __init__(self, url: str = ''):
         self.__url = url
         self.__id = 0
         self.__ws_client = None
+
+    @staticmethod
+    def runner(func):
+        def wrapper(*args, **kwargs):
+            if inspect.iscoroutinefunction(func):
+                future = func(*args, **kwargs)
+            else:
+                coroutine = asyncio.coroutine(func)
+                future = coroutine(*args, **kwargs)
+            asyncio.get_event_loop().run_until_complete(future)
+
+        return wrapper
 
     def __generate_ws_id(self):
         if self.__id == 0:
@@ -67,7 +97,10 @@ class WebsocketClient(object):
 
     async def __send_recv(self, msg: dict, is_full: bool):
         if self.__ws_client is None or self.__ws_client.closed:
-            await self.connect()
+            try:
+                await self.connect()
+            except TimeoutError:
+                raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.__url])))
         await self.__ws_client.send(json.dumps(msg))
         response = await self.__ws_client.recv()
         response = json.loads(response)
@@ -100,7 +133,7 @@ class WebsocketClient(object):
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getbalance', Id=self.__id, Version='1.0.0', Addr=b58_address)
         response = await self.__send_recv(msg, is_full=True)
-        response['Result'] = dict((k, int(v)) for k, v in response['Result'].items())
+        response['Result'] = dict((k.upper(), int(v)) for k, v in response.get('Result', dict()).items())
         if is_full:
             return response
         return response['Result']
@@ -117,7 +150,7 @@ class WebsocketClient(object):
         msg = dict(Action='getstorage', Id=self.__id, Version='1.0.0', Hash=hex_contract_address, Key=key)
         return await self.__send_recv(msg, is_full)
 
-    async def get_smart_contract(self, hex_contract_address: str, is_full: bool = False):
+    async def get_contract(self, hex_contract_address: str, is_full: bool = False):
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getcontract', Id=self.__id, Version='1.0.0', Hash=hex_contract_address, Raw=0)
@@ -126,13 +159,13 @@ class WebsocketClient(object):
             return response
         return response['Result']
 
-    async def get_smart_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
+    async def get_contract_event_by_tx_hash(self, tx_hash: str, is_full: bool = False) -> dict:
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getsmartcodeeventbyhash', Id=self.__id, Version='1.0.0', Hash=tx_hash, Raw=0)
         return await self.__send_recv(msg, is_full)
 
-    async def get_smart_contract_event_by_height(self, height: int, is_full: bool = False):
+    async def get_contract_event_by_height(self, height: int, is_full: bool = False):
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getsmartcodeeventbyheight', Id=self.__id, Version='1.0.0', Height=height)
@@ -148,7 +181,12 @@ class WebsocketClient(object):
         if self.__id == 0:
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getblockheightbytxhash', Id=self.__id, Version='1.0.0', Hash=tx_hash)
-        return await self.__send_recv(msg, is_full)
+        response = await self.__send_recv(msg, is_full=True)
+        if response.get('Result', '') == '':
+            raise SDKException(ErrorCode.invalid_tx_hash(tx_hash))
+        if is_full:
+            return response
+        return response['Result']
 
     async def get_block_hash_by_height(self, height: int, is_full: bool = False):
         if self.__id == 0:
@@ -199,9 +237,9 @@ class WebsocketClient(object):
         msg = dict(Action='sendrawtransaction', Version='1.0.0', Id=self.__id, PreExec='1', Data=tx_data)
         return await self.__send_recv(msg, is_full)
 
-    async def send_neo_vm_transaction_pre_exec(self, contract_address: str or bytes or bytearray,
-                                               signer: Account or None, func: AbiFunction or InvokeFunction,
-                                               is_full: bool = False):
+    async def send_neo_vm_tx_pre_exec(self, contract_address: Union[str, bytes, bytearray],
+                                      func: Union[AbiFunction, InvokeFunction], signer: Account = None,
+                                      is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
         elif isinstance(func, InvokeFunction):
@@ -209,7 +247,7 @@ class WebsocketClient(object):
         else:
             raise SDKException(ErrorCode.other_error('the type of func is error.'))
         contract_address = ensure_bytearray_contract_address(contract_address)
-        tx = NeoVm.make_invoke_transaction(contract_address, params, b'', 0, 0)
+        tx = NeoVm.make_invoke_transaction(contract_address, params)
         if signer is not None:
             tx.sign_transaction(signer)
         return await self.send_raw_transaction_pre_exec(tx, is_full)

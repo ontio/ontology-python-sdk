@@ -1,6 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+
 import base64
 import unittest
 
@@ -79,7 +98,7 @@ class TestAccount(unittest.TestCase):
         hex_private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         account = Account(hex_private_key, SignatureScheme.SHA256withECDSA)
         hex_reverse_address = 'e973f6a189864faee1db3a8842219b82ddc95647'
-        self.assertEqual(hex_reverse_address, account.get_address_hex_reverse())
+        self.assertEqual(hex_reverse_address, account.get_address_hex(little_endian=False))
 
     def test_get_signature_scheme(self):
         hex_private_key = '523c5fcf74823831752f0bcb3634234f10b3beb1c05595058534577752ad2d9f'

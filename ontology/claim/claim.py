@@ -1,5 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import uuid
 import base64
@@ -14,6 +29,7 @@ from ontology.claim.proof import BlockchainProof
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.merkle.merkle_verifier import MerkleVerifier
+from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.crypto.signature_handler import SignatureHandler
 
 
@@ -124,17 +140,20 @@ class Claim(object):
     def from_base64_signature(b64_signature: str):
         return bytes.hex(base64.b64decode(b64_signature))
 
-    def generate_blk_proof(self, iss_acct: Account, payer: Account, gas_limit: int, gas_price: int,
-                           is_big_endian: bool = True, hex_contract_address: str = ''):
+    def commit(self, b58_iss_address: str, b58_payer_address: str, gas_limit: int, gas_price: int,
+               hex_contract_address: str = '') -> InvokeTransaction:
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.require_str_params)
         if len(hex_contract_address) != 0 and len(hex_contract_address) == 40:
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
-        tx_hash = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, iss_acct, self.payload.sub, payer,
-                                                          gas_limit, gas_price)
-        sleep(12)
-        hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
-        merkle_proof = self.__sdk.get_network().get_merkle_proof(tx_hash)
+        tx = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, b58_iss_address, self.payload.sub,
+                                                     b58_payer_address, gas_limit, gas_price)
+        return tx
+
+    def generate_blk_proof(self, commit_tx_hash: str, is_big_endian: bool = True, hex_contract_address: str = ''):
+        if len(hex_contract_address) == 0:
+            hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
+        merkle_proof = self.__sdk.get_network().get_merkle_proof(commit_tx_hash)
         tx_block_height = merkle_proof['BlockHeight']
         current_block_height = merkle_proof['CurBlockHeight']
         target_hash = merkle_proof['TransactionsRoot']
@@ -144,7 +163,7 @@ class Claim(object):
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, is_big_endian)
         if not result:
             raise SDKException(ErrorCode.other_error('Invalid merkle proof'))
-        self.__blk_proof.set_proof(tx_hash, hex_contract_address, tx_block_height, merkle_root, proof_node)
+        self.__blk_proof.set_proof(commit_tx_hash, hex_contract_address, tx_block_height, merkle_root, proof_node)
         return self.__blk_proof
 
     def validate_blk_proof(self, is_big_endian: bool = True):

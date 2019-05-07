@@ -4,11 +4,12 @@
 from enum import Enum
 
 from ontology.utils import utils
+from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.exception.exception import SDKException
-from ontology.smart_contract.neo_contract.abi.struct_type import Struct
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.contract.neo.abi.struct_type import Struct
+from ontology.contract.neo.abi.abi_function import AbiFunction
 
 from ontology.vm.op_code import (
     PACK,
@@ -83,7 +84,6 @@ class BuildParams(object):
         elif isinstance(param, int):
             builder.emit_push_int(param)
         elif isinstance(param, dict):
-            # builder.emit_push_byte_array(BuildParams.get_map_bytes(dict(param)))
             BuildParams.push_map(param, builder)
         elif isinstance(param, list):
             BuildParams.create_code_params_script_builder(param, builder)
@@ -91,6 +91,8 @@ class BuildParams(object):
             builder.emit(PACK)
         elif isinstance(param, Struct):
             BuildParams.push_struct(param, builder)
+        elif isinstance(param, Address):
+            builder.emit_push_bytearray(param.to_bytes())
         else:
             raise SDKException(ErrorCode.other_error('parameter type is error'))
 

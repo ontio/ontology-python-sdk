@@ -1,6 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import unittest
 
 from time import time, sleep
@@ -8,7 +26,6 @@ from time import time, sleep
 from ontology.claim.claim import Claim
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
-from ontology.claim.proof import BlockchainProof
 from ontology.exception.exception import SDKException
 from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct
 
@@ -104,7 +121,12 @@ class TestClaim(unittest.TestCase):
             msg = 'get key failed'
             self.assertTrue(msg in e.args[1])
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
-        blockchain_proof = claim.generate_blk_proof(identity2_ctrl_acct, acct1, gas_limit, gas_price)
+        tx = claim.commit(identity2_ctrl_acct.get_address_base58(), acct1.get_address_base58(), gas_limit, gas_price)
+        tx.sign_transaction(identity2_ctrl_acct)
+        tx.add_sign_transaction(acct1)
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        sleep(7)
+        blockchain_proof = claim.generate_blk_proof(tx_hash)
         self.assertTrue(claim.validate_blk_proof())
         b64_claim = claim.to_base64()
         claim_list = b64_claim.split('.')

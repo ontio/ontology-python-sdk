@@ -1,5 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import base64
 import base58
@@ -81,21 +96,13 @@ class Account(object):
         """
         return self.__address.b58encode()
 
-    def get_address_hex(self):
+    def get_address_hex(self, little_endian: bool = True):
         """
         This interface is used to get the little-endian hexadecimal account address.
 
         :return: little-endian hexadecimal account address.
         """
-        return self.__address.to_hex_str()
-
-    def get_address_hex_reverse(self):
-        """
-        This interface is used to get the big-endian hexadecimal account address.
-
-        :return: big-endian hexadecimal account address.
-        """
-        return self.__address.to_reverse_hex_str()
+        return self.__address.hex(little_endian)
 
     def get_signature_scheme(self) -> SignatureScheme:
         """

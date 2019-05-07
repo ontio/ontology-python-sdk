@@ -1,16 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
+
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+import time
 import unittest
 
-from time import sleep
+from Cryptodome.Random.random import randint
 
+from ontology.utils.contract import Event
 from test import acct1, acct2, acct3, sdk
 
 from ontology.utils import utils
 from ontology.common.address import Address
 from ontology.core.transaction import Transaction
-from ontology.utils.contract_event import ContractEventParser
 
 
 class TestTransaction(unittest.TestCase):
@@ -34,14 +52,14 @@ class TestTransaction(unittest.TestCase):
     def test_multi_serialize(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         m = 2
-        multi_address = Address.address_from_multi_pub_keys(m, pub_keys)
+        multi_address = Address.from_multi_pub_keys(m, pub_keys)
         b58_multi_address = multi_address.b58encode()
         b58_acct1_address = acct1.get_address_base58()
         b58_acct2_address = acct2.get_address_base58()
         gas_price = 500
         gas_limit = 20000
-        tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, 1000000000,
-                                                             b58_acct1_address, gas_limit, gas_price)
+        tx1 = sdk.native_vm.ong().new_transfer_tx(b58_multi_address, b58_acct2_address, 1, b58_acct1_address, gas_price,
+                                                  gas_limit)
         tx_bytes = tx1.serialize()
         tx2 = Transaction.deserialize_from(tx_bytes)
         self.assertEqual(dict(tx1), dict(tx2))
@@ -60,18 +78,18 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(dict(tx4), dict(tx5))
         tx_hash = sdk.rpc.send_raw_transaction(tx5)
         self.assertEqual(64, len(tx_hash))
-        sleep(6)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        time.sleep(randint(10, 15))
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         contract_address = '0200000000000000000000000000000000000000'
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
+        notify = Event.get_notify_by_contract_address(event, contract_address)
         for event in notify:
             self.assertEqual(event['States'][0], 'transfer')
-        multi_address = Address.address_from_multi_pub_keys(m, pub_keys[::-1])
+        multi_address = Address.from_multi_pub_keys(m, pub_keys[::-1])
         b58_multi_address = multi_address.b58encode()
         b58_acct1_address = acct1.get_address_base58()
         b58_acct2_address = acct2.get_address_base58()
-        tx1 = sdk.native_vm.asset().new_transfer_transaction('ong', b58_multi_address, b58_acct2_address, 100000,
-                                                             b58_acct1_address, gas_limit, gas_price)
+        tx1 = sdk.native_vm.ong().new_transfer_tx(b58_multi_address, b58_acct2_address, 100000, b58_acct1_address,
+                                                  gas_price, gas_limit)
         tx_bytes = tx1.serialize()
         tx2 = Transaction.deserialize_from(tx_bytes)
         self.assertEqual(dict(tx1), dict(tx2))
@@ -90,10 +108,10 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(dict(tx4), dict(tx5))
         tx_hash = sdk.rpc.send_raw_transaction(tx5)
         self.assertEqual(64, len(tx_hash))
-        sleep(6)
-        event = sdk.rpc.get_smart_contract_event_by_tx_hash(tx_hash)
+        time.sleep(randint(10, 15))
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         contract_address = '0200000000000000000000000000000000000000'
-        notify = ContractEventParser.get_notify_list_by_contract_address(event, contract_address)
+        notify = Event.get_notify_by_contract_address(event, contract_address)
         for event in notify:
             self.assertEqual(event['States'][0], 'transfer')
 

@@ -1,9 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+Copyright (C) 2018 The ontology Authors
+This file is part of The ontology library.
 
+The ontology is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-from typing import List
+The ontology is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from enum import Enum
+from typing import List, Union
+
+from Cryptodome.Random.random import randint
 
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
@@ -32,18 +48,33 @@ TX_MAX_SIG_SIZE = 16
 
 
 class Transaction(object):
-    def __init__(self, version=0, tx_type=None, nonce=None, gas_price=None, gas_limit=None, payer=None, payload=None,
-                 attributes: bytearray = None, sig_list: List[Sig] = None):
+    def __init__(self, version=0, tx_type: TransactionType or int = None, gas_price: int = 0, gas_limit: int = 0,
+                 payer: Union[str, bytes, Address, None] = b'', payload: bytearray = bytearray(), nonce: int = None,
+                 attributes: bytearray = bytearray(), sig_list: List[Sig] = None):
+        if gas_price < 0:
+            raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
+        if gas_limit < 0:
+            raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         self.version = version
+        if isinstance(tx_type, TransactionType):
+            tx_type = tx_type.value
         self.tx_type = tx_type
+        if not nonce:
+            nonce = randint(0, 0xFFFFFFFF)
         self.nonce = nonce
         self.gas_price = gas_price
         self.gas_limit = gas_limit
-        if payer is None or payer == b'' or payer == bytearray():
+        if not payer:
             payer = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        if isinstance(payer, str):
+            payer = Address.b58decode(payer).to_bytes()
+        if isinstance(payer, Address):
+            payer = payer.to_bytes()
         self.payer = payer
         self.payload = payload
         self.attributes = attributes
+        if not sig_list:
+            sig_list = list()
         self.sig_list = sig_list
 
     def __iter__(self):
@@ -137,9 +168,6 @@ class Transaction(object):
     def sign_transaction(self, signer: Account):
         """
         This interface is used to sign the transaction.
-
-        :param signer: an Account object which will sign the transaction.
-        :return: a Transaction object which has been signed.
         """
         tx_hash = self.hash256()
         sig_data = signer.generate_signature(tx_hash)
@@ -149,9 +177,6 @@ class Transaction(object):
     def add_sign_transaction(self, signer: Account):
         """
         This interface is used to add signature into the transaction.
-
-        :param signer: an Account object which will sign the transaction.
-        :return: a Transaction object which has been signed.
         """
         if self.sig_list is None or len(self.sig_list) == 0:
             self.sig_list = []
@@ -165,12 +190,6 @@ class Transaction(object):
     def add_multi_sign_transaction(self, m: int, pub_keys: List[bytes] or List[str], signer: Account):
         """
         This interface is used to generate an Transaction object which has multi signature.
-
-        :param tx: a Transaction object which will be signed.
-        :param m: the amount of signer.
-        :param pub_keys: a list of public keys.
-        :param signer: an Account object which will sign the transaction.
-        :return: a Transaction object which has been signed.
         """
         for index, pk in enumerate(pub_keys):
             if isinstance(pk, str):
