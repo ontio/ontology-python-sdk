@@ -24,9 +24,9 @@ from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.transaction import Transaction, TransactionType
 from ontology.utils.transaction import ensure_bytearray_contract_address
-from ontology.smart_contract.neo_contract.abi.abi_function import AbiFunction
-from ontology.smart_contract.neo_contract.abi.build_params import BuildParams
-from ontology.smart_contract.neo_contract.invoke_function import InvokeFunction
+from ontology.contract.neo.abi.abi_function import AbiFunction
+from ontology.contract.neo.abi.build_params import BuildParams
+from ontology.contract.neo.invoke_function import InvokeFunction
 
 
 class InvokeTransaction(Transaction):
