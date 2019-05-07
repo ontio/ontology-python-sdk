@@ -49,8 +49,12 @@ TX_MAX_SIG_SIZE = 16
 
 class Transaction(object):
     def __init__(self, version=0, tx_type: TransactionType or int = None, gas_price: int = 0, gas_limit: int = 0,
-                 payer: Union[str, bytes, Address] = b'', payload: bytearray = bytearray(), nonce: int = None,
+                 payer: Union[str, bytes, Address, None] = b'', payload: bytearray = bytearray(), nonce: int = None,
                  attributes: bytearray = bytearray(), sig_list: List[Sig] = None):
+        if gas_price < 0:
+            raise SDKException(ErrorCode.other_error('the gas price should be equal or greater than zero.'))
+        if gas_limit < 0:
+            raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         self.version = version
         if isinstance(tx_type, TransactionType):
             tx_type = tx_type.value
