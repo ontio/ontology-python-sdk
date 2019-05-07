@@ -16,7 +16,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ontology.contract.neo_contract.abi.build_params import BuildParams
+from ontology.contract.neo.abi.build_params import BuildParams
 
 
 class InvokeFunction(object):
