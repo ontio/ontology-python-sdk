@@ -21,6 +21,7 @@ from ontology.contract.native.ong import Ong
 from ontology.contract.native.ontid import OntId
 from ontology.contract.native.aio_ont import AioOnt
 from ontology.contract.native.aio_ong import AioOng
+from ontology.contract.native.aio_ontid import AioOntId
 from ontology.contract.native.governance import Governance
 
 
@@ -36,6 +37,9 @@ class NativeVm(object):
 
     def aio_ong(self):
         return AioOng(self.__sdk)
+
+    def aio_ont_id(self):
+        return AioOntId(self.__sdk)
 
     def ong(self):
         return Ong(self.__sdk)
