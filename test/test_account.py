@@ -98,7 +98,7 @@ class TestAccount(unittest.TestCase):
         hex_private_key = '523c5fcf74823831756f0bcb3634234f10b3beb1c05595058534577752ad2d9f'
         account = Account(hex_private_key, SignatureScheme.SHA256withECDSA)
         hex_reverse_address = 'e973f6a189864faee1db3a8842219b82ddc95647'
-        self.assertEqual(hex_reverse_address, account.get_address_hex_reverse())
+        self.assertEqual(hex_reverse_address, account.get_address_hex(little_endian=False))
 
     def test_get_signature_scheme(self):
         hex_private_key = '523c5fcf74823831752f0bcb3634234f10b3beb1c05595058534577752ad2d9f'

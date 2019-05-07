@@ -8,8 +8,8 @@ from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.exception.exception import SDKException
-from ontology.contract.neo_contract.abi.struct_type import Struct
-from ontology.contract.neo_contract.abi.abi_function import AbiFunction
+from ontology.contract.neo.abi.struct_type import Struct
+from ontology.contract.neo.abi.abi_function import AbiFunction
 
 from ontology.vm.op_code import (
     PACK,
