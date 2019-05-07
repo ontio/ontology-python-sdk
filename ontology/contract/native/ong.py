@@ -43,7 +43,8 @@ class Ong(Asset):
             raise SDKException(ErrorCode.other_error('the amount should be greater than than zero.'))
         payer = Address.b58decode(payer)
         ont_contract = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01'
-        args = dict(claimer=claimer, from_address=ont_contract, to_address=receiver, value=amount)
+        args = dict(claimer=Address.b58decode(claimer), from_address=ont_contract,
+                    to_address=Address.b58decode(receiver), value=amount)
         invoke_code = build_native_invoke_code(self._invoke_address, self._version, 'transferFrom', args)
         return InvokeTransaction(payer, gas_price, gas_limit, invoke_code)
 
