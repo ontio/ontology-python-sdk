@@ -31,8 +31,7 @@ class TestSignatureHandler(unittest.TestCase):
     def test_tx_signature(self):
         b58_from_address = acct1.get_address_base58()
         b58_to_address = acct2.get_address_base58()
-        tx = sdk.native_vm.asset().new_transfer_transaction('ont', b58_from_address, b58_to_address, 10,
-                                                            b58_from_address, 20000, 0)
+        tx = sdk.native_vm.ont().new_transfer_tx(b58_from_address, b58_to_address, 10, b58_from_address, 0, 20000)
         tx.sign_transaction(acct1)
         self.assertTrue(acct1.verify_signature(tx.hash256(), tx.sig_list[0].sig_data[0]))
         self.assertFalse(acct2.verify_signature(tx.hash256(), tx.sig_list[0].sig_data[0]))
