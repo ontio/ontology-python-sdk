@@ -193,34 +193,6 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertEqual(100, states[1][1][2])
 
     @not_panic_exception
-    def test_transfer_multi_args(self):
-        transfer_1 = [acct1.get_address().to_bytes(), acct2.get_address().to_bytes(), 10]
-        transfer_2 = [acct2.get_address().to_bytes(), acct3.get_address().to_bytes(), 100]
-        hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
-        func = InvokeFunction('transfer_multi_args')
-        func.set_params_value(transfer_1, transfer_2)
-        tx_hash = self.send_tx(hex_contract_address, acct1, acct2, func)
-        if len(tx_hash) == 0:
-            return
-        time.sleep(randint(20, 30))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        states = Event.get_states_by_contract_address(event, hex_contract_address)
-        states[0] = Data.to_utf8_str(states[0])
-        self.assertEqual('transfer_multi_args', states[0])
-        states[1][0][0] = Data.to_b58_address(states[1][0][0])
-        self.assertEqual(acct1.get_address_base58(), states[1][0][0])
-        states[1][0][1] = Data.to_b58_address(states[1][0][1])
-        self.assertEqual(acct2.get_address_base58(), states[1][0][1])
-        states[1][0][2] = Data.to_int(states[1][0][2])
-        self.assertEqual(10, states[1][0][2])
-        states[1][1][0] = Data.to_b58_address(states[1][1][0])
-        self.assertEqual(acct2.get_address_base58(), states[1][1][0])
-        states[1][1][1] = Data.to_b58_address(states[1][1][1])
-        self.assertEqual(acct3.get_address_base58(), states[1][1][1])
-        states[1][1][2] = Data.to_int(states[1][1][2])
-        self.assertEqual(100, states[1][1][2])
-
-    @not_panic_exception
     def test_notify_pre_exec(self):
         bool_msg = True
         int_msg = 1024
