@@ -25,6 +25,7 @@ from ontology.crypto.digest import Digest
 from ontology.core.program import ProgramBuilder
 from ontology.exception.error_code import ErrorCode
 from ontology.vm.params_builder import ParamsBuilder
+from ontology.crypto.hd_public_key import HDPublicKey
 from ontology.exception.exception import SDKException
 
 
@@ -48,11 +49,15 @@ class Address(object):
         return cls(Digest.hash160(msg=byte_script, is_hex=False))
 
     @classmethod
-    def address_from_bytes_pubkey(cls, public_key: bytes):
+    def from_public_key(cls, public_key: bytes):
         builder = ParamsBuilder()
         builder.emit_push_bytearray(bytearray(public_key))
         builder.emit(CHECKSIG)
         return cls.__from_byte_script(builder.to_bytes())
+
+    @classmethod
+    def from_hd_public_key(cls, hd_public_key: HDPublicKey):
+        return cls.from_public_key(hd_public_key.to_bytes())
 
     @classmethod
     def from_multi_pub_keys(cls, m: int, pub_keys: List[bytes]):

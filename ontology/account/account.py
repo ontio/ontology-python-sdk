@@ -58,7 +58,7 @@ class Account(object):
             raise SDKException(ErrorCode.invalid_private_key)
         self.__curve_name = Curve.P256
         self.__public_key = Signature.ec_get_public_key_by_private_key(self.__private_key, self.__curve_name)
-        self.__address = Address.address_from_bytes_pubkey(self.__public_key)
+        self.__address = Address.from_public_key(self.__public_key)
 
     def generate_signature(self, msg: bytes):
         handler = SignatureHandler(self.__signature_scheme)
