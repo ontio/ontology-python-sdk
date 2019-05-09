@@ -182,18 +182,15 @@ class TestRestful(unittest.TestCase):
                         '65d3b2d3237743f21795e344563190ccbe50e9930520b8525142b075433fdd74',
                         '7842ed25e4f028529e666bcecda2795ec49d570120f82309e3d5b94f72d30ebb',
                         '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e']
-        try:
-            for tx_hash in tx_hash_list:
-                merkle_proof = sdk.restful.get_merkle_proof(tx_hash)
-                self.assertEqual('MerkleProof', merkle_proof['Type'])
-                self.assertEqual(0, merkle_proof['BlockHeight'])
-                if pre_tx_root == 0:
-                    pre_tx_root = merkle_proof['TransactionsRoot']
-                else:
-                    self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
-                    pre_tx_root = merkle_proof['TransactionsRoot']
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
+        for tx_hash in tx_hash_list:
+            merkle_proof = sdk.restful.get_merkle_proof(tx_hash)
+            self.assertEqual('MerkleProof', merkle_proof['Type'])
+            self.assertEqual(0, merkle_proof['BlockHeight'])
+            if pre_tx_root == 0:
+                pre_tx_root = merkle_proof['TransactionsRoot']
+            else:
+                self.assertEqual(pre_tx_root, merkle_proof['TransactionsRoot'])
+                pre_tx_root = merkle_proof['TransactionsRoot']
 
     @not_panic_exception
     def test_get_memory_pool_tx_count(self):

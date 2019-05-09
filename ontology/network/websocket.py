@@ -100,7 +100,7 @@ class Websocket(object):
             try:
                 await self.connect()
             except TimeoutError:
-                raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.__url])))
+                raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.__url])))
         await self.__ws_client.send(json.dumps(msg))
         response = await self.__ws_client.recv()
         response = json.loads(response)

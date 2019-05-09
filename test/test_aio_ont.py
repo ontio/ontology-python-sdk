@@ -27,9 +27,8 @@ from Cryptodome.Random.random import randint
 
 from ontology.sdk import Ontology
 from ontology.utils.contract import Event
-from ontology.exception.exception import SDKException
 
-from test import sdk, acct1, acct2, acct3, acct4, no_panic_exception, not_panic_exception
+from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 
 class TestAioOnt(unittest.TestCase):
@@ -61,12 +60,9 @@ class TestAioOnt(unittest.TestCase):
         address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
                         acct4.get_address_base58()]
         for address in address_list:
-            try:
-                balance = await sdk.native_vm.aio_ont().balance_of(address)
-                self.assertTrue(isinstance(balance, int))
-                self.assertGreaterEqual(balance, 0)
-            except SDKException as e:
-                self.assertTrue(any(x in e.args[1] for x in no_panic_exception))
+            balance = await sdk.native_vm.aio_ont().balance_of(address)
+            self.assertTrue(isinstance(balance, int))
+            self.assertGreaterEqual(balance, 0)
 
     @not_panic_exception
     @Ontology.runner

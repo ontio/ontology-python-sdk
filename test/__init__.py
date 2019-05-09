@@ -24,13 +24,14 @@ from os import path, environ
 from ontology.exception.exception import SDKException
 from ontology.sdk import Ontology
 
-password = environ['SDK_TEST_PASSWORD']
 sdk = Ontology()
 sdk.rpc.connect_to_test_net()
 sdk.aio_rpc.connect_to_test_net()
 sdk.restful.connect_to_test_net()
 sdk.aio_restful.connect_to_test_net()
 sdk.websocket.connect_to_test_net()
+
+password = environ['SDK_TEST_PASSWORD']
 wallet_path = path.join(path.dirname(__file__), 'test_wallet.json')
 wallet_manager = sdk.wallet_manager
 wallet_manager.open_wallet(wallet_path, is_create=False)
@@ -45,9 +46,8 @@ ont_id_2 = 'did:ont:AP8XfCUo7w3qM4b5gyQU8AEyRSwgtDFSzp'
 identity2 = wallet_manager.get_identity_by_ont_id(ont_id_2)
 identity2_ctrl_acct = wallet_manager.get_control_account_by_index(ont_id_2, 0, password)
 wallet_manager.save()
-no_panic_exception = ['balance insufficient', 'ConnectTimeout', 'already in the tx pool']
 
-not_panic = ['balance insufficient', 'ConnectTimeout', 'unknown transaction', 'Notify not found in {}']
+not_panic = ['balance insufficient', 'ConnectionError', 'unknown transaction', 'Notify not found in {}']
 
 
 def not_panic_exception(func):
