@@ -25,11 +25,12 @@ from time import time, sleep
 from ontology.exception.exception import SDKException
 from test import sdk, identity1, identity2, identity2_ctrl_acct, acct1, not_panic_exception
 
-gas_limit = 20000
-gas_price = 500
-
 
 class TestClaimRecord(unittest.TestCase):
+    def setUp(self):
+        self.gas_price = 500
+        self.gas_limit = 20000
+
     def generate_claim(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
         try:
@@ -79,25 +80,26 @@ class TestClaimRecord(unittest.TestCase):
         claim = self.generate_claim()
         status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
         self.assertFalse(status)
+        record = sdk.neo_vm.claim_record()
 
-        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
-                                                   gas_price, gas_limit)
+        tx_hash = record.commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1, self.gas_price,
+                                self.gas_limit)
         sleep(12)
         self.query_commit_event_create_test_case(tx_hash, claim.claim_id)
 
-        status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
+        status = record.get_status(claim.claim_id)
         self.assertTrue(status)
 
-        tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
-                                                   gas_price, gas_limit)
+        tx_hash = record.commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1, self.gas_price,
+                                self.gas_limit)
         sleep(12)
         self.query_commit_event_exist_test_case(tx_hash, claim.claim_id)
 
-        tx_hash = sdk.neo_vm.claim_record().revoke(claim.claim_id, identity2_ctrl_acct, acct1, gas_price, gas_limit)
+        tx_hash = record.revoke(claim.claim_id, identity2_ctrl_acct, acct1, self.gas_price, self.gas_limit)
         sleep(12)
         self.query_revoke_event_test_case(tx_hash, claim.claim_id)
 
-        status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
+        status = record.get_status(claim.claim_id)
         self.assertFalse(status)
 
 
