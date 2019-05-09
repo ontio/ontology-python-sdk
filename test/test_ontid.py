@@ -407,7 +407,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, gas_price, gas_limit)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(10, 15))
-        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
+        event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.ont_id().contract_address
         notify = Event.get_notify_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
