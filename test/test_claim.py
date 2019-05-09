@@ -29,11 +29,12 @@ from ontology.claim.payload import Payload
 from ontology.exception.exception import SDKException
 from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct
 
-gas_limit = 20000
-gas_price = 500
-
 
 class TestClaim(unittest.TestCase):
+    def setUp(self):
+        self.gas_price = 500
+        self.gas_limit = 20000
+
     def test_head(self):
         kid = 'did:ont:TRAtosUZHNSiLhzBdHacyxMX4Bg3cjWy3r#keys-1'
         claim_header = Header(kid)
@@ -121,7 +122,8 @@ class TestClaim(unittest.TestCase):
             msg = 'get key failed'
             self.assertTrue(msg in e.args[1])
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
-        tx = claim.commit(identity2_ctrl_acct.get_address_base58(), acct1.get_address_base58(), gas_limit, gas_price)
+        tx = claim.commit(identity2_ctrl_acct.get_address_base58(), acct1.get_address_base58(), self.gas_price,
+                          self.gas_limit)
         tx.sign_transaction(identity2_ctrl_acct)
         tx.add_sign_transaction(acct1)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
