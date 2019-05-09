@@ -307,7 +307,7 @@ class Restful(object):
         if is_full:
             return response
         result = response['Result']
-        return dict() if result is None else result
+        return dict() if result is None or len(result) == 0 else result
 
     def get_storage(self, hex_contract_address: str, hex_key: str, is_full: bool = False) -> str or dict:
         url = RestfulMethod.get_storage(self._url, hex_contract_address, hex_key)

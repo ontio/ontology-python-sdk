@@ -21,7 +21,7 @@ import unittest
 from Cryptodome.Random.random import randint
 
 from ontology.sdk import Ontology
-from ontology.utils.contract import Data
+from ontology.utils.contract import Data, Event
 
 from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
@@ -79,8 +79,9 @@ class TestOep4(unittest.TestCase):
         tx_hash = await oep4.init(acct1, acct2, 500, 20000000)
         self.assertEqual(len(tx_hash), 64)
         await asyncio.sleep(randint(14, 20))
-        notify = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
-        self.assertEqual('Already initialized!', Data.to_utf8_str(notify['Notify'][0]['States']))
+        event = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
+        notify = Event.get_notify_by_contract_address(event, oep4.hex_contract_address)
+        self.assertEqual('Already initialized!', Data.to_utf8_str(notify['States']))
 
     @not_panic_exception
     @Ontology.runner
