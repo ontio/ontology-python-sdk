@@ -94,7 +94,8 @@ class TestInvokeFunction(unittest.TestCase):
             self.assertEqual(64, len(tx_hash))
             return tx_hash
         except SDKException as e:
-            self.assertIn('already in the tx pool', e.args[1])
+            if 'already in the tx pool' not in e.args[1]:
+                raise e
             return ''
 
     @not_panic_exception

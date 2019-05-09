@@ -27,7 +27,7 @@ from ontology.claim.claim import Claim
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
 from ontology.exception.exception import SDKException
-from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct
+from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct, not_panic_exception
 
 
 class TestClaim(unittest.TestCase):
@@ -91,8 +91,8 @@ class TestClaim(unittest.TestCase):
         try:
             claim.generate_signature(identity2_ctrl_acct)
         except SDKException as e:
-            msg = 'get key failed'
-            self.assertTrue(msg in e.args[1])
+            if 'get key failed' not in e.args[1]:
+                raise e
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
         b64_claim = claim.to_base64()
         try:
@@ -101,6 +101,7 @@ class TestClaim(unittest.TestCase):
             msg = 'invalid claim head parameter'
             self.assertTrue(msg in e.args[1])
 
+    @not_panic_exception
     def test_claim_demo(self):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
         try:
@@ -127,7 +128,7 @@ class TestClaim(unittest.TestCase):
         tx.sign_transaction(identity2_ctrl_acct)
         tx.add_sign_transaction(acct1)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
-        sleep(7)
+        sleep(12)
         blockchain_proof = claim.generate_blk_proof(tx_hash)
         self.assertTrue(claim.validate_blk_proof())
         b64_claim = claim.to_base64()
@@ -144,6 +145,7 @@ class TestClaim(unittest.TestCase):
         claim.blk_proof.proof_node = proof_node
         self.assertFalse(claim.validate_blk_proof())
 
+    @not_panic_exception
     def test_compatibility(self):
         b64_claim = ('eyJraWQiOiJkaWQ6b250OkFUWmhhVmlyZEVZa3BzSFFEbjlQTXQ1a0RDcTFWUEhjVHIja2V5cy0xIiwidHlwIjoiSldULVgiL'
                      'CJhbGciOiJPTlQtRVMyNTYifQ==.eyJjbG0tcmV2Ijp7InR5cCI6IkF0dGVzdENvbnRyYWN0IiwiYWRkciI6IjM2YmI1YzA1M'
@@ -174,18 +176,18 @@ class TestClaim(unittest.TestCase):
                      'QwOTA4OTAiLCJEaXJlY3Rpb24iOiJMZWZ0In1dLCJDb250cmFjdEFkZHIiOiIzNmJiNWMwNTNiNmI4MzljOGY2YjkyM2ZlODU'
                      'yZjkxMjM5YjlmY2NjIn0=')
         try:
-            sdk.rpc.connect_to_main_net()
+            sdk.default_network.connect_to_main_net()
             claim = sdk.service.claim()
             try:
                 self.assertTrue(claim.validate_signature(b64_claim))
             except SDKException as e:
-                msg = 'invalid claim head parameter'
-                self.assertTrue(msg in e.args[1])
+                if 'invalid claim head parameter' not in e.args[1]:
+                    raise e
             claim.from_base64(b64_claim, True)
             self.assertTrue(claim.validate_blk_proof())
             self.assertTrue(isinstance(claim, Claim))
         finally:
-            sdk.rpc.connect_to_test_net()
+            sdk.default_network.connect_to_test_net()
 
 
 if __name__ == '__main__':
