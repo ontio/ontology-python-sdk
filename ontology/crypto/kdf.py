@@ -17,7 +17,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ontology.crypto.digest import Digest
-from ontology.utils.crypto import str_to_bytes
+from ontology.utils.crypto import to_bytes
 
 
 def pbkdf2(seed: str or bytes, dk_len: int) -> bytes:
@@ -30,7 +30,7 @@ def pbkdf2(seed: str or bytes, dk_len: int) -> bytes:
     """
     key = b''
     index = 1
-    bytes_seed = str_to_bytes(seed)
+    bytes_seed = to_bytes(seed)
     while len(key) < dk_len:
         key += Digest.sha256(b''.join([bytes_seed, index.to_bytes(4, 'big', signed=True)]))
         index += 1
