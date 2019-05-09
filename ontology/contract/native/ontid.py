@@ -16,10 +16,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from time import time
 from typing import Union
 
-from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.vm import build_vm
 from ontology.crypto.curve import Curve
 from ontology.common.address import Address
@@ -31,6 +29,7 @@ from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
+from ontology.core.invoke_transaction import InvokeTransaction
 
 
 class Attribute(object):

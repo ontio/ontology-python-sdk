@@ -24,9 +24,7 @@ import unittest
 from test import acct1, acct2, acct3, sdk, not_panic_exception
 
 from ontology.common.address import Address
-from ontology.wallet.wallet import WalletData
 from ontology.core.program import ProgramBuilder
-from ontology.exception.exception import SDKException
 
 
 class TestOntologySdk(unittest.TestCase):

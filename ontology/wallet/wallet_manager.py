@@ -42,13 +42,13 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class WalletManager(object):
-    def __init__(self, scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
+    def __init__(self, scheme: SignatureScheme = SignatureScheme.SHA256withECDSA, wallet_path: str = ''):
         if not isinstance(scheme, SignatureScheme):
             raise SDKException(ErrorCode.other_error('Invalid signature scheme.'))
         self.scheme = scheme
         self.wallet_file = WalletData()
         self.wallet_in_mem = WalletData()
-        self.__wallet_path = ''
+        self.__wallet_path = wallet_path
 
     @staticmethod
     def __check_ont_id(ont_id: str):
