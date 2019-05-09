@@ -19,7 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import base64
 
-from time import time
+from time import time, sleep
 
 from ontology.claim.header import Header
 from ontology.crypto.digest import Digest
@@ -153,7 +153,18 @@ class Claim(object):
     def generate_blk_proof(self, commit_tx_hash: str, is_big_endian: bool = True, hex_contract_address: str = ''):
         if len(hex_contract_address) == 0:
             hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
-        merkle_proof = self.__sdk.default_network.get_merkle_proof(commit_tx_hash)
+
+        count = 0
+        while True:
+            try:
+                merkle_proof = self.__sdk.default_network.get_merkle_proof(commit_tx_hash)
+                if isinstance(merkle_proof, dict):
+                    break
+            except SDKException as e:
+                if count == 5 or 'INVALID PARAMS' not in e.args[1]:
+                    raise e
+                sleep(6)
+            count += 1
         tx_block_height = merkle_proof['BlockHeight']
         current_block_height = merkle_proof['CurBlockHeight']
         target_hash = merkle_proof['TransactionsRoot']
