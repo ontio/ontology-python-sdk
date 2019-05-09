@@ -21,12 +21,13 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from test import sdk
+from test import sdk, not_panic_exception
 
 from ontology.merkle.merkle_verifier import MerkleVerifier
 
 
 class TestMerkleVerifier(unittest.TestCase):
+    @not_panic_exception
     def test_validate_proof(self):
         proof_node = [
             {'TargetHash': 'fb2530764e458ef5b94147a687e85cbcf46ab575e1869730f792e57176d1a99b', 'Direction': 'Right'},
@@ -54,6 +55,7 @@ class TestMerkleVerifier(unittest.TestCase):
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, True)
         self.assertEqual(True, result)
 
+    @not_panic_exception
     def test_get_proof_local(self):
         tx_block_height = 2
         leaf_0 = 'c7ac8087b4ce292d654001b1ab1bfe5e68fa6f7b8492a5b2f83560f8ac28f5fa'
@@ -74,6 +76,7 @@ class TestMerkleVerifier(unittest.TestCase):
         result = MerkleVerifier.validate_proof(proof_node, target_hash, current_block_root)
         self.assertTrue(result)
 
+    @not_panic_exception
     def test_get_proof_test_net(self):
         tx_hash = 'bf74e9208c0a20ec417de458ab6c9d29c12c614e77fb943be4566c95fab61454'
         merkle_proof = sdk.rpc.get_merkle_proof(tx_hash)
@@ -86,6 +89,7 @@ class TestMerkleVerifier(unittest.TestCase):
         result = MerkleVerifier.validate_proof(proof_node, target_hash, merkle_root, True)
         self.assertTrue(result)
 
+    @not_panic_exception
     def test_get_proof_main_net(self):
         try:
             sdk.rpc.connect_to_main_net()
