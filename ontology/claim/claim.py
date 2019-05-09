@@ -153,7 +153,6 @@ class Claim(object):
     def generate_blk_proof(self, commit_tx_hash: str, is_big_endian: bool = True, hex_contract_address: str = ''):
         if len(hex_contract_address) == 0:
             hex_contract_address = self.__sdk.neo_vm.claim_record().hex_contract_address
-
         count = 0
         while True:
             try:
@@ -161,7 +160,7 @@ class Claim(object):
                 if isinstance(merkle_proof, dict):
                     break
             except SDKException as e:
-                if count == 5 or 'INVALID PARAMS' not in e.args[1]:
+                if count > 5 or 'INVALID PARAMS' not in e.args[1]:
                     raise e
                 sleep(6)
             count += 1
