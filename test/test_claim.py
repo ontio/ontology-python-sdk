@@ -73,6 +73,7 @@ class TestClaim(unittest.TestCase):
         claim_payload_recv = Payload.from_base64(b64_payload)
         self.assertEqual(dict(claim_payload), dict(claim_payload_recv))
 
+    @not_panic_exception
     def test_signature_info(self):
         try:
             pub_keys = sdk.native_vm.ont_id().get_public_keys(identity2.ont_id)
