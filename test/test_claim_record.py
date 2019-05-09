@@ -23,7 +23,7 @@ import unittest
 from time import time, sleep
 
 from ontology.exception.exception import SDKException
-from test import sdk, identity1, identity2, identity2_ctrl_acct, acct1
+from test import sdk, identity1, identity2, identity2_ctrl_acct, acct1, not_panic_exception
 
 gas_limit = 20000
 gas_price = 500
@@ -74,26 +74,27 @@ class TestClaimRecord(unittest.TestCase):
         self.assertEqual(' revoke claim: ', event['States'][2])
         self.assertEqual(claim_id, event['States'][3])
 
+    @not_panic_exception
     def test_claim_record(self):
         claim = self.generate_claim()
         status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
         self.assertFalse(status)
 
         tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
-                                                   gas_limit, gas_price)
-        sleep(8)
+                                                   gas_price, gas_limit)
+        sleep(12)
         self.query_commit_event_create_test_case(tx_hash, claim.claim_id)
 
         status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
         self.assertTrue(status)
 
         tx_hash = sdk.neo_vm.claim_record().commit(claim.claim_id, identity2_ctrl_acct, identity1.ont_id, acct1,
-                                                   gas_limit, gas_price)
-        sleep(8)
+                                                   gas_price, gas_limit)
+        sleep(12)
         self.query_commit_event_exist_test_case(tx_hash, claim.claim_id)
 
-        tx_hash = sdk.neo_vm.claim_record().revoke(claim.claim_id, identity2_ctrl_acct, acct1, gas_limit, gas_price)
-        sleep(8)
+        tx_hash = sdk.neo_vm.claim_record().revoke(claim.claim_id, identity2_ctrl_acct, acct1, gas_price, gas_limit)
+        sleep(12)
         self.query_revoke_event_test_case(tx_hash, claim.claim_id)
 
         status = sdk.neo_vm.claim_record().get_status(claim.claim_id)
