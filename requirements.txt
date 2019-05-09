@@ -5,3 +5,4 @@ cryptography>=2.6.1
 ecdsa>=0.13
 base58>=1.0.3
 requests>=2.21.0
+mnemonic>=0.18
