@@ -146,8 +146,8 @@ class Claim(object):
             raise SDKException(ErrorCode.require_str_params)
         if len(hex_contract_address) == 40:
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
-        tx = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, b58_iss_address, self.payload.sub,
-                                                     b58_payer_address, gas_limit, gas_price)
+        tx = self.__sdk.neo_vm.claim_record().new_commit_tx(self.payload.jti, b58_iss_address, self.payload.sub,
+                                                            b58_payer_address, gas_limit, gas_price)
         return tx
 
     def generate_blk_proof(self, commit_tx_hash: str, is_big_endian: bool = True, hex_contract_address: str = ''):

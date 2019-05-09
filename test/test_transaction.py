@@ -24,7 +24,7 @@ import unittest
 from Cryptodome.Random.random import randint
 
 from ontology.utils.contract import Event
-from test import acct1, acct2, acct3, sdk
+from test import acct1, acct2, acct3, sdk, not_panic_exception
 
 from ontology.utils import utils
 from ontology.common.address import Address
@@ -49,6 +49,7 @@ class TestTransaction(unittest.TestCase):
         self.assertGreaterEqual(tx.gas_price, 0)
         self.assertGreaterEqual(tx.nonce, 0)
 
+    @not_panic_exception
     def test_multi_serialize(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         m = 2

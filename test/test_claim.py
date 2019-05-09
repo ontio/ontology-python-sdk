@@ -122,8 +122,8 @@ class TestClaim(unittest.TestCase):
             msg = 'get key failed'
             self.assertTrue(msg in e.args[1])
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
-        tx = claim.commit(identity2_ctrl_acct.get_address_base58(), acct1.get_address_base58(), self.gas_price,
-                          self.gas_limit)
+        tx = claim.new_commit_tx(identity2_ctrl_acct.get_address_base58(), acct1.get_address_base58(), self.gas_price,
+                                 self.gas_limit)
         tx.sign_transaction(identity2_ctrl_acct)
         tx.add_sign_transaction(acct1)
         tx_hash = sdk.rpc.send_raw_transaction(tx)

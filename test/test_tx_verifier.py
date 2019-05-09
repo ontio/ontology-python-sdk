@@ -21,7 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from test import sdk
+from test import sdk, not_panic_exception
 
 
 class TestMerkleVerifier(unittest.TestCase):
@@ -31,6 +31,7 @@ class TestMerkleVerifier(unittest.TestCase):
             result = sdk.service.tx_verifier().verify_by_tx_hash(tx['Hash'])
             self.assertTrue(result)
 
+    @not_panic_exception
     def test_verifier(self):
         try:
             sdk.rpc.connect_to_main_net()
