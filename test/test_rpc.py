@@ -119,7 +119,7 @@ class TestRpcClient(unittest.TestCase):
             try:
                 balance = sdk.rpc.get_balance(address)
             except SDKException as e:
-                self.assertTrue('ConnectTimeout' in e.args[1])
+                self.assertTrue('ConnectionError' in e.args[1])
                 continue
             self.assertTrue(isinstance(balance, dict))
             self.assertGreaterEqual(balance['ONT'], 0)

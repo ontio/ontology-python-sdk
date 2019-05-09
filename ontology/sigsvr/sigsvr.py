@@ -54,7 +54,7 @@ class SigSvr(object):
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0])) from None
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', self.__url]))) from None
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self.__url]))) from None
         except requests.exceptions.ReadTimeout:
             raise SDKException(ErrorCode.other_error(''.join(['ReadTimeout: ', self.__url]))) from None
         try:

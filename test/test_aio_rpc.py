@@ -47,11 +47,8 @@ class TestAioRpc(unittest.TestCase):
     @not_panic_exception
     @Ontology.runner
     async def test_get_connection_count(self):
-        try:
-            count = await sdk.aio_rpc.get_connection_count()
-            self.assertGreaterEqual(count, 0)
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
+        count = await sdk.aio_rpc.get_connection_count()
+        self.assertGreaterEqual(count, 0)
 
     @not_panic_exception
     @Ontology.runner
@@ -74,21 +71,15 @@ class TestAioRpc(unittest.TestCase):
     @not_panic_exception
     @Ontology.runner
     async def test_get_block_by_hash(self):
-        try:
-            block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
-            block = await sdk.aio_rpc.get_block_by_hash(block_hash)
-            self.assertEqual(block['Hash'], block_hash)
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
+        block_hash = '44425ae42a394ec0c5f3e41d757ffafa790b53f7301147a291ab9b60a956394c'
+        block = await sdk.aio_rpc.get_block_by_hash(block_hash)
+        self.assertEqual(block['Hash'], block_hash)
 
     @Ontology.runner
     async def test_get_block_by_height(self):
-        try:
-            height = 0
-            block = await sdk.aio_rpc.get_block_by_height(height)
-            self.assertEqual(block['Header']['Height'], height)
-        except SDKException as e:
-            self.assertTrue('ConnectTimeout' in e.args[1])
+        height = 0
+        block = await sdk.aio_rpc.get_block_by_height(height)
+        self.assertEqual(block['Header']['Height'], height)
 
     @not_panic_exception
     @Ontology.runner
