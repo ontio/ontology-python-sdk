@@ -309,7 +309,7 @@ class TestAioOntId(unittest.TestCase):
         tx_hash = await sdk.native_vm.aio_ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
                                                                    self.gas_limit)
         self.assertEqual(64, len(tx_hash))
-        # await asyncio.sleep(randint(10, 15))
+        await asyncio.sleep(randint(10, 15))
         event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
         hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
         notify = Event.get_notify_by_contract_address(event, hex_contract_address)
