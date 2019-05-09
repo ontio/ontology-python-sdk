@@ -262,7 +262,8 @@ class TestAioRpc(unittest.TestCase):
         try:
             await sdk.aio_rpc.get_memory_pool_tx_state(tx_hash)
         except SDKException as e:
-            self.assertIn('unknown transaction', e.args[1])
+            if 'unknown transaction' not in e.args[1]:
+                raise e
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         b58_from_address = acct1.get_address_base58()

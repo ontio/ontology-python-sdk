@@ -91,8 +91,8 @@ class TestClaim(unittest.TestCase):
         try:
             claim.generate_signature(identity2_ctrl_acct)
         except SDKException as e:
-            msg = 'get key failed'
-            self.assertTrue(msg in e.args[1])
+            if 'get key failed' not in e.args[1]:
+                raise e
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
         b64_claim = claim.to_base64()
         try:
@@ -181,8 +181,8 @@ class TestClaim(unittest.TestCase):
             try:
                 self.assertTrue(claim.validate_signature(b64_claim))
             except SDKException as e:
-                msg = 'invalid claim head parameter'
-                self.assertTrue(msg in e.args[1])
+                if 'invalid claim head parameter' not in e.args[1]:
+                    raise e
             claim.from_base64(b64_claim, True)
             self.assertTrue(claim.validate_blk_proof())
             self.assertTrue(isinstance(claim, Claim))

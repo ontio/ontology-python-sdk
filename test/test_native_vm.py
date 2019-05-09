@@ -16,20 +16,14 @@ class TestNativeVm(unittest.TestCase):
                                                  acct1.get_address_base58(), 500, 20000)
         tx.sign_transaction(acct1)
         tx.add_sign_transaction(acct2)
-        try:
-            tx_hash = sdk.rpc.send_raw_transaction(tx)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            self.assertIn('[Transfer] balance insufficient', e.args[1])
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(64, len(tx_hash))
         tx = sdk.native_vm.ont().new_transfer_tx(acct1.get_address_base58(), acct2.get_address_base58(), amount,
                                                  acct1.get_address_base58(), 500, 20000)
         tx.sign_transaction(acct2)
         tx.add_sign_transaction(acct1)
-        try:
-            tx_hash = sdk.rpc.send_raw_transaction(tx)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            self.assertIn('[Transfer] balance insufficient', e.args[1])
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(64, len(tx_hash))
 
     @not_panic_exception
     def test_native_vm_withdraw_ong(self):
