@@ -21,7 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from test import acct1, acct2, acct3, sdk
+from test import acct1, acct2, acct3, sdk, not_panic_exception
 
 from ontology.common.address import Address
 from ontology.wallet.wallet import WalletData
@@ -30,6 +30,7 @@ from ontology.exception.exception import SDKException
 
 
 class TestOntologySdk(unittest.TestCase):
+    @not_panic_exception
     def test_add_multi_sign_transaction(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
         m = 2
@@ -53,14 +54,8 @@ class TestOntologySdk(unittest.TestCase):
         tx.sign_transaction(acct1)
         tx.add_multi_sign_transaction(m, pub_keys, acct1)
         tx.add_multi_sign_transaction(m, pub_keys, acct2)
-        try:
-            tx_hash = sdk.rpc.send_raw_transaction(tx)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            if 'ConnectTimeout' in e.args[1]:
-                pass
-            else:
-                raise e
+        tx_hash = sdk.rpc.send_raw_transaction(tx)
+        self.assertEqual(64, len(tx_hash))
 
     def test_sort_public_key(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
