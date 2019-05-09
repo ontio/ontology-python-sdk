@@ -72,7 +72,7 @@ class TestOep4(unittest.TestCase):
         tx_hash = oep4.init(acct1, acct2, 500, 20000000)
         self.assertEqual(len(tx_hash), 64)
         time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)['Notify'][0]
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, oep4.hex_contract_address)
         self.assertEqual('Already initialized!', Data.to_utf8_str(notify['States']))
 
