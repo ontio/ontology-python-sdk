@@ -18,7 +18,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+import sys
 import time
 import asyncio
 import unittest
@@ -72,10 +72,16 @@ class TestAioOnt(unittest.TestCase):
     @Ontology.runner
     async def test_query_allowance(self):
         ont = sdk.native_vm.aio_ont()
-        task_list = [asyncio.create_task(ont.allowance(acct1.get_address_base58(), acct2.get_address_base58())),
-                     asyncio.create_task(ont.allowance(acct2.get_address_base58(), acct3.get_address_base58())),
-                     asyncio.create_task(ont.allowance(acct3.get_address_base58(), acct4.get_address_base58())),
-                     asyncio.create_task(ont.allowance(acct4.get_address_base58(), acct1.get_address_base58()))]
+        if sys.version_info >= (3, 7):
+            task_list = [asyncio.create_task(ont.allowance(acct1.get_address_base58(), acct2.get_address_base58())),
+                         asyncio.create_task(ont.allowance(acct2.get_address_base58(), acct3.get_address_base58())),
+                         asyncio.create_task(ont.allowance(acct3.get_address_base58(), acct4.get_address_base58())),
+                         asyncio.create_task(ont.allowance(acct4.get_address_base58(), acct1.get_address_base58()))]
+        else:
+            task_list = [ont.allowance(acct1.get_address_base58(), acct2.get_address_base58()),
+                         ont.allowance(acct2.get_address_base58(), acct3.get_address_base58()),
+                         ont.allowance(acct3.get_address_base58(), acct4.get_address_base58()),
+                         ont.allowance(acct4.get_address_base58(), acct1.get_address_base58())]
         for task in task_list:
             self.assertGreaterEqual(await task, 0)
 
