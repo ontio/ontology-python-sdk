@@ -135,7 +135,7 @@ class TestAioOnt(unittest.TestCase):
         tx_hash = await ont.transfer_from(acct2, b58_from_address, b58_recv_address, amount, acct2, self.gas_price,
                                           self.gas_limit)
         self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(10, 15))
+        await asyncio.sleep(randint(10, 15))
         event = await sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, sdk.native_vm.ong().contract_address)
         self.assertEqual('transfer', notify['States'][0])
