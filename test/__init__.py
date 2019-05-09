@@ -19,7 +19,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import logging
 from os import path, environ
 
 from ontology.exception.exception import SDKException
@@ -56,7 +55,6 @@ def not_panic_exception(func):
         try:
             func(*args, **kwargs)
         except SDKException as e:
-            logging.warning(e.args[1])
             if not any(x in e.args[1] for x in not_panic):
                 raise e
 
