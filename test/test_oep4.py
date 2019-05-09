@@ -32,7 +32,7 @@ contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
 
 
 class TestOep4(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         sdk.default_network = sdk.rpc
 
     def test_set_contract_address(self):

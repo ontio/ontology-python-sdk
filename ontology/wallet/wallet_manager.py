@@ -329,7 +329,7 @@ class WalletManager(object):
     def create_account_info(self, label: str, pwd: str, salt: str, private_key: str) -> AccountInfo:
         acct = self.__create_account(label, pwd, salt, private_key, True)
         info = AccountInfo()
-        info.address_base58 = Address.address_from_bytes_pubkey(acct.get_public_key_bytes()).b58encode()
+        info.address_base58 = Address.from_public_key(acct.get_public_key_bytes()).b58encode()
         info.public_key = acct.get_public_key_bytes().hex()
         info.encrypted_pri_key = acct.export_gcm_encrypted_private_key(pwd, salt)
         info.address_u160 = acct.get_address().to_bytes().hex()
