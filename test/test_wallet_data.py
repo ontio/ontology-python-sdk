@@ -79,7 +79,7 @@ class TestWalletData(unittest.TestCase):
         test_id = "test_ont_id"
         size = 10
         wallet, address_list = self.create_wallet_data(test_id, size)
-        for i in range(size * 2):
+        for _ in range(size * 2):
             rand_address = choice(address_list)
             acct = wallet.get_account_by_b58_address(rand_address)
             self.assertEqual(rand_address, acct.b58_address)

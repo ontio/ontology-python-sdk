@@ -35,15 +35,16 @@ from ontology.exception.exception import SDKException
 from ontology.wallet.wallet_manager import WalletManager
 from ontology.crypto.signature_scheme import SignatureScheme
 
-path = os.path.join(os.path.dirname(__file__), 'test.json')
-
 
 class TestWalletManager(unittest.TestCase):
+    def setUp(self):
+        self.path = os.path.join(os.path.dirname(__file__), 'test.json')
+
     def test_create_write(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             random_password = utils.get_random_hex_str(10)
             label = 'label'
             wm.create_account(random_password, label)
@@ -80,9 +81,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_deep_copy(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             for index in range(5):
                 wm.create_account(password, f'label{index}')
                 wm.write_wallet()
@@ -98,9 +99,9 @@ class TestWalletManager(unittest.TestCase):
     def test_open_wallet(self):
         wm = WalletManager()
         self.assertRaises(SDKException, wm.open_wallet)
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             self.assertEqual(wm.__dict__['scheme'], SignatureScheme.SHA256withECDSA)
         finally:
             wm.del_wallet_file()
@@ -181,9 +182,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_accounts(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             size = 5
             for i in range(size):
                 wm.create_account(password)
@@ -194,9 +195,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_identity_by_index(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             size = 3
             for i in range(size):
                 private_key = utils.get_random_hex_str(64)
@@ -213,9 +214,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_identity_by_ont_id(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             size = 3
             for i in range(size):
                 private_key = utils.get_random_hex_str(64)
@@ -236,9 +237,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_account_by_index(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             size = 3
             for _ in range(size):
                 wm.create_account(password)
@@ -254,9 +255,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_set_default_account_by_address(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             size = 3
             for _ in range(size):
                 wm.create_account(password)
@@ -272,9 +273,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_get_default_account(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             size = 3
             for _ in range(size):
                 wm.create_account(password)
@@ -289,8 +290,8 @@ class TestWalletManager(unittest.TestCase):
 
     def test_import_identity(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
-        wm.open_wallet(path)
+        wm.create_wallet_file(self.path)
+        wm.open_wallet(self.path)
         try:
             private_key = utils.get_random_hex_str(64)
             acct = Account(private_key)
@@ -307,9 +308,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_identity_from_pri_key(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
             ide = wm.create_identity_from_private_key("ide", "1", private_key)
             self.assertEqual(ide.label, 'ide')
@@ -318,9 +319,8 @@ class TestWalletManager(unittest.TestCase):
             wm.del_wallet_file()
 
     def test_import_account(self):
-        wm = WalletManager()
-        wm.wallet_path = path
-        self.assertEqual(path, wm.wallet_path)
+        wm = WalletManager(wallet_path=self.path)
+        self.assertEqual(self.path, wm.wallet_path)
         wm.create_wallet_file()
         try:
             wm.open_wallet()
@@ -338,9 +338,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_create_account_from_private_key(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
             label = 'hello_account'
             account = wm.create_account_from_private_key(password, private_key, label)
@@ -352,9 +352,9 @@ class TestWalletManager(unittest.TestCase):
 
     def test_add_control_by_private_key(self):
         wm = WalletManager()
-        wm.create_wallet_file(path)
+        wm.create_wallet_file(self.path)
         try:
-            wm.open_wallet(path)
+            wm.open_wallet(self.path)
             private_key = utils.get_random_bytes(32)
             hex_private_key = private_key.hex()
             public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)

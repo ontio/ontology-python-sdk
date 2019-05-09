@@ -19,7 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import base64
 
-from time import time, sleep
+from time import time
 
 from ontology.claim.header import Header
 from ontology.crypto.digest import Digest

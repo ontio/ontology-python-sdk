@@ -18,7 +18,6 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import asyncio
-import inspect
 
 from typing import List
 

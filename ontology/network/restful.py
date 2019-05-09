@@ -19,7 +19,6 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import requests
 
-from time import time
 from typing import List, Union
 
 from Cryptodome.Random.random import randint

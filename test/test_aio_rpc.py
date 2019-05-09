@@ -23,7 +23,6 @@ import unittest
 
 from asyncio import sleep
 from time import perf_counter
-from aiohttp.client import ClientSession
 
 from ontology.sdk import Ontology
 from ontology.utils.contract import Data
