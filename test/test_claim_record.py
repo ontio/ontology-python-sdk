@@ -31,7 +31,8 @@ class TestClaimRecord(unittest.TestCase):
         self.gas_price = 500
         self.gas_limit = 20000
 
-    def generate_claim(self):
+    @staticmethod
+    def generate_claim():
         pub_keys = sdk.native_vm.ont_id().get_public_keys(identity1.ont_id)
         try:
             pk = pub_keys[0]
@@ -50,8 +51,8 @@ class TestClaimRecord(unittest.TestCase):
         try:
             claim.generate_signature(identity2_ctrl_acct)
         except SDKException as e:
-            msg = 'get key failed'
-            self.assertTrue(msg in e.args[1])
+            if 'get key failed' or 'ConnectionError' not in e.args[1]:
+                raise e
             claim.generate_signature(identity2_ctrl_acct, verify_kid=False)
         return claim
 
