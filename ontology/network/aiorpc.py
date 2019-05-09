@@ -67,7 +67,7 @@ class AioRpc(Rpc):
                 else:
                     raise SDKException(ErrorCode.other_error(res['desc']))
         except asyncio.TimeoutError or client_exceptions.ClientConnectorError:
-            raise SDKException(ErrorCode.connect_timeout(self._url))
+            raise SDKException(ErrorCode.connect_timeout(self._url)) from None
         return res
 
     async def get_version(self, is_full: bool = False):
