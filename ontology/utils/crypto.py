@@ -16,8 +16,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
 
-def str_to_bytes(s: str) -> bytes:
+
+def to_bytes(s: Union[bytes, str]) -> bytes:
     if isinstance(s, bytes):
         return s
     elif isinstance(s, str):
