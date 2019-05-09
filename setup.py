@@ -22,10 +22,11 @@ setup(
     license='GNU Lesser General Public License v3 (LGPLv3)',
     packages=find_packages(exclude=['test_*.py', 'test']),
     install_requires=[
-        'pycryptodomex',
+        'base58',
         'cryptography',
         'ecdsa',
-        'base58',
+        'mnemonic',
+        'pycryptodomex',
         'requests',
         'websockets'
     ],
