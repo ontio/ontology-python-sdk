@@ -365,8 +365,6 @@ class TestAioOntId(unittest.TestCase):
     async def test_verify_signature(self):
         identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
-        gas_limit = 20000
-        gas_price = 500
         tx_hash = await sdk.native_vm.aio_ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
                                                                    self.gas_limit)
         self.assertEqual(64, len(tx_hash))

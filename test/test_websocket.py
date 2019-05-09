@@ -134,7 +134,6 @@ class TestWebsocketClient(unittest.TestCase):
     @Ontology.runner
     async def test_get_contract_event_by_tx_hash(self):
         tx_hash = '7bc2dd4693996133c15e6349c3f8dd1edeba2fcd3219c8bc2b854c939337c8ff'
-        event_loop = asyncio.get_event_loop()
         response = await sdk.websocket.get_contract_event_by_tx_hash(tx_hash)
         await sdk.websocket.close_connect()
         self.assertEqual(tx_hash, response['TxHash'])
