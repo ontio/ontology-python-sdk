@@ -101,7 +101,8 @@ class TestAioOntId(unittest.TestCase):
         try:
             await ont_id.registry_ont_id(identity.ont_id, ctrl_acct, acct2, self.gas_price, self.gas_limit)
         except SDKException as e:
-            self.assertIn('already registered', e.args[1])
+            if 'already registered' not in e.args[1]:
+                raise e
 
     @not_panic_exception
     @Ontology.runner
