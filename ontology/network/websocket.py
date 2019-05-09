@@ -133,7 +133,10 @@ class Websocket(object):
             self.__id = self.__generate_ws_id()
         msg = dict(Action='getbalance', Id=self.__id, Version='1.0.0', Addr=b58_address)
         response = await self.__send_recv(msg, is_full=True)
-        response['Result'] = dict((k.upper(), int(v)) for k, v in response.get('Result', dict()).items())
+        try:
+            response['Result'] = dict((k.upper(), int(v)) for k, v in response.get('Result', dict()).items())
+        except AttributeError:
+            raise SDKException(ErrorCode.other_error(response))
         if is_full:
             return response
         return response['Result']
