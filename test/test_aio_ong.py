@@ -20,6 +20,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import asyncio
+import sys
 import unittest
 
 from Cryptodome.Random.random import randint
@@ -76,10 +77,16 @@ class TestAioOng(unittest.TestCase):
     @Ontology.runner
     async def test_query_allowance(self):
         ong = sdk.native_vm.aio_ong()
-        task_list = [asyncio.create_task(ong.allowance(acct1.get_address_base58(), acct2.get_address_base58())),
-                     asyncio.create_task(ong.allowance(acct2.get_address_base58(), acct3.get_address_base58())),
-                     asyncio.create_task(ong.allowance(acct3.get_address_base58(), acct4.get_address_base58())),
-                     asyncio.create_task(ong.allowance(acct4.get_address_base58(), acct1.get_address_base58()))]
+        if sys.version_info >= (3, 7):
+            task_list = [asyncio.create_task(ong.allowance(acct1.get_address_base58(), acct2.get_address_base58())),
+                         asyncio.create_task(ong.allowance(acct2.get_address_base58(), acct3.get_address_base58())),
+                         asyncio.create_task(ong.allowance(acct3.get_address_base58(), acct4.get_address_base58())),
+                         asyncio.create_task(ong.allowance(acct4.get_address_base58(), acct1.get_address_base58()))]
+        else:
+            task_list = [ong.allowance(acct1.get_address_base58(), acct2.get_address_base58()),
+                         ong.allowance(acct2.get_address_base58(), acct3.get_address_base58()),
+                         ong.allowance(acct3.get_address_base58(), acct4.get_address_base58()),
+                         ong.allowance(acct4.get_address_base58(), acct1.get_address_base58())]
         for task in task_list:
             self.assertGreaterEqual(await task, 0)
 
