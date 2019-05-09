@@ -32,6 +32,10 @@ from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 
 class TestAioOnt(unittest.TestCase):
+    def setUp(self):
+        self.gas_price = 500
+        self.gas_limit = 20000
+
     def test_get_contract_address(self):
         ont_address = '0100000000000000000000000000000000000000'
         self.assertEqual(ont_address, sdk.native_vm.aio_ont().contract_address.hex())
@@ -121,12 +125,21 @@ class TestAioOnt(unittest.TestCase):
         b58_from_address = acct1.get_address_base58()
         b58_recv_address = acct2.get_address_base58()
         ont = sdk.native_vm.aio_ont()
-        tx_hash = await ont.transfer_from(acct2, b58_from_address, b58_recv_address, 1, acct2, 500, 20000)
+        amount = 1
+        tx_hash = await ont.transfer_from(acct2, b58_from_address, b58_recv_address, amount, acct2, self.gas_price,
+                                          self.gas_limit)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(10, 15))
         event = await sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
-        self.assertEqual('0100000000000000000000000000000000000000', event['Notify'][0]['ContractAddress'])
-        self.assertEqual('0200000000000000000000000000000000000000', event['Notify'][1]['ContractAddress'])
+        notify = Event.get_notify_by_contract_address(event, sdk.native_vm.ong().contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(b58_recv_address, notify['States'][1])
+        self.assertEqual(self.gas_price * self.gas_limit, notify['States'][3])
+        notify = Event.get_notify_by_contract_address(event, sdk.native_vm.ont().contract_address)
+        self.assertEqual('transfer', notify['States'][0])
+        self.assertEqual(b58_from_address, notify['States'][1])
+        self.assertEqual(b58_recv_address, notify['States'][2])
+        self.assertEqual(amount, notify['States'][3])
 
 
 if __name__ == '__main__':
