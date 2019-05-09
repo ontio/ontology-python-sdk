@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
+
+from ontology.account.account import Account
 from ontology.common.address import Address
 from ontology.utils.contract import Data, Event
 from ontology.exception.error_code import ErrorCode
@@ -26,7 +29,7 @@ from ontology.contract.neo.invoke_function import InvokeFunction
 
 class ClaimRecord(object):
     def __init__(self, sdk, hex_contract_address: str = ''):
-        self.__sdk = sdk
+        self._sdk = sdk
         if isinstance(hex_contract_address, str) and len(hex_contract_address) == 40:
             self.__hex_contract_address = hex_contract_address
         else:
@@ -43,39 +46,49 @@ class ClaimRecord(object):
         else:
             raise SDKException(ErrorCode.invalid_contract_address(hex_contract_address))
 
-    def commit(self, claim_id: str, b58_issuer_address: str, owner_ont_id: str, b58_payer_address: str, gas_limit: int,
-               gas_price: int) -> InvokeTransaction:
-        if gas_limit < 0:
-            raise SDKException(ErrorCode.other_error('Gas limit less than 0.'))
-        if gas_price < 0:
-            raise SDKException(ErrorCode.other_error('Gas price less than 0.'))
+    def new_commit_tx(self, claim_id: str, issuer_address: Union[str, bytes, Address], owner_ont_id: str,
+                      payer_address: Union[str, bytes, Address], gas_price: int, gas_limit: int) -> InvokeTransaction:
         func = InvokeFunction('Commit')
-        issuer = Address.b58decode(b58_issuer_address).to_bytes()
-        func.set_params_value(claim_id, issuer, owner_ont_id)
-        payer = Address.b58decode(b58_payer_address).to_bytes()
-        tx = InvokeTransaction(payer, gas_price, gas_limit)
+        func.set_params_value(claim_id, Address.b58decode(issuer_address), owner_ont_id)
+        tx = InvokeTransaction(Address.b58decode(payer_address), gas_price, gas_limit)
         tx.add_invoke_code(self.__hex_contract_address, func)
         return tx
 
-    def revoke(self, claim_id: str, b58_issuer_address: str, b58_payer_address: str, gas_limit: int, gas_price: int):
-        if gas_limit < 0:
-            raise SDKException(ErrorCode.other_error('Gas limit less than 0.'))
-        if gas_price < 0:
-            raise SDKException(ErrorCode.other_error('Gas price less than 0.'))
+    def commit(self, claim_id: str, issuer: Account, owner_ont_id: str, payer: Account, gas_price: int,
+               gas_limit: int) -> str:
+        tx = self.new_commit_tx(claim_id, issuer.get_address(), owner_ont_id, payer.get_address(), gas_price, gas_limit)
+        tx.sign_transaction(issuer)
+        if issuer.get_address_bytes() != payer.get_address_bytes():
+            tx.add_sign_transaction(payer)
+        tx_hash = self._sdk.default_network.send_raw_transaction(tx)
+        return tx_hash
+
+    def new_revoke_tx(self, claim_id: str, issuer: Union[str, bytes, Address], payer: Union[str, bytes, Address],
+                      gas_price: int, gas_limit: int):
         func = InvokeFunction('Revoke')
-        issuer = Address.b58decode(b58_issuer_address).to_bytes()
-        func.set_params_value(claim_id, issuer)
-        payer = Address.b58decode(b58_payer_address).to_bytes()
-        tx = InvokeTransaction(payer, gas_price, gas_limit)
+        func.set_params_value(claim_id, Address.b58decode(issuer))
+        tx = InvokeTransaction(Address.b58decode(payer), gas_price, gas_limit)
         tx.add_invoke_code(self.__hex_contract_address, func)
         return tx
 
-    def get_status(self, claim_id: str):
+    def revoke(self, claim_id: str, issuer: Account, payer: Account, gas_price: int, gas_limit: int):
+        tx = self.new_revoke_tx(claim_id, issuer.get_address(), payer.get_address(), gas_price, gas_limit)
+        tx.sign_transaction(issuer)
+        if issuer.get_address_bytes() != payer.get_address_bytes():
+            tx.add_sign_transaction(payer)
+        tx_hash = self._sdk.default_network.send_raw_transaction(tx)
+        return tx_hash
+
+    def new_get_status_tx(self, claim_id: str) -> InvokeTransaction:
         func = InvokeFunction('GetStatus')
         func.set_params_value(claim_id)
         tx = InvokeTransaction()
         tx.add_invoke_code(self.__hex_contract_address, func)
-        response = self.__sdk.default_network.send_raw_transaction_pre_exec(tx)
+        return tx
+
+    def get_status(self, claim_id: str):
+        tx = self.new_get_status_tx(claim_id)
+        response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         return self.parse_status(response)
 
     @staticmethod
@@ -89,7 +102,7 @@ class ClaimRecord(object):
         return status
 
     def query_commit_event(self, tx_hash: str):
-        event = self.__sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
+        event = self._sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify) == 0:
             return notify
@@ -105,7 +118,7 @@ class ClaimRecord(object):
         return notify
 
     def query_revoke_event(self, tx_hash: str):
-        event = self.__sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
+        event = self._sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify['States']) == 4:
             notify['States'][0] = Data.to_utf8_str(notify['States'][0])

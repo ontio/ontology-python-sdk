@@ -140,11 +140,11 @@ class Claim(object):
     def from_base64_signature(b64_signature: str):
         return bytes.hex(base64.b64decode(b64_signature))
 
-    def commit(self, b58_iss_address: str, b58_payer_address: str, gas_limit: int, gas_price: int,
-               hex_contract_address: str = '') -> InvokeTransaction:
+    def new_commit_tx(self, b58_iss_address: str, b58_payer_address: str, gas_limit: int, gas_price: int,
+                      hex_contract_address: str = '') -> InvokeTransaction:
         if not isinstance(hex_contract_address, str):
             raise SDKException(ErrorCode.require_str_params)
-        if len(hex_contract_address) != 0 and len(hex_contract_address) == 40:
+        if len(hex_contract_address) == 40:
             self.__sdk.neo_vm.claim_record().hex_contract_address = hex_contract_address
         tx = self.__sdk.neo_vm.claim_record().commit(self.payload.jti, b58_iss_address, self.payload.sub,
                                                      b58_payer_address, gas_limit, gas_price)
