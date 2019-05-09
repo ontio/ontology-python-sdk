@@ -158,7 +158,7 @@ class Restful(object):
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0]))
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self._url])))
+            raise SDKException(ErrorCode.connect_timeout(self._url)) from None
         if response.status_code != 200:
             raise SDKException(ErrorCode.other_error(response.content.decode('utf-8')))
         try:
@@ -175,7 +175,7 @@ class Restful(object):
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0]))
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', self._url]))) from None
+            raise SDKException(ErrorCode.connect_timeout(self._url)) from None
         if response.status_code != 200:
             raise SDKException(ErrorCode.other_error(response.content.decode('utf-8')))
         try:
