@@ -106,10 +106,8 @@ class Rpc(object):
             response = requests.post(url, json=payload, headers=header, timeout=10)
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0])) from None
-        except requests.exceptions.ConnectTimeout:
+        except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
             raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url]))) from None
-        except requests.exceptions.ConnectionError:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from None
         except requests.exceptions.ReadTimeout:
             raise SDKException(ErrorCode.other_error(''.join(['ReadTimeout: ', url]))) from None
         try:
@@ -136,10 +134,8 @@ class Rpc(object):
             response = requests.get(url, params=json.dumps(payload), headers=header, timeout=10)
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0]))
-        except requests.exceptions.ConnectTimeout:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectTimeout: ', url])))
-        except requests.exceptions.ConnectionError:
-            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url])))
+        except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout):
+            raise SDKException(ErrorCode.other_error(''.join(['ConnectionError: ', url]))) from None
         try:
             content = response.content.decode('utf-8')
         except Exception as e:
