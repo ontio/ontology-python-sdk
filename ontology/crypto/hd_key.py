@@ -137,6 +137,6 @@ class HDKey(object):
     def __bytes__(self):
         pass
 
-    @staticmethod
-    def from_bytes(b):
+    @classmethod
+    def from_bytes(cls, b):
         pass
