@@ -79,8 +79,8 @@ class HDPublicKey(HDKey):
         else:
             return self.key.to_string()
 
-    def hex(self, compressed=True):
-        return self.to_bytes(compressed).hex()
+    def hex(self, is_compressed=True):
+        return self.to_bytes(is_compressed).hex()
 
     @classmethod
     def from_hex(cls, h):
@@ -110,8 +110,8 @@ class HDPublicKey(HDKey):
                            depth=parent_key.depth + 1,
                            parent_fingerprint=parent_key.fingerprint)
 
-    @staticmethod
-    def from_bytes(data: bytes):
+    @classmethod
+    def from_bytes(cls, data: bytes):
         """ Generates either a HDPublicKey from the underlying bytes.
 
         The serialization must conform to the description in:
@@ -138,12 +138,13 @@ class HDPublicKey(HDKey):
         x = util.string_to_number(key_bytes[1:])
         y = (x * x * x + curve.a() * x + curve.b()) % curve.p()
         y = numbertheory.square_root_mod_prime(y, curve.p())
-
+        if key_bytes[0] == 0x03:
+            y = (y * -1) % curve.p()
         order = curves.NIST256p.order
         s_key = util.number_to_string(x, order) + util.number_to_string(y, order)
 
         public_key = VerifyingKey.from_string(string=s_key, curve=curves.NIST256p)
-        rv = HDPublicKey(
+        rv = cls(
             public_key=public_key,
             chain_code=chain_code,
             index=index,
