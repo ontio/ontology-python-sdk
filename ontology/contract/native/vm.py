@@ -22,7 +22,6 @@ from ontology.contract.native.ontid import OntId
 from ontology.contract.native.aio_ont import AioOnt
 from ontology.contract.native.aio_ong import AioOng
 from ontology.contract.native.aio_ontid import AioOntId
-from ontology.contract.native.governance import Governance
 
 
 class NativeVm(object):
@@ -47,5 +46,3 @@ class NativeVm(object):
     def ont_id(self):
         return OntId(self.__sdk)
 
-    def governance(self):
-        return Governance(self.__sdk)

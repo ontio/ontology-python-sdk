@@ -5,8 +5,6 @@ import unittest
 
 from test import sdk, acct1, acct2, not_panic_exception
 
-from ontology.exception.exception import SDKException
-
 
 class TestNativeVm(unittest.TestCase):
     @not_panic_exception
