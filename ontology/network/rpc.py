@@ -476,8 +476,11 @@ class Rpc(object):
             tx.sign_transaction(signer)
         return self.send_raw_transaction_pre_exec(tx, is_full)
 
-    def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
-                                payer: Account or None, gas_price: int, gas_limit: int,
+    def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray,
+                                signer: Account or None,
+                                payer: Account or None,
+                                gas_price: int,
+                                gas_limit: int,
                                 func: AbiFunction or InvokeFunction, is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)

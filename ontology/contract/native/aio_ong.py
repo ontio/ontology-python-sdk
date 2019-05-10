@@ -20,9 +20,8 @@ from typing import Union
 
 from ontology.common.address import Address
 from ontology.account.account import Account
-
-from ontology.exception.error_code import ErrorCode
 from ontology.contract.native.ong import Ong
+from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.contract.native.aio_asset import AioAsset
 

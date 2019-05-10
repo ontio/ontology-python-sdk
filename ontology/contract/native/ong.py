@@ -57,14 +57,14 @@ class Ong(Asset):
             address = address.b58encode()
         return int(self._sdk.default_network.get_allowance('ong', Address(ont_contract).b58encode(), address))
 
-    def withdraw(self, claimer: Account, receiver: Union[str, Address], amount: int, payer: Account, gas_limit: int,
-                 gas_price: int) -> str:
+    def withdraw(self, claimer: Account, receiver: Union[str, Address], amount: int, payer: Account, gas_price: int,
+                 gas_limit: int) -> str:
         """
         This interface is used to withdraw a amount of ong and transfer them to receive address.
         """
         if amount <= 0:
             raise SDKException(ErrorCode.other_error('the amount should be greater than than zero.'))
-        tx = self.new_withdraw_tx(claimer.get_address(), receiver, amount, payer.get_address(), gas_limit, gas_price)
+        tx = self.new_withdraw_tx(claimer.get_address(), receiver, amount, payer.get_address(), gas_price, gas_limit)
         tx.sign_transaction(claimer)
         if claimer.get_address_bytes() != payer.get_address_bytes():
             tx.add_sign_transaction(payer)
