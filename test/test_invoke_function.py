@@ -193,7 +193,6 @@ class TestInvokeFunction(unittest.TestCase):
         response = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         self.assertEqual(1, response['State'])
         self.assertEqual(20000, response['Gas'])
-        self.assertEqual(True, Data.to_bool(response['Result']))
         notify = response['Notify'][0]
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         states = notify['States']
