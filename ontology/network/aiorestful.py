@@ -60,8 +60,8 @@ class AioRestful(Restful):
                 else:
                     raise SDKException(ErrorCode.other_error(res['Desc']))
             return res
-        except asyncio.TimeoutError or client_exceptions.ClientConnectorError:
-            raise SDKException(ErrorCode.connect_timeout(self._url))
+        except (asyncio.TimeoutError, client_exceptions.ClientConnectorError):
+            raise SDKException(ErrorCode.connect_timeout(self._url)) from None
 
     async def __get(self, url):
         try:
@@ -79,8 +79,8 @@ class AioRestful(Restful):
                 else:
                     raise SDKException(ErrorCode.other_error(res['Desc']))
             return res
-        except asyncio.TimeoutError or client_exceptions.ClientConnectorError:
-            raise SDKException(ErrorCode.connect_timeout(self._url))
+        except (asyncio.TimeoutError, client_exceptions.ClientConnectorError):
+            raise SDKException(ErrorCode.connect_timeout(self._url)) from None
 
     async def get_version(self, is_full: bool = False):
         url = RestfulMethod.get_version(self._url)

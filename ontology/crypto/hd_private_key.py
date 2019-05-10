@@ -39,7 +39,13 @@ class HDPrivateKey(HDKey):
             key = util.number_to_string(key, curves.NIST256p.order)
         private_key = SigningKey.from_string(string=key, curve=curves.NIST256p)
         super().__init__(private_key, chain_code, index, depth, parent_fingerprint)
-        self._public_key = None
+        self._public_key = HDPublicKey(
+            public_key=self._key.verifying_key,
+            chain_code=self._chain_code,
+            index=self._index,
+            depth=self._depth,
+            parent_fingerprint=self._parent_fingerprint
+        )
 
     def __bytes__(self):
         version = HDPrivateKey.__VERSION
@@ -72,15 +78,6 @@ class HDPrivateKey(HDKey):
         """
         Returns the public key associated with this private key.
         """
-        if self._public_key is None:
-            self._public_key = HDPublicKey(
-                public_key=self._key.verifying_key,
-                chain_code=self._chain_code,
-                index=self._index,
-                depth=self._depth,
-                parent_fingerprint=self._parent_fingerprint
-            )
-
         return self._public_key
 
     @staticmethod

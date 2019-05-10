@@ -11,7 +11,7 @@ with codecs.open(path.join(getcwd(), 'description.md')) as f:
 
 setup(
     name='ontology-python-sdk',
-    version='2.0.0',
+    version='2.0.1',
     description='Comprehensive Python library for the Ontology BlockChain.',
     long_description=long_description,
     long_description_content_type="text/markdown",
