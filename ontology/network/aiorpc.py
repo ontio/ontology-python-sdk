@@ -66,7 +66,7 @@ class AioRpc(Rpc):
                     raise SDKException(ErrorCode.other_error(res['result']))
                 else:
                     raise SDKException(ErrorCode.other_error(res['desc']))
-        except asyncio.TimeoutError or client_exceptions.ClientConnectorError:
+        except (asyncio.TimeoutError, client_exceptions.ClientConnectorError):
             raise SDKException(ErrorCode.connect_timeout(self._url)) from None
         return res
 
@@ -350,7 +350,8 @@ class AioRpc(Rpc):
         return response['result']
 
     async def send_neo_vm_tx_pre_exec(self, contract_address: Union[str, bytes, bytearray],
-                                      func: Union[AbiFunction, InvokeFunction], signer: Account = None,
+                                      func: Union[AbiFunction, InvokeFunction],
+                                      signer: Account = None,
                                       is_full: bool = False):
         contract_address = ensure_bytearray_contract_address(contract_address)
         tx = NeoVm.make_invoke_transaction(contract_address, func)
@@ -358,9 +359,12 @@ class AioRpc(Rpc):
             tx.sign_transaction(signer)
         return await self.send_raw_transaction_pre_exec(tx, is_full)
 
-    async def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
-                                      payer: Account or None, gas_limit: int, gas_price: int,
-                                      func: AbiFunction or InvokeFunction,
+    async def send_neo_vm_transaction(self, contract_address: Union[str, bytes, bytearray],
+                                      signer: Union[Account, None],
+                                      payer: Union[Account, None],
+                                      gas_price: int,
+                                      gas_limit: int,
+                                      func: Union[AbiFunction, InvokeFunction],
                                       is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
