@@ -32,7 +32,7 @@ class Data(object):
     def to_bool(hex_str) -> bool:
         if len(hex_str) != 2:
             raise SDKException(ErrorCode.other_error('invalid str'))
-        return bool(hex_str)
+        return True if hex_str == '01' else False
 
     @staticmethod
     def to_int(hex_str: str) -> int:
