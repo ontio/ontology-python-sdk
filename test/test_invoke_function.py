@@ -68,7 +68,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_oep4_total_supply(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         func = InvokeFunction('totalSupply')
-        result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
+        result = sdk.default_network.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         total_supply = result['Result']
         total_supply = Data.to_int(total_supply)
         self.assertEqual(10000000000000000000, total_supply)
@@ -88,15 +88,10 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertGreater(balance, 100)
 
     def send_tx(self, hex_contract_address, signer, payer, func):
-        try:
-            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, signer, payer, gas_price, gas_limit, func,
-                                                      False)
-            self.assertEqual(64, len(tx_hash))
-            return tx_hash
-        except SDKException as e:
-            if 'already in the tx pool' not in e.args[1]:
-                raise e
-            return ''
+        tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, signer, payer, gas_price, gas_limit,
+                                                              func, False)
+        self.assertEqual(64, len(tx_hash))
+        return tx_hash
 
     @not_panic_exception
     def test_oep4_transfer(self):
@@ -134,12 +129,8 @@ class TestInvokeFunction(unittest.TestCase):
         transfer2 = [bytes_from_address2, bytes_to_address2, value2]
         func = InvokeFunction('transferMulti')
         func.set_params_value(transfer1, transfer2)
-        try:
-            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_price, gas_limit, func,
-                                                      False)
-        except SDKException as e:
-            self.assertIn('already in the tx pool', e.args[1])
-            return
+        tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_price, gas_limit,
+                                                              func, False)
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states_list = Event.get_states_by_contract_address(event, hex_contract_address)
@@ -169,13 +160,8 @@ class TestInvokeFunction(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi')
         func.set_params_value(transfer_list)
-        try:
-            tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_price, gas_limit, func,
-                                                      False)
-            self.assertEqual(64, len(tx_hash))
-        except SDKException as e:
-            self.assertIn('already in the tx pool', e.args[1])
-            return
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_price, gas_limit, func, False)
+        self.assertEqual(64, len(tx_hash))
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
@@ -204,15 +190,10 @@ class TestInvokeFunction(unittest.TestCase):
         func = InvokeFunction('notify_args')
         func.set_params_value(bool_msg, int_msg, list_msg, str_msg, bytes_address_msg)
         sdk.rpc.set_address('http://polaris5.ont.io:20336')
-        try:
-            response = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
-        except SDKException as e:
-            self.assertIn('already in the tx pool', e.args[1])
-            return
-        response['Result'] = Data.to_bool(response['Result'])
+        response = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         self.assertEqual(1, response['State'])
         self.assertEqual(20000, response['Gas'])
-        self.assertEqual(True, response['Result'])
+        self.assertEqual(True, Data.to_bool(response['Result']))
         notify = response['Notify'][0]
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         states = notify['States']
