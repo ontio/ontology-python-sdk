@@ -25,8 +25,8 @@ from time import time, sleep
 
 from ontology.claim.claim import Claim
 from ontology.claim.payload import Payload
-from ontology.claim.header import Header, ClmAlg
 from ontology.exception.exception import SDKException
+from ontology.claim.header import Header, ClmAlg, ClmType
 from tests import sdk, acct1, identity1, identity2, identity2_ctrl_acct, not_panic_exception
 
 
@@ -34,15 +34,27 @@ class TestClaim(unittest.TestCase):
     def setUp(self):
         self.gas_price = 500
         self.gas_limit = 20000
+        self.kid = 'did:ont:TRAtosUZHNSiLhzBdHacyxMX4Bg3cjWy3r#keys-1'
+        self.claim_header = Header(self.kid)
 
-    def test_head(self):
-        kid = 'did:ont:TRAtosUZHNSiLhzBdHacyxMX4Bg3cjWy3r#keys-1'
-        claim_header = Header(kid)
-        claim_header_dict = dict(claim_header)
-        self.assertEqual(kid, claim_header_dict['kid'])
+    def test_head_kid(self):
+        self.assertEqual(self.kid, self.claim_header.kid)
+        self.assertRaises(SDKException, setattr, self.claim_header, 'kid', 1)
+        self.assertRaises(SDKException, setattr, self.claim_header, 'kid', 'test')
+        self.assertRaises(SDKException, setattr, self.claim_header, 'kid', 'did:ont:test')
+        self.kid = self.kid.replace('keys-1', 'keys-2')
+        self.claim_header.kid = self.kid
+        self.assertEqual(self.kid, self.claim_header.kid)
+
+    def test_head_to_json(self):
+        self.assertEqual(96, len(self.claim_header.to_json()))
+
+    def test_head_dict(self):
+        claim_header_dict = dict(self.claim_header)
+        self.assertEqual(self.kid, claim_header_dict['kid'])
         self.assertTrue(isinstance(claim_header_dict, dict))
         self.assertEqual('ONT-ES256', claim_header_dict['alg'])
-        self.assertEqual(96, len(claim_header.to_json()))
+        self.assertEqual(ClmType.witness_claim, claim_header.type)
         b64_head = claim_header.to_base64()
         claim_header_recv = Header.from_base64(b64_head)
         self.assertEqual(dict(claim_header), dict(claim_header_recv))
