@@ -87,8 +87,8 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertGreater(balance, 100)
 
     def send_tx(self, hex_contract_address, signer, payer, func):
-        tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, signer, payer, gas_price, gas_limit,
-                                                              func, False)
+        tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, signer, payer, self.gas_price,
+                                                              self.gas_limit, func, False)
         self.assertEqual(64, len(tx_hash))
         return tx_hash
 
@@ -128,8 +128,8 @@ class TestInvokeFunction(unittest.TestCase):
         transfer2 = [bytes_from_address2, bytes_to_address2, value2]
         func = InvokeFunction('transferMulti')
         func.set_params_value(transfer1, transfer2)
-        tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_price, gas_limit,
-                                                              func, False)
+        tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, acct1, acct2, self.gas_price,
+                                                              self.gas_limit, func, False)
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states_list = Event.get_states_by_contract_address(event, hex_contract_address)
