@@ -138,5 +138,5 @@ class HDKey(object):
         pass
 
     @classmethod
-    def from_bytes(cls, b):
+    def from_bytes(cls, data: bytes):
         pass

@@ -122,21 +122,21 @@ class HDPrivateKey(HDKey):
         return cls.from_bytes(base58.b58decode_check(key))
 
     @classmethod
-    def from_bytes(cls, b):
+    def from_bytes(cls, data: bytes):
         """Generates either a HDPrivateKey or HDPublicKey from the underlying bytes.
 
         The serialization must conform to the description in:
         https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#serialization-format
         """
-        if len(b) < 78:
+        if len(data) < 78:
             raise ValueError("b must be at least 78 bytes long.")
 
-        version = int.from_bytes(b[:4], 'big')
-        depth = b[4]
-        parent_fingerprint = b[5:9]
-        index = int.from_bytes(b[9:13], 'big')
-        chain_code = b[13:45]
-        key_bytes = b[45:78]
+        version = int.from_bytes(data[:4], 'big')
+        depth = data[4]
+        parent_fingerprint = data[5:9]
+        index = int.from_bytes(data[9:13], 'big')
+        chain_code = data[13:45]
+        key_bytes = data[45:78]
 
         if version != HDPrivateKey.__VERSION:
             raise ValueError('invalid HD Public Key.')
