@@ -6,7 +6,7 @@ test:
 coverage:
 	pip install codacy-coverage
 	pip install coverage
-	coverage run -m unittest discover omit = tests/*
+	coverage run -m unittest discover
 	coverage xml --omit=tests/*
 	python-codacy-coverage -r coverage.xml
 
