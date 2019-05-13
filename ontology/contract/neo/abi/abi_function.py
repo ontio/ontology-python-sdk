@@ -15,10 +15,8 @@ class AbiFunction(object):
         """
         if len(params) != len(self.parameters):
             raise Exception("parameter error")
-        self.parameters = []
         for i, p in enumerate(params):
-            self.parameters.append(Parameter(self.parameters[i]['name'], self.parameters[i]['type']))
-            self.parameters[i].set_value(p)
+            self.parameters[i] = Parameter(self.parameters[i]['name'], self.parameters[i]['type'], p)
 
     def get_parameter(self, param_name: str) -> Parameter:
         """
