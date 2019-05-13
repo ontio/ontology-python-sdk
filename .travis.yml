@@ -29,5 +29,12 @@ jobs:
     script: make coverage
   - stage: build
     script: make build
-  - stage: publish
-    script: make publish
+deploy:
+  provider: pypi
+  user: NashMiao
+  password:
+    secure: kI22zgh0F7CZr1CMjB33BTIqfpRQBxdIsTchxdR3Ooq0LBCwp7RKL5F7Ijdc0SuK7pYsZT3t5UUBiltJLvjw+bxVegcqSHXvzN+LibEJZMagM2RujBADbNgai1xBUkcjfoDtiEKvPoJh8CQndjfOQgAQ6O97Y2o0kBS7ryLsHX+2ytUKhS/GSOSLw1sdlH3PIxCinzruLrMecgZgkUDxe6Co6N+l3IUklaOeqcANv9SobWAuNWS6ZdKD8e4gWZrmgxSVb/+CXnk0OfR2JB+w28xMSXrTS4hNdw+OVtefnuSmgKRCfJu2tiYXRG7aUQPHWnBnFZNdwjgK2puYdHUIDUsQ6wI1k4FrOIP3DDZPQ1RMCPI59l+lr9FG7wWjD/wKmtneYlT8VMz7GWKLDJjyeZwdWAt3kYeALQOG0a2eWwlf9yKcc4x+cKI6pOb9IkO8t4Uy0mwova/ztWeHhXbptL2othYDvlnfB9pIiDZYQUdHrdd3r9y9vK0BoE2xJ/f9xRfN1QCx0cJZpq797POHlL3NQgXKX3yRL8aYwYuHWWdjleZjajFRzyY2cfzKDgZGgSOKwAGzKHVJQhY4eX25tX9onl/37xua3glmQONHObRgqHRBgIgALy527LgxGD5j0gLhatC8A+IBtg8PUG8tlxaMEi5tPbQpO5/bGJlCEc4=
+  on:
+    python: 3.7
+    brance: master
+    tags: true
