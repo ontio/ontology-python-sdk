@@ -45,18 +45,6 @@ class Websocket(object):
         self.__id = 0
         self.__ws_client = None
 
-    @staticmethod
-    def runner(func):
-        def wrapper(*args, **kwargs):
-            if inspect.iscoroutinefunction(func):
-                future = func(*args, **kwargs)
-            else:
-                coroutine = asyncio.coroutine(func)
-                future = coroutine(*args, **kwargs)
-            asyncio.get_event_loop().run_until_complete(future)
-
-        return wrapper
-
     def __generate_ws_id(self):
         if self.__id == 0:
             self.__id = randint(0, maxsize)
