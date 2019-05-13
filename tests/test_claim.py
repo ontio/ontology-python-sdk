@@ -27,7 +27,7 @@ from ontology.claim.claim import Claim
 from ontology.claim.header import Header
 from ontology.claim.payload import Payload
 from ontology.exception.exception import SDKException
-from test import sdk, acct1, identity1, identity2, identity2_ctrl_acct, not_panic_exception
+from tests import sdk, acct1, identity1, identity2, identity2_ctrl_acct, not_panic_exception
 
 
 class TestClaim(unittest.TestCase):

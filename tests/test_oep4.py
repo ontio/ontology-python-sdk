@@ -25,7 +25,7 @@ import unittest
 from Cryptodome.Random.random import randint
 
 from ontology.utils.contract import Event, Data
-from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
+from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 
 class TestOep4(unittest.TestCase):

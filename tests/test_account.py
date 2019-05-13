@@ -23,7 +23,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import base64
 import unittest
 
-from test import password
+from tests import password
 
 from ontology.utils import utils
 from ontology.account.account import Account

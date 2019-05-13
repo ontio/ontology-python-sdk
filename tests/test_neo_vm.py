@@ -24,7 +24,7 @@ import unittest
 from time import sleep
 
 from ontology.utils.contract import Event, Data
-from test import sdk, acct1, acct2
+from tests import sdk, acct1, acct2
 
 from ontology.exception.exception import SDKException
 from ontology.contract.neo.invoke_function import InvokeFunction

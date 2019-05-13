@@ -24,7 +24,7 @@ import unittest
 from Cryptodome.Random.random import randint
 
 from ontology.utils.contract import Event
-from test import acct1, acct2, acct3, sdk, not_panic_exception
+from tests import acct1, acct2, acct3, sdk, not_panic_exception
 
 from ontology.utils import utils
 from ontology.common.address import Address

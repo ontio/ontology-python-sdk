@@ -21,7 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from test import sdk, not_panic_exception
+from tests import sdk, not_panic_exception
 
 
 class TestMerkleVerifier(unittest.TestCase):

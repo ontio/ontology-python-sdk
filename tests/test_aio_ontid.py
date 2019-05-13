@@ -25,7 +25,7 @@ import unittest
 from Cryptodome.Random.random import randint
 
 from ontology.sdk import Ontology
-from test import sdk, acct2, acct3, acct4, password, not_panic_exception
+from tests import sdk, acct2, acct3, acct4, password, not_panic_exception
 
 from ontology.utils import utils
 from ontology.crypto.curve import Curve

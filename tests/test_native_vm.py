@@ -3,7 +3,7 @@
 
 import unittest
 
-from test import sdk, acct1, acct2, not_panic_exception
+from tests import sdk, acct1, acct2, not_panic_exception
 
 
 class TestNativeVm(unittest.TestCase):
