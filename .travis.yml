@@ -21,14 +21,10 @@ install:
 - wget https://github.com/ontio/ontology/releases/download/v1.6.0/tool-linux.zip --no-check-certificate
 - unzip tool-linux.zip
 - "./tool-linux/sigsvr-linux-amd64 --abi ./tool-linux/abi &"
-jobs:
-  include:
-  - stage: test
-    script: make test
-  - stage: coverage
-    script: make coverage
-  - stage: build
-    script: make build
+script:
+  - make test
+  - make coverage
+  - make build
 deploy:
   provider: pypi
   user: NashMiao
