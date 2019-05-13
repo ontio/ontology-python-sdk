@@ -24,7 +24,7 @@ import unittest
 
 from Cryptodome.Random.random import choice
 
-from test import password
+from tests import password
 
 from ontology.utils import utils
 from ontology.crypto.curve import Curve

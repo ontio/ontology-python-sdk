@@ -23,7 +23,7 @@ import unittest
 
 from os import path
 
-from test import sdk, password
+from tests import sdk, password
 
 from ontology.crypto.signature_handler import SignatureHandler
 

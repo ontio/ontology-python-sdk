@@ -23,7 +23,7 @@ import unittest
 from time import time, sleep
 
 from ontology.exception.exception import SDKException
-from test import sdk, identity1, identity2, identity2_ctrl_acct, acct1, not_panic_exception
+from tests import sdk, identity1, identity2, identity2_ctrl_acct, acct1, not_panic_exception
 
 
 class TestClaimRecord(unittest.TestCase):

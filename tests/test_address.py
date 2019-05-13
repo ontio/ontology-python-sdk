@@ -22,7 +22,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.crypto.hd_public_key import HDPublicKey
-from test import sdk
+from tests import sdk
 
 from ontology.utils import utils
 from ontology.common.address import Address

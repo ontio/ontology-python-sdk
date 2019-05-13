@@ -21,7 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from test import acct1, acct2, acct3, sdk, not_panic_exception
+from tests import acct1, acct2, acct3, sdk, not_panic_exception
 
 from ontology.common.address import Address
 from ontology.core.program import ProgramBuilder

@@ -23,7 +23,7 @@ from Cryptodome.Random.random import randint
 from ontology.sdk import Ontology
 from ontology.utils.contract import Data, Event
 
-from test import sdk, acct1, acct2, acct3, acct4, not_panic_exception
+from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 networks = [sdk.aio_rpc, sdk.aio_restful, sdk.websocket]
 

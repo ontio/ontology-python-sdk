@@ -21,7 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from test import sdk, acct1, acct2
+from tests import sdk, acct1, acct2
 
 from ontology.crypto.signature_scheme import SignatureScheme
 from ontology.crypto.signature_handler import SignatureHandler
