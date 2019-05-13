@@ -26,15 +26,14 @@ from Cryptodome.Random.random import randint
 
 from ontology.utils.contract import Data, Event
 from test import acct1, acct2, acct3, sdk, not_panic_exception
-
-from ontology.exception.exception import SDKException
 from ontology.contract.neo.invoke_function import InvokeFunction
-
-gas_limit = 20000000
-gas_price = 500
 
 
 class TestInvokeFunction(unittest.TestCase):
+    def setUp(self):
+        self.gas_price = 500
+        self.gas_limit = 2000000
+
     @not_panic_exception
     def test_oep4_name(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
@@ -160,7 +159,8 @@ class TestInvokeFunction(unittest.TestCase):
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
         func = InvokeFunction('transfer_multi')
         func.set_params_value(transfer_list)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, gas_price, gas_limit, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, self.gas_price, self.gas_limit,
+                                                  func, False)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
@@ -296,7 +296,8 @@ class TestInvokeFunction(unittest.TestCase):
         dict_msg = {'key': dict_value, 'key1': int_value, 'key2': str_value, 'key3': bool_value, 'key4': list_value}
         func = InvokeFunction('testMapInMap')
         func.set_params_value(dict_msg)
-        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, gas_price, gas_limit, func, False)
+        tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, self.gas_price, self.gas_limit,
+                                                  func, False)
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
