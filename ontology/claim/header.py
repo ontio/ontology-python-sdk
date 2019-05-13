@@ -39,7 +39,7 @@ class ClmAlg(Enum):
     EDS512 = 'ONT-EDS512'
 
     @staticmethod
-    def from_str_alg(str_alg: str):
+    def from_str(str_alg: str):
         if not isinstance(str_alg, str):
             raise SDKException(ErrorCode.require_str_params)
         if str_alg == 'ES224' or str_alg == 'ONT-ES224':
@@ -56,6 +56,8 @@ class ClmAlg(Enum):
             return ClmAlg.ES3_256
         elif str_alg == 'ES3-384' or str_alg == 'ONT-ES3-384':
             return ClmAlg.ES3_384
+        elif str_alg == 'ES3-512' or str_alg == 'ONT-ES3-512':
+            return ClmAlg.ES3_512
         elif str_alg == 'ER160' or str_alg == 'ONT-ER160':
             return ClmAlg.ER160
         elif str_alg == 'SM' or str_alg == 'ONT-SM':
@@ -89,7 +91,7 @@ class Header(object):
         if isinstance(claim_type, str):
             claim_type = ClmType.from_str_type(claim_type)
         if isinstance(alg, str):
-            alg = ClmAlg.from_str_alg(alg)
+            alg = ClmAlg.from_str(alg)
         if not isinstance(alg, ClmAlg):
             raise SDKException(ErrorCode.invalid_claim_head_params)
         if not isinstance(claim_type, ClmType):
@@ -146,7 +148,7 @@ class Header(object):
             raise SDKException(ErrorCode.require_str_params)
         dict_head = json.loads(json_head)
         try:
-            alg = ClmAlg.from_str_alg(dict_head['alg'])
+            alg = ClmAlg.from_str(dict_head['alg'])
             typ = ClmType.from_str_type(dict_head['typ'])
             head = Header(dict_head['kid'], alg, typ)
         except KeyError:
