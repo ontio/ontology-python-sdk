@@ -15,7 +15,7 @@ env:
   - secure: jYE082/QGcnhZCFsF4vK6EOiddzJhJcMC/RCjsJlqa/yc14XzLcM1aRJk4JCtqMU/3CALX7yIUyi8rdTYnE5xWMhgESh2BPAUP38o1589HaynLyo76LkBUoyFuxuWTT+lkixRdvaRlCK/eWZ0vUMjH2T32xN4QoTci2WzRFj/o+dwDljLxabc0qHbFfjRxyIndBS+eb5y0P38DxSdJP0Z8x7tbVZdUmmQlLZo3K8K4mZJaGAlCCv7eaQAawaDlnoDUo3QJf0JfYcgmxckuTGOuLRdxldRI998oXzop479IYgVIpFV0W2Cl5m9lWwKqarbzebD1GlZu6qLfxhUmVuNk1hNL565Jz4SYJZ/2oNfkZpkBMIw2mNc8LrzaEEyftyL+x/mBKbXThk+PVSX8VePW55imx5K3YgVkgJ6tFWX9o4cer82See/SSr823JypLoK4pi3kQboHBtphpkHaYs9jcJYZ46S5WJC1128gO7UooQf8yXwtd3MwEk3BnXr0NMd+uQ+2W1420Hjxz/G43Pl+VM1IipptXFdzaUo/IgU5zowdt5dOV5UVu0p8e0M3CR3RSctifY9v/IjNrzYKKNZnhaycDlzX2Ko99FeDKwoIv9l/+BwpYkeal8BgtUZtLYUVx69jfTG193ijfG9zaiJhCLu3ZMMn13ruy6gxFrYhs=
 install:
 - pip install -r requirements.txt
-- sudo apt install make
+- sudo apt-get install build-essential
 - sudo apt install wget
 - sudo apt install unzip
 - wget https://github.com/ontio/ontology/releases/download/v1.6.0/tool-linux.zip --no-check-certificate
