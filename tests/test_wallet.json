@@ -1,0 +1,119 @@
+{
+    "name": "MyWallet",
+    "version": "1.1",
+    "createTime": "2018-12-25 23:20:21",
+    "defaultOntid": "did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+    "defaultAccountAddress": "ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+    "scrypt": {
+        "n": 16384,
+        "r": 8,
+        "p": 8,
+        "dkLen": 64
+    },
+    "identities": [
+        {
+            "ontid": "did:ont:ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+            "label": "NashMiao",
+            "lock": false,
+            "controls": [
+                {
+                    "address": "ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+                    "algorithm": "ECDSA",
+                    "enc-alg": "aes-256-gcm",
+                    "hash": "sha256",
+                    "id": "keys-1",
+                    "key": "v8esvyjOXipxtyb0dzSUT/DrBXuOYuFjN5i0smDI5e4UkNiJEiV1Nayf5VBTFIaj",
+                    "parameters": {
+                        "curve": "P-256"
+                    },
+                    "salt": "Y2Q1NjAxOTlhMTllMjMyYg==",
+                    "publicKey": "03d0fdb54acba3f81db3a6e16fa02e7ea3678bd205eb4ed2f1cfa8ab5e5d45633e"
+                }
+            ],
+            "isDefault": true
+        },
+        {
+            "ontid": "did:ont:AP8XfCUo7w3qM4b5gyQU8AEyRSwgtDFSzp",
+            "label": "claimIss",
+            "lock": false,
+            "controls": [
+                {
+                    "address": "AP8XfCUo7w3qM4b5gyQU8AEyRSwgtDFSzp",
+                    "algorithm": "ECDSA",
+                    "enc-alg": "aes-256-gcm",
+                    "hash": "sha256",
+                    "id": "keys-1",
+                    "key": "W6F8Tez++TianDvYL6u1bPb6Sn+z8FhtsGzP3M7Gxfd9gmIf0Fx4Oarkd5mM2Vrr",
+                    "parameters": {
+                        "curve": "P-256"
+                    },
+                    "salt": "NTU3MDMxYjJjOTc2ZGIxYw==",
+                    "publicKey": "03eca83d4e4a0ed1e96d87942f76275c49a2f61a6b1e0f33be5a65f9beae71cd3f"
+                }
+            ],
+            "isDefault": false
+        }
+    ],
+    "accounts": [
+        {
+            "address": "ANDfjwrUroaVtvBguDtrWKRMyxFwvVwnZD",
+            "algorithm": "ECDSA",
+            "enc-alg": "aes-256-gcm",
+            "isDefault": true,
+            "key": "EqcBqg2c4CT9fE5wgySgGsxshB8Q9qzIMwCXWm+Ne8vu9FfTJnat9ZFXbKK9thc0",
+            "label": "acct1",
+            "lock": false,
+            "parameters": {
+                "curve": "P-256"
+            },
+            "salt": "NGFmMmRiMDA5NDZkYjc0NA==",
+            "publicKey": "03d0fdb54acba3f81db3a6e16fa02e7ea3678bd205eb4ed2f1cfa8ab5e5d45633e",
+            "signatureScheme": "SHA256withECDSA"
+        },
+        {
+            "address": "Af1n2cZHhMZumNqKgw9sfCNoTWu9de4NDn",
+            "algorithm": "ECDSA",
+            "enc-alg": "aes-256-gcm",
+            "isDefault": true,
+            "key": "Zum2CjzUgu8EYAF1avxWpRCp4XHw2arT1OUj07X63HppbzrsLWvUOhSrGA6gel5D",
+            "label": "acct2",
+            "lock": false,
+            "parameters": {
+                "curve": "P-256"
+            },
+            "salt": "M2JmNDIxMDE0ODdhMDlkNQ==",
+            "publicKey": "02e8e84be09b87985e7f9dfa74298f6bb7f70f85515afca7e041fe964334e4b6c1",
+            "signatureScheme": "SHA256withECDSA"
+        },
+        {
+            "address": "AXJZrP1jBRo398ebfyemsDxDaThsxcXGMk",
+            "algorithm": "ECDSA",
+            "enc-alg": "aes-256-gcm",
+            "isDefault": true,
+            "key": "zNHXRhc67Xt5LmGWPRmoyBJYemahT36ML98GqmBNbVbMYPO026fxFjks4cPnOeUO",
+            "label": "acct3",
+            "lock": false,
+            "parameters": {
+                "curve": "P-256"
+            },
+            "salt": "ZWYwZDk3Y2RmNzQ0ZTNmOQ==",
+            "publicKey": "023cab3b268c4f268456a972c672c276d23a9c3ca3dfcfc0004d786adbf1fb9282",
+            "signatureScheme": "SHA256withECDSA"
+        },
+        {
+            "address": "APvHaLmJUMdAHiVbFHGi11gnFpuK6ozD5j",
+            "algorithm": "ECDSA",
+            "enc-alg": "aes-256-gcm",
+            "isDefault": true,
+            "key": "bi1cb0ytiGA9LHeT6zKUYU2XxwjzLSy5fAk/sAwobqijZOWRv2Qbw7RJhr07gzqv",
+            "label": "acct4",
+            "lock": false,
+            "parameters": {
+                "curve": "P-256"
+            },
+            "salt": "ZmVhNTJmMTVmMGZmNDY1Nw==",
+            "publicKey": "038ff4e313627a323be5a20a0e55dd294a6852deac3484f94110aa0cda126bf04c",
+            "signatureScheme": "SHA256withECDSA"
+        }
+    ]
+}
