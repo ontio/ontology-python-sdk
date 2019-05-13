@@ -18,13 +18,11 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import socket
-import asyncio
-import inspect
 
 from time import time
 from sys import maxsize
-from typing import List, Union
 from websockets import client
+from typing import List, Union
 
 from Cryptodome.Random.random import randint
 
@@ -33,10 +31,10 @@ from ontology.contract.neo.vm import NeoVm
 from ontology.core.transaction import Transaction
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.utils.transaction import ensure_bytearray_contract_address
 from ontology.contract.neo.abi.abi_function import AbiFunction
 from ontology.contract.neo.abi.build_params import BuildParams
 from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.utils.transaction import ensure_bytearray_contract_address
 
 
 class Websocket(object):
@@ -44,18 +42,6 @@ class Websocket(object):
         self.__url = url
         self.__id = 0
         self.__ws_client = None
-
-    @staticmethod
-    def runner(func):
-        def wrapper(*args, **kwargs):
-            if inspect.iscoroutinefunction(func):
-                future = func(*args, **kwargs)
-            else:
-                coroutine = asyncio.coroutine(func)
-                future = coroutine(*args, **kwargs)
-            asyncio.get_event_loop().run_until_complete(future)
-
-        return wrapper
 
     def __generate_ws_id(self):
         if self.__id == 0:

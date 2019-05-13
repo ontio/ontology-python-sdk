@@ -24,8 +24,8 @@ import unittest
 from time import time, sleep
 
 from ontology.claim.claim import Claim
-from ontology.claim.header import Header
 from ontology.claim.payload import Payload
+from ontology.claim.header import Header, ClmAlg
 from ontology.exception.exception import SDKException
 from tests import sdk, acct1, identity1, identity2, identity2_ctrl_acct, not_panic_exception
 
@@ -46,6 +46,14 @@ class TestClaim(unittest.TestCase):
         b64_head = claim_header.to_base64()
         claim_header_recv = Header.from_base64(b64_head)
         self.assertEqual(dict(claim_header), dict(claim_header_recv))
+
+    def test_from_str(self):
+        clm_alg_lst = [ClmAlg.ES224, ClmAlg.ES256, ClmAlg.ES384, ClmAlg.ES512, ClmAlg.ES3_224, ClmAlg.ES3_256,
+                       ClmAlg.ES3_384, ClmAlg.ES3_512, ClmAlg.ER160, ClmAlg.SM, ClmAlg.EDS512]
+        alg_str_lst = ['ONT-ES224', 'ONT-ES256', 'ONT-ES384', 'ONT-ES512', 'ONT-ES3-224', 'ONT-ES3-256', 'ONT-ES3-384',
+                       'ONT-ES3-512', 'ONT-ER160', 'ONT-SM', 'ONT-EDS512']
+        for index, alg in enumerate(alg_str_lst):
+            self.assertEqual(clm_alg_lst[index], ClmAlg.from_str(alg))
 
     def test_payload(self):
         ver = '0.7.0'
