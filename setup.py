@@ -20,7 +20,7 @@ setup(
     maintainer='NashMiao',
     maintainer_email='wdx7266@outlook.com',
     license='GNU Lesser General Public License v3 (LGPLv3)',
-    packages=find_packages(exclude=['test_*.py', 'test']),
+    packages=find_packages(exclude=['test_*.py', 'tests']),
     install_requires=[
         'aiohttp>=3.5.4',
         'base58>=1.0.3',
