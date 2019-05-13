@@ -16,29 +16,20 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from enum import Enum, unique
-from cryptography.hazmat.primitives.asymmetric import ec
+import unittest
 
-from ontology.exception.error_code import ErrorCode
+from ontology.crypto.curve import Curve
 from ontology.exception.exception import SDKException
 
 
-@unique
-class Curve(Enum):
-    P224 = ec.SECP224R1()
-    P256 = ec.SECP256R1()
-    P384 = ec.SECP384R1()
-    P521 = ec.SECP521R1()
+class CurveTest(unittest.TestCase):
+    def test_from_label(self):
+        self.assertRaises(SDKException, Curve.from_label, 0)
+        curve_lst = ['P224', 'P256', 'P384', 'P521']
+        label_lst = [1, 2, 3, 4]
+        for index, label in enumerate(label_lst):
+            self.assertEqual(curve_lst[index], Curve.from_label(label))
 
-    @staticmethod
-    def from_label(label: int) -> str:
-        if label == 1:
-            return Curve.P224.name
-        elif label == 2:
-            return Curve.P256.name
-        elif label == 3:
-            return Curve.P384.name
-        elif label == 4:
-            return Curve.P521.name
-        else:
-            raise SDKException(ErrorCode.unknown_curve_label)
+
+if __name__ == '__main__':
+    unittest.main()
