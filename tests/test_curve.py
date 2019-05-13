@@ -25,10 +25,10 @@ from ontology.exception.exception import SDKException
 class CurveTest(unittest.TestCase):
     def test_from_label(self):
         self.assertRaises(SDKException, Curve.from_label, 0)
-        self.assertEqual('P224', Curve.from_label(1))
-        self.assertEqual('P256', Curve.from_label(2))
-        self.assertEqual('P384', Curve.from_label(3))
-        self.assertEqual('P521', Curve.from_label(4))
+        curve_lst = ['P224', 'P256', 'P384', 'P521']
+        label_lst = [1, 2, 3, 4]
+        for index, label in enumerate(label_lst):
+            self.assertEqual(curve_lst[index], Curve.from_label(label))
 
 
 if __name__ == '__main__':
