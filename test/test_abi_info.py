@@ -19,36 +19,36 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import json
 import unittest
 
 from ontology.contract.neo.abi.abi_info import AbiInfo
 
-str_abi = '{"hash":"0x362cb5608b3eca61d4846591ebb49688900fedd0","entrypoint":"Main","functions":' \
-          '[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args",' \
-          '"type":"Array"}],"returntype":"Any"},{"name":"Hello","parameters":[{"name":"msg",' \
-          '"type":"String"}],"returntype":"Void"}],"events":[]}'
-dict_abi = json.loads(str_abi)
-abi_info = AbiInfo(dict_abi['hash'], dict_abi['entrypoint'], dict_abi['functions'], dict_abi['events'])
-func_name = 'Hello'
-
 
 class TestAbiInfo(unittest.TestCase):
+    def setUp(self):
+        self.func_name = 'Hello'
+        str_abi = '{"hash":"0x362cb5608b3eca61d4846591ebb49688900fedd0","entrypoint":"Main","functions":' \
+                  '[{"name":"Main","parameters":[{"name":"operation","type":"String"},{"name":"args",' \
+                  '"type":"Array"}],"returntype":"Any"},{"name":"Hello","parameters":[{"name":"msg",' \
+                  '"type":"String"}],"returntype":"Void"}],"events":[]}'
+        dict_abi = json.loads(str_abi)
+        self.abi_info = AbiInfo(dict_abi['hash'], dict_abi['entrypoint'], dict_abi['functions'], dict_abi['events'])
+
     def test_init(self):
-        self.assertTrue(isinstance(abi_info, AbiInfo))
+        self.assertTrue(isinstance(self.abi_info, AbiInfo))
 
     def test_get_function(self):
-        func = abi_info.get_function(func_name)
-        self.assertEqual(func_name, func.name)
+        func = self.abi_info.get_function(self.func_name)
+        self.assertEqual(self.func_name, func.name)
 
     def test_set_params_value(self):
-        func = abi_info.get_function(func_name)
+        func = self.abi_info.get_function(self.func_name)
         func.set_params_value('Value')
         self.assertEqual('Value', func.parameters[0].value)
 
     def test_get_parameter(self):
-        func = abi_info.get_function(func_name)
+        func = self.abi_info.get_function(self.func_name)
         func.set_params_value('Value')
         param_name = 'msg'
         parameter = func.get_parameter(param_name)
