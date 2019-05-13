@@ -78,8 +78,10 @@ class ErrorCode:
     def connect_timeout(url: str):
         return ErrorCode.get_error(60002, f'Network Error, ConnectionError: {url}')
 
-    hd_index_out_of_range = get_error.__func__(70001, 'HD Wallet Error, index is out of range: 0 <= index <= 2**32 - 1')
-    hd_root_key_not_master_key = get_error.__func__(70002, "HD Wallet Error, root_key must be a master key if m is the first element of the path")
+    hd_index_out_of_range = get_error.__func__(70001, 'Crypto Error, index is out of range: 0 <= index <= 2**32 - 1')
+    hd_root_key_not_master_key = get_error.__func__(70002, "Crypto Error, root_key must be a master key if m is the first element of the path")
+
+    unknown_curve_label = get_error.__func__(70003, "Crypto Error, unknown curve label")
 
     invalid_private_key = get_error.__func__(100001, 'Account Error, invalid private key.')
     unsupported_key_type = get_error.__func__(100002, 'Account Error, unsupported key type.')
@@ -107,7 +109,6 @@ class ErrorCode:
     checksum_not_validate = get_error.__func__(200002, "Base800 Error,Checksum does not validate")
     input_too_short = get_error.__func__(200003, "Base800 Error,Input too short")
     unknown_curve = get_error.__func__(200004, "Curve Error,unknown curve")
-    unknown_curve_label = get_error.__func__(200005, "Curve Error,unknown curve label")
     unknown_asymmetric_key_type = get_error.__func__(200006, "keyType Error,unknown asymmetric key type")
     invalid_signature_data = get_error.__func__(200007,
                                                 "Signature Error, invalid signature data: missing the ID parameter for SM3withSM2")
