@@ -1,4 +1,4 @@
-.PHONY: docs
+.PHONY: build
 
 test:
 	python -m unittest discover
