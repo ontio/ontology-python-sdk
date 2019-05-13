@@ -1,19 +1,33 @@
 sudo: true
+dist: xenial
 language: python
 python:
-  - 3.6
-  - 3.6-dev
-  - 3.7-dev
+- '3.6'
+- 3.6-dev
+- '3.7'
+- 3.7-dev
+- 3.8-dev
+virtualenv:
+  system_site_packages: true
 env:
   global:
   - secure: hmihvVrUjcBdEYRF79/XXACDShn2kvkmcKzQgSo6M1UAbvnl+26WUiKiGc4nlgDJfY6WaEN8UasArWWvxN3rzpRygSPhmMjcV3aZsBhKuRgMy2spEM7K3Z4/VTVOqndo+MDjC1ke/vdSqlDnpc6yFWZK3Tci4gx0CAyyu0+MgPaysxfxOVuuyEZzj/3V6fPKKrVjJnJ042giMSuSW3IjZeZf5Yqo0NI+UGrrPU/pniyiaXS8OAL1MML7o+0iiGORJrcBfBAhAS67GrPhVR6EOFXWu03tZEl3MXTPRZ2WR6m+64ZOO+UKiW5lxAg1MTCbcJCvJsmbYD2RThRfH6/r0/nRbNiz5x2T+GAKgbFwL0wNZjaWAKiQzPVXMvEed9NlY7/YzqrPx8Q581DdCirx2jX4SgD4/rSiRZcbjEwfXTB9vQBO7DJwPAP5IAtBkpQr8tDZ12mtA7asPm5+8V2eqlwpuro/dYARAziKM821s+22GExyFpbHPpjrkWeYD7HMwXC+MPUFTJvLdZzQ38gjeMliK2+O89AzeKpfudJCt0J85aXSMqXH2LJ4iAdoHcm4t6L3wRjyns1R4i2NKop/MbA7pctUevDkrsh5+Pm5vmbZUcw4LB3PQZ1r/mDJJoq/ilPORnMCv65PmsYEKCd/vIuaEE/Z/4iB7qOnvSUkWqY=
-go_import_path: github.com/ontio/ontology
+  - secure: HyTCU/IOSiVIOEbyirS2hGOkZrqabQAxayR3J/OnJquo1aBAJrAk8GpveKuAIeblG8gqG4qe6iREFu9Rf+X31qlXF5hdObt7YclGMTwzIXTvPQ6MRYYc2TZZtolnb+n6sXaYmknCO0K3M4NosTHX5J8ZESIrg+zONeHUtRvgOrqqVBKmhiLLcKfLoAPl6+E7aCl/EzS45dv4qKcplBBvnI9zo50DZ5izQYFvYwwJOH3TAGjwxaQA8/7+ZveH82vsVJuQsRhp5evyQR8pdQnRUdLW+9IDY4a9USNcJDlsh23evrU3NgzKtGjj4etZRDnuIoDZbqOgVL6Mj0/6FyEOtfOIdKMo8mHScegq6LJXao0A4KyEIKNJ5GTbBhVFjL0Jd+tEAK1K954G7d2Kw/kudyMBVBVOXCGOgOzIhpGD6erYBDsc65IDs17xF3ht5ZiU/GN/x4UltNG5EDedatoyoU3oLrAvPcbFJEUMGcCSGQ7yjhl1/YjKlGldmJMe9z2ascLZJ5l/FVW79Vec652Dp0WPpN44SmKj2R86nc1cAXt6l20kCnW4AOEE/xcHiUYuF1yWU+Q24GTzxwuMj2PpKZd+LnTg2Zov9MEjuTowmjSUTjuviGe+VWoNrWGfJCLqYUFw2B1nRG3cAdc8iKqHf9ajtDoZbCHxiKBHax2Wfa4=
+  - secure: jYE082/QGcnhZCFsF4vK6EOiddzJhJcMC/RCjsJlqa/yc14XzLcM1aRJk4JCtqMU/3CALX7yIUyi8rdTYnE5xWMhgESh2BPAUP38o1589HaynLyo76LkBUoyFuxuWTT+lkixRdvaRlCK/eWZ0vUMjH2T32xN4QoTci2WzRFj/o+dwDljLxabc0qHbFfjRxyIndBS+eb5y0P38DxSdJP0Z8x7tbVZdUmmQlLZo3K8K4mZJaGAlCCv7eaQAawaDlnoDUo3QJf0JfYcgmxckuTGOuLRdxldRI998oXzop479IYgVIpFV0W2Cl5m9lWwKqarbzebD1GlZu6qLfxhUmVuNk1hNL565Jz4SYJZ/2oNfkZpkBMIw2mNc8LrzaEEyftyL+x/mBKbXThk+PVSX8VePW55imx5K3YgVkgJ6tFWX9o4cer82See/SSr823JypLoK4pi3kQboHBtphpkHaYs9jcJYZ46S5WJC1128gO7UooQf8yXwtd3MwEk3BnXr0NMd+uQ+2W1420Hjxz/G43Pl+VM1IipptXFdzaUo/IgU5zowdt5dOV5UVu0p8e0M3CR3RSctifY9v/IjNrzYKKNZnhaycDlzX2Ko99FeDKwoIv9l/+BwpYkeal8BgtUZtLYUVx69jfTG193ijfG9zaiJhCLu3ZMMn13ruy6gxFrYhs=
 install:
-  - pip install -r requirements.txt
-  - sudo apt install wget
-  - sudo apt install unzip
-  - wget https://github.com/ontio/ontology/releases/download/v1.6.0/tool-linux.zip --no-check-certificate
-  - unzip tool-linux.zip
-  - ./tool-linux/sigsvr-linux-amd64 --abi ./tool-linux/abi &
-script:
-  - python -m unittest discover
+- pip install -r requirements.txt
+- sudo apt install wget
+- sudo apt install unzip
+- wget https://github.com/ontio/ontology/releases/download/v1.6.0/tool-linux.zip --no-check-certificate
+- unzip tool-linux.zip
+- "./tool-linux/sigsvr-linux-amd64 --abi ./tool-linux/abi &"
+jobs:
+  include:
+  - stage: test
+    script: make test
+  - stage: coverage
+    script: make coverage
+  - stage: build
+    script: make build
+  - stage: publish
+    script: make publish
