@@ -211,6 +211,13 @@ class AioRpc(Rpc):
         result = response['result']
         return dict() if result is None else result
 
+    async def get_unbound_ong(self, b58_address: str, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_UNBOUND_ONG, [b58_address])
+        response = await self.__post(payload)
+        if is_full:
+            return response
+        return int(response['result'])
+
     async def get_grant_ong(self, b58_address: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GRANT_ONG, [b58_address])
         response = await self.__post(payload)

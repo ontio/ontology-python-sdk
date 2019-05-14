@@ -35,6 +35,12 @@ from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 
 class TestAioRpc(unittest.TestCase):
+    def setUp(self):
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.from_multi_pub_keys(2, pub_keys)
+        self.address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                             acct4.get_address_base58(), multi_address.b58encode()]
+
     @not_panic_exception
     @Ontology.runner
     async def test_get_version(self):
@@ -128,6 +134,12 @@ class TestAioRpc(unittest.TestCase):
             self.assertTrue(isinstance(balance, dict))
             self.assertGreaterEqual(balance['ONT'], 0)
             self.assertGreaterEqual(balance['ONG'], 0)
+
+    @not_panic_exception
+    @Ontology.runner
+    async def test_get_unbound_ong(self):
+        for address in self.address_list:
+            self.assertEqual(await sdk.aio_rpc.get_unbound_ong(address), sdk.native_vm.ong().unbound(address))
 
     @not_panic_exception
     @Ontology.runner
