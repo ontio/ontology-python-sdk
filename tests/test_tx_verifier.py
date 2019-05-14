@@ -41,6 +41,19 @@ class TestMerkleVerifier(unittest.TestCase):
         finally:
             sdk.rpc.connect_to_test_net()
 
+    @not_panic_exception
+    def test_verify_by_tx_hash(self):
+        tx_hash = 'bf74e9208c0a20ec417de458ab6c9d29c12c614e77fb943be4566c95fab61454'
+        self.assertTrue(sdk.service.tx_verifier().verify_by_tx_hash(tx_hash))
+        tx_hash_lst = ['c17e574dda17f268793757fab0c274d44427fa1b67d63113bd31e39b31d1a026',
+                       '7e8c19fdd4f9ba67f95659833e336eac37116f74ea8bf7be4541ada05b13503e']
+        for tx_hash in tx_hash_lst:
+            try:
+                sdk.rpc.connect_to_main_net()
+                self.assertTrue(sdk.service.tx_verifier().verify_by_tx_hash(tx_hash))
+            finally:
+                sdk.rpc.connect_to_test_net()
+
 
 if __name__ == '__main__':
     unittest.main()
