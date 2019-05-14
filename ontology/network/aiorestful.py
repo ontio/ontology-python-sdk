@@ -163,6 +163,13 @@ class AioRestful(Restful):
             return response
         return response['Result']
 
+    async def get_unbound_ong(self, b58_address: str, is_full: bool = False):
+        url = RestfulMethod.get_unbound_ong(self._url, b58_address)
+        response = await self.__get(url)
+        if is_full:
+            return response
+        return int(response['Result'])
+
     async def get_grant_ong(self, b58_address: str, is_full: bool = False):
         url = RestfulMethod.get_grant_ong(self._url, b58_address)
         response = await self.__get(url)

@@ -123,6 +123,10 @@ class RestfulMethod(object):
         return f'{url}/api/v1/mempool/txstate/{tx_hash}'
 
     @staticmethod
+    def get_unbound_ong(url: str, b58_address: str):
+        return f'{url}/api/v1/unboundong/{b58_address}'
+
+    @staticmethod
     def get_grant_ong(url: str, b58_address: str):
         return f'{url}/api/v1/grantong/{b58_address}'
 
@@ -266,6 +270,13 @@ class Restful(object):
         if is_full:
             return response
         return response['Result']
+
+    def get_unbound_ong(self, b58_address: str, is_full: bool = False):
+        url = RestfulMethod.get_unbound_ong(self._url, b58_address)
+        response = self.__get(url)
+        if is_full:
+            return response
+        return int(response['Result'])
 
     def get_grant_ong(self, b58_address: str, is_full: bool = False):
         url = RestfulMethod.get_grant_ong(self._url, b58_address)
