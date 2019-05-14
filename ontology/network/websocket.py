@@ -19,7 +19,6 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import socket
 
-from time import time
 from sys import maxsize
 from websockets import client
 from typing import List, Union
