@@ -7,7 +7,7 @@ coverage:
 	pip install codacy-coverage
 	pip install coverage
 	coverage run -m unittest discover
-	coverage xml --omit=tests/*
+	coverage xml --include=ontology/* --omit=tests/*
 	python-codacy-coverage -r coverage.xml
 
 build:
