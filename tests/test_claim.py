@@ -49,15 +49,15 @@ class TestClaim(unittest.TestCase):
     def test_head_to_json(self):
         self.assertEqual(96, len(self.claim_header.to_json()))
 
+    def test_claim_head_b64(self):
+        self.assertEqual(dict(self.claim_header), dict(Header.from_base64(self.claim_header.to_base64())))
+
     def test_head_dict(self):
         claim_header_dict = dict(self.claim_header)
         self.assertEqual(self.kid, claim_header_dict['kid'])
         self.assertTrue(isinstance(claim_header_dict, dict))
         self.assertEqual('ONT-ES256', claim_header_dict['alg'])
-        self.assertEqual(ClmType.witness_claim, claim_header.type)
-        b64_head = claim_header.to_base64()
-        claim_header_recv = Header.from_base64(b64_head)
-        self.assertEqual(dict(claim_header), dict(claim_header_recv))
+        self.assertEqual(ClmType.witness_claim, self.claim_header.type)
 
     def test_from_str(self):
         clm_alg_lst = [ClmAlg.ES224, ClmAlg.ES256, ClmAlg.ES384, ClmAlg.ES512, ClmAlg.ES3_224, ClmAlg.ES3_256,
