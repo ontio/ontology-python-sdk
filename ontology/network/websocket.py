@@ -195,6 +195,12 @@ class Websocket(object):
         msg = dict(Action='getblockbyhash', Version='1.0.0', Id=self.__id, Hash=block_hash)
         return await self.__send_recv(msg, is_full)
 
+    async def get_unbound_ong(self, b58_address: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getunboundong', Version='1.0.0', Id=self.__id, Addr=b58_address)
+        return int(await self.__send_recv(msg, is_full))
+
     async def subscribe(self, contract_address_list: List[str] or str, is_event: bool = False,
                         is_json_block: bool = False,
                         is_raw_block: bool = False, is_tx_hash: bool = False, is_full: bool = False) -> dict:
