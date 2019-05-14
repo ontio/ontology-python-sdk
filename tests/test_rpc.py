@@ -22,14 +22,20 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import time
 import unittest
 
-from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
-
 from ontology.utils.contract import Data
 from ontology.common.address import Address
 from ontology.exception.exception import SDKException
 
+from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
+
 
 class TestRpcClient(unittest.TestCase):
+    def setUp(self):
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.from_multi_pub_keys(2, pub_keys)
+        self.address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                             acct4.get_address_base58(), multi_address.b58encode()]
+
     @not_panic_exception
     def test_get_version(self):
         version = sdk.rpc.get_version()
@@ -111,24 +117,20 @@ class TestRpcClient(unittest.TestCase):
 
     @not_panic_exception
     def test_get_balance(self):
-        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
-        multi_address = Address.from_multi_pub_keys(2, pub_keys)
-        address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
-                        acct4.get_address_base58(), multi_address.b58encode()]
-        for address in address_list:
-            try:
-                balance = sdk.rpc.get_balance(address)
-            except SDKException as e:
-                self.assertTrue('ConnectionError' in e.args[1])
-                continue
+        for address in self.address_list:
+            balance = sdk.rpc.get_balance(address)
             self.assertTrue(isinstance(balance, dict))
             self.assertGreaterEqual(balance['ONT'], 0)
             self.assertGreaterEqual(balance['ONG'], 0)
 
     @not_panic_exception
+    def test_get_unbound_ong(self):
+        for address in self.address_list:
+            self.assertEqual(sdk.rpc.get_unbound_ong(address), sdk.native_vm.ong().unbound(address))
+
+    @not_panic_exception
     def test_get_grant_ong(self):
-        b58_address = 'AKDFapcoUhewN9Kaj6XhHusurfHzUiZqUA'
-        grant_ong = sdk.rpc.get_grant_ong(b58_address)
+        grant_ong = sdk.rpc.get_grant_ong('ASaZccBEzdjZQe2p9d1rcyNQqHrv82UmSg')
         self.assertGreaterEqual(grant_ong, 0)
 
     @not_panic_exception

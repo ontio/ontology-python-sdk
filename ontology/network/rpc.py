@@ -52,6 +52,7 @@ class RpcMethod(object):
     GET_CURRENT_BLOCK_HASH = 'getbestblockhash'
     GET_BLOCK_HEIGHT_BY_HASH = 'getblockheightbytxhash'
     GET_BALANCE = 'getbalance'
+    GET_UNBOUND_ONG = 'getunboundong'
     GET_GRANT_ONG = 'getgrantong'
     GET_ALLOWANCE = 'getallowance'
     GET_SMART_CONTRACT_EVENT = 'getsmartcodeevent'
@@ -309,6 +310,13 @@ class Rpc(object):
         if is_full:
             return response
         return response['result']
+
+    def get_unbound_ong(self, b58_address: str, is_full: bool = False):
+        payload = self.generate_json_rpc_payload(RpcMethod.GET_UNBOUND_ONG, [b58_address])
+        response = self.__post(self._url, payload)
+        if is_full:
+            return response
+        return int(response['result'])
 
     def get_grant_ong(self, b58_address: str, is_full: bool = False):
         payload = self.generate_json_rpc_payload(RpcMethod.GET_GRANT_ONG, [b58_address])

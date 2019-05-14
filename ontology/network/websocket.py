@@ -195,6 +195,12 @@ class Websocket(object):
         msg = dict(Action='getblockbyhash', Version='1.0.0', Id=self.__id, Hash=block_hash)
         return await self.__send_recv(msg, is_full)
 
+    async def get_unbound_ong(self, b58_address: str, is_full: bool = False):
+        if self.__id == 0:
+            self.__id = self.__generate_ws_id()
+        msg = dict(Action='getunboundong', Version='1.0.0', Id=self.__id, Addr=b58_address)
+        return int(await self.__send_recv(msg, is_full))
+
     async def subscribe(self, contract_address_list: List[str] or str, is_event: bool = False,
                         is_json_block: bool = False,
                         is_raw_block: bool = False, is_tx_hash: bool = False, is_full: bool = False) -> dict:
@@ -242,7 +248,7 @@ class Websocket(object):
         return await self.send_raw_transaction_pre_exec(tx, is_full)
 
     async def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
-                                      payer: Account or None, gas_limit: int, gas_price: int,
+                                      payer: Account or None, gas_price: int, gas_limit: int,
                                       func: AbiFunction or InvokeFunction, is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
@@ -256,7 +262,7 @@ class Websocket(object):
             params.append(i)
         if payer is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
-        tx = Transaction(0, 0xd1, int(time()), gas_price, gas_limit, payer.get_address_bytes(), params, bytearray(), [])
+        tx = Transaction(0, 0xd1, gas_price, gas_limit, payer.get_address_bytes(), params)
         tx.sign_transaction(payer)
         if isinstance(signer, Account) and signer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(signer)

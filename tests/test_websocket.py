@@ -34,6 +34,12 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class TestWebsocketClient(unittest.TestCase):
+    def setUp(self):
+        pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
+        multi_address = Address.from_multi_pub_keys(2, pub_keys)
+        self.address_list = [acct1.get_address_base58(), acct2.get_address_base58(), acct3.get_address_base58(),
+                             acct4.get_address_base58(), multi_address.b58encode()]
+
     @not_panic_exception
     @Ontology.runner
     async def test_heartbeat(self):
@@ -218,6 +224,15 @@ class TestWebsocketClient(unittest.TestCase):
             response = await sdk.websocket.get_block_by_hash(block_hash)
             self.assertEqual(block_hash, response['Hash'])
             self.assertEqual(1024, response['Header']['Height'])
+        finally:
+            await sdk.websocket.close_connect()
+
+    @not_panic_exception
+    @Ontology.runner
+    async def test_get_unbound_ong(self):
+        try:
+            for address in self.address_list:
+                self.assertEqual(await sdk.websocket.get_unbound_ong(address), sdk.native_vm.ong().unbound(address))
         finally:
             await sdk.websocket.close_connect()
 
