@@ -42,7 +42,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class WalletManager(object):
-    def __init__(self, scheme: SignatureScheme = SignatureScheme.SHA256withECDSA, wallet_path: str = ''):
+    def __init__(self, wallet_path: str = '', scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if not isinstance(scheme, SignatureScheme):
             raise SDKException(ErrorCode.other_error('Invalid signature scheme.'))
         self.scheme = scheme

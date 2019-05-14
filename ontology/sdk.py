@@ -99,9 +99,9 @@ class Ontology(AioRunner, metaclass=_Singleton):
         self.__default_aio_network = network
 
     @property
-    def wallet_manager(self):
+    def wallet_manager(self, wallet_path: str = '', scheme: SignatureScheme = SignatureScheme.SHA256withECDSA):
         if self.__wallet_manager is None:
-            self.__wallet_manager = WalletManager()
+            self.__wallet_manager = WalletManager(scheme, wallet_path)
         return self.__wallet_manager
 
     @wallet_manager.setter
