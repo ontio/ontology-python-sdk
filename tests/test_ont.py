@@ -66,11 +66,11 @@ class TestOnt(unittest.TestCase):
 
     @not_panic_exception
     def test_transfer(self):
-        amount, gas_price, gas_limit = 1, 500, 20000
+        amount = 1
         ont = sdk.native_vm.ont()
-        tx_hash = ont.transfer(acct1, acct2.get_address(), amount, acct4, gas_price, gas_limit)
+        tx_hash = ont.transfer(acct1, acct2.get_address(), amount, acct4, self.gas_price, self.gas_limit)
         time.sleep(randint(14, 20))
-        event = sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
+        event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, ont.contract_address)
         self.assertEqual('transfer', notify['States'][0])
         self.assertEqual(acct1.get_address_base58(), notify['States'][1])
@@ -79,16 +79,16 @@ class TestOnt(unittest.TestCase):
         notify = Event.get_notify_by_contract_address(event, sdk.native_vm.aio_ong().contract_address)
         self.assertEqual('transfer', notify['States'][0])
         self.assertEqual(acct4.get_address_base58(), notify['States'][1])
-        self.assertEqual(gas_price * gas_limit, notify['States'][3])
+        self.assertEqual(self.gas_price * self.gas_limit, notify['States'][3])
 
     @not_panic_exception
     def test_transfer_from_tx(self):
         acct2_b58_address = acct2.get_address_base58()
         tx_hash = sdk.native_vm.ont().transfer_from(acct2, acct1.get_address(), acct2_b58_address, 1, acct2,
-                                                        500, 20000)
+                                                    self.gas_price, self.gas_limit)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(14, 20))
-        event = sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
+        event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, sdk.native_vm.ont().contract_address)
         self.assertEqual('transfer', notify['States'][0])
         self.assertEqual(acct1.get_address_base58(), notify['States'][1])
@@ -97,24 +97,23 @@ class TestOnt(unittest.TestCase):
 
     @not_panic_exception
     def test_approve(self):
-        tx_hash = sdk.native_vm.ont().approve(acct1, acct2.get_address(), 10, acct2, 500, 20000)
+        tx_hash = sdk.native_vm.ont().approve(acct2, acct1.get_address(), 10, acct2, 500, 20000)
         self.assertEqual(64, len(tx_hash))
 
     @not_panic_exception
     def test_transfer_from(self):
-        sdk.rpc.connect_to_test_net()
-        b58_from_address = acct1.get_address_base58()
-        b58_recv_address = acct2.get_address_base58()
+        b58_from_address = acct2.get_address_base58()
+        b58_recv_address = acct1.get_address_base58()
         ont = sdk.native_vm.ont()
         amount = 1
-        tx_hash = ont.transfer_from(acct2, b58_from_address, b58_recv_address, amount, acct2, self.gas_price,
+        tx_hash = ont.transfer_from(acct1, b58_from_address, b58_recv_address, amount, acct2, self.gas_price,
                                     self.gas_limit)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(10, 15))
-        event = sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
+        event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, sdk.native_vm.ong().contract_address)
         self.assertEqual('transfer', notify['States'][0])
-        self.assertEqual(b58_recv_address, notify['States'][1])
+        self.assertEqual(b58_from_address, notify['States'][1])
         self.assertEqual(self.gas_price * self.gas_limit, notify['States'][3])
         notify = Event.get_notify_by_contract_address(event, sdk.native_vm.ont().contract_address)
         self.assertEqual('transfer', notify['States'][0])
