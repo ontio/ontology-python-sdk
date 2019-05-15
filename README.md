@@ -8,18 +8,9 @@
 [![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
 [![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
 
-- [Introduction](#introduction)
-- [Preparations](#preparations)
-- [Interface](#interface)
-- [License](#license)
-
-English | [中文](README_CN.md)
-
-## Introduction
-
 Official Python implementation of the Ontology SDK.
 
-## Preparations
+## Installation
 
 Installation requires a `Python 3.6` or later environment.
 
@@ -27,7 +18,7 @@ Installation requires a `Python 3.6` or later environment.
 pip install ontology-python-sdk
 ```
 
-## Interface
+## Documentation
 
 Read a beautiful, responsive API documentation in [here](https://nashmiao.github.io/ontology-python-sdk-docs/).
 
