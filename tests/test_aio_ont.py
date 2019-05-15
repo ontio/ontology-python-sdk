@@ -88,27 +88,27 @@ class TestAioOnt(unittest.TestCase):
     @not_panic_exception
     @Ontology.runner
     async def test_transfer(self):
-        amount, gas_price, gas_limit = 1, 500, 20000
+        amount = 1
         ont = sdk.native_vm.aio_ont()
-        tx_hash = await ont.transfer(acct1, acct2.get_address(), amount, acct4, gas_price, gas_limit)
+        tx_hash = await ont.transfer(acct2, acct1.get_address(), amount, acct4, self.gas_price, self.gas_limit)
         await asyncio.sleep(randint(14, 20))
         event = await sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, ont.contract_address)
         self.assertEqual('transfer', notify['States'][0])
-        self.assertEqual(acct1.get_address_base58(), notify['States'][1])
-        self.assertEqual(acct2.get_address_base58(), notify['States'][2])
+        self.assertEqual(acct2.get_address_base58(), notify['States'][1])
+        self.assertEqual(acct1.get_address_base58(), notify['States'][2])
         self.assertEqual(amount, notify['States'][3])
         notify = Event.get_notify_by_contract_address(event, sdk.native_vm.aio_ong().contract_address)
         self.assertEqual('transfer', notify['States'][0])
         self.assertEqual(acct4.get_address_base58(), notify['States'][1])
-        self.assertEqual(gas_price * gas_limit, notify['States'][3])
+        self.assertEqual(self.gas_price * self.gas_limit, notify['States'][3])
 
     @not_panic_exception
     @Ontology.runner
     async def test_transfer_from_tx(self):
         acct2_b58_address = acct2.get_address_base58()
         tx_hash = await sdk.native_vm.aio_ont().transfer_from(acct2, acct1.get_address(), acct2_b58_address, 1, acct2,
-                                                              500, 20000)
+                                                              self.gas_price, self.gas_limit)
         self.assertEqual(64, len(tx_hash))
         await asyncio.sleep(randint(14, 20))
         event = await sdk.aio_rpc.get_contract_event_by_tx_hash(tx_hash)
@@ -121,7 +121,8 @@ class TestAioOnt(unittest.TestCase):
     @not_panic_exception
     @Ontology.runner
     async def test_approve(self):
-        tx_hash = await sdk.native_vm.aio_ont().approve(acct1, acct2.get_address(), 10, acct2, 500, 20000)
+        tx_hash = await sdk.native_vm.aio_ont().approve(acct1, acct2.get_address(), 10, acct2, self.gas_price,
+                                                        self.gas_limit)
         self.assertEqual(64, len(tx_hash))
 
     @not_panic_exception
