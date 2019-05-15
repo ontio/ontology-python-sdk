@@ -10,7 +10,7 @@
 
 ## Introduction
 
-The Ontology official Python SDK is a comprehensive SDK which is based on `Python 3.6`. Currently, it supports wallet management, digital identity management, digital asset management, deployment and invoke smart contract, and communication with the Ontology blockchain.
+Official Python implementation of the Ontology SDK.
 
 ## Preparations
 

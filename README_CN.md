@@ -1,4 +1,4 @@
-<h1 align="center">本体 Python 软件开发工具包</h1>
+# 本体 Python 软件开发工具包
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ontio/ontology-python-sdk/&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&utm_medium=referral&utm_content=ontio/ontology-python-sdk/&utm_campaign=Badge_Coverage)
@@ -17,7 +17,7 @@
 
 ## 简介
 
-本体团队的官方 Python SDK 基于 Python 3.6 实现。目前，它支持钱包文件管理、数字身份管理、数字资产管理、智能合约的部署和调用、以及与本体区块链网络的通信。
+本体团队提供的基于 Python 实现的软件开发工具包。
 
 ## 准备
 

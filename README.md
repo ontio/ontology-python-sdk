@@ -1,4 +1,4 @@
-<h1 align="center">Ontology Python SDK</h1>
+# Ontology Python SDK
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ontio/ontology-python-sdk/&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9078ef6584424280b8d6b75556976f94)](https://www.codacy.com/app/NashMiao/ontology-python-sdk?utm_source=github.com&utm_medium=referral&utm_content=ontio/ontology-python-sdk/&utm_campaign=Badge_Coverage)
@@ -17,7 +17,7 @@ English | [中文](README_CN.md)
 
 ## Introduction
 
-The Ontology official Python SDK is a comprehensive SDK which is based on `Python 3.6`. Currently, it supports wallet management, digital identity management, digital asset management, deployment and invoke smart contract, and communication with the Ontology blockchain.
+Official Python implementation of the Ontology SDK.
 
 ## Preparations
 
