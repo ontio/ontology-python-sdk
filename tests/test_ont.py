@@ -71,7 +71,6 @@ class TestOnt(unittest.TestCase):
         tx_hash = ont.transfer(acct1, acct2.get_address(), amount, acct4, self.gas_price, self.gas_limit)
         time.sleep(randint(14, 20))
         event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
-        print(event)
         notify = Event.get_notify_by_contract_address(event, ont.contract_address)
         self.assertEqual('transfer', notify['States'][0])
         self.assertEqual(acct1.get_address_base58(), notify['States'][1])
