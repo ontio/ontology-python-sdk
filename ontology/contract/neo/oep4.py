@@ -123,6 +123,9 @@ class Oep4(object):
         return tx
 
     def init(self, founder: Account, payer: Account, gas_price: int, gas_limit: int):
+        """
+        Contract owner can use this interface to activate oep-4 token.
+        """
         tx = self.new_init_tx(payer.get_address(), gas_price, gas_limit)
         tx.sign_transaction(founder)
         if founder.get_address_bytes() != payer.get_address_bytes():
@@ -227,7 +230,7 @@ class Oep4(object):
     def approve(self, owner: Account, spender: Union[str, bytes, Address], amount: int, payer: Account, gas_price: int,
                 gas_limit: int) -> str:
         """
-        This interface is used to allow spender to withdraw from owner account multiple times, up to the _value amount.
+        Allows spender to withdraw from owner account multiple times, up to the value amount.
         If this function is called again it overwrites the current allowance with amount value.
         """
         tx = self.new_approve_tx(owner.get_address(), spender, amount, payer.get_address(), gas_price, gas_limit)
@@ -269,6 +272,9 @@ class Oep4(object):
         return tx
 
     def allowance(self, owner: Union[str, bytes, Address], spender: Union[str, bytes, Address]) -> int:
+        """
+        Returns the amount which spender is still allowed to withdraw from owner.
+        """
         tx = self.new_allowance_tx(owner, spender)
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         result = response.get('Result')
@@ -290,6 +296,9 @@ class Oep4(object):
 
     def transfer_from(self, spender: Account, owner: Union[str, bytes, Address], to_address: Union[str, bytes, Address],
                       value: int, payer: Account, gas_price: int, gas_limit: int) -> str:
+        """
+        Transfers value amount of tokens from address owner to address to_address, and MUST fire the Transfer event.
+        """
         tx = self.new_transfer_from_tx(spender.get_address(), owner, to_address, value, payer.get_address(), gas_price,
                                        gas_limit)
         tx.sign_transaction(spender)
