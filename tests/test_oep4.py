@@ -31,6 +31,8 @@ from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 class TestOep4(unittest.TestCase):
     def setUp(self):
         sdk.default_network = sdk.rpc
+        self.gas_price = 500
+        self.gas_limit = 20000
         self.networks = [sdk.rpc, sdk.restful]
         self.contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
 
@@ -67,7 +69,7 @@ class TestOep4(unittest.TestCase):
     def test_init(self):
         oep4 = sdk.neo_vm.oep4()
         oep4.hex_contract_address = self.contract_address
-        tx_hash = oep4.init(acct1, acct2, 500, 20000000)
+        tx_hash = oep4.init(acct1, acct2, self.gas_price, self.gas_limit)
         self.assertEqual(len(tx_hash), 64)
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
@@ -94,7 +96,7 @@ class TestOep4(unittest.TestCase):
         from_acct = acct1
         b58_to_address = acct2.get_address_base58()
         value = 10
-        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, 500, 20000000)
+        tx_hash = oep4.transfer(from_acct, b58_to_address, value, from_acct, self.gas_price, self.gas_limit)
         self.assertEqual(64, len(tx_hash))
         time.sleep(randint(10, 15))
         notify = oep4.query_transfer_event(tx_hash)

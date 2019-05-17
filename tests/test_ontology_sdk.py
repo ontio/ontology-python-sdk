@@ -21,6 +21,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
+from ontology.sdk import Ontology
 from tests import acct1, acct2, acct3, sdk, not_panic_exception
 
 from ontology.common.address import Address
@@ -28,6 +29,11 @@ from ontology.core.program import ProgramBuilder
 
 
 class TestOntologySdk(unittest.TestCase):
+    def test_singleton(self):
+        for _ in range(10):
+            new_sdk = Ontology()
+            self.assertEqual(sdk, new_sdk)
+
     @not_panic_exception
     def test_add_multi_sign_transaction(self):
         pub_keys = [acct1.get_public_key_bytes(), acct2.get_public_key_bytes(), acct3.get_public_key_bytes()]
