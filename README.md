@@ -7,6 +7,7 @@
 [![docs](https://img.shields.io/badge/docs-yes-brightgreen.svg)](https://nashmiao.github.io/ontology-python-sdk-docs/)
 [![pypi-pyversions](https://img.shields.io/pypi/pyversions/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
 [![pypi-v](https://img.shields.io/pypi/v/ontology-python-sdk.svg)](https://pypi.org/project/ontology-python-sdk/)
+[![Downloads](https://pepy.tech/badge/ontology-python-sdk)](https://pepy.tech/project/ontology-python-sdk)
 
 Official Python implementation of the Ontology SDK.
 
