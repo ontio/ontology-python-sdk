@@ -18,54 +18,29 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import struct
 import binascii
+from typing import Union
 
-from ontology.io.memory_stream import StreamManager
+from ontology.io.memory_stream import StreamManager, MemoryStream
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 
 
-def swap32(i):
-    """
-    Change the endianness from little endian to big endian.
-    Args:
-        i (int):
-
-    Returns:
-        int:
-    """
-    return struct.unpack("<I", struct.pack(">I", i))[0]
-
-
 class BinaryWriter(StreamManager):
-    """
-    Description:
-    Binary Writer
-
-    Usage:
-        from ontology.io.binary_writer import BinaryWriter
-    """
-
-    def __init__(self, stream):
+    def __init__(self, stream: MemoryStream):
         """
-        Create an instance.
-
-        Args:
-            stream (BytesIO): a stream to operate on. i.e. a neo.IO.MemoryStream or raw BytesIO.
+        Create an instance from a stream to operate on. i.e. a ontology.io.memory_stream or raw BytesIO.
         """
         super().__init__()
         self.stream = stream
 
-    def write_byte(self, value):
+    def write_byte(self, value: Union[bytes, str, int]):
         """
         Write a single byte to the stream.
-
-        Args:
-            value (bytes, str or int): value to write to the stream.
         """
         if isinstance(value, bytes):
-            self.stream.write(value)
+            self.stream.write(value[:1])
         elif isinstance(value, str):
-            self.stream.write(value.encode('utf-8'))
+            self.stream.write(value.encode('utf-8')[:1])
         elif isinstance(value, int):
             self.stream.write(bytes([value]))
 
