@@ -76,6 +76,7 @@ class TestHDWallet(unittest.TestCase):
                 child_pks_from_bip32_pk = HDPublicKey.from_path(HDPublicKey.b58decode(bip32_root_pk), f'0/{index}')
                 for i, pk in enumerate(child_pks_from_root_key):
                     self.assertEqual(child_pks_from_bip32_pk[i].hex(), pk.hex())
+                    self.assertEqual(child_sks_from_bip32_sk[i].public_key.hex(), pk.hex())
 
 
 if __name__ == '__main__':
