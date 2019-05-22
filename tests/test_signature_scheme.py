@@ -18,10 +18,8 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from ontology.crypto.signature_scheme import SignatureScheme
-
-from ontology.crypto.curve import Curve
 from ontology.exception.exception import SDKException
+from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class SignatureSchemeTest(unittest.TestCase):
