@@ -78,40 +78,6 @@ class BinaryWriter(StreamManager):
         """
         return self.pack('c', value)
 
-    def write_float(self, value, little_endian=True):
-        """
-        Pack the value as a float and write 4 bytes to the stream.
-
-        Args:
-            value (number): the value to write to the stream.
-            little_endian (bool): specify the endianness. (Default) Little endian.
-
-        Returns:
-            int: the number of bytes written.
-        """
-        if little_endian:
-            endian = "<"
-        else:
-            endian = ">"
-        return self.pack('%sf' % endian, value)
-
-    def write_double(self, value, little_endian=True):
-        """
-        Pack the value as a double and write 8 bytes to the stream.
-
-        Args:
-            value (number): the value to write to the stream.
-            little_endian (bool): specify the endianness. (Default) Little endian.
-
-        Returns:
-            int: the number of bytes written.
-        """
-        if little_endian:
-            endian = "<"
-        else:
-            endian = ">"
-        return self.pack('%sd' % endian, value)
-
     def write_int8(self, value, little_endian=True):
         """
         Pack the value as a signed byte and write 1 byte to the stream.
