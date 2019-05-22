@@ -90,55 +90,35 @@ class BinaryWriter(StreamManager):
             int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sb' % endian, value)
 
     def write_uint8(self, value, little_endian=True):
         """
         Pack the value as an unsigned byte and write 1 byte to the stream.
-
-        Args:
-            value:
-            little_endian (bool): specify the endianness. (Default) Little endian.
-
-        Returns:
-            int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sB' % endian, value)
 
-    def write_bool(self, value):
+    def write_bool(self, value: bool):
         """
         Pack the value as a bool and write 1 byte to the stream.
-
-        Args:
-            value: the boolean value to write.
-
-        Returns:
-            int: the number of bytes written.
         """
         return self.pack('?', value)
 
     def write_int16(self, value, little_endian=True):
         """
         Pack the value as a signed integer and write 2 bytes to the stream.
-
-        Args:
-            value:
-            little_endian (bool): specify the endianness. (Default) Little endian.
-
-        Returns:
-            int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sh' % endian, value)
 
     def write_uint16(self, value, little_endian=True):
@@ -153,9 +133,9 @@ class BinaryWriter(StreamManager):
             int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sH' % endian, value)
 
     def write_int32(self, value, little_endian=True):
@@ -170,9 +150,9 @@ class BinaryWriter(StreamManager):
             int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%si' % endian, value)
 
     def write_uint32(self, value, little_endian=True):
@@ -187,9 +167,9 @@ class BinaryWriter(StreamManager):
             int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sI' % endian, value)
 
     def write_int64(self, value, little_endian=True):
@@ -204,9 +184,9 @@ class BinaryWriter(StreamManager):
             int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sq' % endian, value)
 
     def write_uint64(self, value, little_endian=True):
@@ -221,9 +201,9 @@ class BinaryWriter(StreamManager):
             int: the number of bytes written.
         """
         if little_endian:
-            endian = "<"
+            endian = '<'
         else:
-            endian = ">"
+            endian = '>'
         return self.pack('%sQ' % endian, value)
 
     def write_var_int(self, value, little_endian=True):

@@ -29,11 +29,20 @@ class TestBinaryWriter(unittest.TestCase):
         self.writer = BinaryWriter(self.stream)
 
     def test_write_byte(self):
-        value = [15, 255, 'a', 'z', b'a', 'byte']
-        result = [b'0f', b'ff', b'61', b'7a', b'61', b'62']
-        for i, v in enumerate(value):
+        values = [15, 255, 'a', 'z', b'a', 'byte']
+        results = [b'0f', b'ff', b'61', b'7a', b'61', b'62']
+        for i, v in enumerate(values):
             self.writer.write_byte(v)
-            self.assertEqual(result[i], self.stream.hexlify())
+            self.assertEqual(results[i], self.stream.hexlify())
+            self.stream.clean_up()
+
+    def test_write_uint8(self):
+        values = [15, 255, 15, 255]
+        results = [b'0f', b'ff', b'0f', b'ff']
+        little_endian_lst = [True, True, False, False]
+        for i, v in enumerate(values):
+            self.writer.write_uint8(v, little_endian=little_endian_lst[i])
+            self.assertEqual(results[i], self.stream.hexlify())
             self.stream.clean_up()
 
 
