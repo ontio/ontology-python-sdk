@@ -20,12 +20,17 @@ import unittest
 
 from mnemonic import Mnemonic
 
+from ontology.account.account import Account
 from ontology.crypto.hd_private_key import HDPrivateKey
 from ontology.crypto.hd_public_key import HDPublicKey
+from ontology.crypto.signature_handler import SignatureHandler
+from ontology.crypto.signature_scheme import SignatureScheme
 
 
 class TestHDWallet(unittest.TestCase):
     def setUp(self):
+        self.msg = b'Attack!'
+        self.mnemonic = Mnemonic(language='English')
         self.strengths = [128, 160, 192, 224, 256]
         self.words = [12, 15, 18, 21, 24]
         self.mnemonic_lst = ['cargo cradle solid excuse rifle wrist forward orchard time athlete slab industry',
@@ -43,10 +48,26 @@ class TestHDWallet(unittest.TestCase):
                                 'dd7b20932f6e50ee28f9a930cb0d70cc57aa9a9634bf59f9687523ab7cebf42e']
 
     def test_generate_mnemonic(self):
-        mnemonic = Mnemonic(language='English')
         for index, strength in enumerate(self.strengths):
-            code = mnemonic.generate(strength)
+            code = self.mnemonic.generate(strength)
             self.assertEqual(self.words[index], len(code.split(' ')))
+
+    def test_signature(self):
+        for strength in self.strengths:
+            master_key = HDPrivateKey.master_key_from_mnemonic(self.mnemonic.generate(strength))
+            acct = Account(master_key.hex())
+            signature = acct.generate_signature(self.msg)
+            self.assertTrue(acct.verify_signature(self.msg, signature))
+            root_sk = HDPrivateKey.from_path(master_key)[-1]
+            root_pk = root_sk.public_key
+            bip32_root_pk = root_pk.b58encode()
+            for index in range(10):
+                child_sk = HDPrivateKey.from_path(root_sk, f'0/{index}')[-1]
+                child_pk = HDPublicKey.from_path(HDPublicKey.b58decode(bip32_root_pk), f'0/{index}')[-1]
+                child_acct = Account(child_sk.hex())
+                signature = child_acct.generate_signature(self.msg)
+                handler = SignatureHandler(SignatureScheme.SHA256withECDSA)
+                handler.verify_signature(child_pk.hex(), self.msg, signature)
 
     def test_from_mnemonic(self):
         for index, mnemonic in enumerate(self.mnemonic_lst):
@@ -69,7 +90,8 @@ class TestHDWallet(unittest.TestCase):
             bip32_root_pk = root_pk.b58encode()
             for index in range(10):
                 child_sks_from_root_key = HDPrivateKey.from_path(root_sk, f'0/{index}')
-                child_sks_from_bip32_sk = HDPrivateKey.from_path(HDPrivateKey.b58decode(bip32_root_sk), f'0/{index}')
+                child_sks_from_bip32_sk = HDPrivateKey.from_path(HDPrivateKey.b58decode(bip32_root_sk),
+                                                                 f'0/{index}')
                 for i, sk in enumerate(child_sks_from_root_key):
                     self.assertEqual(child_sks_from_bip32_sk[i].hex(), sk.hex())
                 child_pks_from_root_key = HDPublicKey.from_path(root_pk, f'0/{index}')
@@ -77,7 +99,6 @@ class TestHDWallet(unittest.TestCase):
                 for i, pk in enumerate(child_pks_from_root_key):
                     self.assertEqual(child_pks_from_bip32_pk[i].hex(), pk.hex())
                     self.assertEqual(child_sks_from_bip32_sk[i].public_key.hex(), pk.hex())
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -52,21 +52,16 @@ class TestAddress(unittest.TestCase):
     def test_from_hd_pubkey(self):
         hd_pub_key = HDPublicKey.b58decode(self.bip32_pubkey)
         address = Address.from_hd_public_key(hd_pub_key)
-        self.assertEqual('AQG1jHoHZPgkCnuajeYADnPXjjo4Vvz5SE', address.b58encode())
-        child_address = ['AMBQ32HCYvREHkw4cTNkbmvHGU3mebxgmc',
-                         'ANVHoXtPE32ka3ftZAvPpJi3urwYmCGGno',
-                         'AVWw2XBoxx7p93Kje1MPHpcdCi4PjWjrRS',
-                         'AUx1uQeNRhXBuuJgj3fVZT2ZwPaXghn3DY',
-                         'AGfZ34XDsAMNPZciFSiphd3YY5sDC2kW7R',
-                         'AMC8ka4b2ujAkZvJGY7FHH2zmwhpPt3Xqk',
-                         'AbFHa4JsPMEEBX3XaXNxdYdwHPPMXkGfWo',
-                         'ATgU6QqT38pUyNQXLqGSS5ofBWYVsnStUz',
-                         'ARhRA2iCz14cpyin4GUcAiqbGt3kwusA1F',
-                         'AakZS35wZTyqWYPU7H5cxmGzXKiEfJiGRe']
-        for i in range(10):
-            child_pks = HDPublicKey.from_path(hd_pub_key, '{change}/{index}'.format(change=0, index=i))
+        self.assertEqual('AW8Tf5R4kyURy6LQ8Th181Z5GpTovWGLg6', address.b58encode())
+        child_address_lst = ['ARXRQog4iZazp5YfXRyDZvU6ahrt3c2bb7', 'APXh8MqcARUgafqvUNnpECzwKDtipkf3Zr',
+                             'ASpmd1MpFSpQ5rhicjRDqBpE1inP3Z7tus', 'APA3M4BRqjBsHXRkeTFiFVb4X1u8FiEgAr',
+                             'AKq5SBTCzHBaqWWDUTGvekbsNJKKtf4ff5', 'APzMnHqrGF1cGZyAdFCwEL29TnAgCuBrY6',
+                             'AJ8LEkLGeNsWvVrP7SgK9szoZ1MGgUTq1s', 'AJo49LSK6rQEwc6qTYMsAZmvLPRrb6qcWa',
+                             'AYzCcNY3PwV432iXVREpDHvpX166KN45xP', 'AbL1wvGCnbzywHBuX1VwQev8xuhJxbPE4P']
+        for index, child_address in enumerate(child_address_lst):
+            child_pks = HDPublicKey.from_path(hd_pub_key, f'0/{index}')
             address = Address.from_hd_public_key(child_pks[-1])
-            self.assertEqual(child_address[i], address.b58encode())
+            self.assertEqual(child_address, address.b58encode())
 
 
 if __name__ == '__main__':
