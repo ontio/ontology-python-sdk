@@ -138,7 +138,7 @@ class HDPublicKey(HDKey):
         x = util.string_to_number(key_bytes[1:])
         y = (x * x * x + curve.a() * x + curve.b()) % curve.p()
         y = numbertheory.square_root_mod_prime(y, curve.p())
-        if key_bytes[0] == 0x03:
+        if (key_bytes[0] == 0x03 and y % 2 == 0) or (key_bytes[0] == 0x02 and y % 2 != 0):
             y = (y * -1) % curve.p()
         order = curves.NIST256p.order
         s_key = util.number_to_string(x, order) + util.number_to_string(y, order)
@@ -152,10 +152,10 @@ class HDPublicKey(HDKey):
             parent_fingerprint=parent_fingerprint)
         return rv
 
-    def b58encode(self):
+    def b58encode(self) -> str:
         """ Generates a Base58Check encoding of this key.
         """
-        return base58.b58encode_check(bytes(self))
+        return base58.b58encode_check(bytes(self)).decode('ascii')
 
     @classmethod
     def b58decode(cls, key: Union[str, bytes]):
