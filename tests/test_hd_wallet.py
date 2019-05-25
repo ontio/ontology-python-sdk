@@ -18,8 +18,8 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from ontology.crypto.mnemonic import Mnemonic
 from ontology.account.account import Account
+from ontology.crypto.mnemonic import Mnemonic
 from ontology.crypto.hd_public_key import HDPublicKey
 from ontology.crypto.hd_private_key import HDPrivateKey
 from ontology.crypto.signature_handler import SignatureHandler

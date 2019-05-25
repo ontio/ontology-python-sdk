@@ -17,6 +17,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import sys
+from os import path
 
 import mnemonic
 
@@ -25,13 +26,5 @@ from ontology.exception.exception import SDKException
 
 
 class Mnemonic(mnemonic.Mnemonic):
-    def __init__(self, language: str = 'English'):
-        try:
-            super().__init__(language)
-        except FileNotFoundError:
-            self.radix = 2048
-            with open('%s/%s.txt' % (self._get_directory(), language), 'r') as f:
-                self.wordlist = [w.strip() for w in f.readlines()]
-            if len(self.wordlist) != self.radix:
-                raise SDKException(ErrorCode.other_error(
-                    f'Wordlist should contain {self.radix} words, but it contains {len(self.wordlist)} words.'))
+    def __init__(self, language: str = 'english'):
+        super().__init__(language)
