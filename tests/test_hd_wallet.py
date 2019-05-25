@@ -18,11 +18,10 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from mnemonic import Mnemonic
-
+from ontology.crypto.mnemonic import Mnemonic
 from ontology.account.account import Account
-from ontology.crypto.hd_private_key import HDPrivateKey
 from ontology.crypto.hd_public_key import HDPublicKey
+from ontology.crypto.hd_private_key import HDPrivateKey
 from ontology.crypto.signature_handler import SignatureHandler
 from ontology.crypto.signature_scheme import SignatureScheme
 
@@ -30,7 +29,7 @@ from ontology.crypto.signature_scheme import SignatureScheme
 class TestHDWallet(unittest.TestCase):
     def setUp(self):
         self.msg = b'Attack!'
-        self.mnemonic = Mnemonic(language='English')
+        self.mnemonic = Mnemonic()
         self.strengths = [128, 160, 192, 224, 256]
         self.words = [12, 15, 18, 21, 24]
         self.mnemonic_lst = ['cargo cradle solid excuse rifle wrist forward orchard time athlete slab industry',
@@ -99,6 +98,7 @@ class TestHDWallet(unittest.TestCase):
                 for i, pk in enumerate(child_pks_from_root_key):
                     self.assertEqual(child_pks_from_bip32_pk[i].hex(), pk.hex())
                     self.assertEqual(child_sks_from_bip32_sk[i].public_key.hex(), pk.hex())
+
 
 if __name__ == '__main__':
     unittest.main()
