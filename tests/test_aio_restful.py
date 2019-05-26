@@ -185,13 +185,11 @@ class TestAioRestful(unittest.TestCase):
     @not_panic_exception
     @Ontology.runner
     async def test_send_raw_transaction(self):
-        private_key = '75de8489fcb2dcaf2ef3cd607feffde18789de7da129b5e97c81e001793cb7cf'
-        acct = Account(private_key, SignatureScheme.SHA256withECDSA)
-        b58_from_address = acct.get_address_base58()
+        b58_from_address = acct1.get_address_base58()
         b58_to_address = 'AW352JufVwuZReSt7SCQpbYqrWeuERUNJr'
         tx = sdk.native_vm.ong().new_transfer_tx(b58_from_address, b58_to_address, 1, b58_from_address, 500,
                                                  20000)
-        tx.sign_transaction(acct)
+        tx.sign_transaction(acct1)
         tx_hash = await sdk.aio_restful.send_raw_transaction(tx)
         self.assertEqual(tx_hash, tx.hash256_explorer())
 
