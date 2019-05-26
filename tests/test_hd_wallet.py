@@ -38,7 +38,7 @@ class TestHDWallet(unittest.TestCase):
                              'tomorrow stable casual write adult bean wisdom give duty sound blanket vanish grab junior crystal duck advice print tail purse orient',
                              'modify moon weird cloud crane grace cheap useless canoe fashion also cement zebra amount pink ocean saddle art fun jewel smooth upon abandon network']
         self.master_keys = list()
-        for i, m in enumerate(self.mnemonic_lst):
+        for _, m in enumerate(self.mnemonic_lst):
             self.master_keys.append(HDPrivateKey.master_key_from_mnemonic(m))
         self.hex_master_keys = ['99c7b4ef1a126c4efd84decaa918c45d90f87f8eaba0d32bb113a7f3e4118162',
                                 '652c39c190b87677211729c3cb73e9bb18867cd26145fb8a6088bd1c9b10b566',
