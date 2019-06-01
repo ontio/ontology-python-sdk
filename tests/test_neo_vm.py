@@ -51,7 +51,7 @@ class TestNeoVm(unittest.TestCase):
         code = '54c56b6c766b00527ac46c766b51527ac4616c766b00c36c766b52527ac46c766b52c30548656c6c6f87630600621a' \
                '006c766b51c300c36165230061516c766b53527ac4620e00006c766b53527ac46203006c766b53c3616c756651c56b' \
                '6c766b00527ac46151c576006c766b00c3c461681553797374656d2e52756e74696d652e4e6f7469667961616c7566'
-        tx = sdk.neo_vm.make_deploy_transaction(code, True, 'name', 'v1.0', 'author', 'email', 'desperation', 500,
+        tx = sdk.neo_vm.make_deploy_transaction(code, True, 'name', '1.0.0', 'author', 'email', 'description', 500,
                                                 20000000, acct2.get_address_base58())
         tx.sign_transaction(acct2)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
