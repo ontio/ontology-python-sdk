@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
+
+from ontology.common.address import Address
 from ontology.io.binary_writer import BinaryWriter
 from ontology.core.transaction import Transaction, TransactionType
 
@@ -23,7 +26,7 @@ from ontology.core.transaction import Transaction, TransactionType
 class DeployTransaction(Transaction):
     def __init__(self, code: bytearray or str, need_storage: bool, name: str = '', version: str = '', author: str = '',
                  email: str = '', description: str = '', gas_price: int = 0, gas_limit: int = 0,
-                 payer: str or bytes = b''):
+                 payer: Union[str, bytes, Address, None] = b''):
         super().__init__(0, TransactionType.DeployCode.value, gas_price, gas_limit, payer)
         if isinstance(code, str):
             code = bytearray.fromhex(code)

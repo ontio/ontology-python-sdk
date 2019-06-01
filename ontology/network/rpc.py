@@ -123,9 +123,9 @@ class Rpc(object):
             raise SDKException(ErrorCode.other_error(e.args[0])) from None
         if content['error'] != 0:
             if content['result'] != '':
-                raise SDKException(ErrorCode.other_error(content['result']))
+                raise SDKException(ErrorCode.other_error(content['result'])) from None
             else:
-                raise SDKException(ErrorCode.other_error(content['desc']))
+                raise SDKException(ErrorCode.other_error(content['desc'])) from None
         return content
 
     @staticmethod
