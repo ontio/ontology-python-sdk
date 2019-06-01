@@ -85,7 +85,7 @@ class Transaction(object):
         data['gasPrice'] = self.gas_price
         data['gasLimit'] = self.gas_limit
         data['payer'] = Address(self.payer).b58encode()
-        data['payload'] = bytes.hex(self.payload)
+        data['payload'] = bytearray.hex(self.payload)
         data['attributes'] = bytearray.hex(self.attributes)
         data['sigs'] = list()
         for sig in self.sig_list:
@@ -103,7 +103,7 @@ class Transaction(object):
         writer.write_uint64(self.gas_limit)
         writer.write_bytes(self.payer)
         self.serialize_exclusive_data(writer)
-        if self.payload is not None:
+        if self.payload is not None and len(self.payload) != 0:
             writer.write_var_bytes(bytes(self.payload))
         writer.write_var_int(len(self.attributes))
         ms.flush()
