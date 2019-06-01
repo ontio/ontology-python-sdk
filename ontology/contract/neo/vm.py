@@ -55,9 +55,9 @@ class NeoVm(object):
                                 description: str,
                                 gas_price: int,
                                 gas_limit: int,
-                                b58_payer_address: str) -> DeployTransaction:
+                                payer: Union[str, bytes, Address]) -> DeployTransaction:
         tx = DeployTransaction(code, need_storage, name, code_version, author, email, description, gas_price, gas_limit,
-                               b58_payer_address)
+                               payer)
         return tx
 
     @staticmethod
