@@ -16,6 +16,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import binascii
+
 from enum import Enum
 from typing import List, Union
 
@@ -85,8 +87,8 @@ class Transaction(object):
         data['gasPrice'] = self.gas_price
         data['gasLimit'] = self.gas_limit
         data['payer'] = Address(self.payer).b58encode()
-        data['payload'] = bytearray.hex(self.payload)
-        data['attributes'] = bytearray.hex(self.attributes)
+        data['payload'] = binascii.b2a_hex(self.payload)
+        data['attributes'] = binascii.b2a_hex(self.attributes)
         data['sigs'] = list()
         for sig in self.sig_list:
             data['sigs'].append(dict(sig))
