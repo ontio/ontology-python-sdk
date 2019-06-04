@@ -4,16 +4,18 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+wheel = "*"
+twine = "*"
 
 [packages]
-aiohttp = ">=3.5.4"
-base58 = ">=1.0.3"
-cryptography = ">=2.6.1"
-ecdsa = ">=0.13"
-mnemonic = ">=0.18"
-pycryptodomex = ">=3.7"
-requests = ">=2.21.0"
-websockets = ">=7.0"
+aiohttp = "*"
+base58 = "*"
+cryptography = "*"
+ecdsa = "*"
+mnemonic = "*"
+pycryptodomex = "*"
+requests = "*"
+websockets = "*"
 
 [requires]
 python_version = ">=3.6"
