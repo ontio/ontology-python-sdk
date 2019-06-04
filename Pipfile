@@ -16,6 +16,3 @@ mnemonic = "*"
 pycryptodomex = "*"
 requests = "*"
 websockets = "*"
-
-[requires]
-python_version = ">=3.6"
