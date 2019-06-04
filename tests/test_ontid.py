@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """
-Copyright (C) 2018 The ontology Authors
+Copyright (C) 2018-2019 The ontology Authors
 This file is part of The ontology library.
 
 The ontology is free software: you can redistribute it and/or modify

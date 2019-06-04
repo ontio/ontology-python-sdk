@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2018 The ontology Authors
+Copyright (C) 2018-2019 The ontology Authors
 This file is part of The ontology library.
 
 The ontology is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 
 import base64
 import unittest
