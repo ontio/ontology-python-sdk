@@ -1,10 +1,11 @@
 .PHONY: build
 
-install
+install:
+	pip install --user pipenv
     pipenv install
     pipenv shell
 
-install-mirror
+install-mirror:
     pipenv install --pypi-mirror https://mirrors.aliyun.com/pypi/simple
     pipenv shell
 
