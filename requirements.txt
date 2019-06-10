@@ -1,0 +1,8 @@
+aiohttp == *
+base58 == *
+cryptography == *
+ecdsa == *
+mnemonic == *
+pycryptodomex == *
+requests == *
+websockets == *

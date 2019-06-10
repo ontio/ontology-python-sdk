@@ -14,6 +14,9 @@ test:
 	pipenv shell
 	python -m unittest discover
 
+ci-test:
+	python -m unittest discover
+
 coverage:
 	pipenv shell
 	pipenv install codacy-coverage --dev
@@ -22,9 +25,20 @@ coverage:
 	coverage xml --include=ontology/* --omit=tests/*
 	python-codacy-coverage -r coverage.xml
 
+ci-coverage:
+	pip install codacy-coverage
+	pip install coverage
+	coverage run -m unittest discover
+	coverage xml --include=ontology/* --omit=tests/*
+	python-codacy-coverage -r coverage.xml
+
 build:
 	pipenv shell
 	pipenv install wheel --dev --pypi-mirror https://mirrors.aliyun.com/pypi/simple
+	python setup.py bdist_wheel --python-tag py3
+
+ci-build:
+	pip install wheel
 	python setup.py bdist_wheel --python-tag py3
 
 publish:
