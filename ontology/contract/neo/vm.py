@@ -22,6 +22,7 @@ from ontology.common.address import Address
 from ontology.contract.neo.oep4 import Oep4
 from ontology.contract.neo.aio_oep4 import AioOep4
 from ontology.contract.neo.claim_record import ClaimRecord
+from ontology.contract.neo.oep5 import Oep5
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.contract.neo.abi.abi_function import AbiFunction
@@ -34,6 +35,9 @@ class NeoVm(object):
 
     def oep4(self, hex_contract_address: str = '') -> Oep4:
         return Oep4(hex_contract_address, self.__sdk)
+
+    def oep5(self, hex_contract_address: str = '') -> Oep5:
+        return Oep5(hex_contract_address, self.__sdk)
 
     def aio_oep4(self, hex_contract_address: str = '') -> AioOep4:
         return AioOep4(hex_contract_address, self.__sdk)
