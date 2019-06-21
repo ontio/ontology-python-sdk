@@ -20,6 +20,7 @@ from enum import Enum
 
 from ontology.utils import utils
 from ontology.common.address import Address
+from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.vm.params_builder import ParamsBuilder
 from ontology.exception.exception import SDKException
@@ -108,6 +109,8 @@ class BuildParams(object):
             BuildParams.push_struct(param, builder)
         elif isinstance(param, Address):
             builder.emit_push_bytearray(param.to_bytes())
+        elif isinstance(param, Account):
+            builder.emit_push_bytearray(param.get_address().to_bytes())
         else:
             raise SDKException(ErrorCode.other_error('parameter type is error'))
 
