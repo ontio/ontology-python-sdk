@@ -27,6 +27,18 @@ class InvokeFunction(object):
         self.__parameters = parameters
         self.__return_type = return_type
 
+    @property
+    def func_name(self):
+        return self.__func_name
+
+    @property
+    def parameters(self):
+        return self.__parameters
+
+    @property
+    def return_type(self):
+        return self.__return_type
+
     def set_params_value(self, *params):
         if len(self.__parameters) != 0:
             self.__parameters = list()
