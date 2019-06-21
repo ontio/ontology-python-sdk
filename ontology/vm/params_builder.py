@@ -16,6 +16,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Union
+
 from ontology.io.memory_stream import MemoryStream
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -49,7 +51,7 @@ class ParamsBuilder:
             bs = self.big_int_to_neo_bytearray(num)
             return self.emit_push_bytearray(bs)
 
-    def emit_push_bytearray(self, data):
+    def emit_push_bytearray(self, data: Union[bytes, bytearray]):
         data_len = len(data)
         if data_len < int.from_bytes(PUSHBYTES75, 'little'):
             self.write_bytes(bytearray([data_len]))
@@ -64,7 +66,7 @@ class ParamsBuilder:
             self.write_bytes(len(data).to_bytes(4, "little"))
         self.write_bytes(data)
 
-    def emit_push_call(self, address):
+    def emit_push_call(self, address: bytes):
         self.emit(APPCALL)
         self.write_bytes(address)
 
