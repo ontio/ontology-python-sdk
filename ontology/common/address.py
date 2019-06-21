@@ -68,7 +68,10 @@ class Address(object):
         """
         generate contract address from avm bytecode.
         """
-        return cls.__from_byte_script(bytes.fromhex(code), little_endian=False)
+        try:
+            return cls.__from_byte_script(bytes.fromhex(code), little_endian=False)
+        except ValueError:
+            raise SDKException(ErrorCode.other_error('Invalid avm code.'))
 
     def b58encode(self):
         data = Address.__COIN_VERSION + self.ZERO
