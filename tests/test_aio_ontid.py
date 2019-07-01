@@ -40,13 +40,22 @@ class TestAioOntId(unittest.TestCase):
         self.gas_price = 500
         self.gas_limit = 20000
 
+    def check_ecdsa_pk(self, ont_id: str, pk: dict):
+        self.assertIn(ont_id, pk['PubKeyId'])
+        self.assertEqual('ECDSA', pk['Type'])
+        self.assertEqual('P256', pk['Curve'])
+        self.assertEqual(66, len(pk['Value']))
+
     async def check_pk_by_ont_id(self, ont_id):
         pub_keys = await sdk.native_vm.aio_ont_id().get_public_keys(ont_id)
         for pk in pub_keys:
-            self.assertIn(ont_id, pk['PubKeyId'])
-            self.assertEqual('ECDSA', pk['Type'])
-            self.assertEqual('P256', pk['Curve'])
-            self.assertEqual(66, len(pk['Value']))
+            self.check_ecdsa_pk(ont_id, pk)
+
+    async def get_ddo_test_case(self, ont_id: str):
+        ddo = await sdk.native_vm.aio_ont_id().get_ddo(ont_id)
+        for pk in ddo.get('Owners', list()):
+            self.check_ecdsa_pk(ont_id, pk)
+        self.assertEqual(ont_id, ddo.get('OntId', ''))
 
     @not_panic_exception
     @Ontology.runner
@@ -60,15 +69,6 @@ class TestAioOntId(unittest.TestCase):
             await self.check_pk_by_ont_id(ont_id)
         finally:
             sdk.default_aio_network.connect_to_test_net()
-
-    async def get_ddo_test_case(self, ont_id: str):
-        ddo = await sdk.native_vm.aio_ont_id().get_ddo(ont_id)
-        for pk in ddo.get('Owners', list()):
-            self.assertIn(ont_id, pk['PubKeyId'])
-            self.assertEqual('ECDSA', pk['Type'])
-            self.assertEqual('P256', pk['Curve'])
-            self.assertEqual(66, len(pk['Value']))
-        self.assertEqual(ont_id, ddo.get('OntId', ''))
 
     @not_panic_exception
     @Ontology.runner
@@ -101,13 +101,7 @@ class TestAioOntId(unittest.TestCase):
             if 'already registered' not in e.args[1]:
                 raise e
 
-    @not_panic_exception
-    @Ontology.runner
-    async def test_add_and_remove_public_key(self):
-        identity = sdk.wallet_manager.create_identity(password)
-        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
-        tx_hash = await sdk.native_vm.aio_ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
-                                                                   self.gas_limit)
+    async def check_register_ont_id_event(self, ont_id: str, tx_hash: str):
         self.assertEqual(64, len(tx_hash))
         await asyncio.sleep(randint(10, 15))
         event = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
@@ -115,7 +109,51 @@ class TestAioOntId(unittest.TestCase):
         notify = Event.get_notify_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Register', notify['States'][0])
-        self.assertEqual(identity.ont_id, notify['States'][1])
+        self.assertEqual(ont_id, notify['States'][1])
+
+    async def check_add_pk_event(self, ont_id: str, tx_hash: str, new_hex_public_key: str):
+        self.assertEqual(64, len(tx_hash))
+        await asyncio.sleep(randint(10, 15))
+        event = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
+        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('add', notify['States'])
+        self.assertIn(ont_id, notify['States'])
+        self.assertIn(new_hex_public_key, notify['States'])
+
+    async def check_duplicated_add_pk(self, ont_id: str, ctrl_acct: Account, new_hex_pk: str):
+        try:
+            await sdk.native_vm.aio_ont_id().add_public_key(ont_id, ctrl_acct, new_hex_pk, acct4, self.gas_price,
+                                                            self.gas_limit)
+        except SDKException as e:
+            self.assertIn('already exists', e.args[1])
+
+    async def check_revoke_pk_event(self, ont_id: str, tx_hash: str, hex_public_key: str):
+        self.assertEqual(64, len(tx_hash))
+        await asyncio.sleep(randint(10, 15))
+        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
+        notify = Event.get_notify_by_contract_address(event, hex_public_key)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('remove', notify['States'])
+        self.assertIn(ont_id, notify['States'])
+        self.assertIn(hex_public_key, notify['States'])
+
+    async def check_duplicated_revoke_pk(self, ont_id: str, ctrl_acct: Account, hex_public_key: str):
+        try:
+            await sdk.native_vm.aio_ont_id().revoke_public_key(ont_id, ctrl_acct, hex_public_key, acct3,
+                                                               self.gas_price, self.gas_limit)
+        except SDKException as e:
+            self.assertIn('public key has already been revoked', e.args[1])
+
+    @not_panic_exception
+    @Ontology.runner
+    async def test_add_and_remove_public_key(self):
+        identity = sdk.wallet_manager.create_identity(password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
+        tx_hash = await sdk.native_vm.aio_ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
+                                                                   self.gas_limit)
+        await self.check_register_ont_id_event(identity.ont_id, tx_hash)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
@@ -123,33 +161,13 @@ class TestAioOntId(unittest.TestCase):
 
         tx_hash = await sdk.native_vm.aio_ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                                   self.gas_price, self.gas_limit)
-        await asyncio.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('add', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
-        try:
-            await sdk.native_vm.aio_ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
-                                                            self.gas_price, self.gas_limit)
-        except SDKException as e:
-            self.assertIn('already exists', e.args[1])
+        await self.check_add_pk_event(identity.ont_id, tx_hash, hex_new_public_key)
+        await self.check_duplicated_add_pk(identity.ont_id, ctrl_acct, hex_new_public_key)
+
         tx_hash = await sdk.native_vm.aio_ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key,
                                                                      acct3, self.gas_price, self.gas_limit)
-        await asyncio.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('remove', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
-        try:
-            await sdk.native_vm.aio_ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
-                                                               self.gas_price, self.gas_limit)
-        except SDKException as e:
-            self.assertIn('public key has already been revoked', e.args[1])
+        await self.check_revoke_pk_event(identity.ont_id, tx_hash, hex_new_public_key)
+        await self.check_duplicated_revoke_pk(identity.ont_id, ctrl_acct, hex_new_public_key)
 
     @not_panic_exception
     @Ontology.runner
@@ -158,15 +176,9 @@ class TestAioOntId(unittest.TestCase):
         identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         tx_hash = await ont_id.registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price, self.gas_limit)
-        self.assertEqual(64, len(tx_hash))
-        await asyncio.sleep(randint(10, 15))
-        event = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = ont_id.contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('Register', notify['States'][0])
-        self.assertEqual(identity.ont_id, notify['States'][1])
+        await self.check_register_ont_id_event(identity.ont_id, tx_hash)
 
+        hex_contract_address = ont_id.contract_address
         attribute = Attribute('hello', 'string', 'attribute')
         tx_hash = await ont_id.add_attribute(identity.ont_id, ctrl_acct, attribute, acct2, self.gas_price,
                                              self.gas_limit)
@@ -205,14 +217,7 @@ class TestAioOntId(unittest.TestCase):
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         tx_hash = await sdk.native_vm.aio_ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
                                                                    self.gas_limit)
-        self.assertEqual(64, len(tx_hash))
-        await asyncio.sleep(randint(10, 15))
-        event = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('Register', notify['States'][0])
-        self.assertEqual(identity.ont_id, notify['States'][1])
+        await self.check_register_ont_id_event(identity.ont_id, tx_hash)
 
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
@@ -221,6 +226,7 @@ class TestAioOntId(unittest.TestCase):
                                                                 self.gas_price, self.gas_limit)
         await asyncio.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
+        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
         notify = Event.get_notify_by_contract_address(event, hex_contract_address)
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         self.assertEqual('Recovery', notify['States'][0])
@@ -276,18 +282,8 @@ class TestAioOntId(unittest.TestCase):
 
         tx_hash = await sdk.native_vm.aio_ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key,
                                                                      acct3, self.gas_price, self.gas_limit, True)
-        await asyncio.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('remove', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
-        try:
-            await sdk.native_vm.aio_ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
-                                                               self.gas_price, self.gas_limit, True)
-        except SDKException as e:
-            self.assertIn('public key has already been revoked', e.args[1])
+        await self.check_revoke_pk_event(identity.ont_id, tx_hash, hex_new_public_key)
+        await self.check_duplicated_revoke_pk(identity.ont_id, ctrl_acct, hex_new_public_key)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
@@ -364,14 +360,7 @@ class TestAioOntId(unittest.TestCase):
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         tx_hash = await sdk.native_vm.aio_ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
                                                                    self.gas_limit)
-        self.assertEqual(64, len(tx_hash))
-        await asyncio.sleep(randint(10, 15))
-        event = await sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('Register', notify['States'][0])
-        self.assertEqual(identity.ont_id, notify['States'][1])
+        await self.check_register_ont_id_event(identity.ont_id, tx_hash)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
@@ -380,14 +369,8 @@ class TestAioOntId(unittest.TestCase):
 
         tx_hash = await sdk.native_vm.aio_ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                                   self.gas_price, self.gas_limit)
-        await asyncio.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('add', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
+        await self.check_add_pk_event(identity.ont_id, tx_hash, hex_new_public_key)
+
         result = await sdk.native_vm.aio_ont_id().verify_signature(identity.ont_id, 1, ctrl_acct)
         self.assertTrue(result)
         result = await sdk.native_vm.aio_ont_id().verify_signature(identity.ont_id, 2, ctrl_acct)
