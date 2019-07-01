@@ -6,7 +6,6 @@ python:
 - 3.6-dev
 - '3.7'
 - 3.7-dev
-- 3.8-dev
 cache: pip
 env:
   global:
@@ -22,7 +21,6 @@ install:
 - unzip tool-linux.zip
 - "./tool-linux/sigsvr-linux-amd64 --abi ./tool-linux/abi &"
 script:
-- make ci-test
 - make ci-coverage
 - make ci-build
 deploy:
