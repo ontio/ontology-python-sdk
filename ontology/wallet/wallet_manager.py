@@ -266,18 +266,24 @@ class WalletManager(object):
             self.wallet_in_mem.identities.append(idt)
         return account
 
-    def add_control(self, ont_id: str, password: str):
-        WalletManager.__check_ont_id(ont_id)
-        private_key = get_random_hex_str(64)
-        salt = get_random_hex_str(16)
-        b64_salt = base64.b64encode(salt.encode('utf-8')).decode('ascii')
+    def __add_control(self, ont_id: str, password: str, private_key: str = '', salt: str = '') -> Account:
+        if len(private_key) == 0:
+            private_key = get_random_hex_str(64)
+        if len(salt) == 0:
+            salt = get_random_hex_str(16)
         account = Account(private_key, self.scheme)
         key = account.export_gcm_encrypted_private_key(password, salt)
         b58_address = account.get_address_base58()
         public_key = account.get_public_key_hex()
+        b64_salt = base64.b64encode(salt.encode('utf-8')).decode('ascii')
         ctrl = Control(kid='', key=key, salt=b64_salt, address=b58_address, public_key=public_key)
         identity = self.get_identity_by_ont_id(ont_id)
         identity.add_control(ctrl)
+        return account
+
+    def add_control(self, ont_id: str, password: str) -> Account:
+        WalletManager.__check_ont_id(ont_id)
+        return self.__add_control(ont_id, password)
 
     def add_control_by_hex_private_key(self, ont_id: str, password: str, hex_private_key: str) -> Account:
         WalletManager.__check_ont_id(ont_id)
@@ -285,16 +291,7 @@ class WalletManager(object):
             raise SDKException(ErrorCode.require_str_params)
         if not isinstance(hex_private_key, str):
             raise SDKException(ErrorCode.require_str_params)
-        salt = get_random_hex_str(16)
-        b64_salt = base64.b64encode(salt.encode('utf-8')).decode('ascii')
-        account = Account(hex_private_key, self.scheme)
-        key = account.export_gcm_encrypted_private_key(password, salt)
-        b58_address = account.get_address_base58()
-        public_key = account.get_public_key_hex()
-        ctrl = Control(kid='', key=key, salt=b64_salt, address=b58_address, public_key=public_key)
-        identity = self.get_identity_by_ont_id(ont_id)
-        identity.add_control(ctrl)
-        return account
+        return self.__add_control(ont_id, password, hex_private_key)
 
     def add_control_by_bytes_private_key(self, ont_id: str, password: str, bytes_private_key: bytes) -> Account:
         WalletManager.__check_ont_id(ont_id)
@@ -399,12 +396,7 @@ class WalletManager(object):
         if not isinstance(password, str):
             raise SDKException(ErrorCode.require_str_params)
         ctrl = self.get_control_info_by_index(ont_id, index)
-        salt = base64.b64decode(ctrl.salt)
-        key = ctrl.key
-        b58_address = ctrl.b58_address
-        n = self.wallet_in_mem.scrypt.n
-        private_key = Account.get_gcm_decoded_private_key(key, password, b58_address, salt, n, self.scheme)
-        return Account(private_key, self.scheme)
+        return self.__get_control_account(ctrl, password)
 
     def get_control_info_by_b58_address(self, ont_id: str, b58_address: str) -> Control:
         WalletManager.__check_ont_id(ont_id)
@@ -414,15 +406,17 @@ class WalletManager(object):
                 return ctrl
         raise SDKException(ErrorCode.other_error(f'Get account {b58_address} failed.'))
 
+    def __get_control_account(self, ctrl_info: Control, password: str) -> Account:
+        salt = base64.b64decode(ctrl_info.salt)
+        n = self.wallet_in_mem.scrypt.n
+        private_key = Account.get_gcm_decoded_private_key(ctrl_info.key, password, ctrl_info.b58_address, salt, n,
+                                                          self.scheme)
+        return Account(private_key, self.scheme)
+
     def get_control_account_by_b58_address(self, ont_id: str, b58_address: str, password: str) -> Account:
         WalletManager.__check_ont_id(ont_id)
         ctrl = self.get_control_info_by_b58_address(ont_id, b58_address)
-        salt = base64.b64decode(ctrl.salt)
-        key = ctrl.key
-        b58_address = ctrl.b58_address
-        n = self.wallet_in_mem.scrypt.n
-        private_key = Account.get_gcm_decoded_private_key(key, password, b58_address, salt, n, self.scheme)
-        return Account(private_key, self.scheme)
+        return self.__get_control_account(ctrl, password)
 
     def get_account_data_by_b58_address(self, b58_address: str) -> AccountData:
         if not isinstance(b58_address, str):

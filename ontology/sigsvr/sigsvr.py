@@ -32,6 +32,7 @@ from ontology.exception.exception import SDKException
 class SigSvr(object):
     def __init__(self, url: str = ''):
         self.__url = url
+        self.__header = {'Content-type': 'application/json'}
 
     def set_address(self, url: str):
         self.__url = url
@@ -43,14 +44,13 @@ class SigSvr(object):
         self.set_address('http://localhost:20000/cli')
 
     def __post(self, method, b58_address: str or None, pwd: str or None, params):
-        header = {'Content-type': 'application/json'}
         payload = dict(qid=str(randint(0, maxsize)), method=method, params=params)
         if isinstance(b58_address, str):
             payload['account'] = b58_address
         if isinstance(pwd, str):
             payload['pwd'] = pwd
         try:
-            response = requests.post(self.__url, json=payload, headers=header, timeout=10)
+            response = requests.post(self.__url, json=payload, headers=self.__header, timeout=10)
         except requests.exceptions.MissingSchema as e:
             raise SDKException(ErrorCode.connect_err(e.args[0])) from None
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
