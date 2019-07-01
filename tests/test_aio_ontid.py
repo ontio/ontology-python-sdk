@@ -133,7 +133,8 @@ class TestAioOntId(unittest.TestCase):
         self.assertEqual(64, len(tx_hash))
         await asyncio.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_public_key)
+        hex_contract_address = sdk.native_vm.aio_ont_id().contract_address
+        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
         self.assertIn('PublicKey', notify['States'])
         self.assertIn('remove', notify['States'])
         self.assertIn(ont_id, notify['States'])
