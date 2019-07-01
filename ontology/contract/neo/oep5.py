@@ -18,6 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 from typing import Union
 
 from ontology.utils.contract import Data
+from ontology.contract.neo.oep import Oep
 from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -25,21 +26,9 @@ from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.contract.neo.invoke_function import InvokeFunction
 
 
-class Oep5(object):
+class Oep5(Oep):
     def __init__(self, hex_contract_address: str = '', sdk=None):
-        self._contract_address = hex_contract_address
-        self._sdk = sdk
-
-    @property
-    def hex_contract_address(self):
-        return self._contract_address
-
-    @hex_contract_address.setter
-    def hex_contract_address(self, hex_contract_address: str):
-        if not isinstance(hex_contract_address, str) and len(hex_contract_address) == 40:
-            raise SDKException(ErrorCode.require_str_params)
-        hex_contract_address.replace(' ', '')
-        self._contract_address = hex_contract_address
+        super().__init__(hex_contract_address, sdk)
 
     def __new_token_setting_tx(self, func_name: str) -> InvokeTransaction:
         func = InvokeFunction(func_name)
