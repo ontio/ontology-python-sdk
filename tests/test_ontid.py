@@ -40,14 +40,17 @@ class TestOntId(unittest.TestCase):
         self.gas_price = 500
         self.gas_limit = 20000
 
+    def check_ecdsa_pk(self, ont_id: str, pk: dict):
+        self.assertIn(ont_id, pk['PubKeyId'])
+        self.assertEqual('ECDSA', pk['Type'])
+        self.assertEqual('P256', pk['Curve'])
+        self.assertEqual(66, len(pk['Value']))
+
     @not_panic_exception
     def check_pk_by_ont_id(self, ont_id):
         pub_keys = sdk.native_vm.ont_id().get_public_keys(ont_id)
         for pk in pub_keys:
-            self.assertIn(ont_id, pk['PubKeyId'])
-            self.assertEqual('ECDSA', pk['Type'])
-            self.assertEqual('P256', pk['Curve'])
-            self.assertEqual(66, len(pk['Value']))
+            self.check_ecdsa_pk(ont_id, pk)
 
     @not_panic_exception
     def test_get_public_keys(self):
@@ -116,20 +119,45 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertIn('already registered', e.args[1])
 
+    def get_ont_id_contract_notify(self, tx_hash: str):
+        self.assertEqual(64, len(tx_hash))
+        time.sleep(randint(10, 15))
+        event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
+        return Event.get_notify_by_contract_address(event, sdk.native_vm.ont_id().contract_address)
+
+    def check_register_ont_id_case(self, ont_id: str, tx_hash: str):
+        notify = self.get_ont_id_contract_notify(tx_hash)
+        self.assertEqual('Register', notify['States'][0])
+        self.assertEqual(ont_id, notify['States'][1])
+
+    def check_add_public_key_case(self, ont_id: str, hex_new_pub_key: str, tx_hash: str):
+        notify = self.get_ont_id_contract_notify(tx_hash)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('add', notify['States'])
+        self.assertIn(ont_id, notify['States'])
+        self.assertIn(hex_new_pub_key, notify['States'])
+
+    def check_remove_public_key_case(self, ont_id: str, hex_removed_pub_key: str, tx_hash: str):
+        notify = self.get_ont_id_contract_notify(tx_hash)
+        self.assertIn('PublicKey', notify['States'])
+        self.assertIn('remove', notify['States'])
+        self.assertIn(ont_id, notify['States'])
+        self.assertIn(hex_removed_pub_key, notify['States'])
+
+    def check_duplicated_remove_public_key_case(self, ont_id: str, hex_revoker_pub_key: str, ctrl_acct: Account):
+        try:
+            sdk.native_vm.ont_id().revoke_public_key(ont_id, ctrl_acct, hex_revoker_pub_key, acct3, self.gas_price,
+                                                     self.gas_limit)
+        except SDKException as e:
+            self.assertIn('public key has already been revoked', e.args[1])
+
     @not_panic_exception
     def test_add_and_remove_public_key(self):
         identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         ont_id = sdk.native_vm.ont_id()
         tx_hash = ont_id.registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price, self.gas_limit)
-        self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(10, 15))
-        event = sdk.restful.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = ont_id.contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('Register', notify['States'][0])
-        self.assertEqual(identity.ont_id, notify['States'][1])
+        self.check_register_ont_id_case(identity.ont_id, tx_hash)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
@@ -137,32 +165,15 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4,
                                                         self.gas_price, self.gas_limit)
-        time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.ont_id().contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('add', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
+        self.check_add_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
         try:
             ont_id.add_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct4, self.gas_price, self.gas_limit)
         except SDKException as e:
             self.assertIn('already exists', e.args[1])
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            self.gas_price, self.gas_limit)
-        time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('remove', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
-        try:
-            ont_id.revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3, self.gas_price,
-                                     self.gas_limit)
-        except SDKException as e:
-            self.assertIn('public key has already been revoked', e.args[1])
+        self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
+        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, ctrl_acct)
 
     @not_panic_exception
     def test_add_and_remove_attribute(self):
@@ -281,15 +292,7 @@ class TestOntId(unittest.TestCase):
         hex_new_public_key = public_key.hex()
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key, acct2,
                                                         self.gas_price, self.gas_limit, True)
-        time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('PublicKey', notify['States'][0])
-        self.assertEqual('add', notify['States'][1])
-        self.assertEqual(identity.ont_id, notify['States'][2])
-        self.assertEqual(2, notify['States'][3])
-        self.assertEqual(hex_new_public_key, notify['States'][4])
+        self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
 
         ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
         self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
