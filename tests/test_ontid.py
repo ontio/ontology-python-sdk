@@ -144,9 +144,10 @@ class TestOntId(unittest.TestCase):
         self.assertIn(ont_id, notify['States'])
         self.assertIn(hex_removed_pub_key, notify['States'])
 
-    def check_duplicated_remove_public_key_case(self, ont_id: str, hex_revoker_pub_key: str, ctrl_acct: Account):
+    def check_duplicated_remove_public_key_case(self, ont_id: str, hex_revoker_pub_key: str, ctrl_acct: Account,
+                                                payer: Account):
         try:
-            sdk.native_vm.ont_id().revoke_public_key(ont_id, ctrl_acct, hex_revoker_pub_key, acct3, self.gas_price,
+            sdk.native_vm.ont_id().revoke_public_key(ont_id, ctrl_acct, hex_revoker_pub_key, payer, self.gas_price,
                                                      self.gas_limit)
         except SDKException as e:
             self.assertIn('public key has already been revoked', e.args[1])
@@ -173,7 +174,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, ctrl_acct, hex_new_public_key, acct3,
                                                            self.gas_price, self.gas_limit)
         self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
-        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, ctrl_acct)
+        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, ctrl_acct, acct3)
 
     @not_panic_exception
     def test_add_and_remove_attribute(self):
@@ -241,34 +242,29 @@ class TestOntId(unittest.TestCase):
             self.assertEqual(59000, e.args[0])
             self.assertIn('attribute not exist', e.args[1])
 
+    def check_add_recovery_case(self, ont_id: str, hex_recovery_address: str, tx_hash: str):
+        notify = self.get_ont_id_contract_notify(tx_hash)
+        self.assertEqual(sdk.native_vm.ont_id().contract_address, notify['ContractAddress'])
+        self.assertEqual('Recovery', notify['States'][0])
+        self.assertEqual('add', notify['States'][1])
+        self.assertEqual(ont_id, notify['States'][2])
+        self.assertEqual(hex_recovery_address, notify['States'][3])
+
     @not_panic_exception
     def test_add_recovery(self):
         identity = sdk.wallet_manager.create_identity(password)
         ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         tx_hash = sdk.native_vm.ont_id().registry_ont_id(identity.ont_id, ctrl_acct, acct3, self.gas_price,
                                                          self.gas_limit)
-        self.assertEqual(64, len(tx_hash))
-        time.sleep(randint(10, 15))
-        event = sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
-        hex_contract_address = sdk.native_vm.ont_id().contract_address
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('Register', notify['States'][0])
-        self.assertEqual(identity.ont_id, notify['States'][1])
+        self.check_register_ont_id_case(identity.ont_id, tx_hash)
 
         rand_private_key = utils.get_random_bytes(32).hex()
         recovery = Account(rand_private_key, SignatureScheme.SHA256withECDSA)
         b58_recovery_address = recovery.get_address_base58()
         tx_hash = sdk.native_vm.ont_id().add_recovery(identity.ont_id, ctrl_acct, b58_recovery_address, acct2,
                                                       self.gas_price, self.gas_limit)
-        time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertEqual(hex_contract_address, notify['ContractAddress'])
-        self.assertEqual('Recovery', notify['States'][0])
-        self.assertEqual('add', notify['States'][1])
-        self.assertEqual(identity.ont_id, notify['States'][2])
-        self.assertEqual(recovery.get_address_hex(little_endian=False), notify['States'][3])
+        self.check_add_recovery_case(identity.ont_id, recovery.get_address().hex(little_endian=False), tx_hash)
+
         ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
         self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
         self.assertEqual('ECDSA', ddo['Owners'][0]['Type'])
@@ -292,7 +288,7 @@ class TestOntId(unittest.TestCase):
         hex_new_public_key = public_key.hex()
         tx_hash = sdk.native_vm.ont_id().add_public_key(identity.ont_id, recovery, hex_new_public_key, acct2,
                                                         self.gas_price, self.gas_limit, True)
-        self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
+        self.check_add_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
 
         ddo = sdk.native_vm.ont_id().get_ddo(identity.ont_id)
         self.assertIn(ctrl_acct.get_ont_id(), ddo['Owners'][0]['PubKeyId'])
@@ -310,18 +306,8 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
                                                            self.gas_price, self.gas_limit, True)
-        time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('remove', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
-        try:
-            sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
-                                                     self.gas_price, self.gas_limit, True)
-        except SDKException as e:
-            self.assertIn('public key has already been revoked', e.args[1])
+        self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
+        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, ctrl_acct, acct3)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
