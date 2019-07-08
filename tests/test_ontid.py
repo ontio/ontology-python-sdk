@@ -306,7 +306,7 @@ class TestOntId(unittest.TestCase):
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
                                                            self.gas_price, self.gas_limit, True)
         self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
-        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, acct3)
+        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, recovery)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
