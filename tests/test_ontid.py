@@ -305,18 +305,8 @@ class TestOntId(unittest.TestCase):
 
         tx_hash = sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
                                                            self.gas_price, self.gas_limit, True)
-        time.sleep(randint(10, 15))
-        event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
-        notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-        self.assertIn('PublicKey', notify['States'])
-        self.assertIn('remove', notify['States'])
-        self.assertIn(identity.ont_id, notify['States'])
-        self.assertIn(hex_new_public_key, notify['States'])
-        try:
-            sdk.native_vm.ont_id().revoke_public_key(identity.ont_id, recovery, hex_new_public_key, acct3,
-                                                     self.gas_price, self.gas_limit, True)
-        except SDKException as e:
-            self.assertIn('public key has already been revoked', e.args[1])
+        self.check_remove_public_key_case(identity.ont_id, hex_new_public_key, tx_hash)
+        self.check_duplicated_remove_public_key_case(identity.ont_id, hex_new_public_key, acct3)
 
         private_key = utils.get_random_bytes(32)
         public_key = Signature.ec_get_public_key_by_private_key(private_key, Curve.P256)
