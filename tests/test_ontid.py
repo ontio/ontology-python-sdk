@@ -89,30 +89,10 @@ class TestOntId(unittest.TestCase):
             sdk.default_network.connect_to_test_net()
 
     @not_panic_exception
-    def test_new_registry_ont_id_transaction(self):
-        ont_id = sdk.native_vm.ont_id()
-        hex_public_key = acct2.get_public_key_hex()
-        b58_address = acct2.get_address_base58()
-        acct_did = DID_ONT + b58_address
-        tx = ont_id.new_registry_ont_id_tx(acct_did, hex_public_key, b58_address, self.gas_price, self.gas_limit)
-        tx.sign_transaction(acct2)
-        self.assertEqual(64, len(tx.hash256(is_hex=True)))
-        self.assertEqual(598, len(tx.serialize(is_hex=True)))
-        try:
-            sdk.rpc.send_raw_transaction(tx)
-        except SDKException as e:
-            self.assertEqual(59000, e.args[0])
-            self.assertIn('already registered', e.args[1])
-
-    @not_panic_exception
     def test_registry_ont_id(self):
         ont_id = sdk.native_vm.ont_id()
-        try:
-            identity = sdk.wallet_manager.create_identity(password)
-            ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
-        except SDKException as e:
-            self.assertIn('Wallet identity exists', e.args[1])
-            return
+        identity = sdk.wallet_manager.create_identity(password)
+        ctrl_acct = sdk.wallet_manager.get_control_account_by_index(identity.ont_id, 0, password)
         try:
             ont_id.registry_ont_id(identity.ont_id, ctrl_acct, acct2, self.gas_price, self.gas_limit)
         except SDKException as e:
