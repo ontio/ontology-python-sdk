@@ -45,6 +45,8 @@ class TestOnt(unittest.TestCase):
     def test_query_name(self):
         token_name = sdk.native_vm.ont().name()
         self.assertEqual('ONT Token', token_name)
+        token_name = sdk.native_vm.ong().name()
+        self.assertEqual('ONG Token', token_name)
 
     @not_panic_exception
     def test_query_symbol(self):
