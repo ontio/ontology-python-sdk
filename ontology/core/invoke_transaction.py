@@ -32,7 +32,7 @@ from ontology.contract.neo.invoke_function import InvokeFunction
 class InvokeTransaction(Transaction):
     def __init__(self, payer: Union[str, bytes, Address] = b'', gas_price: int = 0, gas_limit: int = 0,
                  payload: bytearray = None, version: int = 0):
-        super().__init__(version, TransactionType.InvokeCode.value, gas_price, gas_limit, payer, payload)
+        super().__init__(version, TransactionType.InvokeNeoVm.value, gas_price, gas_limit, payer, payload)
 
     @staticmethod
     def generate_invoke_code(contract_address: Union[str, bytes, bytearray, Address],

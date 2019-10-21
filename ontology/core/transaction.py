@@ -17,22 +17,21 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import binascii
-
 from enum import Enum
 from typing import List, Union
 
 from Cryptodome.Random.random import randint
 
+from ontology.account.account import Account
+from ontology.common.address import Address
+from ontology.core.program import ProgramBuilder
 from ontology.core.sig import Sig
 from ontology.crypto.digest import Digest
-from ontology.common.address import Address
-from ontology.account.account import Account
-from ontology.core.program import ProgramBuilder
-from ontology.io.binary_writer import BinaryWriter
-from ontology.io.binary_reader import BinaryReader
-from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
+from ontology.io.binary_reader import BinaryReader
+from ontology.io.binary_writer import BinaryWriter
+from ontology.io.memory_stream import StreamManager
 
 
 class TransactionType(Enum):
@@ -41,9 +40,9 @@ class TransactionType(Enum):
     Claim = 0x03
     Enrollment = 0x04
     Vote = 0x05
-    DeployCode = 0xd0
-    InvokeCode = 0xd1
-    TransferTransaction = 0x80
+    Deploy = 0xd0
+    InvokeNeoVm = 0xd1
+    InvokeWasmVm = 0xd2
 
 
 TX_MAX_SIG_SIZE = 16
