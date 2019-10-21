@@ -22,6 +22,7 @@ from tests import sdk, acct4, acct3, acct2, acct1, not_panic_exception
 
 from ontology.sdk import Ontology
 from ontology.utils.contract import Data
+from ontology.vm.vm_type import VmType
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
@@ -133,10 +134,11 @@ class TestAioRestful(unittest.TestCase):
     @Ontology.runner
     async def test_get_smart_contract(self):
         address_list = ['1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9', '0100000000000000000000000000000000000000']
-        info_list = [[True, 'DINGXIN', 'A sample of OEP4'], [True, 'Ontology Team', 'Ontology Network ONT Token']]
+        info_list = [[VmType.Neo, 'DINGXIN', 'A sample of OEP4'],
+                     [VmType.Neo, 'Ontology Team', 'Ontology Network ONT Token']]
         for index, address in enumerate(address_list):
             contract = await sdk.aio_restful.get_contract(address)
-            self.assertEqual(info_list[index][0], contract['NeedStorage'])
+            self.assertEqual(VmType.from_int(info_list[index][0]), contract['VmType'])
             self.assertEqual(info_list[index][1], contract['Author'])
             self.assertEqual(info_list[index][2], contract['Description'])
         try:

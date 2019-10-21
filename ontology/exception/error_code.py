@@ -79,9 +79,12 @@ class ErrorCode:
         return ErrorCode.get_error(60002, f'Network Error, ConnectionError: {url}')
 
     hd_index_out_of_range = get_error.__func__(70001, 'Crypto Error, index is out of range: 0 <= index <= 2**32 - 1')
-    hd_root_key_not_master_key = get_error.__func__(70002, "Crypto Error, root_key must be a master key if m is the first element of the path")
+    hd_root_key_not_master_key = get_error.__func__(70002,
+                                                    "Crypto Error, root_key must be a master key if m is the first element of the path")
 
     unknown_curve_label = get_error.__func__(70003, "Crypto Error, unknown curve label")
+
+    unknown_vm_type = get_error.__func__(80001, 'VM Error, unknown vm type')
 
     invalid_private_key = get_error.__func__(100001, 'Account Error, invalid private key.')
     unsupported_key_type = get_error.__func__(100002, 'Account Error, unsupported key type.')

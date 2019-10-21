@@ -22,6 +22,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import time
 import unittest
 
+from ontology.vm.vm_type import VmType
 from ontology.utils.contract import Data
 from ontology.common.address import Address
 from ontology.exception.exception import SDKException
@@ -194,10 +195,11 @@ class TestRpcClient(unittest.TestCase):
     @not_panic_exception
     def test_get_smart_contract(self):
         address_list = ['1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9', '0100000000000000000000000000000000000000']
-        info_list = [[True, 'DINGXIN', 'A sample of OEP4'], [True, 'Ontology Team', 'Ontology Network ONT Token']]
+        info_list = [[VmType.Neo, 'DINGXIN', 'A sample of OEP4'],
+                     [VmType.Neo, 'Ontology Team', 'Ontology Network ONT Token']]
         for index, address in enumerate(address_list):
             contract = sdk.rpc.get_contract(address)
-            self.assertEqual(info_list[index][0], contract['NeedStorage'])
+            self.assertEqual(VmType.from_int(info_list[index][0]), contract['VmType'])
             self.assertEqual(info_list[index][1], contract['Author'])
             self.assertEqual(info_list[index][2], contract['Description'])
         try:
