@@ -48,6 +48,7 @@ class ErrorCode:
     require_dict_params = get_error.__func__(20009, 'Interface Error, the type of parameter should be dict.')
     require_control_params = get_error.__func__(20010, 'Interface Error, a Control object is required.')
     require_acct_params = get_error.__func__(20011, 'Interface Error, a Account object is required.')
+    require_file_path_params = get_error.__func__(20012, 'Interface Error, a valid file path is required.')
 
     invalid_b64_claim_data = get_error.__func__(21001, 'Interface Error, invalid base64 encode claim.')
     invalid_blk_proof = get_error.__func__(21002, 'Interface Error, invalid blockchain proof.')

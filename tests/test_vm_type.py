@@ -16,22 +16,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from enum import IntEnum, unique
-
-from ontology.exception.error_code import ErrorCode
+import unittest
 
 from ontology.exception.exception import SDKException
 
+from ontology.vm.vm_type import VmType
 
-@unique
-class VmType(IntEnum):
-    Neo = 1
-    Wasm = 3
 
-    @classmethod
-    def from_int(cls, value: int):
-        if value == 1:
-            return cls.Neo
-        if value == 3:
-            return cls.Wasm
-        raise SDKException(ErrorCode.unknown_vm_type)
+class TestVmType(unittest.TestCase):
+    def test_from_int(self):
+        self.assertEqual(VmType.Neo, VmType.from_int(VmType.Neo.value))
+        self.assertEqual(VmType.Wasm, VmType.from_int(VmType.Wasm.value))
+        self.assertRaises(SDKException, VmType.from_int, 0)

@@ -27,6 +27,7 @@ from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.contract.neo.abi.abi_function import AbiFunction
 from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.vm.vm_type import VmType
 
 
 class NeoVm(object):
@@ -51,7 +52,6 @@ class NeoVm(object):
 
     @staticmethod
     def make_deploy_transaction(code: str,
-                                need_storage: bool,
                                 name: str,
                                 code_version: str,
                                 author: str,
@@ -60,7 +60,7 @@ class NeoVm(object):
                                 gas_price: int,
                                 gas_limit: int,
                                 payer: Union[str, bytes, Address]) -> DeployTransaction:
-        tx = DeployTransaction(code, need_storage, name, code_version, author, email, description, gas_price, gas_limit,
+        tx = DeployTransaction(code, VmType.Neo, name, code_version, author, email, description, gas_price, gas_limit,
                                payer)
         return tx
 

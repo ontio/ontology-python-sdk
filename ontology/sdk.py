@@ -23,6 +23,7 @@ from typing import Union
 
 from Cryptodome.Random.random import choice
 
+from ontology.contract.wasm.vm import WasmVm
 from ontology.network.aiorpc import AioRpc
 from ontology.contract.neo.vm import NeoVm
 from ontology.service.service import Service
@@ -79,6 +80,7 @@ class Ontology(AioRunner, metaclass=_Singleton):
         self.__default_aio_network = self.__aio_rpc
         self.__native_vm = NativeVm(self)
         self.__neo_vm = NeoVm(self)
+        self.__wasm_vm = WasmVm(self)
         self.__service = Service(self)
         self.__wallet_manager = WalletManager()
         self.__default_signature_scheme = default_signature_scheme
@@ -217,6 +219,10 @@ class Ontology(AioRunner, metaclass=_Singleton):
     @property
     def neo_vm(self):
         return self.__neo_vm
+
+    @property
+    def wasm_vm(self):
+        return self.__wasm_vm
 
     @property
     def service(self):
