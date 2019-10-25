@@ -36,7 +36,7 @@ class WasmVm(object):
         self.__sdk = sdk
 
     @staticmethod
-    def open_wasm(wasm_file_path: str):
+    def open_wasm(wasm_file_path: str) -> str:
         if not path.isfile(wasm_file_path):
             raise SDKException(ErrorCode.require_file_path_params)
         with open(wasm_file_path, 'rb') as f:

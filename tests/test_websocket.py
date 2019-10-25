@@ -120,7 +120,6 @@ class TestWebsocketClient(unittest.TestCase):
     async def test_get_contract(self):
         hex_contract_address = '0100000000000000000000000000000000000000'
         response = await sdk.websocket.get_contract(hex_contract_address)
-        self.assertEqual(True, response['NeedStorage'])
         self.assertEqual('ONT', response['Name'])
         self.assertEqual('1.0', response['CodeVersion'])
         self.assertEqual('Ontology Team', response['Author'])

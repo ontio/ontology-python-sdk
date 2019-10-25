@@ -27,7 +27,7 @@ from aiohttp.client import ClientSession
 from ontology.contract.neo.vm import NeoVm
 from ontology.account.account import Account
 from ontology.network.rpc import Rpc, RpcMethod
-from ontology.core.transaction import Transaction
+from ontology.core.transaction import Transaction, TxType
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
@@ -385,7 +385,7 @@ class AioRpc(Rpc):
             params.append(i)
         if payer is None:
             raise SDKException(ErrorCode.param_err('payer account is None.'))
-        tx = Transaction(0, 0xd1, gas_price, gas_limit, payer.get_address_bytes(), params)
+        tx = Transaction(0, TxType.InvokeNeoVm, gas_price, gas_limit, payer.get_address_bytes(), params)
         tx.sign_transaction(payer)
         if isinstance(signer, Account) and signer.get_address_base58() != payer.get_address_base58():
             tx.add_sign_transaction(signer)

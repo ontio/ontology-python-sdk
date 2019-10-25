@@ -57,9 +57,10 @@ class Transaction(object):
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         self.version = version
-        if not isinstance(tx_type, TxType):
-            raise SDKException(ErrorCode.other_error('invalid tx type'))
-        self.tx_type = tx_type.value
+        if isinstance(tx_type, int):
+            tx_type = TxType(tx_type)
+        if tx_type is not None:
+            self.tx_type = tx_type.value
         if not nonce:
             nonce = randint(0, 0xFFFFFFFF)
         self.nonce = nonce

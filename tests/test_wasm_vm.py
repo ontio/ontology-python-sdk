@@ -53,7 +53,7 @@ class TestWasmVm(unittest.TestCase):
     def get_wasm_file_path(file_name):
         return path.join(path.dirname(__file__), 'wasm', file_name)
 
-    def get_contract_code(self, file_name):
+    def get_contract_code(self, file_name) -> str:
         wasm_file_path = self.get_wasm_file_path(file_name)
         return sdk.wasm_vm.open_wasm(wasm_file_path)
 

@@ -15,9 +15,10 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 from ontology.account.account import Account
 from ontology.contract.native.ontid import OntId, Attribute
-from ontology.core.transaction import Transaction
+from ontology.core.transaction import Transaction, TxType
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.arguments import check_ont_id
@@ -32,7 +33,7 @@ class AioOntId(OntId):
     async def get_public_keys(self, ont_id: str):
         args = dict(ontid=ont_id.encode('utf-8'))
         invoke_code = build_vm.build_native_invoke_code(self._contract_address, self._version, 'getPublicKeys', args)
-        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
+        tx = Transaction(0, TxType.InvokeNeoVm, 0, 0, b'', invoke_code)
         response = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
         pub_keys = OntId.parse_pub_keys(ont_id, response['Result'])
         return pub_keys
@@ -47,7 +48,7 @@ class AioOntId(OntId):
         """
         args = dict(ontid=ont_id.encode('utf-8'))
         invoke_code = build_vm.build_native_invoke_code(self._contract_address, self._version, 'getDDO', args)
-        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
+        tx = Transaction(0, TxType.InvokeNeoVm, 0, 0, b'', invoke_code)
         response = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
         ddo = OntId.parse_ddo(ont_id, response['Result'])
         return ddo

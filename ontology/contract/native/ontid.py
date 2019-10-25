@@ -24,7 +24,7 @@ from ontology.common.address import Address
 from ontology.crypto.key_type import KeyType
 from ontology.account.account import Account
 from ontology.utils.arguments import check_ont_id
-from ontology.core.transaction import Transaction
+from ontology.core.transaction import Transaction, TxType
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
@@ -170,7 +170,7 @@ class OntId(object):
     def get_public_keys(self, ont_id: str):
         args = dict(ontid=ont_id.encode('utf-8'))
         invoke_code = build_vm.build_native_invoke_code(self._contract_address, self._version, 'getPublicKeys', args)
-        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
+        tx = Transaction(0, TxType.InvokeNeoVm, 0, 0, b'', invoke_code)
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         pub_keys = OntId.parse_pub_keys(ont_id, response['Result'])
         return pub_keys
@@ -185,7 +185,7 @@ class OntId(object):
         """
         args = dict(ontid=ont_id.encode('utf-8'))
         invoke_code = build_vm.build_native_invoke_code(self._contract_address, self._version, 'getDDO', args)
-        tx = Transaction(0, 0xd1, 0, 0, b'', invoke_code)
+        tx = Transaction(0, TxType.InvokeNeoVm, 0, 0, b'', invoke_code)
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         ddo = OntId.parse_ddo(ont_id, response['Result'])
         return ddo
