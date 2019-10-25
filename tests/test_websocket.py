@@ -127,7 +127,6 @@ class TestWebsocketClient(unittest.TestCase):
         self.assertEqual('Ontology Network ONT Token', response['Description'])
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
         response = await sdk.websocket.get_contract(hex_contract_address)
-        self.assertEqual(True, response['NeedStorage'])
         self.assertEqual('DINGXIN', response['Author'])
         self.assertEqual('A sample of OEP4', response['Description'])
         await sdk.websocket.close_connect()
