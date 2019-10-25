@@ -19,7 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.utils.contract import Data
-from ontology.vm.params_builder import ParamsBuilder
+from ontology.contract.neo.params_builder import NeoParamsBuilder
 
 
 class TestContractDataParser(unittest.TestCase):
@@ -33,9 +33,9 @@ class TestContractDataParser(unittest.TestCase):
             self.assertEqual(value, neo_value)
 
     def test_op_code_to_int(self):
-        builder = ParamsBuilder()
+        builder = NeoParamsBuilder()
         for num in range(100000):
-            builder.emit_push_int(num)
+            builder.push_int(num)
             op_code = builder.to_bytes().hex()
             builder.clear_up()
             value = Data.op_code_to_int(op_code)

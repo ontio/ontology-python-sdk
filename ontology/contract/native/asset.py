@@ -21,7 +21,7 @@ from typing import Union
 from ontology.common.address import Address
 from ontology.utils.contract import Data
 from ontology.account.account import Account
-from ontology.core.transaction import Transaction
+from ontology.core.transaction import Transaction, TxType
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.vm.build_vm import build_native_invoke_code

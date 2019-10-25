@@ -24,7 +24,7 @@ from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.contract.neo.abi.struct_type import Struct
-from ontology.contract.neo.abi.build_params import BuildParams
+from ontology.vm.build_params import BuildParams
 
 
 class Data(object):
@@ -33,6 +33,30 @@ class Data(object):
         if len(hex_str) != 2:
             raise SDKException(ErrorCode.other_error('invalid str'))
         return True if hex_str == '01' else False
+
+    @staticmethod
+    def get_map_bytes(param_dict: dict):
+        builder = NeoParamsBuilder()
+        builder.emit(BuildParams.Type.dict_type.value)
+        builder.emit(Data.big_int_to_neo_bytearray(len(param_dict)))
+        for key, value in param_dict.items():
+            builder.emit(BuildParams.Type.bytearray_type.value)
+            builder.push_bytearray(str(key).encode())
+            if isinstance(value, bytearray) or isinstance(value, bytes):
+                builder.emit(BuildParams.Type.bytearray_type.value)
+                builder.push_bytearray(bytearray(value))
+            elif isinstance(value, str):
+                builder.emit(BuildParams.Type.bytearray_type.value)
+                builder.push_bytearray(value.encode())
+            elif isinstance(value, bool):
+                builder.emit(BuildParams.Type.bool_type.value)
+                builder.push_bool(value)
+            elif isinstance(value, int):
+                builder.emit(BuildParams.Type.int_type.value)
+                builder.push_int(int(value))
+            else:
+                raise Exception("param error")
+        return builder.to_bytes()
 
     @staticmethod
     def to_int(hex_str: str) -> int:

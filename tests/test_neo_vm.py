@@ -24,7 +24,7 @@ from ontology.utils.contract import Event, Data
 from tests import sdk, acct1, acct2
 
 from ontology.exception.exception import SDKException
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 
 class TestNeoVm(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestNeoVm(unittest.TestCase):
                    '6f6a52c352c176c9681553797374656d2e52756e74696d652e4e6f746966796a52c36c7566'
         contract_address = sdk.neo_vm.address_from_avm_code(avm_code).hex()
         self.assertEqual('f7b9970fd6def5229c1f30ad15372bd1c20bb260', contract_address)
-        hello = InvokeFunction('hello')
+        hello = NeoInvokeFunction('hello')
         hello.set_params_value('ontology')
         tx = sdk.neo_vm.make_invoke_transaction(contract_address, hello, acct1.get_address_base58(), 500, 20000)
         response = sdk.rpc.send_raw_transaction_pre_exec(tx)

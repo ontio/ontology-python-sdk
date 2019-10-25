@@ -26,7 +26,7 @@ from ontology.contract.neo.oep5 import Oep5
 from ontology.core.deploy_transaction import DeployTransaction
 from ontology.core.invoke_transaction import InvokeTransaction
 from ontology.contract.neo.abi.abi_function import AbiFunction
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 from ontology.vm.vm_type import VmType
 
 
@@ -66,7 +66,7 @@ class NeoVm(object):
 
     @staticmethod
     def make_invoke_transaction(contract_address: Union[str, bytes, bytearray, Address],
-                                func: Union[AbiFunction, InvokeFunction],
+                                func: Union[AbiFunction, NeoInvokeFunction],
                                 payer: Union[str, bytes, Address] = b'',
                                 gas_price: int = 0,
                                 gas_limit: int = 0) -> InvokeTransaction:

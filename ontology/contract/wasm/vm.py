@@ -19,11 +19,16 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 from os import path
 from typing import Union
 
+from ontology.utils.transaction import ensure_bytearray_contract_address
+
 from ontology.vm.vm_type import VmType
 from ontology.common.address import Address
+from ontology.core.transaction import TxType
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.deploy_transaction import DeployTransaction
+from ontology.core.invoke_transaction import InvokeTransaction
+from ontology.contract.wasm.invoke_function import WasmInvokeFunction
 
 
 class WasmVm(object):
@@ -50,4 +55,14 @@ class WasmVm(object):
                                 payer: Union[str, bytes, Address]) -> DeployTransaction:
         tx = DeployTransaction(code, VmType.Wasm, name, code_version, author, email, description, gas_price, gas_limit,
                                payer)
+        return tx
+
+    @staticmethod
+    def make_invoke_transaction(contract_address: Union[str, bytes, bytearray, Address],
+                                func: WasmInvokeFunction,
+                                payer: Union[str, bytes, Address] = b'',
+                                gas_price: int = 0,
+                                gas_limit: int = 0) -> InvokeTransaction:
+        payload = InvokeTransaction.generate_wasm_vm_invoke_code(contract_address, func)
+        tx = InvokeTransaction(payer, gas_price, gas_limit, payload, TxType.InvokeWasmVm)
         return tx

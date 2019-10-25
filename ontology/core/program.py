@@ -19,6 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 from ecdsa import util
 from typing import List
 
+from ontology.core.base_params_builder import BaseParamsBuilder
 from ontology.crypto.key_type import KeyType
 from ontology.utils.utils import bytes_reader
 from ontology.io.binary_reader import BinaryReader
@@ -26,7 +27,6 @@ from ontology.io.binary_writer import BinaryWriter
 from ontology.core.program_info import ProgramInfo
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
-from ontology.vm.params_builder import ParamsBuilder
 from ontology.exception.exception import SDKException
 from ontology.vm.op_code import PUSHBYTES75, PUSHBYTES1, PUSHDATA1, PUSHDATA2, PUSHDATA4, CHECKSIG, CHECKMULTISIG, PUSH1
 
@@ -44,8 +44,8 @@ class ProgramBuilder(object):
 
     @staticmethod
     def program_from_pubkey(public_key):
-        builder = ParamsBuilder()
-        builder.emit_push_bytearray(public_key)
+        builder = BaseParamsBuilder()
+        builder.push_bytearray(public_key)
         builder.emit(CHECKSIG)
         return builder.to_bytes()
 
@@ -125,12 +125,13 @@ class ProgramBuilder(object):
             raise SDKException(ErrorCode.other_error(f'Param error: m == {m} n == {n}'))
         if n > MULTI_SIG_MAX_PUBKEY_SIZE:
             raise SDKException(ErrorCode.other_error(f'Param error: n == {n} > {MULTI_SIG_MAX_PUBKEY_SIZE}'))
-        builder = ParamsBuilder()
-        builder.emit_push_int(m)
+        from ontology.contract.neo.params_builder import NeoParamsBuilder
+        builder = NeoParamsBuilder()
+        builder.push_int(m)
         pub_keys = ProgramBuilder.sort_public_keys(pub_keys)
         for pk in pub_keys:
-            builder.emit_push_bytearray(pk)
-        builder.emit_push_int(n)
+            builder.push_bytearray(pk)
+        builder.push_int(n)
         builder.emit(CHECKMULTISIG)
         return builder.to_bytes()
 

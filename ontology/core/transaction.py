@@ -34,7 +34,7 @@ from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
 
 
-class TransactionType(Enum):
+class TxType(Enum):
     Bookkeeping = 0x00
     Bookkeeper = 0x02
     Claim = 0x03
@@ -49,7 +49,7 @@ TX_MAX_SIG_SIZE = 16
 
 
 class Transaction(object):
-    def __init__(self, version=0, tx_type: TransactionType or int = None, gas_price: int = 0, gas_limit: int = 0,
+    def __init__(self, version=0, tx_type: TxType or int = None, gas_price: int = 0, gas_limit: int = 0,
                  payer: Union[str, bytes, Address, None] = b'', payload: bytearray = bytearray(), nonce: int = None,
                  attributes: bytearray = bytearray(), sig_list: List[Sig] = None):
         if gas_price < 0:
@@ -57,9 +57,9 @@ class Transaction(object):
         if gas_limit < 0:
             raise SDKException(ErrorCode.other_error('the gas limit should be equal or greater than zero.'))
         self.version = version
-        if isinstance(tx_type, TransactionType):
-            tx_type = tx_type.value
-        self.tx_type = tx_type
+        if not isinstance(tx_type, TxType):
+            raise SDKException(ErrorCode.other_error('invalid tx type'))
+        self.tx_type = tx_type.value
         if not nonce:
             nonce = randint(0, 0xFFFFFFFF)
         self.nonce = nonce
@@ -94,7 +94,7 @@ class Transaction(object):
         for key, value in data.items():
             yield (key, value)
 
-    def serialize_unsigned(self, is_str: bool = False) -> bytes or str:
+    def serialize_unsigned(self) -> bytes or str:
         ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
         writer.write_uint8(self.version)
@@ -110,10 +110,7 @@ class Transaction(object):
         ms.flush()
         hex_bytes = ms.to_bytes()
         StreamManager.release_stream(ms)
-        if is_str:
-            return bytes.hex(hex_bytes)
-        else:
-            return hex_bytes
+        return hex_bytes
 
     def serialize_exclusive_data(self, writer):
         pass
@@ -133,7 +130,7 @@ class Transaction(object):
     def serialize(self, is_hex: bool = False) -> bytes or str:
         ms = StreamManager.get_stream()
         writer = BinaryWriter(ms)
-        writer.write_bytes(self.serialize_unsigned(is_str=False))
+        writer.write_bytes(self.serialize_unsigned())
         writer.write_var_int(len(self.sig_list))
         for sig in self.sig_list:
             writer.write_bytes(sig.serialize())

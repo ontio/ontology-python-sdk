@@ -26,7 +26,7 @@ from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 
 class Oep4(Oep):
@@ -34,7 +34,7 @@ class Oep4(Oep):
         super().__init__(hex_contract_address, sdk)
 
     def __new_token_setting_tx(self, func_name: str) -> InvokeTransaction:
-        func = InvokeFunction(func_name)
+        func = NeoInvokeFunction(func_name)
         tx = InvokeTransaction()
         tx.add_invoke_code(self._contract_address, func)
         return tx
@@ -87,7 +87,7 @@ class Oep4(Oep):
         This interface is used to generate transaction which can get the total token supply.
         """
         tx = InvokeTransaction()
-        tx.add_invoke_code(self._contract_address, InvokeFunction('totalSupply'))
+        tx.add_invoke_code(self._contract_address, NeoInvokeFunction('totalSupply'))
         return tx
 
     def total_supply(self) -> int:
@@ -108,7 +108,7 @@ class Oep4(Oep):
         that initialize smart contract parameter.
         """
         tx = InvokeTransaction(payer, gas_price, gas_limit)
-        tx.add_invoke_code(self._contract_address, InvokeFunction('init'))
+        tx.add_invoke_code(self._contract_address, NeoInvokeFunction('init'))
         return tx
 
     def init(self, founder: Account, payer: Account, gas_price: int, gas_limit: int):
@@ -126,7 +126,7 @@ class Oep4(Oep):
         """
         This interface is used to generate transaction which can get the account balance of another account with owner address.
         """
-        func = InvokeFunction('balanceOf')
+        func = NeoInvokeFunction('balanceOf')
         func.set_params_value(Address.b58decode(owner))
         tx = InvokeTransaction()
         tx.add_invoke_code(self._contract_address, func)
@@ -149,9 +149,9 @@ class Oep4(Oep):
         """
         This interface is used to generate a transaction which can transfer amount of tokens to to_address.
         """
-        func = InvokeFunction('transfer')
+        func = NeoInvokeFunction('transfer')
         func.set_params_value(Address.b58decode(from_address), Address.b58decode(to_address), amount)
-        params = InvokeTransaction.generate_invoke_code(self._contract_address, func)
+        params = InvokeTransaction.generate_neo_vm_invoke_code(self._contract_address, func)
         tx = InvokeTransaction(payer, gas_price, gas_limit, params)
         return tx
 
@@ -174,7 +174,7 @@ class Oep4(Oep):
         This interface is used to generate a transaction which can
         transfer amount of token from from-account to to-account multiple times.
         """
-        func = InvokeFunction('transferMulti')
+        func = NeoInvokeFunction('transferMulti')
         for index, item in enumerate(transfer_list):
             if not isinstance(item[2], int):
                 raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
@@ -183,7 +183,7 @@ class Oep4(Oep):
             transfer_list[index] = [Address.b58decode(item[0]), Address.b58decode(item[1]), item[2]]
         for item in transfer_list:
             func.add_params_value(item)
-        params = InvokeTransaction.generate_invoke_code(self._contract_address, func)
+        params = InvokeTransaction.generate_neo_vm_invoke_code(self._contract_address, func)
         tx = InvokeTransaction(payer, gas_price, gas_limit, params)
         return tx
 
@@ -210,9 +210,9 @@ class Oep4(Oep):
             raise SDKException(ErrorCode.param_err('the data type of amount should be int.'))
         if amount < 0:
             raise SDKException(ErrorCode.param_err('the amount should be equal or great than 0.'))
-        func = InvokeFunction('approve')
+        func = NeoInvokeFunction('approve')
         func.set_params_value(Address.b58decode(owner), Address.b58decode(spender), amount)
-        params = InvokeTransaction.generate_invoke_code(self._contract_address, func)
+        params = InvokeTransaction.generate_neo_vm_invoke_code(self._contract_address, func)
         tx = InvokeTransaction(payer, gas_price, gas_limit, params)
         return tx
 
@@ -254,7 +254,7 @@ class Oep4(Oep):
 
     def new_allowance_tx(self, owner: Union[str, bytes, Address],
                          spender: Union[str, bytes, Address]) -> InvokeTransaction:
-        func = InvokeFunction('allowance')
+        func = NeoInvokeFunction('allowance')
         func.set_params_value(Address.b58decode(owner), Address.b58decode(spender))
         tx = InvokeTransaction()
         tx.add_invoke_code(self._contract_address, func)
@@ -274,7 +274,7 @@ class Oep4(Oep):
     def new_transfer_from_tx(self, spender: Union[str, bytes, Address], owner: Union[str, bytes, Address],
                              to_address: Union[str, bytes, Address], value: int, payer: Union[str, bytes, Address],
                              gas_price: int, gas_limit: int) -> InvokeTransaction:
-        func = InvokeFunction('transferFrom')
+        func = NeoInvokeFunction('transferFrom')
         if not isinstance(value, int):
             raise SDKException(ErrorCode.param_err('the data type of value should be int.'))
         func.set_params_value(Address.b58decode(spender), Address.b58decode(owner), Address.b58decode(to_address),

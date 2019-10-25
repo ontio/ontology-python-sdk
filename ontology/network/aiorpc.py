@@ -32,8 +32,8 @@ from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
 from ontology.contract.neo.abi.abi_function import AbiFunction
-from ontology.contract.neo.abi.build_params import BuildParams
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.vm.build_params import BuildParams
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 
 class AioRpc(Rpc):
@@ -357,7 +357,7 @@ class AioRpc(Rpc):
         return response['result']
 
     async def send_neo_vm_tx_pre_exec(self, contract_address: Union[str, bytes, bytearray],
-                                      func: Union[AbiFunction, InvokeFunction],
+                                      func: Union[AbiFunction, NeoInvokeFunction],
                                       signer: Account = None,
                                       is_full: bool = False):
         contract_address = ensure_bytearray_contract_address(contract_address)
@@ -371,11 +371,11 @@ class AioRpc(Rpc):
                                       payer: Union[Account, None],
                                       gas_price: int,
                                       gas_limit: int,
-                                      func: Union[AbiFunction, InvokeFunction],
+                                      func: Union[AbiFunction, NeoInvokeFunction],
                                       is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
-        elif isinstance(func, InvokeFunction):
+        elif isinstance(func, NeoInvokeFunction):
             params = func.create_invoke_code()
         else:
             raise SDKException(ErrorCode.other_error('the type of func is error.'))

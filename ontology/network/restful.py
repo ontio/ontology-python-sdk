@@ -30,8 +30,8 @@ from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.utils.transaction import ensure_bytearray_contract_address
 from ontology.contract.neo.abi.abi_function import AbiFunction
-from ontology.contract.neo.abi.build_params import BuildParams
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.vm.build_params import BuildParams
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 TEST_RESTFUL_ADDRESS = ['http://polaris1.ont.io:20334', 'http://polaris2.ont.io:20334', 'http://polaris3.ont.io:20334']
 MAIN_RESTFUL_ADDRESS = ['http://dappnode1.ont.io:20334', 'http://dappnode2.ont.io:20334']
@@ -377,7 +377,7 @@ class Restful(object):
         return response['Result']['State']
 
     def send_neo_vm_tx_pre_exec(self, contract_address: Union[str, bytes, bytearray],
-                                func: Union[AbiFunction, InvokeFunction], signer: Account = None,
+                                func: Union[AbiFunction, NeoInvokeFunction], signer: Account = None,
                                 is_full: bool = False):
         contract_address = ensure_bytearray_contract_address(contract_address)
         tx = NeoVm.make_invoke_transaction(contract_address, func)
@@ -387,10 +387,10 @@ class Restful(object):
 
     def send_neo_vm_transaction(self, contract_address: str or bytes or bytearray, signer: Account or None,
                                 payer: Account or None, gas_limit: int, gas_price: int,
-                                func: AbiFunction or InvokeFunction, is_full: bool = False):
+                                func: AbiFunction or NeoInvokeFunction, is_full: bool = False):
         if isinstance(func, AbiFunction):
             params = BuildParams.serialize_abi_function(func)
-        elif isinstance(func, InvokeFunction):
+        elif isinstance(func, NeoInvokeFunction):
             params = func.create_invoke_code()
         else:
             raise SDKException(ErrorCode.other_error('the type of func is error.'))

@@ -23,7 +23,7 @@ from Cryptodome.Random.random import randint
 
 from ontology.utils.contract import Data, Event
 from tests import acct1, acct2, acct3, sdk, not_panic_exception
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 
 class TestInvokeFunction(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_oep4_name(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        func = InvokeFunction('name')
+        func = NeoInvokeFunction('name')
         self.assertEqual(bytearray(b'\x00\xc1\x04name'), func.create_invoke_code())
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         name = result['Result']
@@ -44,7 +44,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_oep4_symbol(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        func = InvokeFunction('symbol')
+        func = NeoInvokeFunction('symbol')
         self.assertEqual(bytearray(b'\x00\xc1\x06symbol'), func.create_invoke_code())
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         symbol = result['Result']
@@ -54,7 +54,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_oep4_decimal(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        func = InvokeFunction('decimals')
+        func = NeoInvokeFunction('decimals')
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         decimals = result['Result']
         decimals = Data.to_int(decimals)
@@ -63,7 +63,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_oep4_total_supply(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        func = InvokeFunction('totalSupply')
+        func = NeoInvokeFunction('totalSupply')
         result = sdk.default_network.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         total_supply = result['Result']
         total_supply = Data.to_int(total_supply)
@@ -72,7 +72,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_oep4_balance_of(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        func = InvokeFunction('balanceOf')
+        func = NeoInvokeFunction('balanceOf')
         self.assertEqual(bytearray(b'\x00\xc1\tbalanceOf'), func.create_invoke_code())
         bytes_address = acct1.get_address().to_bytes()
         func.set_params_value(bytes_address)
@@ -92,7 +92,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_oep4_transfer(self):
         hex_contract_address = '1ddbb682743e9d9e2b71ff419e97a9358c5c4ee9'
-        func = InvokeFunction('transfer')
+        func = NeoInvokeFunction('transfer')
         bytes_from_address = acct1.get_address().to_bytes()
         bytes_to_address = acct2.get_address().to_bytes()
         value = 1
@@ -123,7 +123,7 @@ class TestInvokeFunction(unittest.TestCase):
         bytes_to_address2 = acct3.get_address().to_bytes()
         value2 = 1
         transfer2 = [bytes_from_address2, bytes_to_address2, value2]
-        func = InvokeFunction('transferMulti')
+        func = NeoInvokeFunction('transferMulti')
         func.set_params_value(transfer1, transfer2)
         tx_hash = sdk.default_network.send_neo_vm_transaction(hex_contract_address, acct1, acct2, self.gas_price,
                                                               self.gas_limit, func, False)
@@ -154,7 +154,7 @@ class TestInvokeFunction(unittest.TestCase):
         transfer_2 = [acct2.get_address().to_bytes(), acct3.get_address().to_bytes(), 100]
         transfer_list = [transfer_1, transfer_2]
         hex_contract_address = 'ca91a73433c016fbcbcf98051d385785a6a5d9be'
-        func = InvokeFunction('transfer_multi')
+        func = NeoInvokeFunction('transfer_multi')
         func.set_params_value(transfer_list)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, acct1, acct2, self.gas_price, self.gas_limit,
                                                   func, False)
@@ -184,7 +184,7 @@ class TestInvokeFunction(unittest.TestCase):
         str_msg = 'Hello'
         bytes_address_msg = acct1.get_address().to_bytes()
         hex_contract_address = '4855735ffadad50e7000d73e1c4e96f38d225f70'
-        func = InvokeFunction('notify_args')
+        func = NeoInvokeFunction('notify_args')
         func.set_params_value(bool_msg, int_msg, list_msg, str_msg, bytes_address_msg)
         sdk.rpc.set_address('http://polaris5.ont.io:20336')
         response = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
@@ -209,7 +209,7 @@ class TestInvokeFunction(unittest.TestCase):
     @not_panic_exception
     def test_notify(self):
         hex_contract_address = '6690b6638251be951dded8c537678200a470c679'
-        notify_args = InvokeFunction('testHello')
+        notify_args = NeoInvokeFunction('testHello')
         bool_msg = True
         int_msg = 1
         bytes_msg = b'Hello'
@@ -239,7 +239,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_list(self):
         hex_contract_address = '6690b6638251be951dded8c537678200a470c679'
         list_msg = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
-        func = InvokeFunction('testList')
+        func = NeoInvokeFunction('testList')
         func.set_params_value(list_msg)
         tx_hash = self.send_tx(hex_contract_address, None, acct1, func)
         if len(tx_hash) == 0:
@@ -256,7 +256,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_dict(self):
         hex_contract_address = '6690b6638251be951dded8c537678200a470c679'
         dict_msg = {'key': 'value'}
-        func = InvokeFunction('testMap')
+        func = NeoInvokeFunction('testMap')
         func.set_params_value(dict_msg)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         dict_value = result['Result']
@@ -264,7 +264,7 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertEqual('value', dict_value)
         list_value = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
         dict_msg = {'key': list_value}
-        func = InvokeFunction('testMap')
+        func = NeoInvokeFunction('testMap')
         func.set_params_value(dict_msg)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         dict_value = result['Result']
@@ -275,7 +275,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_get_dict(self):
         hex_contract_address = '6690b6638251be951dded8c537678200a470c679'
         key = 'key'
-        func = InvokeFunction('testGetMap')
+        func = NeoInvokeFunction('testGetMap')
         func.set_params_value(key)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         dict_value = result['Result']
@@ -291,7 +291,7 @@ class TestInvokeFunction(unittest.TestCase):
         dict_value = {'key': 'value'}
         list_value = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
         dict_msg = {'key': dict_value, 'key1': int_value, 'key2': str_value, 'key3': bool_value, 'key4': list_value}
-        func = InvokeFunction('testMapInMap')
+        func = NeoInvokeFunction('testMapInMap')
         func.set_params_value(dict_msg)
         tx_hash = sdk.rpc.send_neo_vm_transaction(hex_contract_address, None, acct1, self.gas_price, self.gas_limit,
                                                   func, False)
@@ -307,7 +307,7 @@ class TestInvokeFunction(unittest.TestCase):
     def test_get_dict_in_ctx(self):
         hex_contract_address = '6690b6638251be951dded8c537678200a470c679'
         key = 'key'
-        func = InvokeFunction('testGetMapInMap')
+        func = NeoInvokeFunction('testGetMapInMap')
         func.set_params_value(key)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         value = result['Result']

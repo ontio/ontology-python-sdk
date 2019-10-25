@@ -24,7 +24,7 @@ from ontology.utils.contract import Data, Event
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 
 class ClaimRecord(object):
@@ -48,7 +48,7 @@ class ClaimRecord(object):
 
     def new_commit_tx(self, claim_id: str, issuer_address: Union[str, bytes, Address], owner_ont_id: str,
                       payer_address: Union[str, bytes, Address], gas_price: int, gas_limit: int) -> InvokeTransaction:
-        func = InvokeFunction('Commit')
+        func = NeoInvokeFunction('Commit')
         func.set_params_value(claim_id, Address.b58decode(issuer_address), owner_ont_id)
         tx = InvokeTransaction(Address.b58decode(payer_address), gas_price, gas_limit)
         tx.add_invoke_code(self.__hex_contract_address, func)
@@ -65,7 +65,7 @@ class ClaimRecord(object):
 
     def new_revoke_tx(self, claim_id: str, issuer: Union[str, bytes, Address], payer: Union[str, bytes, Address],
                       gas_price: int, gas_limit: int):
-        func = InvokeFunction('Revoke')
+        func = NeoInvokeFunction('Revoke')
         func.set_params_value(claim_id, Address.b58decode(issuer))
         tx = InvokeTransaction(Address.b58decode(payer), gas_price, gas_limit)
         tx.add_invoke_code(self.__hex_contract_address, func)
@@ -80,7 +80,7 @@ class ClaimRecord(object):
         return tx_hash
 
     def new_get_status_tx(self, claim_id: str) -> InvokeTransaction:
-        func = InvokeFunction('GetStatus')
+        func = NeoInvokeFunction('GetStatus')
         func.set_params_value(claim_id)
         tx = InvokeTransaction()
         tx.add_invoke_code(self.__hex_contract_address, func)

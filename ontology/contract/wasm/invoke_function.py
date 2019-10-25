@@ -20,13 +20,12 @@ from ontology.vm.build_params import BuildParams
 from ontology.core.base_invoke_func import BaseInvokeFunc
 
 
-class NeoInvokeFunction(BaseInvokeFunc):
+class WasmInvokeFunction(BaseInvokeFunc):
     def __init__(self, func_name: str, parameters: list = None, return_type: str = ''):
         super().__init__(func_name, parameters, return_type)
 
-    def create_invoke_code(self):
+    def create_invoke_code(self) -> bytearray:
         param_list = list()
-        param_list.append(self.func_name.encode('utf-8'))
-        param_list.append(self.parameters)
-        return BuildParams.create_neo_vm_invoke_code(param_list)
-
+        param_list.append(self.func_name)
+        param_list += self.parameters
+        return BuildParams.create_wasm_vm_invoke_code(param_list)

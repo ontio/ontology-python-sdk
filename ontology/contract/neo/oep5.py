@@ -23,7 +23,7 @@ from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction
-from ontology.contract.neo.invoke_function import InvokeFunction
+from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
 
 class Oep5(Oep):
@@ -31,7 +31,7 @@ class Oep5(Oep):
         super().__init__(hex_contract_address, sdk)
 
     def __new_token_setting_tx(self, func_name: str) -> InvokeTransaction:
-        func = InvokeFunction(func_name)
+        func = NeoInvokeFunction(func_name)
         tx = InvokeTransaction()
         tx.add_invoke_code(self._contract_address, func)
         return tx
@@ -68,7 +68,7 @@ class Oep5(Oep):
         """
         This interface is used to generate transaction which can get the account balance of another account with owner address.
         """
-        func = InvokeFunction('balanceOf')
+        func = NeoInvokeFunction('balanceOf')
         func.set_params_value(Address.b58decode(owner))
         tx = InvokeTransaction()
         tx.add_invoke_code(self._contract_address, func)

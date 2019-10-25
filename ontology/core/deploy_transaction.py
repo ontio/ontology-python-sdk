@@ -18,9 +18,13 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
+from ontology.exception.error_code import ErrorCode
+
+from ontology.exception.exception import SDKException
+
 from ontology.common.address import Address
 from ontology.io.binary_writer import BinaryWriter
-from ontology.core.transaction import Transaction, TransactionType
+from ontology.core.transaction import Transaction, TxType
 from ontology.vm.vm_type import VmType
 
 
@@ -28,10 +32,12 @@ class DeployTransaction(Transaction):
     def __init__(self, code: bytearray or str, vm_type: VmType, name: str = '', version: str = '', author: str = '',
                  email: str = '', description: str = '', gas_price: int = 0, gas_limit: int = 0,
                  payer: Union[str, bytes, Address, None] = b''):
-        super().__init__(0, TransactionType.Deploy.value, gas_price, gas_limit, payer)
+        super().__init__(0, TxType.Deploy, gas_price, gas_limit, payer)
         if isinstance(code, str):
             code = bytearray.fromhex(code)
         self.__code = code
+        if not isinstance(vm_type, VmType):
+            raise SDKException(ErrorCode.other_error('invalid vm type'))
         self.__vm_type = vm_type
         self.__name = name
         self.__code_version = version

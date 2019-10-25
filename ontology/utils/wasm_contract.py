@@ -15,18 +15,12 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-from ontology.vm.build_params import BuildParams
-from ontology.core.base_invoke_func import BaseInvokeFunc
+from typing import Union
 
 
-class NeoInvokeFunction(BaseInvokeFunc):
-    def __init__(self, func_name: str, parameters: list = None, return_type: str = ''):
-        super().__init__(func_name, parameters, return_type)
-
-    def create_invoke_code(self):
-        param_list = list()
-        param_list.append(self.func_name.encode('utf-8'))
-        param_list.append(self.parameters)
-        return BuildParams.create_neo_vm_invoke_code(param_list)
-
+class WasmData(object):
+    @staticmethod
+    def to_int(value: Union[str, bytes]):
+        if isinstance(value, str):
+            value = bytes.fromhex(value)
+        return int.from_bytes(value, byteorder='little')
