@@ -6,7 +6,7 @@ install:
 	pipenv shell
 
 install-mirror:
-	pip install --user pipenv
+	pip3 install --user pipenv
 	pipenv install --pypi-mirror https://mirrors.aliyun.com/pypi/simple
 	pipenv shell
 
@@ -26,8 +26,8 @@ coverage:
 	python-codacy-coverage -r coverage.xml
 
 ci-coverage:
-	pip install codacy-coverage
-	pip install coverage
+	pip3 install codacy-coverage
+	pip3 install coverage
 	coverage run -m unittest discover
 	coverage xml --include=ontology/* --omit=tests/*
 	python-codacy-coverage -r coverage.xml
@@ -38,7 +38,7 @@ build:
 	python setup.py bdist_wheel --python-tag py3
 
 ci-build:
-	pip install wheel
+	pip3 install wheel
 	python setup.py bdist_wheel --python-tag py3
 
 publish:
