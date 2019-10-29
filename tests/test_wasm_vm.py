@@ -128,8 +128,9 @@ class TestWasmVm(unittest.TestCase):
         func = WasmInvokeFunction('storage_read')
         func.set_params_value(key)
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct2.get_address(),
-                                                 self.gas_price,
-                                                 self.gas_limit)
+                                                 self.gas_price, self.gas_limit)
+        target_payload = '5daf0ec53b21abfab6459c7ba7f760c376e18ebf110c73746f726167655f72656164036b6579'
+        self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct2)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertTrue(isinstance(result, dict))
@@ -140,14 +141,13 @@ class TestWasmVm(unittest.TestCase):
         func = WasmInvokeFunction('storage_write')
         func.set_params_value(key, 'value')
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct1.get_address(),
-                                                 self.gas_price,
-                                                 self.gas_limit)
+                                                 self.gas_price, self.gas_limit)
         target_payload = '5daf0ec53b21abfab6459c7ba7f760c376e18ebf180d73746f726167655f7772697465036b65790576616c7565'
         self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct1)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
-        sleep(8)
+        sleep(15)
         result = self.read_storage_in_test_contract(key)
         self.assertEqual('0576616c7565', result)
         func = WasmInvokeFunction('storage_delete')

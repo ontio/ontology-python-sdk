@@ -35,11 +35,11 @@ ci-coverage:
 build:
 	pipenv shell
 	pipenv install wheel --dev --pypi-mirror https://mirrors.aliyun.com/pypi/simple
-	python setup.py bdist_wheel --python-tag py3
+	python3 setup.py bdist_wheel --python-tag py3
 
 ci-build:
 	pip3 install wheel
-	python setup.py bdist_wheel --python-tag py3
+	python3 setup.py bdist_wheel --python-tag py3
 
 publish:
 	pipenv shell
