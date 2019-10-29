@@ -23,7 +23,7 @@ import time
 import unittest
 
 from ontology.vm.vm_type import VmType
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 from ontology.common.address import Address
 from ontology.exception.exception import SDKException
 

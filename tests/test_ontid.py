@@ -25,8 +25,8 @@ from tests import sdk, acct2, acct3, acct4, password, not_panic_exception
 
 from ontology.utils import utils
 from ontology.crypto.curve import Curve
-from ontology.utils.contract import Data
-from ontology.utils.contract import Event
+from ontology.utils.neo import Data
+from ontology.utils.neo import Event
 from ontology.common.define import DID_ONT
 from ontology.account.account import Account
 from ontology.crypto.signature import Signature

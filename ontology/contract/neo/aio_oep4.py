@@ -21,7 +21,7 @@ from typing import Union
 from ontology.contract.neo.oep4 import Oep4
 from ontology.common.address import Address
 from ontology.account.account import Account
-from ontology.utils.contract import Data, Event
+from ontology.utils.neo import Data, Event
 from ontology.exception.exception import SDKException
 
 

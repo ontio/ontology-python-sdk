@@ -20,7 +20,7 @@ import unittest
 
 from time import sleep
 
-from ontology.utils.contract import Event, Data
+from ontology.utils.neo import Event, Data
 from tests import sdk, acct1, acct2
 
 from ontology.exception.exception import SDKException

@@ -22,8 +22,8 @@ import unittest
 from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 from ontology.sdk import Ontology
-from ontology.utils.contract import Data
-from ontology.utils.contract import Event
+from ontology.utils.neo import Data
+from ontology.utils.neo import Event
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException

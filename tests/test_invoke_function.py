@@ -21,7 +21,7 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from ontology.utils.contract import Data, Event
+from ontology.utils.neo import Data, Event
 from tests import acct1, acct2, acct3, sdk, not_panic_exception
 from ontology.contract.neo.invoke_function import NeoInvokeFunction
 

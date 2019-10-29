@@ -19,8 +19,8 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.common.address import Address
+from ontology.contract.wasm.params_builder import WasmParamsBuilder, WASM_INT128_MAX, WASM_INT128_MIN
 from ontology.exception.exception import SDKException
-from ontology.contract.wasm.params_builder import WasmParamsBuilder, WASM_UINT128_MAX, WASM_UINT128_MIN
 
 
 class TestWasmVm(unittest.TestCase):
@@ -31,15 +31,17 @@ class TestWasmVm(unittest.TestCase):
         self.builder.clear_up()
 
     def test_push_int(self):
-        py_int_list = [0, 1, 9007199254740993, 2 ** 128 - 1]
-        wasm_int_list = ['00000000000000000000000000000000', '01000000000000000000000000000000',
-                         '01000000000020000000000000000000', 'ffffffffffffffffffffffffffffffff']
+        py_int_list = [-2 ** 127, -2, -1, 0, 1, 2, 2 ** 127 - 1]
+        wasm_int_list = ['00000000000000000000000000000080', 'feffffffffffffffffffffffffffffff',
+                         'ffffffffffffffffffffffffffffffff', '00000000000000000000000000000000',
+                         '01000000000000000000000000000000', '02000000000000000000000000000000',
+                         'ffffffffffffffffffffffffffffff7f']
         for index, value in enumerate(py_int_list):
             self.builder.push_int(value)
             self.assertEqual(wasm_int_list[index], self.builder.to_bytes().hex())
             self.builder.clear_up()
-        self.assertRaises(SDKException, self.builder.push_int, WASM_UINT128_MAX + 1)
-        self.assertRaises(SDKException, self.builder.push_int, WASM_UINT128_MIN - 1)
+        self.assertRaises(SDKException, self.builder.push_int, WASM_INT128_MAX + 1)
+        self.assertRaises(SDKException, self.builder.push_int, WASM_INT128_MIN - 1)
 
     def test_push_address(self):
         b58_address_list = ['AS3SCXw8GKTEeXpdwVw7EcC4rqSebFYpfb', 'AJkkLbouowk6teTaxz1F2DYKfJh24PVk3r',

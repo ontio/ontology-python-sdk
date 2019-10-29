@@ -19,12 +19,13 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 from typing import List, Union
 
 from ontology.common.address import Address
+from ontology.vm.build_params import BuildParams
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.memory_stream import StreamManager
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.contract.neo.abi.struct_type import Struct
-from ontology.vm.build_params import BuildParams
+from ontology.contract.neo.params_builder import NeoParamsBuilder
 
 
 class Data(object):

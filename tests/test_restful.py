@@ -22,7 +22,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.vm.vm_type import VmType
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 from tests import sdk, acct4, acct3, acct1, acct2, not_panic_exception
 
 from ontology.common.address import Address

@@ -18,7 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 from ontology.contract.neo.params_builder import NeoParamsBuilder
 
 

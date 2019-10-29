@@ -20,7 +20,7 @@ from typing import Union
 
 from ontology.account.account import Account
 from ontology.common.address import Address
-from ontology.utils.contract import Data, Event
+from ontology.utils.neo import Data, Event
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction

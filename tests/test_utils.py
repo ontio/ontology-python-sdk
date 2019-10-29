@@ -19,7 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.utils import utils
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 
 
 class TestUtil(unittest.TestCase):

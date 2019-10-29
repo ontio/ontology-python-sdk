@@ -22,7 +22,7 @@ from asyncio import sleep
 from time import perf_counter
 
 from ontology.sdk import Ontology
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 from ontology.vm.vm_type import VmType
 from ontology.common.address import Address
 from ontology.account.account import Account

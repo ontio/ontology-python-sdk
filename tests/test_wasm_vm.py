@@ -23,7 +23,7 @@ from time import sleep
 
 from ontology.vm.vm_type import VmType
 from ontology.common.address import Address
-from ontology.utils.wasm_contract import WasmData
+from ontology.utils.wasm import WasmData
 from ontology.contract.wasm.invoke_function import WasmInvokeFunction
 
 from tests import sdk, acct1, acct2, acct3, acct4
@@ -83,6 +83,14 @@ class TestWasmVm(unittest.TestCase):
 
     def test_invoke_add_transaction(self):
         func = WasmInvokeFunction('add')
+        func.set_params_value(-2, 3)
+        tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
+                                                 self.gas_price, self.gas_limit)
+        tx.sign_transaction(acct3)
+        result = sdk.rpc.send_raw_transaction_pre_exec(tx)
+        print(result)
+
+        func = WasmInvokeFunction('add')
         func.set_params_value(1, 2)
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
                                                  self.gas_price, self.gas_limit)
@@ -90,9 +98,19 @@ class TestWasmVm(unittest.TestCase):
                          '000000000000000000000000002000000000000000000000000000000'
         self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct3)
-        result = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        target_result = '03000000000000000000000000000000'
-        self.assertEqual(target_result, result.get('Result', ''))
+        result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result', '')
+        self.assertEqual('03000000000000000000000000000000', result)
+        self.assertEqual(3, WasmData.to_int(result))
+        func.set_params_value(2 ** 127 - 1, -2 ** 127)
+        tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct2.get_address(),
+                                                 self.gas_price, self.gas_limit)
+        target_payload = '5daf0ec53b21abfab6459c7ba7f760c376e18ebf2403616464fffffff' \
+                         'fffffffffffffffffffffff7f00000000000000000000000000000080'
+        self.assertEqual(target_payload, tx.payload.hex())
+        tx.sign_transaction(acct2)
+        result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result')
+        self.assertEqual('ffffffffffffffffffffffffffffffff', result)
+        self.assertEqual(-1, WasmData.to_int(result))
 
     def test_invoke_notify_transaction(self):
         func = WasmInvokeFunction('notify')
@@ -160,6 +178,8 @@ class TestWasmVm(unittest.TestCase):
         func = WasmInvokeFunction('totalSupply')
         tx = sdk.wasm_vm.make_invoke_transaction(self.oep4_contract_address, func, acct1.get_address(), self.gas_price,
                                                  self.gas_limit)
+        payload = '0faeff23255536928b308e5caa38bc2dc14f30c30c0b746f74616c537570706c79'
+        self.assertEqual(payload, tx.payload.hex())
         tx.sign_transaction(acct1)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(100_000_000_000, WasmData.to_int(result.get('Result')))

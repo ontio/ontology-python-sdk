@@ -18,7 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode

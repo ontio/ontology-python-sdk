@@ -18,7 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import List
 
-from ontology.utils.contract import Data
+from ontology.utils.neo import Data
 from ontology.crypto.digest import Digest
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException

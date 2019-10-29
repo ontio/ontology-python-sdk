@@ -15,6 +15,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 from typing import Union
 
 
@@ -23,4 +24,4 @@ class WasmData(object):
     def to_int(value: Union[str, bytes]):
         if isinstance(value, str):
             value = bytes.fromhex(value)
-        return int.from_bytes(value, byteorder='little')
+        return int.from_bytes(value, byteorder='little', signed=True)

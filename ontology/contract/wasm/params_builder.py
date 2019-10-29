@@ -21,10 +21,10 @@ from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.base_params_builder import BaseParamsBuilder
 
-WASM_UINT128_SIZE = 16
-WASM_UINT128_FF = b'\xff' * WASM_UINT128_SIZE
-WASM_UINT128_MAX = 2 ** 128 - 1
-WASM_UINT128_MIN = 0
+WASM_INT128_SIZE = 16
+WASM_INT128_FF = b'\xff' * WASM_INT128_SIZE
+WASM_INT128_MAX = 2 ** 127 - 1
+WASM_INT128_MIN = -2 ** 127
 
 WASM_TRUE = b'\x01'
 WASM_FALSE = b'\x00'
@@ -85,9 +85,9 @@ class WasmParamsBuilder(BaseParamsBuilder):
     def push_int(self, value: int):
         if not isinstance(value, int):
             raise SDKException(ErrorCode.other_error('invalid data'))
-        if value < WASM_UINT128_MIN or value > WASM_UINT128_MAX:
+        if value < WASM_INT128_MIN or value > WASM_INT128_MAX:
             raise SDKException(ErrorCode.other_error("out of range"))
-        self.write_bytes(value.to_bytes(length=WASM_UINT128_SIZE, byteorder='little', signed=False))
+        self.write_bytes(value.to_bytes(length=WASM_INT128_SIZE, byteorder='little', signed=True))
 
     def push_str(self, value: str):
         if not isinstance(value, str):

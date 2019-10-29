@@ -20,7 +20,7 @@ import time
 import unittest
 
 from Cryptodome.Random.random import randint
-from ontology.utils.contract import Event
+from ontology.utils.neo import Event
 
 from ontology.common.address import Address
 
