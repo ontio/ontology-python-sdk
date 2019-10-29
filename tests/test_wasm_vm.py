@@ -87,9 +87,9 @@ class TestWasmVm(unittest.TestCase):
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
                                                  self.gas_price, self.gas_limit)
         tx.sign_transaction(acct3)
-        result = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        print(result)
-
+        result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result', '')
+        self.assertEqual('01000000000000000000000000000000', result)
+        self.assertEqual(1, WasmData.to_int(result))
         func = WasmInvokeFunction('add')
         func.set_params_value(1, 2)
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),

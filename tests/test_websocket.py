@@ -22,8 +22,8 @@ import unittest
 from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 from ontology.sdk import Ontology
-from ontology.utils.neo import Data
-from ontology.utils.neo import Event
+from ontology.utils.neo import NeoData
+from ontology.utils.event import Event
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.exception import SDKException
@@ -67,7 +67,7 @@ class TestWebsocketClient(unittest.TestCase):
             self.assertEqual(False, response['SubscribeBlockTxHashs'])
             self.assertEqual(64, len(event['TxHash']))
             notify = Event.get_notify_by_contract_address(event, hex_contract_address)
-            notify = Data.parse_addr_addr_int_notify(notify)
+            notify = NeoData.parse_addr_addr_int_notify(notify)
             self.assertEqual(hex_contract_address, notify['ContractAddress'])
             self.assertEqual('transfer', notify['States'][0])
             self.assertEqual(acct1.get_address_base58(), notify['States'][1])
@@ -112,7 +112,7 @@ class TestWebsocketClient(unittest.TestCase):
         key = '746f74616c537570706c79'
         storage = await sdk.websocket.get_storage(hex_contract_address, key)
         await sdk.websocket.close_connect()
-        value = Data.to_int(storage)
+        value = NeoData.to_int(storage)
         self.assertEqual(1000000000, value)
 
     @not_panic_exception

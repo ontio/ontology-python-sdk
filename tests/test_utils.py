@@ -19,7 +19,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.utils import utils
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 
 
 class TestUtil(unittest.TestCase):
@@ -36,8 +36,8 @@ class TestUtil(unittest.TestCase):
             self.assertEqual(len(utils.get_random_hex_str(length)), length)
 
     def test_to_bool(self):
-        self.assertTrue(Data.to_bool('01'))
-        self.assertFalse(Data.to_bool('00'))
+        self.assertTrue(NeoData.to_bool('01'))
+        self.assertFalse(NeoData.to_bool('00'))
 
 
 if __name__ == '__main__':

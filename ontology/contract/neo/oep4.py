@@ -18,9 +18,9 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
+from ontology.utils.neo import NeoData
+from ontology.utils.event import Event
 from ontology.contract.neo.oep import Oep
-from ontology.utils.neo import Data
-from ontology.utils.neo import Event
 from ontology.common.address import Address
 from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
@@ -51,7 +51,7 @@ class Oep4(Oep):
         """
         tx = self.new_name_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_utf8_str(response.get('Result', ''))
+        return NeoData.to_utf8_str(response.get('Result', ''))
 
     def new_symbol_tx(self) -> InvokeTransaction:
         """
@@ -65,7 +65,7 @@ class Oep4(Oep):
         """
         tx = self.new_symbol_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_utf8_str(response.get('Result', ''))
+        return NeoData.to_utf8_str(response.get('Result', ''))
 
     def new_decimals_tx(self) -> InvokeTransaction:
         """
@@ -80,7 +80,7 @@ class Oep4(Oep):
         """
         tx = self.new_decimals_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_int(response.get('Result', ''))
+        return NeoData.to_int(response.get('Result', ''))
 
     def new_total_supply_tx(self) -> InvokeTransaction:
         """
@@ -97,7 +97,7 @@ class Oep4(Oep):
         tx = self.new_total_supply_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         try:
-            total_supply = Data.to_int(response['Result'])
+            total_supply = NeoData.to_int(response['Result'])
         except SDKException:
             total_supply = 0
         return total_supply
@@ -139,7 +139,7 @@ class Oep4(Oep):
         tx = self.new_balance_of_tx(owner)
         result = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         try:
-            balance = Data.to_int(result['Result'])
+            balance = NeoData.to_int(result['Result'])
         except SDKException:
             balance = 0
         return balance
@@ -232,14 +232,14 @@ class Oep4(Oep):
     def query_transfer_event(self, tx_hash: str):
         event = self._sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self._contract_address)
-        notify = Data.parse_addr_addr_int_notify(notify)
+        notify = NeoData.parse_addr_addr_int_notify(notify)
         return notify
 
     def _parse_multi_transfer_event(self, event: dict):
         notify_list = Event.get_notify_by_contract_address(event, self._contract_address)
         for index, notify in enumerate(notify_list):
             if notify.get('ContractAddress', '') == self._contract_address:
-                notify_list[index] = Data.parse_addr_addr_int_notify(notify_list[index])
+                notify_list[index] = NeoData.parse_addr_addr_int_notify(notify_list[index])
         return notify_list
 
     def query_multi_transfer_event(self, tx_hash: str) -> list:
@@ -249,7 +249,7 @@ class Oep4(Oep):
     def query_approve_event(self, tx_hash: str):
         event = self._sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self._contract_address)
-        notify = Data.parse_addr_addr_int_notify(notify)
+        notify = NeoData.parse_addr_addr_int_notify(notify)
         return notify
 
     def new_allowance_tx(self, owner: Union[str, bytes, Address],
@@ -299,5 +299,5 @@ class Oep4(Oep):
     def query_transfer_from_event(self, tx_hash: str):
         event = self._sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self._contract_address)
-        notify = Data.parse_addr_addr_int_notify(notify)
+        notify = NeoData.parse_addr_addr_int_notify(notify)
         return notify

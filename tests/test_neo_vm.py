@@ -20,7 +20,8 @@ import unittest
 
 from time import sleep
 
-from ontology.utils.neo import Event, Data
+from ontology.utils.event import Event
+from ontology.utils.neo import NeoData
 from tests import sdk, acct1, acct2
 
 from ontology.exception.exception import SDKException
@@ -85,7 +86,7 @@ class TestNeoVm(unittest.TestCase):
         tx = sdk.neo_vm.make_invoke_transaction(contract_address, hello, acct1.get_address_base58(), 500, 20000)
         response = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(1, response['State'])
-        response['Result'] = Data.to_utf8_str(response['Result'])
+        response['Result'] = NeoData.to_utf8_str(response['Result'])
         self.assertEqual('ontology', response['Result'])
         tx.sign_transaction(acct1)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
@@ -96,8 +97,8 @@ class TestNeoVm(unittest.TestCase):
                 if isinstance(event, dict) and event.get('Notify', '') != '':
                     notify = Event.get_notify_by_contract_address(event, contract_address)
                     self.assertEqual(contract_address, notify['ContractAddress'])
-                    self.assertEqual('hello', Data.to_utf8_str(notify['States'][0]))
-                    self.assertEqual('ontology', Data.to_utf8_str(notify['States'][1]))
+                    self.assertEqual('hello', NeoData.to_utf8_str(notify['States'][0]))
+                    self.assertEqual('ontology', NeoData.to_utf8_str(notify['States'][1]))
                     break
             except SDKException:
                 continue

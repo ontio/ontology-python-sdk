@@ -28,7 +28,7 @@ from ontology.contract.neo.abi.struct_type import Struct
 from ontology.contract.neo.params_builder import NeoParamsBuilder
 
 
-class Data(object):
+class NeoData(object):
     @staticmethod
     def to_bool(hex_str) -> bool:
         if len(hex_str) != 2:
@@ -39,7 +39,7 @@ class Data(object):
     def get_map_bytes(param_dict: dict):
         builder = NeoParamsBuilder()
         builder.emit(BuildParams.Type.dict_type.value)
-        builder.emit(Data.big_int_to_neo_bytearray(len(param_dict)))
+        builder.emit(NeoData.big_int_to_neo_bytearray(len(param_dict)))
         for key, value in param_dict.items():
             builder.emit(BuildParams.Type.bytearray_type.value)
             builder.push_bytearray(str(key).encode())
@@ -85,15 +85,15 @@ class Data(object):
             stream = StreamManager.get_stream(op_code)
             reader = BinaryReader(stream)
             op_code = bytearray(reader.read_var_bytes())
-            return Data.neo_bytearray_to_big_int(op_code)
+            return NeoData.neo_bytearray_to_big_int(op_code)
 
     @staticmethod
     def to_int_list(hex_str_list: list) -> List[int]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Data.to_int_list(item)
+                hex_str_list[index] = NeoData.to_int_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Data.to_int(item)
+                hex_str_list[index] = NeoData.to_int(item)
             else:
                 raise SDKException(ErrorCode.other_error('Invalid data.'))
         return hex_str_list
@@ -110,9 +110,9 @@ class Data(object):
     def to_bytes_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Data.to_bytes_list(item)
+                hex_str_list[index] = NeoData.to_bytes_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Data.to_bytes(item)
+                hex_str_list[index] = NeoData.to_bytes(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -140,9 +140,9 @@ class Data(object):
     def to_utf8_str_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Data.to_utf8_str_list(item)
+                hex_str_list[index] = NeoData.to_utf8_str_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Data.to_utf8_str(item)
+                hex_str_list[index] = NeoData.to_utf8_str(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -160,9 +160,9 @@ class Data(object):
     def to_b58_address_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Data.to_b58_address_list(item)
+                hex_str_list[index] = NeoData.to_b58_address_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Data.to_b58_address(item)
+                hex_str_list[index] = NeoData.to_b58_address(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -180,9 +180,9 @@ class Data(object):
     def to_bytes_address_list(hex_str_list: list) -> List[bytes]:
         for index, item in enumerate(hex_str_list):
             if isinstance(item, list):
-                hex_str_list[index] = Data.to_bytes_address_list(item)
+                hex_str_list[index] = NeoData.to_bytes_address_list(item)
             elif isinstance(item, str):
-                hex_str_list[index] = Data.to_bytes_address(item)
+                hex_str_list[index] = NeoData.to_bytes_address(item)
             else:
                 raise SDKException(ErrorCode.other_error('invalid data'))
         return hex_str_list
@@ -191,7 +191,7 @@ class Data(object):
     def to_dict(item_serialize: str) -> dict:
         stream = StreamManager.get_stream(bytearray.fromhex(item_serialize))
         reader = BinaryReader(stream)
-        return Data.__deserialize_stack_item(reader)
+        return NeoData.__deserialize_stack_item(reader)
 
     @staticmethod
     def __deserialize_stack_item(reader: BinaryReader) -> dict or bytearray:
@@ -203,12 +203,12 @@ class Data(object):
             return reader.read_bool()
         elif param_type == BuildParams.Type.int_type.value:
             b = reader.read_var_bytes()
-            return Data.__big_int_from_bytes(bytearray(b))
+            return NeoData.__big_int_from_bytes(bytearray(b))
         elif param_type == BuildParams.Type.struct_type.value or param_type == BuildParams.Type.array_type.value:
             count = reader.read_var_int()
             item_list = list()
             for _ in range(count):
-                item = Data.__deserialize_stack_item(reader)
+                item = NeoData.__deserialize_stack_item(reader)
                 item_list.append(item)
             if param_type == BuildParams.Type.struct_type.value:
                 return Struct(item_list)
@@ -217,8 +217,8 @@ class Data(object):
             count = reader.read_var_int()
             item_dict = dict()
             for _ in range(count):
-                key = Data.__deserialize_stack_item(reader)
-                value = Data.__deserialize_stack_item(reader)
+                key = NeoData.__deserialize_stack_item(reader)
+                value = NeoData.__deserialize_stack_item(reader)
                 item_dict[key] = value
             return item_dict
         else:
@@ -250,11 +250,11 @@ class Data(object):
     def big_int_to_neo_bytearray(data: int) -> bytearray:
         if data == 0:
             return bytearray()
-        data_bytes = Data.int_to_bytearray(data)
+        data_bytes = NeoData.int_to_bytearray(data)
         if len(data_bytes) == 0:
             return bytearray()
         if data < 0:
-            data_bytes2 = Data.int_to_bytearray(-data)
+            data_bytes2 = NeoData.int_to_bytearray(-data)
             b = data_bytes2[0]
             data_bytes.reverse()
             if b >> 7 == 1:
@@ -279,109 +279,8 @@ class Data(object):
 
     @staticmethod
     def parse_addr_addr_int_notify(notify: dict):
-        notify['States'][0] = Data.to_utf8_str(notify['States'][0])
-        notify['States'][1] = Data.to_b58_address(notify['States'][1])
-        notify['States'][2] = Data.to_b58_address(notify['States'][2])
-        notify['States'][3] = Data.to_int(notify['States'][3])
+        notify['States'][0] = NeoData.to_utf8_str(notify['States'][0])
+        notify['States'][1] = NeoData.to_b58_address(notify['States'][1])
+        notify['States'][2] = NeoData.to_b58_address(notify['States'][2])
+        notify['States'][3] = NeoData.to_int(notify['States'][3])
         return notify
-
-
-class Event(object):
-    @staticmethod
-    def __check_event(event: dict):
-        if not isinstance(event, dict):
-            raise SDKException(ErrorCode.require_dict_params)
-
-    @staticmethod
-    def get_tx_hash(event: dict):
-        Event.__check_event(event)
-        try:
-            return event['TxHash']
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('TxHash not found in event'))
-
-    @staticmethod
-    def get_state(event: dict):
-        Event.__check_event(event)
-        try:
-            return event['State']
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('State not found in event'))
-
-    @staticmethod
-    def get_gas_consumed(event: dict):
-        Event.__check_event(event)
-        try:
-            return event['GasConsumed']
-        except KeyError:
-            raise SDKException(ErrorCode.other_error('Gas consumed not found in event'))
-
-    @staticmethod
-    def get_notify_list(event: dict):
-        Event.__check_event(event)
-        try:
-            return event['Notify']
-        except KeyError:
-            raise SDKException(ErrorCode.other_error(f'Notify not found in {event}')) from None
-
-    @staticmethod
-    def get_ong_contract_notify(event: dict) -> dict:
-        Event.__check_event(event)
-        notify_list = Event.get_notify_list(event)
-        for notify in notify_list:
-            if notify['ContractAddress'] == '0200000000000000000000000000000000000000':
-                return notify
-        return dict()
-
-    @staticmethod
-    def __get_notify_list_by_contract_address(event: dict, hex_contract_address: str) -> list:
-        if not isinstance(hex_contract_address, str):
-            raise SDKException(ErrorCode.require_str_params)
-        Event.__check_event(event)
-        notify_list = Event.get_notify_list(event)
-        specify_notify_list = list()
-        for notify in notify_list:
-            if notify['ContractAddress'] == hex_contract_address:
-                specify_notify_list.append(notify)
-        return specify_notify_list
-
-    @staticmethod
-    def get_event_from_event_list_by_contract_address(event_list: list, hex_contract_address: str) -> List[dict]:
-        if not isinstance(hex_contract_address, str):
-            raise SDKException(ErrorCode.require_str_params)
-        specify_event_list = list()
-        for event in event_list:
-            if event['ContractAddress'] == hex_contract_address:
-                specify_event_list.append(event)
-        return specify_event_list
-
-    @staticmethod
-    def get_notify_by_contract_address(event: dict, contract_address: Union[str, bytes]) -> list or dict:
-        if not isinstance(contract_address, str):
-            try:
-                contract_address = contract_address.hex()
-            except AttributeError:
-                raise SDKException(ErrorCode.require_str_params) from None
-        Event.__check_event(event)
-        notify_list = Event.get_notify_list(event)
-        specify_notify_list = list()
-        for notify in notify_list:
-            if notify['ContractAddress'] == contract_address:
-                specify_notify_list.append(notify)
-        if len(specify_notify_list) == 1:
-            specify_notify_list = specify_notify_list[0]
-        return specify_notify_list
-
-    @staticmethod
-    def get_states_by_contract_address(event: dict, hex_contract_address: str):
-        if not isinstance(hex_contract_address, str):
-            raise SDKException(ErrorCode.require_str_params)
-        notify_list = Event.__get_notify_list_by_contract_address(event, hex_contract_address)
-        states_list = list()
-        for notify in notify_list:
-            states = notify.get('States', list())
-            states_list.append(states)
-        states_list.count(list)
-        if len(states_list) == 1:
-            states_list = states_list[0]
-        return states_list

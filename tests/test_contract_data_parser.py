@@ -18,7 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 from ontology.contract.neo.params_builder import NeoParamsBuilder
 
 
@@ -27,9 +27,9 @@ class TestContractDataParser(unittest.TestCase):
         value_list = [9175052165852779861, -9175052165852779861, 9199634313818843819, -9199634313818843819, 8380656,
                       -8380656, 8446192, -8446192, 0]
         for value in value_list:
-            neo_bytearray = Data.big_int_to_neo_bytearray(value)
+            neo_bytearray = NeoData.big_int_to_neo_bytearray(value)
             self.assertTrue(isinstance(neo_bytearray, bytearray))
-            neo_value = Data.neo_bytearray_to_big_int(neo_bytearray)
+            neo_value = NeoData.neo_bytearray_to_big_int(neo_bytearray)
             self.assertEqual(value, neo_value)
 
     def test_op_code_to_int(self):
@@ -38,5 +38,5 @@ class TestContractDataParser(unittest.TestCase):
             builder.push_int(num)
             op_code = builder.to_bytes().hex()
             builder.clear_up()
-            value = Data.op_code_to_int(op_code)
+            value = NeoData.op_code_to_int(op_code)
             self.assertEqual(num, value)

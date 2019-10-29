@@ -22,7 +22,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from ontology.vm.vm_type import VmType
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 from tests import sdk, acct4, acct3, acct1, acct2, not_panic_exception
 
 from ontology.common.address import Address
@@ -146,7 +146,7 @@ class TestRestful(unittest.TestCase):
         contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = sdk.restful.get_storage(contract_address, key)
-        value = Data.to_int(value)
+        value = NeoData.to_int(value)
         self.assertEqual(1000000000, value)
 
     @not_panic_exception

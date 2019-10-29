@@ -21,7 +21,8 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from ontology.utils.neo import Data, Event
+from ontology.utils.neo import NeoData
+from ontology.utils.event import Event
 from tests import acct1, acct2, acct3, sdk, not_panic_exception
 from ontology.contract.neo.invoke_function import NeoInvokeFunction
 
@@ -38,7 +39,7 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertEqual(bytearray(b'\x00\xc1\x04name'), func.create_invoke_code())
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         name = result['Result']
-        name = Data.to_utf8_str(name)
+        name = NeoData.to_utf8_str(name)
         self.assertEqual('DXToken', name)
 
     @not_panic_exception
@@ -48,7 +49,7 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertEqual(bytearray(b'\x00\xc1\x06symbol'), func.create_invoke_code())
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         symbol = result['Result']
-        symbol = Data.to_utf8_str(symbol)
+        symbol = NeoData.to_utf8_str(symbol)
         self.assertEqual('DX', symbol)
 
     @not_panic_exception
@@ -57,7 +58,7 @@ class TestInvokeFunction(unittest.TestCase):
         func = NeoInvokeFunction('decimals')
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         decimals = result['Result']
-        decimals = Data.to_int(decimals)
+        decimals = NeoData.to_int(decimals)
         self.assertEqual(10, decimals)
 
     @not_panic_exception
@@ -66,7 +67,7 @@ class TestInvokeFunction(unittest.TestCase):
         func = NeoInvokeFunction('totalSupply')
         result = sdk.default_network.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         total_supply = result['Result']
-        total_supply = Data.to_int(total_supply)
+        total_supply = NeoData.to_int(total_supply)
         self.assertEqual(10000000000000000000, total_supply)
 
     @not_panic_exception
@@ -80,7 +81,7 @@ class TestInvokeFunction(unittest.TestCase):
         self.assertEqual(target, func.create_invoke_code())
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         balance = result['Result']
-        balance = Data.to_int(balance)
+        balance = NeoData.to_int(balance)
         self.assertGreater(balance, 100)
 
     def send_tx(self, hex_contract_address, signer, payer, func):
@@ -103,13 +104,13 @@ class TestInvokeFunction(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
-        states[0] = Data.to_utf8_str(states[0])
+        states[0] = NeoData.to_utf8_str(states[0])
         self.assertEqual('transfer', states[0])
-        states[1] = Data.to_b58_address(states[1])
+        states[1] = NeoData.to_b58_address(states[1])
         self.assertEqual(acct1.get_address().b58encode(), states[1])
-        states[2] = Data.to_b58_address(states[2])
+        states[2] = NeoData.to_b58_address(states[2])
         self.assertEqual(acct2.get_address().b58encode(), states[2])
-        states[3] = Data.to_int(states[3])
+        states[3] = NeoData.to_int(states[3])
         self.assertEqual(value, states[3])
 
     @not_panic_exception
@@ -130,22 +131,22 @@ class TestInvokeFunction(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states_list = Event.get_states_by_contract_address(event, hex_contract_address)
-        states_list[0][0] = Data.to_utf8_str(states_list[0][0])
+        states_list[0][0] = NeoData.to_utf8_str(states_list[0][0])
         self.assertEqual('transfer', states_list[0][0])
-        states_list[0][1] = Data.to_b58_address(states_list[0][1])
+        states_list[0][1] = NeoData.to_b58_address(states_list[0][1])
         self.assertEqual(acct1.get_address().b58encode(), states_list[0][1])
-        states_list[0][2] = Data.to_b58_address(states_list[0][2])
+        states_list[0][2] = NeoData.to_b58_address(states_list[0][2])
         self.assertEqual(acct2.get_address().b58encode(), states_list[0][2])
-        states_list[0][3] = Data.to_int(states_list[0][3])
+        states_list[0][3] = NeoData.to_int(states_list[0][3])
         self.assertEqual(value1, states_list[0][3])
 
-        states_list[1][0] = Data.to_utf8_str(states_list[1][0])
+        states_list[1][0] = NeoData.to_utf8_str(states_list[1][0])
         self.assertEqual('transfer', states_list[1][0])
-        states_list[1][1] = Data.to_b58_address(states_list[1][1])
+        states_list[1][1] = NeoData.to_b58_address(states_list[1][1])
         self.assertEqual(acct2.get_address().b58encode(), states_list[1][1])
-        states_list[1][2] = Data.to_b58_address(states_list[1][2])
+        states_list[1][2] = NeoData.to_b58_address(states_list[1][2])
         self.assertEqual(acct3.get_address().b58encode(), states_list[1][2])
-        states_list[1][3] = Data.to_int(states_list[1][3])
+        states_list[1][3] = NeoData.to_int(states_list[1][3])
         self.assertEqual(value2, states_list[1][3])
 
     @not_panic_exception
@@ -162,18 +163,18 @@ class TestInvokeFunction(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
-        states[0] = Data.to_utf8_str(states[0])
-        states[1][0][0] = Data.to_b58_address(states[1][0][0])
+        states[0] = NeoData.to_utf8_str(states[0])
+        states[1][0][0] = NeoData.to_b58_address(states[1][0][0])
         self.assertEqual(acct1.get_address_base58(), states[1][0][0])
-        states[1][0][1] = Data.to_b58_address(states[1][0][1])
+        states[1][0][1] = NeoData.to_b58_address(states[1][0][1])
         self.assertEqual(acct2.get_address_base58(), states[1][0][1])
-        states[1][0][2] = Data.to_int(states[1][0][2])
+        states[1][0][2] = NeoData.to_int(states[1][0][2])
         self.assertEqual(10, states[1][0][2])
-        states[1][1][0] = Data.to_b58_address(states[1][1][0])
+        states[1][1][0] = NeoData.to_b58_address(states[1][1][0])
         self.assertEqual(acct2.get_address_base58(), states[1][1][0])
-        states[1][1][1] = Data.to_b58_address(states[1][1][1])
+        states[1][1][1] = NeoData.to_b58_address(states[1][1][1])
         self.assertEqual(acct3.get_address_base58(), states[1][1][1])
-        states[1][1][2] = Data.to_int(states[1][1][2])
+        states[1][1][2] = NeoData.to_int(states[1][1][2])
         self.assertEqual(100, states[1][1][2])
 
     @not_panic_exception
@@ -193,17 +194,17 @@ class TestInvokeFunction(unittest.TestCase):
         notify = response['Notify'][0]
         self.assertEqual(hex_contract_address, notify['ContractAddress'])
         states = notify['States']
-        states[0] = Data.to_utf8_str(states[0])
+        states[0] = NeoData.to_utf8_str(states[0])
         self.assertEqual('notify args', states[0])
-        states[1] = Data.to_bool(states[1])
+        states[1] = NeoData.to_bool(states[1])
         self.assertEqual(True, states[1])
-        states[2] = Data.to_int(states[2])
+        states[2] = NeoData.to_int(states[2])
         self.assertEqual(int_msg, states[2])
-        states[3] = Data.to_int_list(states[3])
+        states[3] = NeoData.to_int_list(states[3])
         self.assertEqual(list_msg, states[3])
-        states[4] = Data.to_utf8_str(states[4])
+        states[4] = NeoData.to_utf8_str(states[4])
         self.assertEqual(str_msg, states[4])
-        states[5] = Data.to_b58_address(states[5])
+        states[5] = NeoData.to_b58_address(states[5])
         self.assertEqual(acct1.get_address_base58(), states[5])
 
     @not_panic_exception
@@ -222,17 +223,17 @@ class TestInvokeFunction(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
-        states[0] = Data.to_utf8_str(states[0])
+        states[0] = NeoData.to_utf8_str(states[0])
         self.assertEqual('testHello', states[0])
-        states[1] = Data.to_bool(states[1])
+        states[1] = NeoData.to_bool(states[1])
         self.assertEqual(bool_msg, states[1])
-        states[2] = Data.to_int(states[2])
+        states[2] = NeoData.to_int(states[2])
         self.assertEqual(int_msg, states[2])
-        states[3] = Data.to_bytes(states[3])
+        states[3] = NeoData.to_bytes(states[3])
         self.assertEqual(bytes_msg, states[3])
-        states[4] = Data.to_utf8_str(states[4])
+        states[4] = NeoData.to_utf8_str(states[4])
         self.assertEqual(str_msg, states[4])
-        states[5] = Data.to_b58_address(states[5])
+        states[5] = NeoData.to_b58_address(states[5])
         self.assertEqual(acct1.get_address_base58(), states[5])
 
     @not_panic_exception
@@ -247,9 +248,9 @@ class TestInvokeFunction(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
-        states[0] = Data.to_utf8_str(states[0])
+        states[0] = NeoData.to_utf8_str(states[0])
         self.assertEqual('testMsgList', states[0])
-        states[1] = Data.to_int_list(states[1])
+        states[1] = NeoData.to_int_list(states[1])
         self.assertEqual(list_msg, states[1])
 
     @not_panic_exception
@@ -260,7 +261,7 @@ class TestInvokeFunction(unittest.TestCase):
         func.set_params_value(dict_msg)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         dict_value = result['Result']
-        dict_value = Data.to_utf8_str(dict_value)
+        dict_value = NeoData.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
         list_value = [1, 10, 1024, [1, 10, 1024, [1, 10, 1024]]]
         dict_msg = {'key': list_value}
@@ -268,7 +269,7 @@ class TestInvokeFunction(unittest.TestCase):
         func.set_params_value(dict_msg)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         dict_value = result['Result']
-        dict_value = Data.to_int_list(dict_value)
+        dict_value = NeoData.to_int_list(dict_value)
         self.assertEqual(list_value, dict_value)
 
     @not_panic_exception
@@ -279,7 +280,7 @@ class TestInvokeFunction(unittest.TestCase):
         func.set_params_value(key)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         dict_value = result['Result']
-        dict_value = Data.to_utf8_str(dict_value)
+        dict_value = NeoData.to_utf8_str(dict_value)
         self.assertEqual('value', dict_value)
 
     @not_panic_exception
@@ -298,9 +299,9 @@ class TestInvokeFunction(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         states = Event.get_states_by_contract_address(event, hex_contract_address)
-        states[0] = Data.to_utf8_str(states[0])
+        states[0] = NeoData.to_utf8_str(states[0])
         self.assertEqual('mapInfo', states[0])
-        states[1] = Data.to_dict(states[1])
+        states[1] = NeoData.to_dict(states[1])
         self.assertTrue(isinstance(states[1], dict))
 
     @not_panic_exception
@@ -311,7 +312,7 @@ class TestInvokeFunction(unittest.TestCase):
         func.set_params_value(key)
         result = sdk.rpc.send_neo_vm_tx_pre_exec(hex_contract_address, func)
         value = result['Result']
-        value = Data.to_utf8_str(value)
+        value = NeoData.to_utf8_str(value)
         self.assertEqual('value', value)
 
 

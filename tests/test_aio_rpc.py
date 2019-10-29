@@ -22,7 +22,7 @@ from asyncio import sleep
 from time import perf_counter
 
 from ontology.sdk import Ontology
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 from ontology.vm.vm_type import VmType
 from ontology.common.address import Address
 from ontology.account.account import Account
@@ -159,7 +159,7 @@ class TestAioRpc(unittest.TestCase):
         hex_contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = await sdk.aio_rpc.get_storage(hex_contract_address, key)
-        self.assertEqual(1000000000, Data.to_int(value))
+        self.assertEqual(1000000000, NeoData.to_int(value))
 
     @not_panic_exception
     @Ontology.runner

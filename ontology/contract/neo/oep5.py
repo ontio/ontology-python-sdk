@@ -17,7 +17,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import Union
 
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 from ontology.contract.neo.oep import Oep
 from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
@@ -48,7 +48,7 @@ class Oep5(Oep):
         """
         tx = self.new_name_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_utf8_str(response.get('Result', ''))
+        return NeoData.to_utf8_str(response.get('Result', ''))
 
     def new_symbol_tx(self) -> InvokeTransaction:
         """
@@ -62,7 +62,7 @@ class Oep5(Oep):
         """
         tx = self.new_symbol_tx()
         response = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_utf8_str(response.get('Result', ''))
+        return NeoData.to_utf8_str(response.get('Result', ''))
 
     def new_balance_of_tx(self, owner: Union[str, bytes, Address]) -> InvokeTransaction:
         """
@@ -81,7 +81,7 @@ class Oep5(Oep):
         tx = self.new_balance_of_tx(owner)
         result = self._sdk.default_network.send_raw_transaction_pre_exec(tx)
         try:
-            balance = Data.to_int(result['Result'])
+            balance = NeoData.to_int(result['Result'])
         except SDKException:
             balance = 0
         return balance

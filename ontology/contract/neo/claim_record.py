@@ -18,9 +18,10 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
-from ontology.account.account import Account
+from ontology.utils.neo import NeoData
+from ontology.utils.event import Event
 from ontology.common.address import Address
-from ontology.utils.neo import Data, Event
+from ontology.account.account import Account
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
 from ontology.core.invoke_transaction import InvokeTransaction
@@ -97,7 +98,7 @@ class ClaimRecord(object):
         if status == '':
             status = False
         else:
-            status = Data.to_dict(status)
+            status = NeoData.to_dict(status)
             status = bool(status[3])
         return status
 
@@ -107,22 +108,22 @@ class ClaimRecord(object):
         if len(notify) == 0:
             return notify
         if len(notify['States']) == 4:
-            notify['States'][0] = Data.to_utf8_str(notify['States'][0])
-            notify['States'][1] = Data.to_b58_address(notify['States'][1])
-            notify['States'][2] = Data.to_utf8_str(notify['States'][2])
-            notify['States'][3] = Data.to_hex_str(notify['States'][3])
+            notify['States'][0] = NeoData.to_utf8_str(notify['States'][0])
+            notify['States'][1] = NeoData.to_b58_address(notify['States'][1])
+            notify['States'][2] = NeoData.to_utf8_str(notify['States'][2])
+            notify['States'][3] = NeoData.to_hex_str(notify['States'][3])
         if len(notify['States']) == 3:
-            notify['States'][0] = Data.to_utf8_str(notify['States'][0])
-            notify['States'][1] = Data.to_hex_str(notify['States'][1])
-            notify['States'][2] = Data.to_utf8_str(notify['States'][2])
+            notify['States'][0] = NeoData.to_utf8_str(notify['States'][0])
+            notify['States'][1] = NeoData.to_hex_str(notify['States'][1])
+            notify['States'][2] = NeoData.to_utf8_str(notify['States'][2])
         return notify
 
     def query_revoke_event(self, tx_hash: str):
         event = self._sdk.default_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self.__hex_contract_address)
         if len(notify['States']) == 4:
-            notify['States'][0] = Data.to_utf8_str(notify['States'][0])
-            notify['States'][1] = Data.to_b58_address(notify['States'][1])
-            notify['States'][2] = Data.to_utf8_str(notify['States'][2])
-            notify['States'][3] = Data.to_hex_str(notify['States'][3])
+            notify['States'][0] = NeoData.to_utf8_str(notify['States'][0])
+            notify['States'][1] = NeoData.to_b58_address(notify['States'][1])
+            notify['States'][2] = NeoData.to_utf8_str(notify['States'][2])
+            notify['States'][3] = NeoData.to_hex_str(notify['States'][3])
         return notify

@@ -26,8 +26,8 @@ from tests import sdk, acct2, acct3, acct4, password, not_panic_exception
 
 from ontology.utils import utils
 from ontology.crypto.curve import Curve
-from ontology.utils.neo import Data
-from ontology.utils.neo import Event
+from ontology.utils.neo import NeoData
+from ontology.utils.event import Event
 from ontology.account.account import Account
 from ontology.crypto.signature import Signature
 from ontology.exception.exception import SDKException
@@ -189,7 +189,7 @@ class TestAioOntId(unittest.TestCase):
         self.assertEqual('Attribute', notify['States'][0])
         self.assertEqual('add', notify['States'][1])
         self.assertEqual(identity.ont_id, notify['States'][2])
-        self.assertEqual('hello', Data.to_utf8_str(notify['States'][3][0]))
+        self.assertEqual('hello', NeoData.to_utf8_str(notify['States'][3][0]))
 
         attrib_key = 'hello'
         tx_hash = await ont_id.remove_attribute(identity.ont_id, ctrl_acct, attrib_key, acct3, self.gas_price,
@@ -200,7 +200,7 @@ class TestAioOntId(unittest.TestCase):
         self.assertEqual('Attribute', notify['States'][0])
         self.assertEqual('remove', notify['States'][1])
         self.assertEqual(identity.ont_id, notify['States'][2])
-        self.assertEqual('hello', Data.to_utf8_str(notify['States'][3]))
+        self.assertEqual('hello', NeoData.to_utf8_str(notify['States'][3]))
         try:
             await ont_id.remove_attribute(identity.ont_id, ctrl_acct, attrib_key, acct3, self.gas_price, self.gas_limit)
         except SDKException as e:

@@ -16,14 +16,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 import sys
+import asyncio
 import unittest
 
 from Cryptodome.Random.random import randint
 
 from ontology.sdk import Ontology
-from ontology.utils.neo import Event
+from ontology.utils.event import Event
 
 from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 

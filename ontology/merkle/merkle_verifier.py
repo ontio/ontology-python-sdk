@@ -18,7 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import List
 
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 from ontology.crypto.digest import Digest
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
@@ -46,15 +46,15 @@ class MerkleVerifier(object):
     @staticmethod
     def validate_proof(proof: List[dict], hex_target_hash: str, hex_merkle_root: str, is_big_endian: bool = False):
         if is_big_endian:
-            hex_merkle_root = Data.to_reserve_hex_str(hex_merkle_root)
-            hex_target_hash = Data.to_reserve_hex_str(hex_target_hash)
+            hex_merkle_root = NeoData.to_reserve_hex_str(hex_merkle_root)
+            hex_target_hash = NeoData.to_reserve_hex_str(hex_target_hash)
         if len(proof) == 0:
             return hex_target_hash == hex_merkle_root
         else:
             hex_proof_hash = hex_target_hash
             for node in proof:
                 if is_big_endian:
-                    sibling = Data.to_reserve_hex_str(node['TargetHash'])
+                    sibling = NeoData.to_reserve_hex_str(node['TargetHash'])
                 else:
                     sibling = node['TargetHash']
                 try:

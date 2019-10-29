@@ -23,7 +23,7 @@ import time
 import unittest
 
 from ontology.vm.vm_type import VmType
-from ontology.utils.neo import Data
+from ontology.utils.neo import NeoData
 from ontology.common.address import Address
 from ontology.exception.exception import SDKException
 
@@ -145,7 +145,7 @@ class TestRpcClient(unittest.TestCase):
         hex_contract_address = "0100000000000000000000000000000000000000"
         key = "746f74616c537570706c79"
         value = sdk.rpc.get_storage(hex_contract_address, key)
-        value = Data.to_int(value)
+        value = NeoData.to_int(value)
         self.assertEqual(1000000000, value)
 
     @not_panic_exception
@@ -244,7 +244,7 @@ class TestRpcClient(unittest.TestCase):
         tx = sdk.native_vm.ong().new_transfer_tx(b58_address, acct2.get_address(), 2, b58_address, 500, 20000)
         tx.sign_transaction(acct1)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        self.assertTrue(Data.to_bool(result['Result']))
+        self.assertTrue(NeoData.to_bool(result['Result']))
         self.assertEqual(result['Gas'], 20000)
         self.assertEqual(result['State'], 1)
 

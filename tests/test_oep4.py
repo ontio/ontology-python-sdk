@@ -21,7 +21,8 @@ import unittest
 
 from Cryptodome.Random.random import randint
 
-from ontology.utils.neo import Event, Data
+from ontology.utils.event import Event
+from ontology.utils.neo import NeoData
 from tests import sdk, acct1, acct2, acct3, acct4, not_panic_exception
 
 
@@ -71,7 +72,7 @@ class TestOep4(unittest.TestCase):
         time.sleep(randint(10, 15))
         event = sdk.rpc.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, oep4.hex_contract_address)
-        self.assertEqual('Already initialized!', Data.to_utf8_str(notify['States']))
+        self.assertEqual('Already initialized!', NeoData.to_utf8_str(notify['States']))
 
     @not_panic_exception
     def test_get_total_supply(self):

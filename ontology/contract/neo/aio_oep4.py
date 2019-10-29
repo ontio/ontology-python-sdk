@@ -18,10 +18,11 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
-from ontology.contract.neo.oep4 import Oep4
+from ontology.utils.neo import NeoData
+from ontology.utils.event import Event
 from ontology.common.address import Address
+from ontology.contract.neo.oep4 import Oep4
 from ontology.account.account import Account
-from ontology.utils.neo import Data, Event
 from ontology.exception.exception import SDKException
 
 
@@ -35,7 +36,7 @@ class AioOep4(Oep4):
         """
         tx = self.new_name_tx()
         response = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_utf8_str(response.get('Result', ''))
+        return NeoData.to_utf8_str(response.get('Result', ''))
 
     async def symbol(self):
         """
@@ -43,7 +44,7 @@ class AioOep4(Oep4):
         """
         tx = self.new_symbol_tx()
         response = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_utf8_str(response.get('Result', ''))
+        return NeoData.to_utf8_str(response.get('Result', ''))
 
     async def decimals(self):
         """
@@ -52,7 +53,7 @@ class AioOep4(Oep4):
         """
         tx = self.new_decimals_tx()
         response = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
-        return Data.to_int(response.get('Result', ''))
+        return NeoData.to_int(response.get('Result', ''))
 
     async def total_supply(self) -> int:
         """
@@ -61,7 +62,7 @@ class AioOep4(Oep4):
         tx = self.new_total_supply_tx()
         response = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
         try:
-            total_supply = Data.to_int(response['Result'])
+            total_supply = NeoData.to_int(response['Result'])
         except SDKException:
             total_supply = 0
         return total_supply
@@ -81,7 +82,7 @@ class AioOep4(Oep4):
         tx = self.new_balance_of_tx(owner)
         result = await self._sdk.default_aio_network.send_raw_transaction_pre_exec(tx)
         try:
-            balance = Data.to_int(result['Result'])
+            balance = NeoData.to_int(result['Result'])
         except SDKException:
             balance = 0
         return balance
@@ -127,7 +128,7 @@ class AioOep4(Oep4):
     async def query_transfer_event(self, tx_hash: str):
         event = await self._sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self._contract_address)
-        notify = Data.parse_addr_addr_int_notify(notify)
+        notify = NeoData.parse_addr_addr_int_notify(notify)
         return notify
 
     async def query_multi_transfer_event(self, tx_hash: str) -> list:
@@ -137,7 +138,7 @@ class AioOep4(Oep4):
     async def query_approve_event(self, tx_hash: str):
         event = await self._sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self._contract_address)
-        notify = Data.parse_addr_addr_int_notify(notify)
+        notify = NeoData.parse_addr_addr_int_notify(notify)
         return notify
 
     async def allowance(self, owner: Union[str, bytes, Address], spender: Union[str, bytes, Address]) -> int:
@@ -162,5 +163,5 @@ class AioOep4(Oep4):
     async def query_transfer_from_event(self, tx_hash: str):
         event = await self._sdk.default_aio_network.get_contract_event_by_tx_hash(tx_hash)
         notify = Event.get_notify_by_contract_address(event, self._contract_address)
-        notify = Data.parse_addr_addr_int_notify(notify)
+        notify = NeoData.parse_addr_addr_int_notify(notify)
         return notify
