@@ -60,7 +60,7 @@ class TestWasmVm(unittest.TestCase):
     def test_address_from_avm_code(self):
         for index, file in enumerate(self.wasm_file_list):
             code = self.get_contract_code(file)
-            contract_address = Address.from_avm_code(code)
+            contract_address = sdk.wasm_vm.address_from_wasm_code(code)
             self.assertEqual(self.wasm_contract_address[index], contract_address.hex())
 
     def test_deploy_contract(self):

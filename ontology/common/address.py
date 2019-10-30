@@ -64,7 +64,7 @@ class Address(object):
         return cls.__from_byte_script(ProgramBuilder.program_from_multi_pubkey(m, pub_keys))
 
     @classmethod
-    def from_avm_code(cls, code: str):
+    def from_hex_contract_code(cls, code: str):
         """
         generate contract address from avm bytecode.
         """

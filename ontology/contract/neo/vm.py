@@ -48,7 +48,7 @@ class NeoVm(object):
 
     @staticmethod
     def address_from_avm_code(avm_code: str) -> Address:
-        return Address.from_avm_code(avm_code)
+        return Address.from_hex_contract_code(avm_code)
 
     @staticmethod
     def make_deploy_transaction(code: str,
