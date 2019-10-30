@@ -44,8 +44,8 @@ class WasmVm(object):
             return content.hex()
 
     @staticmethod
-    def address_from_wasm_code(avm_code: str) -> Address:
-        return Address.from_hex_contract_code(avm_code)
+    def address_from_wasm_code(wasm_code: str) -> Address:
+        return Address.from_hex_contract_code(wasm_code)
 
     @staticmethod
     def make_deploy_transaction(code: str,

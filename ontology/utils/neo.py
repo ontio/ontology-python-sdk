@@ -61,6 +61,8 @@ class NeoData(object):
 
     @staticmethod
     def to_int(hex_str: str) -> int:
+        if len(hex_str) == 0:
+            return 0
         try:
             array = bytearray.fromhex(hex_str)
         except ValueError as e:
