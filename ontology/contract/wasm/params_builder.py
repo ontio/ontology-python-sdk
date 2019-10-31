@@ -15,6 +15,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Union
 
 from ontology.common.address import Address
 from ontology.exception.error_code import ErrorCode
@@ -31,8 +32,8 @@ WASM_FALSE = b'\x00'
 
 
 class WasmParamsBuilder(BaseParamsBuilder):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def push_vm_param(self, param):
         if isinstance(param, str):
@@ -82,12 +83,28 @@ class WasmParamsBuilder(BaseParamsBuilder):
             self.write_bytes(b'\xFF')
             self.write_bytes(value.to_bytes(length=8, byteorder='little', signed=False))
 
+    def read_var_uint(self):
+        tag = int.from_bytes(self.read_byte(), byteorder='little', signed=False)
+        if tag < 0xFD:
+            return tag
+        if tag == 0xFD:
+            return int.from_bytes(self.read_bytes(2), byteorder='little', signed=False)
+        if tag == 0xFE:
+            return int.from_bytes(self.read_bytes(4), byteorder='little', signed=False)
+        if tag == 0xFF:
+            return int.from_bytes(self.read_bytes(8), byteorder='little', signed=False)
+        raise SDKException(ErrorCode.other_error('invalid wasm var uint data'))
+
     def push_int(self, value: int):
         if not isinstance(value, int):
             raise SDKException(ErrorCode.other_error('invalid data'))
         if value < WASM_INT128_MIN or value > WASM_INT128_MAX:
             raise SDKException(ErrorCode.other_error("out of range"))
         self.write_bytes(value.to_bytes(length=WASM_INT128_SIZE, byteorder='little', signed=True))
+
+    def pop_str(self):
+        str_len = self.read_var_uint()
+        return self.read_bytes(str_len).decode('utf-8')
 
     def push_str(self, value: str):
         if not isinstance(value, str):

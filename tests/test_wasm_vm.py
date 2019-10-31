@@ -158,7 +158,7 @@ class TestWasmVm(unittest.TestCase):
         tx.sign_transaction(acct3)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
-        sleep(8)
+        sleep(15)
         result = self.read_storage_in_test_contract(key)
         self.assertEqual('', result)
 

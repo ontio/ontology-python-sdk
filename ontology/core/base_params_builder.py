@@ -10,11 +10,22 @@ from ontology.io.memory_stream import MemoryStream
 
 
 class BaseParamsBuilder(object):
-    def __init__(self):
-        self.ms = MemoryStream()
+    def __init__(self, *args, **kwargs):
+        self.ms = MemoryStream(*args, **kwargs)
+
+    def set_buffer(self, value: Union[bytes, str]):
+        if isinstance(value, str):
+            value = bytes.fromhex(value)
+        self.ms = MemoryStream(value)
 
     def clear_up(self):
         self.ms.clean_up()
+
+    def read_byte(self) -> bytes:
+        return self.ms.read(1)
+
+    def read_bytes(self, size: int) -> bytes:
+        return self.ms.read(size)
 
     def write_bytes(self, value: bytearray or bytes or str or int):
         if isinstance(value, bytearray) or isinstance(value, bytes):

@@ -53,7 +53,7 @@ class TestWasmVm(unittest.TestCase):
             self.assertEqual(wasm_address_list[index], self.builder.to_bytes().hex())
             self.builder.clear_up()
 
-    def test_push_str(self):
+    def test_push_pop_str(self):
         str_list = [
             'Hello, world!',
             'Ontology',
@@ -71,6 +71,9 @@ class TestWasmVm(unittest.TestCase):
             self.builder.push_str(value)
             self.assertEqual(wasm_str_list[index], self.builder.to_bytes().hex())
             self.builder.clear_up()
+        for index, wasm_str in enumerate(wasm_str_list):
+            self.builder.set_buffer(wasm_str)
+            self.assertEqual(str_list[index], self.builder.pop_str())
 
     def test_push_bool(self):
         bool_list = [True, False]
@@ -85,3 +88,14 @@ class TestWasmVm(unittest.TestCase):
         wasm_list = '030d48656c6c6f2c20776f726c64216400000000000000000000000000000001'
         self.builder.push_list(py_list)
         self.assertEqual(wasm_list, self.builder.to_bytes().hex())
+
+    def test_read_var_int(self):
+        wasm_hex_uint = ['00', '01', 'fdfe00', 'fe00000100', 'fe01000100',
+                         'feffffffff', 'ff0000000001000000', 'ffffffffffffffff0f', 'ffffffffffffffffff',
+                         'ffffffffffffffffffff', 'ffffffffffffffffffffffff']
+        int_data = [0, 1, 254, 65536, 65537,
+                    4294967295, 4294967296, 1152921504606846975, 18446744073709551615,
+                    18446744073709551615, 18446744073709551615]
+        for index, hex_uint in enumerate(wasm_hex_uint):
+            self.builder.set_buffer(hex_uint)
+            self.assertEqual(int_data[index], self.builder.read_var_uint())
