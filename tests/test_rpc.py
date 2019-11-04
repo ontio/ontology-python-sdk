@@ -127,7 +127,7 @@ class TestRpcClient(unittest.TestCase):
     @not_panic_exception
     def test_get_unbound_ong(self):
         for address in self.address_list:
-            self.assertEqual(sdk.rpc.get_unbound_ong(address), sdk.native_vm.ong().unbound(address))
+            self.assertGreaterEqual(sdk.rpc.get_unbound_ong(address), 0)
 
     @not_panic_exception
     def test_get_grant_ong(self):

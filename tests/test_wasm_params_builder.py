@@ -99,3 +99,27 @@ class TestWasmVm(unittest.TestCase):
         for index, hex_uint in enumerate(wasm_hex_uint):
             self.builder.set_buffer(hex_uint)
             self.assertEqual(int_data[index], self.builder.read_var_uint())
+
+    def test_pop_str_struct(self):
+        hex_wasm_str = '01606438646337313735616137333633323165343639643539623663303661396531666462356432373735633' \
+                       '83261396638333364333463643361343033356132303166653964633762333961653832643963356339316262' \
+                       '663564313634366364042e6a70672032303165393337366361616131366561393832623561333165626130663' \
+                       '36634823034383436383165383932333630646334373030363036323733626631366236613063343133393864' \
+                       '65326532643936306633343030373936313061656538383536363736623231323233313966613037323665633' \
+                       '16666323735396664336339313232646438333461666531376535316164666665626638326162633037656363'
+        target_struct = [
+            [
+                'd8dc7175aa736321e469d59b6c06a9e1fdb5d2775c82a9f833d34cd3a4035a201fe9dc7b39ae82d9c5c91bbf5d1646cd',
+                '.jpg',
+                '201e9376caaa16ea982b5a31eba0f3f4',
+                '0484681e892360dc4700606273bf16b6a0c41398de2e2d960f340079610aee885'
+                '6676b2122319fa0726ec1ff2759fd3c9122dd834afe17e51adffebf82abc07ecc'
+            ]
+        ]
+        self.builder.set_buffer(hex_wasm_str)
+        item_len = self.builder.read_var_uint()
+        for index in range(item_len):
+            self.assertEqual(target_struct[index][0], self.builder.pop_str())
+            self.assertEqual(target_struct[index][1], self.builder.pop_str())
+            self.assertEqual(target_struct[index][2], self.builder.pop_str())
+            self.assertEqual(target_struct[index][3], self.builder.pop_str())

@@ -227,7 +227,7 @@ class TestWebsocketClient(unittest.TestCase):
     async def test_get_unbound_ong(self):
         try:
             for address in self.address_list:
-                self.assertEqual(await sdk.websocket.get_unbound_ong(address), sdk.native_vm.ong().unbound(address))
+                self.assertGreaterEqual(await sdk.websocket.get_unbound_ong(address), 0)
         finally:
             await sdk.websocket.close_connect()
 

@@ -137,7 +137,7 @@ class TestAioRpc(unittest.TestCase):
     @Ontology.runner
     async def test_get_unbound_ong(self):
         for address in self.address_list:
-            self.assertEqual(await sdk.aio_rpc.get_unbound_ong(address), sdk.native_vm.ong().unbound(address))
+            self.assertGreaterEqual(await sdk.aio_rpc.get_unbound_ong(address), 0)
 
     @not_panic_exception
     @Ontology.runner

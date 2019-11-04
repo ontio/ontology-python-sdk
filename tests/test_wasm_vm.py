@@ -124,22 +124,22 @@ class TestWasmVm(unittest.TestCase):
         self.assertEqual(self.basic_test_case_contract_address, notify.get('ContractAddress'))
         self.assertEqual('hello', notify.get('States')[0])
 
-    def read_storage_in_test_contract(self, key) -> str:
+    def test_read_storage(self):
         func = WasmInvokeFunction('storage_read')
-        func.set_params_value(key)
-        tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct2.get_address(),
+        func.set_params_value('key')
+        tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
                                                  self.gas_price, self.gas_limit)
         target_payload = '5daf0ec53b21abfab6459c7ba7f760c376e18ebf110c73746f726167655f72656164036b6579'
         self.assertEqual(target_payload, tx.payload.hex())
-        tx.sign_transaction(acct2)
+        tx.sign_transaction(acct3)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertTrue(isinstance(result, dict))
-        return result.get('Result', '')
+        result = result.get('Result', '')
+        self.assertTrue(isinstance(result, str))
 
-    def test_write_read_delete_storage_transaction(self):
-        key = 'key'
+    def test_write_storage_transaction(self):
         func = WasmInvokeFunction('storage_write')
-        func.set_params_value(key, 'value')
+        func.set_params_value('key', 'value')
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct1.get_address(),
                                                  self.gas_price, self.gas_limit)
         target_payload = '5daf0ec53b21abfab6459c7ba7f760c376e18ebf180d73746f726167655f7772697465036b65790576616c7565'
@@ -147,20 +147,6 @@ class TestWasmVm(unittest.TestCase):
         tx.sign_transaction(acct1)
         tx_hash = sdk.rpc.send_raw_transaction(tx)
         self.assertEqual(64, len(tx_hash))
-        sleep(15)
-        result = self.read_storage_in_test_contract(key)
-        self.assertEqual('0576616c7565', result)
-        func = WasmInvokeFunction('storage_delete')
-        func.set_params_value('key')
-        tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
-                                                 self.gas_price,
-                                                 self.gas_limit)
-        tx.sign_transaction(acct3)
-        tx_hash = sdk.rpc.send_raw_transaction(tx)
-        self.assertEqual(64, len(tx_hash))
-        sleep(15)
-        result = self.read_storage_in_test_contract(key)
-        self.assertEqual('', result)
 
     def test_balance_of_transaction(self):
         func = WasmInvokeFunction('balanceOf')
