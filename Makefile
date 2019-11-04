@@ -33,8 +33,7 @@ ci-coverage:
 	python-codacy-coverage -r coverage.xml
 
 build:
-	pipenv shell
-	pipenv install wheel --dev --pypi-mirror https://mirrors.aliyun.com/pypi/simple
+	python3 -m pip install -U twine wheel setuptools -i https://mirrors.aliyun.com/pypi/simple
 	python3 setup.py bdist_wheel --python-tag py3
 
 ci-build:

@@ -16,7 +16,7 @@ Official Python implementation of the Ontology SDK.
 Installation requires a `Python 3.6` or later environment.
 
 ```bash
-pip3 install ontology-python-sdk
+pyhton3 -m pip install ontology-python-sdk
 ```
 
 ## Documentation
