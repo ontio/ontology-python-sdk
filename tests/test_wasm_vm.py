@@ -86,6 +86,7 @@ class TestWasmVm(unittest.TestCase):
         func.set_params_value(-2, 3)
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
                                                  self.gas_price, self.gas_limit)
+        print(tx.payload.hex())
         tx.sign_transaction(acct3)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result', '')
         self.assertEqual('01000000000000000000000000000000', result)
@@ -98,6 +99,7 @@ class TestWasmVm(unittest.TestCase):
                          '000000000000000000000000002000000000000000000000000000000'
         self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct3)
+        print(tx.serialize().hex())
         result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result', '')
         self.assertEqual('03000000000000000000000000000000', result)
         self.assertEqual(3, WasmData.to_int(result))

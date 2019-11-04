@@ -44,10 +44,22 @@ class TestWasmVm(unittest.TestCase):
         self.assertRaises(SDKException, self.builder.push_int, WASM_INT128_MIN - 1)
 
     def test_push_address(self):
-        b58_address_list = ['AS3SCXw8GKTEeXpdwVw7EcC4rqSebFYpfb', 'AJkkLbouowk6teTaxz1F2DYKfJh24PVk3r',
-                            'Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT', 'AK98G45DhmPXg4TFPG1KjftvkEaHbU8SHM']
-        wasm_address_list = ['70a2ababdae0a9d1f9fc7296df3c6d343b772cf7', '20b1dc499cdf56ba70a574a1e17ac986d1f06ec2',
-                             'e98f4998d837fcdd44a50561f7f32140c7c6c260', '24ed4f965d3a5a76f5d0e87633c0b76941fc8827']
+        b58_address_list = [
+            'AS7MjVEicEsJ4zjEfm2LoKoYoFsmapD7rT',
+            'AFmseVrdL9f9oyCzZefL9tG6UbviEH9ugK',
+            'AS3SCXw8GKTEeXpdwVw7EcC4rqSebFYpfb',
+            'AJkkLbouowk6teTaxz1F2DYKfJh24PVk3r',
+            'Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT',
+            'AK98G45DhmPXg4TFPG1KjftvkEaHbU8SHM'
+        ]
+        wasm_address_list = [
+            '71609b2c2f7b9447b089ad1da31586f42ca9eb10',
+            '0000000000000000000000000000000000000007',
+            '70a2ababdae0a9d1f9fc7296df3c6d343b772cf7',
+            '20b1dc499cdf56ba70a574a1e17ac986d1f06ec2',
+            'e98f4998d837fcdd44a50561f7f32140c7c6c260',
+            '24ed4f965d3a5a76f5d0e87633c0b76941fc8827'
+        ]
         for index, b58_address in enumerate(b58_address_list):
             self.builder.push_address(Address.b58decode(b58_address))
             self.assertEqual(wasm_address_list[index], self.builder.to_bytes().hex())
@@ -89,16 +101,36 @@ class TestWasmVm(unittest.TestCase):
         self.builder.push_list(py_list)
         self.assertEqual(wasm_list, self.builder.to_bytes().hex())
 
-    def test_read_var_int(self):
-        wasm_hex_uint = ['00', '01', 'fdfe00', 'fe00000100', 'fe01000100',
-                         'feffffffff', 'ff0000000001000000', 'ffffffffffffffff0f', 'ffffffffffffffffff',
-                         'ffffffffffffffffffff', 'ffffffffffffffffffffffff']
-        int_data = [0, 1, 254, 65536, 65537,
-                    4294967295, 4294967296, 1152921504606846975, 18446744073709551615,
-                    18446744073709551615, 18446744073709551615]
+    def test_read_var_uint(self):
+        wasm_hex_uint = [
+            '00',
+            '01',
+            'fdfe00',
+            'fe00000100',
+            'fe01000100',
+            'feffffffff',
+            'ff0000000001000000',
+            'ffffffffffffffff0f',
+            'ffffffffffffffffff',
+        ]
+        int_data = [
+            0,
+            1,
+            254,
+            65536,
+            65537,
+            4294967295,
+            4294967296,
+            1152921504606846975,
+            18446744073709551615
+        ]
         for index, hex_uint in enumerate(wasm_hex_uint):
+            self.builder.write_var_uint(int_data[index])
+            self.assertEqual(wasm_hex_uint[index], self.builder.to_bytes().hex())
+            self.builder.clear_up()
             self.builder.set_buffer(hex_uint)
             self.assertEqual(int_data[index], self.builder.read_var_uint())
+            self.builder.clear_up()
 
     def test_pop_str_struct(self):
         hex_wasm_str = '01606438646337313735616137333633323165343639643539623663303661396531666462356432373735633' \

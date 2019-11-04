@@ -73,10 +73,10 @@ class WasmParamsBuilder(BaseParamsBuilder):
             raise SDKException(ErrorCode.other_error('invalid data'))
         elif value < 0xFD:
             self.write_bytes(value.to_bytes(length=1, byteorder='little', signed=False))
-        elif value < 0xFFFF:
+        elif value <= 0xFFFF:
             self.write_bytes(b'\xFD')
             self.write_bytes(value.to_bytes(length=2, byteorder='little', signed=False))
-        elif value < 0xFFFFFFFF:
+        elif value <= 0xFFFFFFFF:
             self.write_bytes(b'\xFE')
             self.write_bytes(value.to_bytes(length=4, byteorder='little', signed=False))
         else:
