@@ -125,6 +125,7 @@ class TestAioOnt(unittest.TestCase):
                                                         self.gas_limit)
         self.assertEqual(64, len(tx_hash))
 
+    @not_panic_exception
     @Ontology.runner
     async def test_transfer_from(self):
         sdk.rpc.connect_to_test_net()

@@ -15,12 +15,11 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import Union
 
 from ontology.common.address import Address
+from ontology.core.base_params_builder import BaseParamsBuilder
 from ontology.exception.error_code import ErrorCode
 from ontology.exception.exception import SDKException
-from ontology.core.base_params_builder import BaseParamsBuilder
 
 WASM_INT128_SIZE = 16
 WASM_INT128_FF = b'\xff' * WASM_INT128_SIZE

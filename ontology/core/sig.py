@@ -15,18 +15,19 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import List
 
-from ontology.utils.utils import bytes_reader
 from ontology.core.program import ProgramBuilder
+from ontology.exception.error_code import ErrorCode
+from ontology.exception.exception import SDKException
 from ontology.io.binary_reader import BinaryReader
 from ontology.io.binary_writer import BinaryWriter
 from ontology.io.memory_stream import StreamManager
-from ontology.exception.error_code import ErrorCode
-from ontology.exception.exception import SDKException
+from ontology.utils.utils import bytes_reader
 
 
 class Sig(object):
-    def __init__(self, public_keys=None, m: int = 0, sig_data: list = None):
+    def __init__(self, public_keys: List[bytes] = None, m: int = 0, sig_data: List[bytes] = None):
         self.public_keys = public_keys  # a list to save public keys
         self.m = m
         if sig_data is None:

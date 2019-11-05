@@ -27,4 +27,4 @@ class TestWasmVm(unittest.TestCase):
             '5565758595a6162636465666768696a6b6c6d6e6f707172737475767778797a'
         ]
         for index, wasm_str in enumerate(wasm_str_list):
-            self.assertEqual(str_list[index], WasmData.to_utf8(wasm_str))
+            self.assertEqual(str_list[index], WasmData.detect_to_utf8(wasm_str))

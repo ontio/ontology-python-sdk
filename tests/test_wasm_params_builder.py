@@ -30,6 +30,14 @@ class TestWasmVm(unittest.TestCase):
     def tearDown(self):
         self.builder.clear_up()
 
+    def test_push_bool(self):
+        py_bool_list = [True, False]
+        wasm_bool_list = ['01', '00']
+        for index, value in enumerate(py_bool_list):
+            self.builder.push_bool(value)
+            self.assertEqual(wasm_bool_list[index], self.builder.to_bytes().hex())
+            self.builder.clear_up()
+
     def test_push_int(self):
         py_int_list = [-2 ** 127, -2, -1, 0, 1, 2, 2 ** 127 - 1]
         wasm_int_list = ['00000000000000000000000000000080', 'feffffffffffffffffffffffffffffff',
@@ -86,14 +94,6 @@ class TestWasmVm(unittest.TestCase):
         for index, wasm_str in enumerate(wasm_str_list):
             self.builder.set_buffer(wasm_str)
             self.assertEqual(str_list[index], self.builder.pop_str())
-
-    def test_push_bool(self):
-        bool_list = [True, False]
-        wasm_bool_list = ['01', '00']
-        for index, value in enumerate(bool_list):
-            self.builder.push_bool(value)
-            self.assertEqual(wasm_bool_list[index], self.builder.to_bytes().hex())
-            self.builder.clear_up()
 
     def test_push_list(self):
         py_list = ['Hello, world!', 100, True]

@@ -18,6 +18,7 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 
+from ontology.common.address import Address
 from ontology.contract.wasm.params_builder import WasmParamsBuilder
 
 
@@ -29,8 +30,20 @@ class WasmData(object):
         return int.from_bytes(value, byteorder='little', signed=True)
 
     @staticmethod
-    def to_utf8(value: Union[str, bytes]):
+    def detect_to_utf8(value: Union[str, bytes]):
         if isinstance(value, str):
             value = bytes.fromhex(value)
         builder = WasmParamsBuilder(value)
         return builder.pop_str()
+
+    @staticmethod
+    def to_utf8(value: Union[str, bytes]):
+        if isinstance(value, str):
+            value = bytes.fromhex(value)
+        return value.decode('utf-8')
+
+    @staticmethod
+    def to_b58_address(value: Union[str, bytes]) -> str:
+        if isinstance(value, str):
+            value = bytes.fromhex(value)
+        return Address(value).b58encode()

@@ -164,14 +164,15 @@ class Transaction(object):
             tx.sig_list.append(Sig.deserialize(reader))
         return tx
 
-    def sign_transaction(self, signer: Account):
+    def sign_transaction(self, *signers: Account):
         """
         This interface is used to sign the transaction.
         """
         tx_hash = self.hash256()
-        sig_data = signer.generate_signature(tx_hash)
-        sig = [Sig([signer.get_public_key_bytes()], 1, [sig_data])]
-        self.sig_list = sig
+        for signer in signers:
+            sig_data = signer.generate_signature(tx_hash)
+            sig = Sig([signer.get_public_key_bytes()], 1, [sig_data])
+            self.sig_list.append(sig)
 
     def add_sign_transaction(self, signer: Account):
         """

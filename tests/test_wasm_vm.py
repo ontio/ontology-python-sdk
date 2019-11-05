@@ -19,12 +19,12 @@ along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
 from os import path
-from time import sleep
 
-from ontology.vm.vm_type import VmType
 from ontology.common.address import Address
-from ontology.utils.wasm import WasmData
 from ontology.contract.wasm.invoke_function import WasmInvokeFunction
+from ontology.utils.event import Event
+from ontology.utils.wasm import WasmData
+from ontology.vm.vm_type import VmType
 
 from tests import sdk, acct1, acct2, acct3, acct4
 
@@ -86,7 +86,9 @@ class TestWasmVm(unittest.TestCase):
         func.set_params_value(-2, 3)
         tx = sdk.wasm_vm.make_invoke_transaction(self.basic_test_case_contract_address, func, acct3.get_address(),
                                                  self.gas_price, self.gas_limit)
-        print(tx.payload.hex())
+        target_payload = '5daf0ec53b21abfab6459c7ba7f760c376e18ebf2403616464fefffff' \
+                         'fffffffffffffffffffffffff03000000000000000000000000000000'
+        self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct3)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result', '')
         self.assertEqual('01000000000000000000000000000000', result)
@@ -99,7 +101,6 @@ class TestWasmVm(unittest.TestCase):
                          '000000000000000000000000002000000000000000000000000000000'
         self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct3)
-        print(tx.serialize().hex())
         result = sdk.rpc.send_raw_transaction_pre_exec(tx).get('Result', '')
         self.assertEqual('03000000000000000000000000000000', result)
         self.assertEqual(3, WasmData.to_int(result))
@@ -160,7 +161,7 @@ class TestWasmVm(unittest.TestCase):
         self.assertEqual(target_payload, tx.payload.hex())
         tx.sign_transaction(acct4)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
-        self.assertEqual(100_000_000_000, WasmData.to_int(result.get('Result')))
+        self.assertGreaterEqual(WasmData.to_int(result.get('Result')), 0)
 
     def test_total_supply_tx(self):
         func = WasmInvokeFunction('totalSupply')
@@ -171,3 +172,25 @@ class TestWasmVm(unittest.TestCase):
         tx.sign_transaction(acct1)
         result = sdk.rpc.send_raw_transaction_pre_exec(tx)
         self.assertEqual(100_000_000_000, WasmData.to_int(result.get('Result')))
+
+    def test_transfer_tx(self):
+        amount = 100
+        func = WasmInvokeFunction('transfer')
+        func.set_params_value(acct1.get_address(), Address.b58decode('AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve'), amount)
+        tx = sdk.wasm_vm.make_invoke_transaction(self.oep4_contract_address, func, acct2.get_address(), self.gas_price,
+                                                 self.gas_limit)
+        target_payload = '0faeff23255536928b308e5caa38bc2dc14f30c341087472616e7366657246b1a18af6b7c9f8a4602f9f73' \
+                         'eeb3030f0c29b7d2c124dd088190f709b684e0bc676d70c41b377664000000000000000000000000000000'
+        self.assertEqual(target_payload, tx.payload.hex())
+        tx.sign_transaction(acct1, acct2)
+        result = sdk.rpc.send_raw_transaction_pre_exec(tx)
+        self.assertEqual('01', result.get('Result'))
+        self.assertEqual(1, result.get('State'))
+        notify_list = Event.get_event_from_event_list_by_contract_address(result.get('Notify'),
+                                                                          self.oep4_contract_address)
+        self.assertEqual(self.oep4_contract_address, notify_list[0].get('ContractAddress'))
+        states = notify_list[1].get('States')
+        self.assertEqual('transfer', WasmData.to_utf8(states[0]))
+        self.assertEqual(acct1.get_address().b58encode(), WasmData.to_b58_address(states[1]))
+        self.assertEqual('AazEvfQPcQ2GEFFPLF1ZLwQ7K5jDn81hve', WasmData.to_b58_address(states[2]))
+        self.assertEqual(amount, WasmData.to_int(states[3]))
